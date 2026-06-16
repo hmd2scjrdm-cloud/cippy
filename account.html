@@ -117,8 +117,8 @@
 <a class="font-label-md text-label-md text-primary border-b-2 border-primary pb-1" href="account.html">Community</a>
 </div>
 <div class="flex-1 flex justify-end gap-6 items-center">
-<button class="material-symbols-outlined text-primary hover:opacity-70 transition-opacity">shopping_bag</button>
-<button class="material-symbols-outlined text-primary hover:opacity-70 transition-opacity">person</button>
+<button class="material-symbols-outlined text-primary hover:opacity-70 transition-opacity" onclick="location.href='cart.html'">shopping_bag</button>
+<button class="font-label-sm text-label-sm font-semibold px-2 hover:text-primary transition-colors" data-lang-toggle="" onclick="toggleCippyLang()">中文</button><button class="material-symbols-outlined text-primary hover:opacity-70 transition-opacity" onclick="location.href='account.html'">person</button>
 </div>
 </nav>
 </header>
@@ -357,4 +357,5 @@
             observer.observe(el);
         });
     </script>
+<script src="i18n.js"></script>
 </body></html>

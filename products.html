@@ -57,8 +57,8 @@
 </div>
 <div class="flex items-center gap-md">
 <button class="material-symbols-outlined text-on-surface hover:opacity-70 transition-opacity">search</button>
-<button class="material-symbols-outlined text-on-surface hover:opacity-70 transition-opacity">shopping_bag</button>
-<button class="material-symbols-outlined text-on-surface hover:opacity-70 transition-opacity">person</button>
+<button class="material-symbols-outlined text-on-surface hover:opacity-70 transition-opacity" onclick="location.href='cart.html'">shopping_bag</button>
+<button class="font-label-sm text-label-sm font-semibold px-2 hover:text-primary transition-colors" data-lang-toggle="" onclick="toggleCippyLang()">中文</button><button class="material-symbols-outlined text-on-surface hover:opacity-70 transition-opacity" onclick="location.href='account.html'">person</button>
 </div>
 </div></nav>
 <main class="pt-32 pb-xl px-6 md:px-margin-desktop max-w-[1440px] mx-auto">
@@ -278,4 +278,5 @@
             filterContainer.scrollLeft = scrollLeft - walk;
         });
     </script>
+<script src="i18n.js"></script>
 </body></html>
