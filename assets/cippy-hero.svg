@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Cippy boutique hero</title>
+  <desc id="desc">Soft Korean boutique fashion scene with blush, cream, and charcoal styling.</desc>
+  <defs>
+    <linearGradient id="wall" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#fff8f7"/>
+      <stop offset=".55" stop-color="#f3e5e5"/>
+      <stop offset="1" stop-color="#d9c2bf"/>
+    </linearGradient>
+    <linearGradient id="skirt" x1="0" x2="1">
+      <stop stop-color="#f5d8d8"/>
+      <stop offset="1" stop-color="#cf9ca3"/>
+    </linearGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+  </defs>
+  <rect width="1600" height="900" fill="url(#wall)"/>
+  <circle cx="260" cy="260" r="170" fill="#fff" opacity=".55" filter="url(#soft)"/>
+  <circle cx="1310" cy="190" r="210" fill="#ffd9dd" opacity=".36" filter="url(#soft)"/>
+  <rect x="760" y="160" width="520" height="16" rx="8" fill="#947d7d"/>
+  <rect x="1004" y="160" width="14" height="560" rx="7" fill="#947d7d"/>
+  <rect x="732" y="160" width="14" height="560" rx="7" fill="#947d7d"/>
+  <path d="M850 210c56-24 109-23 159 0l-18 245H868z" fill="#fffdf9"/>
+  <path d="M1065 210c70-28 136-20 192 20l-42 255H1098z" fill="#3f3b3b"/>
+  <path d="M1100 465h118l48 285H1047z" fill="#8eb0c7"/>
+  <path d="M864 445h128l60 280H792z" fill="url(#skirt)"/>
+  <ellipse cx="930" cy="735" rx="160" ry="24" fill="#bba7a7" opacity=".45"/>
+  <path d="M1170 215c140-20 258 65 292 212 38 165-18 322-116 388-122-64-167-233-128-394 17-68 1-127-48-206z" fill="#fff7ef"/>
+  <path d="M1245 418c26 12 69 16 115 2l49 327c-78 28-151 27-219-1z" fill="#efc8c9"/>
+  <path d="M1325 176c80 82 102 182 64 300" fill="none" stroke="#4f3f40" stroke-width="34" stroke-linecap="round"/>
+  <rect x="130" y="585" width="350" height="26" rx="13" fill="#fff" opacity=".8"/>
+  <rect x="175" y="610" width="260" height="38" rx="19" fill="#d7c1c3"/>
+  <rect x="216" y="520" width="120" height="80" rx="24" fill="#e9c3c4"/>
+  <path d="M242 520c10-38 68-38 78 0" fill="none" stroke="#b58d8e" stroke-width="10"/>
+</svg>
