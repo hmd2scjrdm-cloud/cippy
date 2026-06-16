@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Checkout | cippy</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&amp;family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-effect {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#fbf2ed",
+                        "outline-variant": "#e8bcbb",
+                        "primary-fixed": "#ffdad8",
+                        "on-tertiary": "#ffffff",
+                        "secondary": "#76574b",
+                        "on-background": "#1e1b18",
+                        "on-secondary": "#ffffff",
+                        "primary": "#bb0028",
+                        "outline": "#926e6d",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed": "#2c160c",
+                        "surface-container-highest": "#e9e1dc",
+                        "surface-variant": "#e9e1dc",
+                        "on-primary-fixed-variant": "#92001d",
+                        "surface-tint": "#bf0029",
+                        "surface-container": "#f5ece7",
+                        "secondary-container": "#fed4c3",
+                        "inverse-surface": "#34302c",
+                        "tertiary-container": "#7a736b",
+                        "on-surface": "#1e1b18",
+                        "inverse-on-surface": "#f8efea",
+                        "inverse-primary": "#ffb3b1",
+                        "surface-container-high": "#efe6e2",
+                        "on-surface-variant": "#5e3f3e",
+                        "on-tertiary-container": "#fffbff",
+                        "on-tertiary-fixed-variant": "#4c463e",
+                        "primary-fixed-dim": "#ffb3b1",
+                        "secondary-fixed": "#ffdbcd",
+                        "on-secondary-container": "#795a4d",
+                        "on-primary-fixed": "#410007",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed-variant": "#5c4034",
+                        "surface-bright": "#fff8f5",
+                        "on-primary-container": "#fffbff",
+                        "primary-container": "#e80535",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed": "#ebe1d6",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "surface-dim": "#e1d8d4",
+                        "secondary-fixed-dim": "#e6beae",
+                        "on-tertiary-fixed": "#1f1b14",
+                        "background": "#fff8f5",
+                        "tertiary": "#615b53",
+                        "on-primary": "#ffffff",
+                        "surface": "#fff8f5",
+                        "tertiary-fixed-dim": "#cec5bb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "80px",
+                        "xs": "4px",
+                        "md": "24px",
+                        "margin-mobile": "20px",
+                        "lg": "48px",
+                        "xl": "64px",
+                        "sm": "12px",
+                        "base": "8px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Be Vietnam Pro"],
+                        "headline-lg": ["Playfair Display"],
+                        "body-sm": ["Be Vietnam Pro"],
+                        "headline-md": ["Playfair Display"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "display-lg": ["Playfair Display"],
+                        "label-sm": ["Be Vietnam Pro"],
+                        "headline-lg-mobile": ["Playfair Display"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-sm": ["12px", {"lineHeight": "14px", "fontWeight": "500"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "700"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md selection:bg-primary-fixed">
+<nav class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md shadow-sm">
+<div class="flex justify-between items-center px-margin-desktop py-4 w-full max-w-[1440px] mx-auto">
+<div class="flex items-center gap-base">
+<a class="font-display-lg text-display-lg text-primary tracking-tighter" href="#">cippy</a>
+</div>
+<div class="hidden md:flex gap-lg items-center">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-opacity duration-300" href="index.html">New In</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-opacity duration-300" href="products.html">Clothing</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-opacity duration-300" href="products.html">Accessories</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-opacity duration-300" href="products.html">Sale</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-opacity duration-300" href="account.html">Community</a>
+</div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-primary hover:opacity-70 transition-opacity">shopping_bag</button>
+<button class="material-symbols-outlined text-primary hover:opacity-70 transition-opacity">person</button>
+</div>
+</div>
+</nav>
+<main class="pt-32 pb-xl px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto min-h-screen">
+<header class="mb-xl text-center md:text-left">
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-xs">Your Shopping Bag</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Review your selections and proceed to secure checkout.</p>
+</header>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-xl">
+<!-- Left Column: Cart Items & Gift Note -->
+<div class="lg:col-span-8 space-y-lg">
+<section class="bg-white rounded-xl p-md md:p-lg shadow-[0_20px_40px_rgba(118,87,75,0.05)] border border-surface-container">
+<div class="flex flex-col gap-lg">
+<!-- Free Shipping Progress -->
+<div class="space-y-base">
+<div class="flex justify-between font-label-md text-label-md">
+<span class="text-primary">Almost there!</span>
+<span class="text-on-surface-variant">MYR 50.00 to free shipping</span>
+</div>
+<div class="h-2 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary transition-all duration-1000 ease-out" style="width: 75%;"></div>
+</div>
+<p class="text-xs font-body-sm text-outline flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">info</span>
+                                Free standard shipping on orders over MYR 200.00
+                            </p>
+</div>
+<!-- Cart Items -->
+<div class="divide-y divide-surface-container">
+<!-- Item 1 -->
+<div class="py-md flex gap-md items-start">
+<div class="w-24 h-32 md:w-32 md:h-40 flex-shrink-0 bg-surface-container-low rounded-lg overflow-hidden">
+<img alt="Model in Korean streetwear" class="w-full h-full object-cover" data-alt="A fashionable model wearing a minimalist Korean-style oversized white knit sweater and pastel pink trousers. The setting is a bright, high-key studio with soft neutral shadows, echoing a clean aesthetic. The lighting is diffused, highlighting the texture of the fabric against the warm oat background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyvnFqouEXqFeQioOAPszfuqmj3pdz9o8FhST69OjDKQOPJC1BDaxvDtlnckCvTS0aJos8VetIUiHSkYcFWnkqR9aHKuDjdue3LxvfNGUvobOruTj8wad_-VffR2KkoxikZIBhTaxkruScfOvES8K6Z4ptHiyYSQbsYtwAPOR0IFpixLJxx3lEn_QR_X2vKRbMfM5MedBDbt20lVcHhJEBAx9yTKLzMUYhxeZT5rj96W1MzD0p7qqBvOcUCl9XpXshe6hS9wBYF0I"/>
+</div>
+<div class="flex-grow flex flex-col justify-between h-32 md:h-40">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Cloud Knit Sweater</h3>
+<p class="text-body-sm text-on-surface-variant mt-1">Ivory | M</p>
+</div>
+<button class="material-symbols-outlined text-outline hover:text-error transition-colors">delete</button>
+</div>
+<div class="flex justify-between items-end">
+<div class="flex items-center border border-outline-variant rounded-full px-3 py-1 gap-4">
+<button class="text-on-surface-variant hover:text-primary transition-colors">-</button>
+<span class="font-label-md text-label-md">1</span>
+<button class="text-on-surface-variant hover:text-primary transition-colors">+</button>
+</div>
+<p class="font-label-md text-label-md text-on-surface">MYR 129.00</p>
+</div>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="py-md flex gap-md items-start">
+<div class="w-24 h-32 md:w-32 md:h-40 flex-shrink-0 bg-surface-container-low rounded-lg overflow-hidden">
+<img alt="Modern accessory" class="w-full h-full object-cover" data-alt="Close up of a dainty minimalist gold-plated necklace with a small geometric pendant, styled against a soft beige linen background. The lighting is warm and cinematic, emphasizing the glossy metallic sheen. The overall composition is airy and sophisticated, typical of high-end boutique product photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCI9bkmGLN34zr8h0KXkhGvIpAsm61QIhdOyOPBfmhtTganGSHHdSUf8q2K_XS7LTQdJCcfpJ4eW70b302YbImygf4plSVDN3pclZlu42LwrTZ40UKExk1UCAlD2xdq0NJ4fpzwfSI-q6iwa0hAoHj9sYE91ysDukeD_qqIQhC12WUr9BS54CSjLvTjoAKMcL-9hr0pDR774nz4ajkMY0OBRA_wWWj6XKLzhGZGDbbn-74IGfO2kavFgziPVt594SjKbzX8cYihVjo"/>
+</div>
+<div class="flex-grow flex flex-col justify-between h-32 md:h-40">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Geometric Charm</h3>
+<p class="text-body-sm text-on-surface-variant mt-1">Gold-plated | OS</p>
+</div>
+<button class="material-symbols-outlined text-outline hover:text-error transition-colors">delete</button>
+</div>
+<div class="flex justify-between items-end">
+<div class="flex items-center border border-outline-variant rounded-full px-3 py-1 gap-4">
+<button class="text-on-surface-variant hover:text-primary transition-colors">-</button>
+<span class="font-label-md text-label-md">1</span>
+<button class="text-on-surface-variant hover:text-primary transition-colors">+</button>
+</div>
+<p class="font-label-md text-label-md text-on-surface">MYR 21.00</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="bg-white rounded-xl p-md md:p-lg border border-surface-container">
+<button class="flex items-center gap-base text-on-surface font-label-md hover:text-primary transition-colors" onclick="toggleGiftNote()">
+<span class="material-symbols-outlined">feature_search</span>
+<span>Add a gift note (Free)</span>
+<span class="material-symbols-outlined ml-auto transition-transform duration-300" id="gift-chevron">expand_more</span>
+</button>
+<div class="hidden mt-md" id="gift-note-container">
+<textarea class="w-full bg-surface-container-low border-none rounded-lg p-md text-body-md focus:ring-1 focus:ring-primary placeholder-outline" placeholder="Write your heartfelt message here..." rows="3"></textarea>
+</div>
+</section>
+<!-- Payment Methods Local Focus -->
+<section class="bg-white rounded-xl p-md md:p-lg border border-surface-container">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-md">Payment Methods</h3>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-gutter">
+<div class="border border-outline-variant rounded-xl p-md flex flex-col items-center justify-center gap-xs cursor-pointer hover:border-primary hover:bg-primary-fixed transition-all group">
+<span class="material-symbols-outlined text-secondary group-hover:text-primary">wallet</span>
+<span class="font-label-sm text-label-sm uppercase">GrabPay</span>
+</div>
+<div class="border border-outline-variant rounded-xl p-md flex flex-col items-center justify-center gap-xs cursor-pointer hover:border-primary hover:bg-primary-fixed transition-all group">
+<span class="material-symbols-outlined text-secondary group-hover:text-primary">qr_code_2</span>
+<span class="font-label-sm text-label-sm uppercase">T&amp;G eWallet</span>
+</div>
+<div class="border border-outline-variant rounded-xl p-md flex flex-col items-center justify-center gap-xs cursor-pointer hover:border-primary hover:bg-primary-fixed transition-all group">
+<span class="material-symbols-outlined text-secondary group-hover:text-primary">account_balance</span>
+<span class="font-label-sm text-label-sm uppercase">FPX</span>
+</div>
+<div class="border border-outline-variant rounded-xl p-md flex flex-col items-center justify-center gap-xs cursor-pointer hover:border-primary hover:bg-primary-fixed transition-all group">
+<span class="material-symbols-outlined text-secondary group-hover:text-primary">credit_card</span>
+<span class="font-label-sm text-label-sm uppercase">Visa/Master</span>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Summary -->
+<div class="lg:col-span-4">
+<div class="sticky top-24 space-y-lg">
+<section class="bg-white rounded-xl p-md md:p-lg shadow-[0_20px_40px_rgba(118,87,75,0.08)] border border-surface-container">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-lg">Order Summary</h2>
+<div class="space-y-md">
+<div class="flex justify-between font-body-md text-body-md text-on-surface-variant">
+<span>Subtotal</span>
+<span>MYR 150.00</span>
+</div>
+<div class="flex justify-between font-body-md text-body-md text-on-surface-variant">
+<span>Shipping</span>
+<span>MYR 12.00</span>
+</div>
+<div class="flex justify-between font-body-md text-body-md text-on-surface-variant">
+<span>Tax (SST 6%)</span>
+<span>MYR 9.00</span>
+</div>
+<div class="pt-md border-t border-surface-container">
+<div class="flex items-center gap-base mb-md">
+<input class="flex-grow bg-surface-container-low border-none rounded-full px-4 py-2 text-body-sm focus:ring-1 focus:ring-primary" placeholder="Promo Code" type="text"/>
+<button class="bg-secondary text-white px-4 py-2 rounded-full font-label-md hover:bg-on-surface transition-colors">Apply</button>
+</div>
+</div>
+<div class="pt-md border-t border-surface-container flex justify-between items-center mb-lg">
+<span class="font-headline-md text-headline-md text-on-surface">Total</span>
+<span class="font-headline-lg text-headline-lg text-primary">MYR 171.00</span>
+</div>
+<button class="w-full bg-primary text-white py-4 rounded-full font-label-md text-lg shadow-[0_8px_16px_rgba(187,0,40,0.2)] hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-base group">
+                                Secure Checkout
+                                <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+<p class="text-center text-xs font-body-sm text-outline mt-md">
+                                All transactions are secured and encrypted. <br/>
+                                GST included where applicable.
+                            </p>
+</div>
+</section>
+<!-- Trust Badges -->
+<div class="flex justify-center items-center gap-lg py-md grayscale opacity-50">
+<div class="flex flex-col items-center">
+<span class="material-symbols-outlined text-4xl">verified_user</span>
+<span class="text-[10px] uppercase tracking-widest mt-1">Secured</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="material-symbols-outlined text-4xl">local_shipping</span>
+<span class="text-[10px] uppercase tracking-widest mt-1">Tracked</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="material-symbols-outlined text-4xl">sync</span>
+<span class="text-[10px] uppercase tracking-widest mt-1">Returns</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="bg-surface-container-low w-full py-xl mt-xl">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-desktop w-full max-w-[1440px] mx-auto">
+<div class="space-y-md">
+<span class="font-headline-md text-headline-md text-on-surface">cippy</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant max-w-xs">Effortless chic for the modern Malaysian lifestyle. Curated with love, delivered with care.</p>
+</div>
+<div class="flex flex-col gap-sm">
+<h4 class="font-label-md text-label-md text-secondary">Customer Care</h4>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Shipping &amp; Returns</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Contact Us</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">FAQs</a>
+</div>
+<div class="flex flex-col gap-sm">
+<h4 class="font-label-md text-label-md text-secondary">Legal</h4>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a>
+</div>
+<div class="flex flex-col gap-sm">
+<h4 class="font-label-md text-label-md text-secondary">Connect</h4>
+<div class="flex gap-md">
+<a class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-all" href="#">share</a>
+<a class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-all" href="#">camera</a>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-md">© 2024 cippy Malaysia. All Rights Reserved.</p>
+</div>
+</div>
+</footer>
+<script>
+        function toggleGiftNote() {
+            const container = document.getElementById('gift-note-container');
+            const chevron = document.getElementById('gift-chevron');
+            if (container.classList.contains('hidden')) {
+                container.classList.remove('hidden');
+                chevron.style.transform = 'rotate(180deg)';
+            } else {
+                container.classList.add('hidden');
+                chevron.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // Simple scroll behavior for nav
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 20) {
+                nav.classList.add('shadow-md');
+                nav.style.paddingTop = '8px';
+                nav.style.paddingBottom = '8px';
+            } else {
+                nav.classList.remove('shadow-md');
+                nav.style.paddingTop = '16px';
+                nav.style.paddingBottom = '16px';
+            }
+        });
+    </script>
+</body></html>

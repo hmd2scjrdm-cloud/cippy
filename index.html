@@ -1,215 +1,366 @@
-<!doctype html>
-<html lang="zh-CN">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Cippy Malaysia | Daily & Lovely Korean Fashion</title>
-    <meta
-      name="description"
-      content="Cippy Malaysia brings daily and lovely Korean-inspired fashion, curated outfit drops, membership rewards, and KL-ready styling."
-    />
-    <meta name="theme-color" content="#fff8f7" />
-    <meta property="og:title" content="Cippy Malaysia" />
-    <meta property="og:description" content="Daily & Lovely Korean fashion for Malaysia." />
-    <meta property="og:image" content="/assets/cippy-hero.svg" />
-    <meta property="og:type" content="website" />
-    <link rel="preload" as="image" href="/assets/cippy-hero.svg" />
-    <link rel="stylesheet" href="/styles.css" />
-  </head>
-  <body>
-    <header class="site-header" data-header>
-      <a class="brand" href="#home" aria-label="Cippy home">
-        <span class="brand-mark">c</span>
-        <span>
-          <strong>cippy</strong>
-          <small>Daily & Lovely</small>
-        </span>
-      </a>
-      <button class="icon-button menu-toggle" type="button" aria-label="Open menu" data-menu-toggle>
-        <span></span>
-        <span></span>
-      </button>
-      <nav class="main-nav" data-nav>
-        <a href="#new">New In</a>
-        <a href="#products">Products</a>
-        <a href="#bag">Shopping Bag</a>
-        <a href="#member">Member</a>
-        <a class="nav-cta" href="#shop">Shop Now</a>
-      </nav>
-    </header>
+<!DOCTYPE html>
 
-    <main id="home">
-      <section class="hero" aria-labelledby="hero-title">
-        <img class="hero-image" src="/assets/cippy-hero.svg" alt="Cippy Korean fashion boutique styling" />
-        <div class="hero-copy">
-          <p class="eyebrow">Malaysia launch edit</p>
-          <h1 id="hero-title">cippy</h1>
-          <p class="hero-tagline">Daily & Lovely outfits with a soft Seoul mood, curated for KL days and weekend plans.</p>
-          <div class="hero-actions">
-            <a class="button primary" href="#products">Shop the Drop</a>
-            <a class="button secondary" href="#lookbook">View Lookbook</a>
-          </div>
-        </div>
-      </section>
+<html lang="en" style=""><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>cippy | Effortless Chic Fashion</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&amp;family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"surface-container-low": "#fef0f1", "outline-variant": "#d7c1c3", "primary-fixed": "#ffd9dd", "on-tertiary": "#ffffff", secondary: "#77555a", "on-background": "#201a1b", "on-secondary": "#ffffff", primary: "#8d4a55", outline: "#857374", "surface-container-lowest": "#ffffff", "on-secondary-fixed": "#2d1418", "surface-container-highest": "#eddfe0", "surface-variant": "#eddfe0", "on-primary-fixed-variant": "#70343e", "surface-tint": "#8d4a55", "surface-container": "#f8ebeb", "secondary-container": "#ffd2d6", "inverse-surface": "#362f2f", "tertiary-container": "#73ae85", "on-surface": "#201a1b", "inverse-on-surface": "#fbeeee", "inverse-primary": "#ffb2bc", "surface-container-high": "#f3e5e5", "on-surface-variant": "#524344", "on-tertiary-container": "#004122", "on-tertiary-fixed-variant": "#155130", "primary-fixed-dim": "#ffb2bc", "secondary-fixed": "#ffd9dd", "on-secondary-container": "#7a585c", "on-primary-fixed": "#3a0814", "on-error": "#ffffff", "on-secondary-fixed-variant": "#5e3e42", "surface-bright": "#fff8f7", "on-primary-container": "#5e252f", "primary-container": "#da8b96", error: "#ba1a1a", "tertiary-fixed": "#b3f1c3", "error-container": "#ffdad6", "on-error-container": "#93000a", "surface-dim": "#e4d7d7", "secondary-fixed-dim": "#e7bcc0", "on-tertiary-fixed": "#00210f", background: "#fff8f7", tertiary: "#306946", "on-primary": "#ffffff", surface: "#fff8f7", "tertiary-fixed-dim": "#98d4a9"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}, spacing: {"margin-desktop": "80px", xs: "4px", md: "24px", "margin-mobile": "20px", lg: "48px", xl: "64px", sm: "12px", base: "8px", gutter: "16px"}, fontFamily: {"label-md": ["Be Vietnam Pro"], "headline-lg": ["Playfair Display"], "body-sm": ["Be Vietnam Pro"], "headline-md": ["Playfair Display"], "body-lg": ["Be Vietnam Pro"], "body-md": ["Be Vietnam Pro"], "display-lg": ["Playfair Display"], "label-sm": ["Be Vietnam Pro"], "headline-lg-mobile": ["Playfair Display"], headline: ["Playfair Display"], display: ["Playfair Display"], body: ["Be Vietnam Pro"], label: ["Be Vietnam Pro"]}, fontSize: {"label-md": ["14px", {lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600"}], "headline-lg": ["32px", {lineHeight: "40px", fontWeight: "700"}], "body-sm": ["14px", {lineHeight: "20px", fontWeight: "400"}], "headline-md": ["24px", {lineHeight: "32px", fontWeight: "600"}], "body-lg": ["18px", {lineHeight: "28px", fontWeight: "400"}], "body-md": ["16px", {lineHeight: "24px", fontWeight: "400"}], "display-lg": ["48px", {lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "700"}], "label-sm": ["12px", {lineHeight: "14px", fontWeight: "500"}], "headline-lg-mobile": ["28px", {lineHeight: "36px", fontWeight: "700"}]}}}};</script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-nav {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: minmax(200px, auto);
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Promo Banner -->
+<div class="bg-primary text-on-primary py-2 px-margin-mobile text-center font-label-sm text-label-sm tracking-widest uppercase">
+        Free shipping in Malaysia on all orders above RM150 • Shop Now
+    </div>
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 backdrop-blur-md shadow-sm bg-transparent">
+<div class="flex justify-between items-center px-margin-desktop py-4 w-full max-w-[1440px] mx-auto">
+<div class="flex items-center gap-lg">
+<div class="hidden md:flex gap-md">
+<a class="font-label-md text-label-md text-primary dark:text-primary-fixed border-b-2 border-primary pb-1 transition-all duration-300 ease-in-out" href="index.html">New In</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-on-surface-variant hover:text-primary transition-opacity duration-300" href="products.html">Clothing</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-on-surface-variant hover:text-primary transition-opacity duration-300" href="products.html">Accessories</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-on-surface-variant hover:text-primary transition-opacity duration-300" href="products.html">Sale</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-on-surface-variant hover:text-primary transition-opacity duration-300" href="account.html">Community</a>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="hidden lg:flex items-center bg-surface-container px-4 py-2 rounded-full border border-outline-variant/30">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-label-sm placeholder:text-on-surface-variant/50 w-32 xl:w-48" placeholder="Search trends..." type="text"/>
+</div>
+<button class="material-symbols-outlined text-on-surface hover:text-primary transition-colors">person</button>
+<button class="material-symbols-outlined text-on-surface hover:text-primary transition-colors relative">
+                    shopping_bag
+                    <span class="absolute -top-1 -right-1 bg-primary text-on-primary text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">2</span>
+</button>
+<button class="md:hidden material-symbols-outlined text-on-surface">menu</button>
+</div>
+</div>
+</nav>
+<main class="pt-16">
+<!-- Hero Section -->
+<section class="relative h-[870px] w-full overflow-hidden">
+<div class="absolute inset-0">
+<img class="w-full h-full object-cover" data-alt="A high-fashion editorial portrait of a trendy young woman in a minimalist, sunlit Korean studio. She wears an oversized cream blazer and loose linen trousers, leaning gracefully against a simple white column. The lighting is soft and ethereal, emphasizing the warm oat and primary red accents in the scene. The mood is sophisticated, airy, and effortlessly chic, capturing a premium boutique aesthetic for Gen Z." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMKM_WhXtMeejwD-tnvlLpvUozNMrOuFONUb_Ev-SBZ9l5YbTKI683hJ4t80_hQFW0F_1wZFcCZoPs_pbOvLOYMARpEDH1-4O94Qe9QjeuEwhLdbsc9x1I-WZvEKiFsHKbd7AAdbZrEeI7W4HrRu0GEccuBfzAaOENHE_-rDTZSur0D924Su1DWvwnRbhu8dfRD6qhalgCRcdZYuNBmeTO-NzeuenDr9BSNGNRQar2HwO3Wwsp1Xd4AFfvmRgmSowiOidr-FLSjXg"/>
+</div>
+<div class="absolute inset-0 bg-gradient-to-r from-background/40 to-transparent"></div>
+<div class="relative z-10 h-full flex flex-col justify-center px-margin-desktop max-w-[1440px] mx-auto">
+<h2 class="font-label-md text-label-md uppercase tracking-[0.3em] text-on-surface-variant mb-4">SS24 Collection</h2>
+<h1 class="font-display-lg text-display-lg md:text-[80px] md:leading-[1.1] max-w-2xl mb-8">
+                    The Art of <br/><span class="text-primary italic">Effortless</span> Chic
+                </h1>
+<div class="flex flex-wrap gap-md">
+<a class="bg-primary text-on-primary px-lg py-md rounded-full font-label-md text-label-md hover:scale-105 transition-transform shadow-xl shadow-primary/20" href="#">
+                        Shop New In
+                    </a>
+<a class="bg-white/20 backdrop-blur-md border border-white/40 text-on-surface px-lg py-md rounded-full font-label-md text-label-md hover:bg-white/40 transition-colors" href="#">
+                        Explore Trends
+                    </a>
+</div>
+</div>
+</section>
+<!-- Category Quick Links -->
+<section class="py-xl px-margin-desktop max-w-[1440px] mx-auto">
+<div class="text-center mb-8">
+<h2 class="font-headline-md text-headline-md text-on-surface uppercase tracking-[0.2em] mb-2">Popular Categories</h2>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Trending Now</p>
+</div><div class="flex overflow-x-auto gap-lg pb-4 scrollbar-hide justify-center gap-xl">
+<div class="flex-none group cursor-pointer">
+<p class="text-center font-label-md text-label-md uppercase tracking-[0.2em] hover:text-primary transition-colors px-md py-2 border-b border-transparent hover:border-primary">Dresses</p>
+</div>
+<div class="flex-none group cursor-pointer">
+<p class="text-center font-label-md text-label-md uppercase tracking-[0.2em] hover:text-primary transition-colors px-md py-2 border-b border-transparent hover:border-primary">Bottoms</p>
+</div>
+<div class="flex-none group cursor-pointer">
+<p class="text-center font-label-md text-label-md uppercase tracking-[0.2em] hover:text-primary transition-colors px-md py-2 border-b border-transparent hover:border-primary">Accessories</p>
+</div>
+<div class="flex-none group cursor-pointer">
+<p class="text-center font-label-md text-label-md uppercase tracking-[0.2em] hover:text-primary transition-colors px-md py-2 border-b border-transparent hover:border-primary">Knitwear</p>
+</div>
+<div class="flex-none group cursor-pointer">
+<p class="text-center font-label-md text-label-md uppercase tracking-[0.2em] hover:text-primary transition-colors px-md py-2 border-b border-transparent hover:border-primary">Shoes</p>
+</div>
+</div>
+</section>
+<!-- New In Bento Grid -->
+<section class="py-xl px-margin-desktop max-w-[1440px] mx-auto">
+<div class="flex justify-between items-end mb-lg justify-center gap-xl">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Weekly Drop</h2>
+<p class="text-on-surface-variant font-body-md">Fresh picks from our Seoul design team.</p>
+</div>
+<a class="text-primary font-label-md text-label-md border-b border-primary pb-1" href="#">Shop All New Arrivals</a>
+</div>
+<div class="flex overflow-x-auto snap-x snap-mandatory gap-gutter pb-4 scrollbar-hide">
+<!-- Main Bento Item -->
+<div class="flex-none w-[450px] snap-start group relative overflow-hidden rounded-xl bg-surface-container-low h-[600px]">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A full-length fashion shot of a model walking down a clean, modern street. She is wearing a striking primary red trench coat over a minimalist white outfit. The image is captured with a shallow depth of field, blurring the urban background. The overall style is energetic, high-contrast, and deeply fashionable, characteristic of popular Xiaohongshu fashion posts." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLApn6fsny1fHRavzsfmbIzuQi__ApvE68l-E_M174_qEOBZVa425nkV_pFgXUAFu9orKR3gxg4-rpL5WeT0nCs02XqSmLwzNb82FrCCVOA7mdpTy_oXJl0UFS7pSq-JzHJzImln47qW50pBZzRtl3kNdLc-qc3Njf2ouX3KBdkedUYcwOTi_CAyAxuzm5Q2WBpyFrNTPZfUCBLFb6ofLyu8uuPvZhqj_FQoYFHsTG1De2G00kVAfD8H9ztixsHxF5zJ7vRdK_XaA"/>
+<div class="absolute bottom-lg left-lg text-on-primary-container">
+<span class="bg-primary px-3 py-1 rounded-full text-label-sm font-label-sm uppercase mb-4 inline-block">Limited Edition</span>
+<h3 class="font-display-lg text-display-lg text-white mb-2">The Crimson Edit</h3>
+<p class="text-white/80 font-body-md mb-6 max-w-md">Our signature bold red collection, designed to make a statement in the city.</p>
+<button class="bg-white text-on-surface px-lg py-2 rounded-full font-label-md text-label-md">Shop Collection</button>
+</div>
+</div>
+<!-- Side Bento Item 1 -->
+<div class="flex-none w-[450px] snap-start group relative overflow-hidden rounded-xl bg-surface-container-low h-[600px]">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A lifestyle shot of a woman sipping iced tea at a minimalist cafe in Kuala Lumpur. She wears a delicate floral blouse in soft rose tones. The lighting is warm and golden, creating a dreamy, relatable atmosphere typical of user-generated fashion inspiration. The focus is soft and inviting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvvVMokKxPLqFEMxCP2oKuNI7CnTVA79PxooGiPFh1rh6Uw_J2L1u3DFMRnOZVYxioH_Prftj7sr9mXtPD9-7qm0TS4zY813iX2vd4lUpcQq7ZRuH_DhC6lWKf4XwIe873KSHljQhdO1M1eE2QsxXRlghC0XCUQgirbqRGQgQssfTaHhGvIzkdYo5YZk5v9FrxGmxZKNUU9fQo6pOXvNXOBw4fFhi1jVRDr1pH5DSRQZb-b0hFFYi0n968znp8FQNlkM05FkFTptg"/>
+<div class="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors"></div>
+<div class="absolute bottom-base left-base p-md">
+<h4 class="text-white font-headline-md text-headline-md">Floral Romance</h4>
+<p class="text-white/90 text-label-sm font-label-sm">From RM 89</p>
+</div>
+</div>
+<!-- Side Bento Item 2 -->
+<div class="flex-none w-[450px] snap-start group relative overflow-hidden rounded-xl bg-surface-container-low h-[600px]">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A flat lay photography of chic essentials: a pair of designer sunglasses, a small primary red leather wallet, and a sprig of dried flowers on a cream-colored linen cloth. The composition is artistic and minimalist, lit by natural side-light that emphasizes textures. The vibe is sophisticated and boutique-oriented." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGRwaLzHTEuAnhkCeFc-NtW79MjN-BTr-o0cBda91fL2mYXwADRpa0_rafe5qOHuFqqdrs1NZS2QWMTq0gIZBPrnKEbNbGxIC0nxZp2Eh7vWwQmNysNmuibsGWBEjIqf62LKRTeL68EFrsx-CDWNWqfbGs5xgLFP9NoCFRrsvylIyH4sArnQiOjlfv18jos7rYmbOEo6-rhIvwypSu94C4FbHORNdYpshIyeb63McMkHzDYTvuHP8lyvkjfU6ogh0G5e--LVTPUi4"/>
+<div class="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors"></div>
+<div class="absolute bottom-base left-base p-md">
+<h4 class="text-white font-headline-md text-headline-md">City Essentials</h4>
+<p class="text-white/90 text-label-sm font-label-sm">From RM 45</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Trending Section - Product Cards -->
+<section class="py-xl bg-surface-container-lowest">
+<div class="px-margin-desktop max-w-[1440px] mx-auto">
+<div class="flex flex-col md:flex-row justify-between items-center mb-xl gap-md">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Trending in KL</h2>
+<div class="flex gap-md border-b border-outline-variant w-full md:w-auto">
+<button class="px-md py-base font-label-md text-label-md text-primary border-b-2 border-primary">Bestsellers</button>
+<button class="px-md py-base font-label-md text-label-md text-on-surface-variant">Influencer's Choice</button>
+<button class="px-md py-base font-label-md text-label-md text-on-surface-variant">Limited Re-stock</button>
+</div>
+</div>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- Product Card 1 -->
+<div class="group">
+<div class="relative aspect-[3/4] mb-md overflow-hidden rounded-lg">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A product shot of a high-quality, oversized cotton t-shirt in a soft cream color. It is shown being worn by a model in a minimalist pose against a neutral background. The lighting is high-key and clean. A small 'cippy' logo is subtly visible. The overall look is premium, simple, and versatile for a Gen Z wardrobe." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpN47AqbCWPNXvsNTwvYCbbntwPH4XEPTtNBy3MD3Qsdagyhkmg7n3ylX0mqPAAqp4kKcZQyUEnFrqtXdli9qhNQb3l8jBGDbgMqBmRfatHTDu1bAuPU0sCpdcZNc2DK_xxRTqFqthop_LQecN_vOu9sEZ2UhKOiNuQQ5P6BwWr7Nd4FoGIytWoo-IRx4Nnz50Hk7yg8GtAhP6b7MqPNzud_8wkzuDsQv28FQM9qumpImC2tJb2nKbhQV8oISvHBUeONvcAjRoauA"/>
+<div class="absolute top-4 right-4 bg-white/80 backdrop-blur-sm p-2 rounded-full shadow-sm">
+<span class="material-symbols-outlined text-[20px] text-primary">favorite</span>
+</div>
+<button class="absolute bottom-0 left-0 w-full bg-primary text-on-primary py-3 translate-y-full group-hover:translate-y-0 transition-transform font-label-md text-label-md">Add to Cart</button>
+</div>
+<p class="font-headline-md text-headline-md mb-xs">Aesthetic Oversized Tee</p>
+<p class="text-on-surface-variant text-label-md">RM 79.00</p>
+</div>
+<!-- Product Card 2 -->
+<div class="group">
+<div class="relative aspect-[3/4] mb-md overflow-hidden rounded-lg">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A fashion product image of a pair of high-waisted linen trousers in a warm tan color. The model is standing in a brightly lit studio with a soft, minimalist aesthetic. The fabric drapes beautifully, and the tailoring is sharp yet relaxed. The lighting is warm and natural, emphasizing the effortless chic style of the garment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD4w5r75SF4YoN0JP8viWUg1v7z61_prH0bFhV-3x5GxOUoAGcKNFBX4ximSZnRlo_BnyQwFeDFaRZtEgtO3JyTtPjb4O-OghGGrl1S_2_RqWAftgrU7SYsmpH9FwCx2W-k5fzhGmLnFZTvEku1DxUen15S6npvffBMCp_fcK204OfSMmgNI9INNUhGRbqwLVpvgM6ISNWaUnLm6kh22lEHOtDM9Z64cz2bjadnYPh2tTft2XLPoLEH1YT79dVnLTzxUtR348_qZaY"/>
+<div class="absolute top-4 right-4 bg-white/80 backdrop-blur-sm p-2 rounded-full shadow-sm">
+<span class="material-symbols-outlined text-[20px] text-on-surface-variant">favorite</span>
+</div>
+<button class="absolute bottom-0 left-0 w-full bg-primary text-on-primary py-3 translate-y-full group-hover:translate-y-0 transition-transform font-label-md text-label-md">Add to Cart</button>
+</div>
+<p class="font-headline-md text-headline-md mb-xs">Wide-Leg Linen Trousers</p>
+<p class="text-on-surface-variant text-label-md">RM 149.00</p>
+</div>
+<!-- Product Card 3 -->
+<div class="group">
+<div class="relative aspect-[3/4] mb-md overflow-hidden rounded-lg">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A product shot of a delicate, slip dress in a soft rose silk. The model is photographed in a slightly low-light setting with a romantic, moody atmosphere. The soft sheen of the silk reflects subtle light, highlighting the high-quality material. The overall vibe is elegant, premium, and perfect for an evening out in Malaysia." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoymu71XYVRLfHB6l1wkEntkUmSq-64NxR1kQu0DXuZg-kxJVztwyQTL3WRr4JrVITMl24P7ePULnc1AYM2Oaj47bZVjhEP5lOmeaHUqGw6BVcw9WaofbZ5Ll28jRSu4GiqtDFQx3kFrT4wMVxzmTTkT7FPDNPAIPjhZ_IFxz410-GKw5zYHcD7fE0fh4QKe5BL4Q7Az_aMrcu6E_MG-S6ZLqONK6yJmIc2RmyoVSVOBCruf53X4iiKkCTUUDXzcytSFcwTXD-js8"/>
+<div class="absolute top-4 left-4 bg-primary text-on-primary px-2 py-1 rounded text-[10px] font-bold uppercase">Trending</div>
+<button class="absolute bottom-0 left-0 w-full bg-primary text-on-primary py-3 translate-y-full group-hover:translate-y-0 transition-transform font-label-md text-label-md">Add to Cart</button>
+</div>
+<p class="font-headline-md text-headline-md mb-xs">Silk Slip Dress</p>
+<p class="text-on-surface-variant text-label-md">RM 189.00</p>
+</div>
+<!-- Product Card 4 -->
+<div class="group">
+<div class="relative aspect-[3/4] mb-md overflow-hidden rounded-lg">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A high-end product photograph of a structured blazer in a deep charcoal gray. The blazer is displayed against a clean, off-white background with professional studio lighting. The fabric texture is sharp and clear. The style is modern and sophisticated, aimed at young professionals seeking a chic, minimalist look." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCR_YT-XNBcPN922uFUpz1aZAUP-RgpUuxk7XBwRCyvRfUqmMzwr1tGqLWYCbNTS_Hv4_yWdqNA7choqTii_WSDgjJrhi6-mgfdL1iG1QfkkbE0srcMvt5HlVQIEXdhrw_v9tbLJ_jxWs50mdeVjZlIQAjElE15bTYCzAJDRnvuSTI3UBxHsxwkvIzBYUMwlkvgUStgqmrXjzouXA5aoLa8jPLn5avlTW38dwvCC8VIvEMSt0kbWiI3gstgtB5gcwiZSS55t7VPYsk"/>
+<button class="absolute bottom-0 left-0 w-full bg-primary text-on-primary py-3 translate-y-full group-hover:translate-y-0 transition-transform font-label-md text-label-md">Add to Cart</button>
+</div>
+<p class="font-headline-md text-headline-md mb-xs">Boxy Structure Blazer</p>
+<p class="text-on-surface-variant text-label-md">RM 219.00</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Xiaohongshu Inspiration Section -->
+<section class="py-xl bg-surface-container overflow-hidden">
+<div class="px-margin-desktop max-w-[1440px] mx-auto mb-lg">
+<div class="flex items-center gap-sm mb-base">
+<span class="w-10 h-[1px] bg-primary"></span>
+<span class="font-label-md text-label-md text-primary uppercase tracking-widest">Xiaohongshu Inspiration</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Styled by You #cippyGirls</h2>
+</div>
+<!-- Draggable Carousel Style -->
+<div class="flex gap-gutter px-margin-desktop overflow-x-auto scrollbar-hide py-base">
+<div class="flex-none w-72 md:w-80 group cursor-pointer">
+<div class="aspect-[4/5] rounded-xl overflow-hidden mb-md shadow-lg group-hover:-translate-y-2 transition-transform duration-300">
+<img class="w-full h-full object-cover" data-alt="A portrait of a young woman posing with a latte in a stylish Kuala Lumpur cafe, wearing a cippy oversized knit sweater. The photo has a slightly desaturated, film-like grain, typical of the aesthetic on Xiaohongshu. The lighting is soft and natural from a nearby window, creating a cozy and fashionable lifestyle moment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1rK8MNV_8FqFgXGSfB94MhXecgQJheBLIucLEpzexGp4wctBwlsZXtUbQXwtKwl3hGfvZT1VACe98N49vhOz_EDsQDiTQNhGT0D6a09ILRqN7Fkjtk-PJxz-dq5kyR18_GFlS9RZsTtEEimaXK-I79A4ivBVqowYKGKrJ-AosvczJu7G0K_DMbIF46ro15LNzA3a6fjApF8Fcbd-vQf-d3o91Sk0KZqqkiXdCrcIrQ1Hdtt-hCttPkWLG5yoiVRedASDc1ov0tBI"/>
+</div>
+<div class="flex items-center gap-base">
+<div class="w-8 h-8 rounded-full bg-outline-variant"></div>
+<p class="font-label-sm text-label-sm">@sofia_lee</p>
+</div>
+</div>
+<div class="flex-none w-72 md:w-80 group cursor-pointer translate-y-8">
+<div class="aspect-[4/5] rounded-xl overflow-hidden mb-md shadow-lg group-hover:-translate-y-2 transition-transform duration-300">
+<img class="w-full h-full object-cover" data-alt="A mirror selfie of a girl showing off her cippy outfit: high-waisted jeans and a primary red crop top. The background is a clean, minimalist bedroom with warm lighting. The image is candid and authentic, capturing the 'get ready with me' vibe popular among Gen Z social media users in Malaysia." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAt9-M2f2PBWtLaFmmyBGsLONBOS-bNGWQSht55TFNGAD-YBroJR2xGb7hRbgiWezto-EQQ3GL7P_UQshHZdVRTXpOoqZfsteYHSZ4kxMMfir-iGwiqEgmrON7nCRl6UX6AKR3ngaHS4OevHHQ76bPT5SqEPer7QHH55spWDE_OZfzT57rPTjPdyUojVE7wHzw7Wyscl5zn6tUCLDGUKOymx-_MFyEVTk0LuctYTFHjtCTuYhaVFAQ2DGd3E3uYQijQ9ieZLCsjc1I"/>
+</div>
+<div class="flex items-center gap-base">
+<div class="w-8 h-8 rounded-full bg-outline-variant"></div>
+<p class="font-label-sm text-label-sm">@nurul.fits</p>
+</div>
+</div>
+<div class="flex-none w-72 md:w-80 group cursor-pointer">
+<div class="aspect-[4/5] rounded-xl overflow-hidden mb-md shadow-lg group-hover:-translate-y-2 transition-transform duration-300">
+<img class="w-full h-full object-cover" data-alt="A fashion shot of a woman walking through an art gallery, wearing an elegant cippy midi skirt and a beige top. The composition is artistic and clean, with large white walls and modern art in the background. The lighting is even and bright, emphasizing the high-end boutique aesthetic of the brand." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCruv76qWYUwl2dqwhOHJsFhyEFAAEmIghcXJ4rpldMbkp84BN7AufF-O_6PiWHXByEd67Xh8mG6msBJs_OFzin2kC4W4nx6lK0UJnq2-ltilAyaNfwXCBHLZoQ14lZwp72ouYzU4au37_z5vJSm6FE300UWRo5JkTfPwVPyLEj4ucok5K9CLw8qmqM0XPOpwWTzEAjLVFCBI9imd8l-LnnwOQd-I3l88CR7Dsx8aP11JZRYmyPRkcCCwrj1EM8ghTPvbJ5QKqvT4Q"/>
+</div>
+<div class="flex items-center gap-base">
+<div class="w-8 h-8 rounded-full bg-outline-variant"></div>
+<p class="font-label-sm text-label-sm">@amy_wong</p>
+</div>
+</div>
+<div class="flex-none w-72 md:w-80 group cursor-pointer translate-y-8">
+<div class="aspect-[4/5] rounded-xl overflow-hidden mb-md shadow-lg group-hover:-translate-y-2 transition-transform duration-300">
+<img class="w-full h-full object-cover" data-alt="An outdoor shot of a woman in a cippy sundress standing in front of a colorful wall in Penang. The lighting is bright and cheerful afternoon sun. The image captures a sense of freedom and style, perfect for lifestyle marketing targeted at trend-conscious young adults in Malaysia." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8hVjNtx4AmzPkn-ur0PAOwWsnnNxA4Xj5PRyfr5ldltIcilJKgY67rumiGjXP98sBCYx6BU9vfDFNs3UxczF2dYbQATBufUu1Ukun-N0Lb4m-PndKajLJODzQnUTm4t-JpvvB2ZwF5MwKsuMqV2n4v2mFzNMKfGKKAjbXPEEUV0YKcgSsu7s9M3yGk3aLHMZUPiN5GJxZOiodrPlnvsNruUYxquGveGse2Z6XoQh3Ho_XQ39HeTgS8DXkKy3P4sOMcYI8Rh30lk4"/>
+</div>
+<div class="flex items-center gap-base">
+<div class="w-8 h-8 rounded-full bg-outline-variant"></div>
+<p class="font-label-sm text-label-sm">@jolene_t</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Newsletter / CTA Section -->
+<section class="py-xl px-margin-desktop">
+<div class="max-w-[1000px] mx-auto bg-surface-container-high rounded-3xl p-lg md:p-xl flex flex-col md:flex-row items-center gap-xl relative overflow-hidden justify-center">
+<div class="absolute top-0 right-0 w-64 h-64 bg-primary-fixed/20 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+<div class="flex-1 z-10">
+<h2 class="font-display-lg text-display-lg text-on-surface mb-4">Join the Club</h2>
+<p class="text-on-surface-variant font-body-lg mb-8">Sign up for early access to drops and exclusive 'Red' inspired styling tips. Get 10% off your first order!</p>
+<div class="flex flex-col sm:flex-row gap-base">
+<input class="flex-1 bg-white border-none rounded-full px-lg py-md focus:ring-2 focus:ring-primary" placeholder="Email address" type="email"/>
+<button class="bg-primary text-on-primary px-xl py-md rounded-full font-label-md text-label-md hover:bg-primary-container transition-colors">Subscribe</button>
+</div>
+</div>
+<div class="flex-1 hidden md:block z-10">
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-low dark:bg-surface-container-lowest w-full py-xl">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-desktop w-full max-w-[1440px] mx-auto">
+<div class="mb-lg md:mb-0">
+<img alt="cippy Brand Logo" class="h-16 w-auto mb-6" src="https://lh3.googleusercontent.com/aida/AP1WRLtQBwZuQbt8NMGFCqA38Z4fLcnS-eI4jFkX3F_XnIvoyfy3DK6kggLkUhmIbFrRnWxxPTO8hoRa5-a362Rji-o_1kmfuzXUHNP2c_CRNuU-wJ0_sIVuGMewxyMS2WxioGsty0LpZO3aGpmlg_FGHwyamw8hWnmwvCNxRviVoQI7k589X7EwTCUBtbb4m15bdHO-cxqT-yszZhFb5-BFJGzgLHazf6D56KUzorQViLoJ0Akoqq4nc3Iw4g"/>
+<p class="text-on-surface-variant font-body-sm text-body-sm mb-6 max-w-xs">
+                    Curating effortless Korean aesthetic for the modern Malaysian woman. Quality pieces for your everyday vibe.
+                </p>
+<div class="flex gap-md">
+<span class="material-symbols-outlined text-secondary cursor-pointer hover:text-primary transition-colors">face_nod</span>
+<span class="material-symbols-outlined text-secondary cursor-pointer hover:text-primary transition-colors">brand_awareness</span>
+<span class="material-symbols-outlined text-secondary cursor-pointer hover:text-primary transition-colors">share</span>
+</div>
+</div>
+<div>
+<h5 class="font-label-md text-label-md mb-lg text-on-surface uppercase tracking-widest">Shop</h5>
+<ul class="flex flex-col gap-sm">
+<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">New Arrivals</a></li>
+<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Best Sellers</a></li>
+<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="products.html">Clothing</a></li>
+<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="products.html">Accessories</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-label-md text-label-md mb-lg text-on-surface uppercase tracking-widest">Help</h5>
+<ul class="flex flex-col gap-sm">
+<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Shipping &amp; Returns</a></li>
+<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a></li>
+<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a></li>
+<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Contact Us</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-label-md text-label-md mb-lg text-on-surface uppercase tracking-widest">Contact</h5>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-base">Bangsar Village II, <br/>Kuala Lumpur, Malaysia</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">hello@cippy.com.my</p>
+<div class="mt-lg pt-lg border-t border-outline-variant/30">
+<p class="text-on-surface-variant font-body-sm text-body-sm">© 2024 cippy Malaysia. All Rights Reserved.</p>
+</div>
+</div>
+</div>
+</footer>
+<!-- Mobile Bottom Navigation Shell -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-white/80 backdrop-blur-xl border-t border-outline-variant/20 z-50 px-margin-mobile py-2 flex justify-between items-center h-16">
+<a class="flex flex-col items-center gap-xs text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="text-[10px] font-label-md uppercase tracking-tighter">Home</span>
+</a>
+<a class="flex flex-col items-center gap-xs text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">search</span>
+<span class="text-[10px] font-label-md uppercase tracking-tighter">Explore</span>
+</a>
+<a class="flex flex-col items-center -translate-y-6" href="#">
+<div class="bg-primary text-on-primary p-4 rounded-full shadow-lg shadow-primary/40">
+<span class="material-symbols-outlined">shopping_bag</span>
+</div>
+</a>
+<a class="flex flex-col items-center gap-xs text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">favorite</span>
+<span class="text-[10px] font-label-md uppercase tracking-tighter">Wishlist</span>
+</a>
+<a class="flex flex-col items-center gap-xs text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-label-md uppercase tracking-tighter">Profile</span>
+</a>
+</nav>
+<script>
+        // Micro-interaction for smooth scrolling & hover effects
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
 
-      <section class="launch-strip" aria-label="Launch benefits">
-        <span>Free shipping over RM150</span>
-        <span>Ready stock in Malaysia</span>
-        <span>Member points on every order</span>
-      </section>
-
-      <section class="section intro" id="new">
-        <div>
-          <p class="eyebrow">New in this week</p>
-          <h2>Soft basics, polished layers, easy matching.</h2>
-        </div>
-        <p>
-          Built from the supplied Cippy visual direction, this launch page turns the prototype overview into a real shopping front:
-          clear collections, local pricing, shopping bag preview, and member rewards.
-        </p>
-      </section>
-
-      <section class="collection-grid" id="shop" aria-label="Featured collections">
-        <article class="collection-card large">
-          <img src="/assets/cippy-hero.svg" alt="Cippy home inspiration preview" />
-          <div>
-            <span>Editorial</span>
-            <h3>Korean Boutique Mood</h3>
-            <a href="#products">Explore edit</a>
-          </div>
-        </article>
-        <article class="collection-card">
-          <img src="/assets/cippy-logo-board.svg" alt="Elegant essentials product detail preview" />
-          <div>
-            <span>Essentials</span>
-            <h3>Everyday Lovely</h3>
-            <a href="#products">Shop pieces</a>
-          </div>
-        </article>
-        <article class="collection-card">
-          <img src="/assets/cippy-hero.svg" alt="All products preview" />
-          <div>
-            <span>New arrivals</span>
-            <h3>Explore Your Style</h3>
-            <a href="#products">Browse all</a>
-          </div>
-        </article>
-      </section>
-
-      <section class="section products-section" id="products">
-        <div class="section-heading">
-          <p class="eyebrow">Ready stock</p>
-          <h2>Trending in Malaysia</h2>
-        </div>
-        <div class="filter-row" role="tablist" aria-label="Product filters">
-          <button class="filter active" type="button" data-filter="all">All</button>
-          <button class="filter" type="button" data-filter="tops">Tops</button>
-          <button class="filter" type="button" data-filter="bottoms">Bottoms</button>
-          <button class="filter" type="button" data-filter="sets">Sets</button>
-        </div>
-        <div class="product-grid">
-          <article class="product-card" data-category="tops">
-            <div class="product-image blush">01</div>
-            <div class="product-info">
-              <h3>Ribbon Knit Cardigan</h3>
-              <p>Soft cream knit with a cropped feminine fit.</p>
-              <strong>RM 89</strong>
-            </div>
-            <button class="button mini" type="button" data-add="Ribbon Knit Cardigan">Add</button>
-          </article>
-          <article class="product-card" data-category="bottoms">
-            <div class="product-image sage">02</div>
-            <div class="product-info">
-              <h3>Blush Midi Skirt</h3>
-              <p>Flowy A-line shape for workdays and cafe dates.</p>
-              <strong>RM 119</strong>
-            </div>
-            <button class="button mini" type="button" data-add="Blush Midi Skirt">Add</button>
-          </article>
-          <article class="product-card" data-category="sets">
-            <div class="product-image ink">03</div>
-            <div class="product-info">
-              <h3>Seoul Layer Set</h3>
-              <p>Blazer, tee, and denim styling bundle.</p>
-              <strong>RM 219</strong>
-            </div>
-            <button class="button mini" type="button" data-add="Seoul Layer Set">Add</button>
-          </article>
-          <article class="product-card" data-category="tops">
-            <div class="product-image rose">04</div>
-            <div class="product-info">
-              <h3>Lovely Puff Blouse</h3>
-              <p>Lightweight rose blouse with subtle texture.</p>
-              <strong>RM 99</strong>
-            </div>
-            <button class="button mini" type="button" data-add="Lovely Puff Blouse">Add</button>
-          </article>
-        </div>
-      </section>
-
-      <section class="split-section" id="bag">
-        <div>
-          <p class="eyebrow">Shopping bag</p>
-          <h2>Your picks stay simple.</h2>
-          <p>Customers can add favourites, review estimated totals, and move toward checkout with a clean bag summary.</p>
-        </div>
-        <aside class="bag-panel" aria-live="polite">
-          <div class="bag-top">
-            <span>Items</span>
-            <strong data-cart-count>2</strong>
-          </div>
-          <ul data-cart-list>
-            <li>Ribbon Knit Cardigan</li>
-            <li>Blush Midi Skirt</li>
-          </ul>
-          <div class="bag-total">
-            <span>Estimated total</span>
-            <strong data-cart-total>RM 208</strong>
-          </div>
-          <a class="button primary full" href="https://wa.me/?text=Hi%20Cippy%2C%20I%20want%20to%20order." target="_blank" rel="noreferrer">Order via WhatsApp</a>
-        </aside>
-      </section>
-
-      <section class="lookbook" id="lookbook" aria-label="Brand lookbook">
-        <div class="lookbook-copy">
-          <p class="eyebrow">Brand system</p>
-          <h2>Daily & Lovely, ready for launch.</h2>
-          <p>The Cippy logo system and soft boutique styling create a simple launch-ready brand experience.</p>
-        </div>
-        <img src="/assets/cippy-logo-board.svg" alt="Cippy logo and packaging board" />
-      </section>
-
-      <section class="member-section" id="member">
-        <div>
-          <p class="eyebrow">Member center</p>
-          <h2>Rewards for every lovely moment.</h2>
-        </div>
-        <div class="reward-grid">
-          <article>
-            <strong>01</strong>
-            <h3>Points</h3>
-            <p>Earn points on every order and redeem for vouchers.</p>
-          </article>
-          <article>
-            <strong>02</strong>
-            <h3>Birthday Treat</h3>
-            <p>Exclusive member gift during your birthday month.</p>
-          </article>
-          <article>
-            <strong>03</strong>
-            <h3>Early Drops</h3>
-            <p>Preview weekly arrivals before they go public.</p>
-          </article>
-        </div>
-      </section>
-    </main>
-
-    <footer class="site-footer">
-      <span>cippy</span>
-      <p>Daily & Lovely | Seoul mood for Malaysia</p>
-      <a href="#home">Back to top</a>
-    </footer>
-
-    <script src="/script.js"></script>
-  </body>
-</html>
+        // Simple sticky header adjustment
+        let lastScroll = 0;
+        const nav = document.querySelector('nav');
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            if (currentScroll <= 0) {
+                nav.classList.remove('translate-y-[-100%]');
+                return;
+            }
+            if (currentScroll > lastScroll && !nav.classList.contains('translate-y-[-100%]')) {
+                // Scroll Down
+                nav.classList.add('translate-y-[-100%]');
+            } else if (currentScroll < lastScroll && nav.classList.contains('translate-y-[-100%]')) {
+                // Scroll Up
+                nav.classList.remove('translate-y-[-100%]');
+            }
+            lastScroll = currentScroll;
+        });
+    </script>
+</body></html>

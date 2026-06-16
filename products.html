@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+
+<html lang="en" style=""><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>cippy | Effortless Chic Product Listing</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&amp;family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"surface-container-low": "#fef0f1", "outline-variant": "#d7c1c3", "primary-fixed": "#ffd9dd", "on-tertiary": "#ffffff", secondary: "#77555a", "on-background": "#201a1b", "on-secondary": "#ffffff", primary: "#8d4a55", outline: "#857374", "surface-container-lowest": "#ffffff", "on-secondary-fixed": "#2d1418", "surface-container-highest": "#eddfe0", "surface-variant": "#eddfe0", "on-primary-fixed-variant": "#70343e", "surface-tint": "#8d4a55", "surface-container": "#f8ebeb", "secondary-container": "#ffd2d6", "inverse-surface": "#362f2f", "tertiary-container": "#73ae85", "on-surface": "#201a1b", "inverse-on-surface": "#fbeeee", "inverse-primary": "#ffb2bc", "surface-container-high": "#f3e5e5", "on-surface-variant": "#524344", "on-tertiary-container": "#004122", "on-tertiary-fixed-variant": "#155130", "primary-fixed-dim": "#ffb2bc", "secondary-fixed": "#ffd9dd", "on-secondary-container": "#7a585c", "on-primary-fixed": "#3a0814", "on-error": "#ffffff", "on-secondary-fixed-variant": "#5e3e42", "surface-bright": "#fff8f7", "on-primary-container": "#5e252f", "primary-container": "#da8b96", error: "#ba1a1a", "tertiary-fixed": "#b3f1c3", "error-container": "#ffdad6", "on-error-container": "#93000a", "surface-dim": "#e4d7d7", "secondary-fixed-dim": "#e7bcc0", "on-tertiary-fixed": "#00210f", background: "#fff8f7", tertiary: "#306946", "on-primary": "#ffffff", surface: "#fff8f7", "tertiary-fixed-dim": "#98d4a9"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}, spacing: {"margin-desktop": "80px", xs: "4px", md: "24px", "margin-mobile": "20px", lg: "48px", xl: "64px", sm: "12px", base: "8px", gutter: "16px"}, fontFamily: {"label-md": ["Be Vietnam Pro"], "headline-lg": ["Playfair Display"], "body-sm": ["Be Vietnam Pro"], "headline-md": ["Playfair Display"], "body-lg": ["Be Vietnam Pro"], "body-md": ["Be Vietnam Pro"], "display-lg": ["Playfair Display"], "label-sm": ["Be Vietnam Pro"], "headline-lg-mobile": ["Playfair Display"], headline: ["Playfair Display"], display: ["Playfair Display"], body: ["Be Vietnam Pro"], label: ["Be Vietnam Pro"]}, fontSize: {"label-md": ["14px", {lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600"}], "headline-lg": ["32px", {lineHeight: "40px", fontWeight: "700"}], "body-sm": ["14px", {lineHeight: "20px", fontWeight: "400"}], "headline-md": ["24px", {lineHeight: "32px", fontWeight: "600"}], "body-lg": ["18px", {lineHeight: "28px", fontWeight: "400"}], "body-md": ["16px", {lineHeight: "24px", fontWeight: "400"}], "display-lg": ["48px", {lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "700"}], "label-sm": ["12px", {lineHeight: "14px", fontWeight: "500"}], "headline-lg-mobile": ["28px", {lineHeight: "36px", fontWeight: "700"}]}}}};</script>
+<style>
+        body {
+            background-color: #fff8f5;
+            color: #1e1b18;
+            -webkit-font-smoothing: antialiased;
+        }
+        .waterfall-grid {
+            column-count: 2;
+            column-gap: 16px;
+        }
+        @media (min-width: 768px) {
+            .waterfall-grid {
+                column-count: 3;
+                column-gap: 24px;
+            }
+        }
+        @media (min-width: 1024px) {
+            .waterfall-grid {
+                column-count: 4;
+                column-gap: 24px;
+            }
+        }
+        .product-card {
+            break-inside: avoid;
+            margin-bottom: 24px;
+        }
+        .glass-nav {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-heart {
+            font-variation-settings: 'FILL' 1;
+            color: #bb0028;
+        }
+    </style>
+</head>
+<body class="font-body-md selection:bg-primary-fixed">
+<!-- Top Navigation Bar -->
+<nav class="fixed top-0 w-full z-50 backdrop-blur-md bg-transparent"><div class="flex justify-between items-center px-6 md:px-margin-desktop py-4 w-full max-w-[1440px] mx-auto">
+<div class="flex items-center gap-lg">
+<div class="font-headline-lg text-headline-md tracking-tight text-primary">cippy</div>
+<div class="hidden md:flex gap-md items-center"><a class="text-primary border-b-2 border-primary pb-1 font-label-md text-label-md" href="index.html">New In</a><a class="text-on-surface-variant hover:text-primary transition-opacity duration-300 font-label-md text-label-md" href="products.html">Clothing</a><a class="text-on-surface-variant hover:text-primary transition-opacity duration-300 font-label-md text-label-md" href="products.html">Accessories</a><a class="text-on-surface-variant hover:text-primary transition-opacity duration-300 font-label-md text-label-md" href="products.html">Sale</a><a class="text-on-surface-variant hover:text-primary transition-opacity duration-300 font-label-md text-label-md" href="account.html">Community</a></div>
+</div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-on-surface hover:opacity-70 transition-opacity">search</button>
+<button class="material-symbols-outlined text-on-surface hover:opacity-70 transition-opacity">shopping_bag</button>
+<button class="material-symbols-outlined text-on-surface hover:opacity-70 transition-opacity">person</button>
+</div>
+</div></nav>
+<main class="pt-32 pb-xl px-6 md:px-margin-desktop max-w-[1440px] mx-auto">
+<!-- Header & Filters -->
+<header class="mb-lg flex flex-col md:flex-row md:items-end justify-between gap-gutter">
+<div>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-xs">The Edit</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-lg">Curated essentials for the modern lifestyle. Effortless, chic, and uniquely yours.</p>
+</div>
+<div class="flex gap-sm overflow-x-auto pb-2 no-scrollbar"><button class="px-md py-2 bg-primary text-on-primary rounded-full font-label-md text-label-md whitespace-nowrap shadow-md hover:scale-105 transition-transform">Dresses</button><button class="px-md py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-md text-label-md whitespace-nowrap hover:bg-secondary-container transition-colors">Skirts</button><button class="px-md py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-md text-label-md whitespace-nowrap hover:bg-secondary-container transition-colors">Tops</button><button class="px-md py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-md text-label-md whitespace-nowrap hover:bg-secondary-container transition-colors">Pants</button><button class="px-md py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-md text-label-md whitespace-nowrap hover:bg-secondary-container transition-colors">Outerwear</button><button class="px-md py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-md text-label-md whitespace-nowrap hover:bg-secondary-container transition-colors">Sets</button></div>
+</header>
+<!-- Product Waterfall Grid -->
+<div class="flex items-center justify-between border-b border-outline-variant mb-md pb-2 overflow-x-auto no-scrollbar">
+<div class="flex gap-lg">
+<button class="font-headline-md text-label-md text-primary border-b-2 border-primary pb-2 whitespace-nowrap transition-colors">All</button>
+<button class="font-headline-md text-label-md text-on-surface-variant hover:text-primary pb-2 whitespace-nowrap transition-colors">Price: Low to High</button>
+<button class="font-headline-md text-label-md text-on-surface-variant hover:text-primary pb-2 whitespace-nowrap transition-colors">Price: High to Low</button>
+<button class="font-headline-md text-label-md text-on-surface-variant hover:text-primary pb-2 whitespace-nowrap transition-colors">Bestsellers</button>
+<button class="font-headline-md text-label-md text-on-surface-variant hover:text-primary pb-2 whitespace-nowrap transition-colors">New Arrivals</button>
+</div>
+<div class="hidden md:flex items-center gap-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-sm">grid_view</span>
+<span class="text-label-sm">6 Items</span>
+</div>
+</div><div class="flex items-center gap-md mb-md pb-2 overflow-x-auto no-scrollbar border-b border-outline-variant/30"><span class="text-label-sm font-bold text-secondary uppercase tracking-widest whitespace-nowrap">Series:</span><div class="flex gap-md"><button class="text-label-md text-on-surface-variant hover:text-primary whitespace-nowrap transition-colors">Cippy Essential</button><button class="text-label-md text-on-surface-variant hover:text-primary whitespace-nowrap transition-colors">Cippy Sweet</button><button class="text-label-md text-on-surface-variant hover:text-primary whitespace-nowrap transition-colors">Cippy Summer</button><button class="text-label-md text-on-surface-variant hover:text-primary whitespace-nowrap transition-colors">Cippy Daily</button></div></div><div class="waterfall-grid">
+<!-- Product Card 1 -->
+<div class="product-card group cursor-pointer">
+<div class="relative overflow-hidden rounded-xl bg-surface-container-low shadow-sm transition-all duration-300 hover:shadow-xl">
+<img class="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A stylish young woman posing in a minimalist outdoor setting in Kuala Lumpur, wearing a soft cream-colored oversized linen blazer and matching trousers. The lighting is warm golden hour, creating a dreamlike Korean boutique aesthetic. The color palette is dominated by soft oats, creams, and a subtle high-contrast red accent in her lipstick, fitting the Xiaohongshu trend." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDA7KQX8mabz8CziPwEBHJW8CCdiQkRTwyzGzlT4LGCno7WDkMK38yaWiH1SGuPj-IiHgiXdB-nGSu9mPcGaNQqrXXcK0411dpn3FHxPnLNdZ_B56rDAJ6mlgr8okbRdJuymEF7cKR_5QLK8oV3EDrfv3irINnKWOy-YkHxXT6a7xTlES6s0MTRsTMgPOa4FMoe44l08FVtzG9tWOg5n6u0YHVU21TevefDTxllVZHpHn25EyGKP3TEPz0ThdgalD2zSljKLhhbtcw"/>
+<button class="absolute top-4 right-4 z-10 w-10 h-10 bg-white/60 backdrop-blur-md rounded-full flex items-center justify-center text-primary transition-all hover:bg-white active:scale-90" onclick="toggleHeart(this)">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+<div class="p-4">
+<div class="flex gap-xs mb-2">
+<span class="px-2 py-1 bg-tertiary-fixed text-on-tertiary-fixed-variant rounded-full text-[10px] font-bold uppercase tracking-wider">#OOTD</span>
+<span class="px-2 py-1 bg-secondary-fixed text-on-secondary-fixed-variant rounded-full text-[10px] font-bold uppercase tracking-wider">#KoreanStyle</span>
+</div>
+<h3 class="font-headline-md text-[18px] leading-tight mb-1">Urban Linen Set</h3>
+<p class="font-label-md text-primary mb-2">MYR 189.00</p>
+</div>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="product-card group cursor-pointer">
+<div class="relative overflow-hidden rounded-xl bg-surface-container-low shadow-sm transition-all duration-300 hover:shadow-xl">
+<img class="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Close-up lifestyle shot of a designer leather handbag resting on a marble café table with a latte. The scene is bright and airy with a minimalist aesthetic typical of high-end Korean cafes. Soft diffused shadows and a warm color palette of beige and rose gold create a sophisticated, aspirational mood for a Gen Z audience." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUHaBfmhzZAnZMp8nyJyMb0layvMocIHqLOzL95tkK43SgKflFU6T9P5pD4eIu4CjdhXIK1PYXjfC3lDB7c5f7WrUmJkBsgqiWuNt75KV2uojx_Q6eG2ciC4wy1UWFKFUvD1lCu3wbFlP54oEL16rdM1TVtuYeAGChOum-gK5OU4cRJrjaPboaEI6g1uFDTJzvIzBe4MK3ViN-kl0NFpxEOyaJL1X8_rmRuTXF6wV34nhLvw3Xj35HCy2EfV89xLryaO9X-7WB16M"/>
+<button class="absolute top-4 right-4 z-10 w-10 h-10 bg-white/60 backdrop-blur-md rounded-full flex items-center justify-center text-primary transition-all hover:bg-white active:scale-90" onclick="toggleHeart(this)">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+<div class="p-4">
+<div class="flex gap-xs mb-2">
+<span class="px-2 py-1 bg-tertiary-fixed text-on-tertiary-fixed-variant rounded-full text-[10px] font-bold uppercase tracking-wider">#Aesthetic</span>
+</div>
+<h3 class="font-headline-md text-[18px] leading-tight mb-1">Petite Croissant Bag</h3>
+<p class="font-label-md text-primary mb-2">MYR 125.00</p>
+</div>
+</div>
+</div>
+<!-- Product Card 3 -->
+<div class="product-card group cursor-pointer">
+<div class="relative overflow-hidden rounded-xl bg-surface-container-low shadow-sm transition-all duration-300 hover:shadow-xl">
+<img class="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A fashion-forward model walking through a modern urban landscape with clean architectural lines. She is wearing a vibrant red silk slip dress paired with an oversized white shirt. The contrast between the bold primary red and the neutral background creates a striking visual impact inspired by Xiaohongshu photography styles." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDzszQdOnc-g_E6ktMqU8ypTXu6iCvQ4uOAQQnmD4NIXfs58GcRmlAziR5e4uMjBp1EIr43pnyN9a-xpzXA9zEdmjmqmNcVxTw1hH03TzctIETjql7L_GGmU5pURvosX3mVh_DzcG8A7NufYdy-JoTq_hl8HhTfLQ8ez9bf9PkFy-BK-gK2GoFeBt3_5rQ9XIVXsaUWIC_YONrWYy2Hm6zweU2C0f-dM27sum02h6_Dp-nuum9DjejcMNDTPB44Nl86ZnWRzlEvLKk"/>
+<button class="absolute top-4 right-4 z-10 w-10 h-10 bg-white/60 backdrop-blur-md rounded-full flex items-center justify-center text-primary transition-all hover:bg-white active:scale-90" onclick="toggleHeart(this)">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+<div class="p-4">
+<div class="flex gap-xs mb-2">
+<span class="px-2 py-1 bg-primary-fixed text-on-primary-fixed-variant rounded-full text-[10px] font-bold uppercase tracking-wider">#HotItem</span>
+<span class="px-2 py-1 bg-secondary-fixed text-on-secondary-fixed-variant rounded-full text-[10px] font-bold uppercase tracking-wider">#DateNight</span>
+</div>
+<h3 class="font-headline-md text-[18px] leading-tight mb-1">Crimson Silk Muse</h3>
+<p class="font-label-md text-primary mb-2">MYR 210.00</p>
+</div>
+</div>
+</div>
+<!-- Product Card 4 -->
+<div class="product-card group cursor-pointer">
+<div class="relative overflow-hidden rounded-xl bg-surface-container-low shadow-sm transition-all duration-300 hover:shadow-xl">
+<img class="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Minimalist product photography of a pair of chunky designer sneakers in off-white and muted rose tones. The shoes are placed on a textured paper background with soft, long shadows. The overall feel is clean, youthful, and trendy, targeting the Malaysian streetwear community with a premium boutique vibe." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQ1o7ucGL9IlOO7zlHbZlUwHcK_KPCsOTIEyOrBg3nFG_4Qwif2TsLbrvN8nQmVvFsNKLwaDNr1fjmlmMMRbIi2eLd484HCgbsdZQx8fnecyHLxsVSpp479JHF7dbKgguL_rabeSsw1O7A2NwDdMzmVNI2MvGE_yYfeiB2f_Cu_znSfv8Ea43ONha9CGPR-2iDUhZ8Neqqll350DreT-4sefQ2PHmqXbLuzRj4yvJmhNUjutSHkAEqWV5G9iw4PVDxNy37YC0t-to"/>
+<button class="absolute top-4 right-4 z-10 w-10 h-10 bg-white/60 backdrop-blur-md rounded-full flex items-center justify-center text-primary transition-all hover:bg-white active:scale-90" onclick="toggleHeart(this)">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+<div class="p-4">
+<div class="flex gap-xs mb-2">
+<span class="px-2 py-1 bg-tertiary-fixed text-on-tertiary-fixed-variant rounded-full text-[10px] font-bold uppercase tracking-wider">#StreetStyle</span>
+</div>
+<h3 class="font-headline-md text-[18px] leading-tight mb-1">Cloud Walker Chunky</h3>
+<p class="font-label-md text-primary mb-2">MYR 299.00</p>
+</div>
+</div>
+</div>
+<!-- Product Card 5 -->
+<div class="product-card group cursor-pointer">
+<div class="relative overflow-hidden rounded-xl bg-surface-container-low shadow-sm transition-all duration-300 hover:shadow-xl">
+<img class="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Candid street style photography of a stylish group of friends in a trendy Bangsar neighborhood. They are wearing a mix of soft tailoring and casual knits in a cohesive palette of earth tones. The image captures a sense of community and effortless chic, with a high-key, airy editing style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAjAhgDaooMraVt52ZWjibhBZ7McWzkIyDUQ2gD5Sd0tdIAV2MglfUFsU88fHOxQ0mb3LDGgsTkdcEqotoRLmJwJOu-iRNHPoIW7s6huugxXInzqZfgxTWJzwjDoX2IB-EaVK_jVZxCyFMtsp19LgoL_zidjkfN2eNABc7pVHOMEDuRsfpiSqtjQ6cA5ZIxAW61wfvElEBRWabF0z9O3Nx1MPcsEl9g6GuPHohyRyDWZalwhNAahesC18DqwTOkqqgl1qMtPCQZCi8"/>
+<button class="absolute top-4 right-4 z-10 w-10 h-10 bg-white/60 backdrop-blur-md rounded-full flex items-center justify-center text-primary transition-all hover:bg-white active:scale-90" onclick="toggleHeart(this)">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+<div class="p-4">
+<div class="flex gap-xs mb-2">
+<span class="px-2 py-1 bg-secondary-fixed text-on-secondary-fixed-variant rounded-full text-[10px] font-bold uppercase tracking-wider">#SquadGoals</span>
+</div>
+<h3 class="font-headline-md text-[18px] leading-tight mb-1">Autumn Knit Vest</h3>
+<p class="font-label-md text-primary mb-2">MYR 95.00</p>
+</div>
+</div>
+</div>
+<!-- Product Card 6 -->
+<div class="product-card group cursor-pointer">
+<div class="relative overflow-hidden rounded-xl bg-surface-container-low shadow-sm transition-all duration-300 hover:shadow-xl">
+<img class="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A curated flat lay of fashion accessories including a gold watch, a pair of minimalist sunglasses, and a small vial of perfume on a silk background. The lighting is soft and directional, highlighting the textures and high-quality materials. The color scheme is a mix of warm neutrals and soft gold accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuATq1G11hINeJ5Y8yf0KC8A-RSYKuSCdh55aC3Oio_XYMEJqLj5blOhwZm7TuJ2H5AtgT3G1RURohCH8ulOYd_HomRBGM3umuzJ32EzdHnmHeUcZaQTkoGJWnOJwEZSk2F6Ju1efv8xFi9Ljdim0168nyptmkcy13rE-twEawmyp1yLKCMTWz20LjCPm8QkmTubn_bEnMDzJynktjyH27BuzS21leqPt5paxgYQGxaEcqAAcXlfCWj2ldSUQFWbdOcwjDKN3Nh_oCM"/>
+<button class="absolute top-4 right-4 z-10 w-10 h-10 bg-white/60 backdrop-blur-md rounded-full flex items-center justify-center text-primary transition-all hover:bg-white active:scale-90" onclick="toggleHeart(this)">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+<div class="p-4">
+<div class="flex gap-xs mb-2">
+<span class="px-2 py-1 bg-tertiary-fixed text-on-tertiary-fixed-variant rounded-full text-[10px] font-bold uppercase tracking-wider">#DailyCarry</span>
+</div>
+<h3 class="font-headline-md text-[18px] leading-tight mb-1">Essence Gold Series</h3>
+<p class="font-label-md text-primary mb-2">MYR 155.00</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-low py-xl w-full">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-6 md:px-margin-desktop w-full max-w-[1440px] mx-auto">
+<div class="col-span-1 md:col-span-1 mb-lg md:mb-0">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-md">cippy</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Defining the new standard of effortless chic for Gen Z Malaysia. Community-driven, trend-conscious, and always evolving.</p>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-secondary mb-md uppercase tracking-widest">Shop</h4>
+<ul class="space-y-sm">
+<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">New Arrivals</a></li>
+<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Best Sellers</a></li>
+<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Instagram Shop</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-secondary mb-md uppercase tracking-widest">Support</h4>
+<ul class="space-y-sm">
+<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Shipping &amp; Returns</a></li>
+<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a></li>
+<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-secondary mb-md uppercase tracking-widest">Connect</h4>
+<div class="flex gap-md mb-md">
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined">alternate_email</span></a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined">language</span></a>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">© 2024 cippy Malaysia. All Rights Reserved.</p>
+</div>
+</div>
+</footer>
+<!-- Mobile Bottom Nav (Persistent) -->
+<div class="md:hidden fixed bottom-0 left-0 right-0 h-20 bg-surface/80 backdrop-blur-xl flex items-center justify-around px-gutter z-50 rounded-t-[32px] shadow-[0_-10px_30px_rgba(0,0,0,0.05)] border-t border-white/20">
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined" style='font-variation-settings: "FILL" 1;'>home</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">explore</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Explore</span>
+</button>
+<div class="w-14 h-14 bg-primary rounded-full -mt-10 flex items-center justify-center text-on-primary shadow-lg shadow-primary/40 active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-3xl">add</span>
+</div>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">favorite</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Saves</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Me</span>
+</button>
+</div>
+<script>
+        function toggleHeart(btn) {
+            const icon = btn.querySelector('.material-symbols-outlined');
+            icon.classList.toggle('active-heart');
+            if(icon.classList.contains('active-heart')) {
+                icon.style.fontVariationSettings = "'FILL' 1";
+                // Simple vibration/animation effect
+                btn.style.transform = 'scale(1.2)';
+                setTimeout(() => btn.style.transform = 'scale(1)', 200);
+            } else {
+                icon.style.fontVariationSettings = "'FILL' 0";
+            }
+        }
+
+        // Horizontal scroll animation for filters
+        const filterContainer = document.querySelector('.no-scrollbar');
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        filterContainer.addEventListener('mousedown', (e) => {
+            isDown = true;
+            startX = e.pageX - filterContainer.offsetLeft;
+            scrollLeft = filterContainer.scrollLeft;
+        });
+        filterContainer.addEventListener('mouseleave', () => {
+            isDown = false;
+        });
+        filterContainer.addEventListener('mouseup', () => {
+            isDown = false;
+        });
+        filterContainer.addEventListener('mousemove', (e) => {
+            if(!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - filterContainer.offsetLeft;
+            const walk = (x - startX) * 2;
+            filterContainer.scrollLeft = scrollLeft - walk;
+        });
+    </script>
+</body></html>
