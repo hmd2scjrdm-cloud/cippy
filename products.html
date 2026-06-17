@@ -77,7 +77,16 @@
 <h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-xs">The Edit</h2>
 <p class="font-body-md text-body-md text-on-surface-variant max-w-lg">Curated essentials for the modern lifestyle. Effortless, chic, and uniquely yours.</p>
 </div>
-<div class="flex gap-sm overflow-x-auto pb-2 no-scrollbar"><button class="px-md py-2 bg-primary text-on-primary rounded-none font-label-md text-label-md whitespace-nowrap hover:opacity-80 transition-opacity">Dresses</button><button class="px-md py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-md text-label-md whitespace-nowrap hover:bg-secondary-container transition-colors">Skirts</button><button class="px-md py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-md text-label-md whitespace-nowrap hover:bg-secondary-container transition-colors">Tops</button><button class="px-md py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-md text-label-md whitespace-nowrap hover:bg-secondary-container transition-colors">Pants</button><button class="px-md py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-md text-label-md whitespace-nowrap hover:bg-secondary-container transition-colors">Outerwear</button><button class="px-md py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-md text-label-md whitespace-nowrap hover:bg-secondary-container transition-colors">Sets</button></div>
+<div class="flex gap-sm overflow-x-auto pb-2 no-scrollbar" id="categoryBtns">
+<button class="cat-btn px-md py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-md text-label-md whitespace-nowrap hover:bg-secondary-container transition-colors" data-cat="">All</button>
+<button class="cat-btn px-md py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-md text-label-md whitespace-nowrap hover:bg-secondary-container transition-colors" data-cat="Dresses">Dresses</button>
+<button class="cat-btn px-md py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-md text-label-md whitespace-nowrap hover:bg-secondary-container transition-colors" data-cat="Skirts">Skirts</button>
+<button class="cat-btn px-md py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-md text-label-md whitespace-nowrap hover:bg-secondary-container transition-colors" data-cat="Tops">Tops</button>
+<button class="cat-btn px-md py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-md text-label-md whitespace-nowrap hover:bg-secondary-container transition-colors" data-cat="Pants">Pants</button>
+<button class="cat-btn px-md py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-md text-label-md whitespace-nowrap hover:bg-secondary-container transition-colors" data-cat="Outerwear">Outerwear</button>
+<button class="cat-btn px-md py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-md text-label-md whitespace-nowrap hover:bg-secondary-container transition-colors" data-cat="Sets">Sets</button>
+<button class="cat-btn px-md py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-md text-label-md whitespace-nowrap hover:bg-secondary-container transition-colors" data-cat="Accessories">Accessories</button>
+</div>
 </header>
 <!-- Product Waterfall Grid -->
 <div class="flex items-center justify-between border-b border-outline-variant mb-md pb-2 overflow-x-auto no-scrollbar">
@@ -201,6 +210,7 @@ const sb = createClient(
 
 let allProducts = [];
 let currentSort = 'default';
+let currentCategory = new URLSearchParams(window.location.search).get('category') || '';
 
 async function loadProducts() {
   const { data, error } = await sb
@@ -211,6 +221,7 @@ async function loadProducts() {
 
   if (error || !data) return;
   allProducts = data;
+  setActiveCategory(currentCategory);
   renderProducts();
 }
 
@@ -221,6 +232,7 @@ function renderProducts() {
 
   let data = [...allProducts];
 
+  if (currentCategory) data = data.filter(p => (p.category || '').toLowerCase() === currentCategory.toLowerCase());
   if (currentSort === 'price_asc') data.sort((a, b) => parseFloat(a.price_myr || a.price) - parseFloat(b.price_myr || b.price));
   else if (currentSort === 'price_desc') data.sort((a, b) => parseFloat(b.price_myr || b.price) - parseFloat(a.price_myr || a.price));
   else if (currentSort === 'new') data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -254,6 +266,28 @@ function renderProducts() {
     </div>
   `).join('');
 }
+
+function setCategory(cat) {
+  currentCategory = cat;
+  setActiveCategory(cat);
+  renderProducts();
+}
+
+function setActiveCategory(cat) {
+  document.querySelectorAll('.cat-btn').forEach(btn => {
+    const active = btn.dataset.cat === cat;
+    btn.classList.toggle('bg-primary', active);
+    btn.classList.toggle('text-on-primary', active);
+    btn.classList.toggle('rounded-none', active);
+    btn.classList.toggle('bg-surface-container-high', !active);
+    btn.classList.toggle('text-on-surface-variant', !active);
+    btn.classList.toggle('rounded-full', !active);
+  });
+}
+
+document.querySelectorAll('.cat-btn').forEach(btn => {
+  btn.addEventListener('click', () => setCategory(btn.dataset.cat));
+});
 
 function setSort(sort) {
   currentSort = sort;
