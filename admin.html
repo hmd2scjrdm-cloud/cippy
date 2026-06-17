@@ -201,6 +201,19 @@
         <input id="fNotes" type="text" placeholder="例：发货慢，提前备货" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4928A]"/>
       </div>
 
+      <!-- Sizes -->
+      <div>
+        <label class="text-xs text-stone-500 mb-2 block">尺码</label>
+        <div class="flex gap-3 flex-wrap">
+          <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="size" value="XS" class="w-4 h-4 accent-[#C4928A]"/><span class="text-sm text-stone-600">XS</span></label>
+          <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="size" value="S" class="w-4 h-4 accent-[#C4928A]"/><span class="text-sm text-stone-600">S</span></label>
+          <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="size" value="M" class="w-4 h-4 accent-[#C4928A]"/><span class="text-sm text-stone-600">M</span></label>
+          <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="size" value="L" class="w-4 h-4 accent-[#C4928A]"/><span class="text-sm text-stone-600">L</span></label>
+          <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="size" value="XL" class="w-4 h-4 accent-[#C4928A]"/><span class="text-sm text-stone-600">XL</span></label>
+          <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="size" value="FREE" class="w-4 h-4 accent-[#C4928A]"/><span class="text-sm text-stone-600">均码</span></label>
+        </div>
+      </div>
+
       <!-- Toggles -->
       <div class="flex gap-6">
         <label class="flex items-center gap-2 cursor-pointer">
@@ -409,6 +422,9 @@ async function editProduct(id) {
   document.getElementById('fNotes').value = p.notes || '';
   document.getElementById('fIsNew').checked = p.is_new ?? true;
   document.getElementById('fInStock').checked = p.in_stock ?? true;
+  document.querySelectorAll('input[name="size"]').forEach(cb => {
+    cb.checked = (p.sizes || []).includes(cb.value);
+  });
   if (p.image_url) {
     document.getElementById('imagePreview').src = p.image_url;
     document.getElementById('imagePreviewWrap').classList.remove('hidden');
@@ -453,6 +469,7 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
     notes: document.getElementById('fNotes').value || null,
     is_new: document.getElementById('fIsNew').checked,
     in_stock: document.getElementById('fInStock').checked,
+    sizes: Array.from(document.querySelectorAll('input[name="size"]:checked')).map(el => el.value),
   };
 
   const editId = document.getElementById('editId').value;
