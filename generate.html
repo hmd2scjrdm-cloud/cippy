@@ -132,15 +132,27 @@ fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
 
 function handleFile(file) {
   if (!file || !file.type.startsWith('image/')) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    imageBase64 = e.target.result;
+  const img = new Image();
+  const url = URL.createObjectURL(file);
+  img.onload = () => {
+    // Resize to max 1024px and compress to stay under 4MB
+    const MAX = 1024;
+    let w = img.width, h = img.height;
+    if (w > MAX || h > MAX) {
+      if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+      else { w = Math.round(w * MAX / h); h = MAX; }
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+    imageBase64 = canvas.toDataURL('image/jpeg', 0.85);
     preview.src = imageBase64;
     preview.classList.remove('hidden');
     uploadPrompt.classList.add('hidden');
     generateBtn.disabled = false;
+    URL.revokeObjectURL(url);
   };
-  reader.readAsDataURL(file);
+  img.src = url;
 }
 
 // Type selector styling
@@ -176,7 +188,10 @@ async function generate() {
       body: JSON.stringify({ imageBase64, type }),
     });
 
-    const data = await res.json();
+    const text = await res.text();
+    let data;
+    try { data = JSON.parse(text); }
+    catch { throw new Error(res.status === 413 ? '图片太大，请用更小的图片（建议2MB以内）' : `服务器错误 ${res.status}`); }
     if (!res.ok) throw new Error(data.error || 'Unknown error');
 
     const imgSrc = data.image.url || `data:image/png;base64,${data.image.base64}`;
