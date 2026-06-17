@@ -82,11 +82,10 @@
 <!-- Product Waterfall Grid -->
 <div class="flex items-center justify-between border-b border-outline-variant mb-md pb-2 overflow-x-auto no-scrollbar">
 <div class="flex gap-lg">
-<button class="font-headline-md text-label-md text-primary border-b-2 border-primary pb-2 whitespace-nowrap transition-colors">All</button>
-<button class="font-headline-md text-label-md text-on-surface-variant hover:text-primary pb-2 whitespace-nowrap transition-colors">Price: Low to High</button>
-<button class="font-headline-md text-label-md text-on-surface-variant hover:text-primary pb-2 whitespace-nowrap transition-colors">Price: High to Low</button>
-<button class="font-headline-md text-label-md text-on-surface-variant hover:text-primary pb-2 whitespace-nowrap transition-colors">Bestsellers</button>
-<button class="font-headline-md text-label-md text-on-surface-variant hover:text-primary pb-2 whitespace-nowrap transition-colors">New Arrivals</button>
+<button class="sort-btn font-headline-md text-label-md text-primary border-b-2 border-primary pb-2 whitespace-nowrap transition-colors" onclick="setSort('default')">All</button>
+<button class="sort-btn font-headline-md text-label-md text-on-surface-variant hover:text-primary pb-2 whitespace-nowrap transition-colors" onclick="setSort('price_asc')">Price: Low to High</button>
+<button class="sort-btn font-headline-md text-label-md text-on-surface-variant hover:text-primary pb-2 whitespace-nowrap transition-colors" onclick="setSort('price_desc')">Price: High to Low</button>
+<button class="sort-btn font-headline-md text-label-md text-on-surface-variant hover:text-primary pb-2 whitespace-nowrap transition-colors" onclick="setSort('new')">New Arrivals</button>
 </div>
 <div class="hidden md:flex items-center gap-xs text-on-surface-variant">
 <span class="material-symbols-outlined text-sm">grid_view</span>
@@ -200,6 +199,9 @@ const sb = createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI'
 );
 
+let allProducts = [];
+let currentSort = 'default';
+
 async function loadProducts() {
   const { data, error } = await sb
     .from('products')
@@ -207,16 +209,30 @@ async function loadProducts() {
     .eq('in_stock', true)
     .order('created_at', { ascending: false });
 
+  if (error || !data) return;
+  allProducts = data;
+  renderProducts();
+}
+
+function renderProducts() {
   const grid = document.getElementById('productsGrid');
   const empty = document.getElementById('productsEmpty');
   const countEl = document.getElementById('productCount');
 
-  if (error || !data || !data.length) {
+  let data = [...allProducts];
+
+  if (currentSort === 'price_asc') data.sort((a, b) => parseFloat(a.price_myr || a.price) - parseFloat(b.price_myr || b.price));
+  else if (currentSort === 'price_desc') data.sort((a, b) => parseFloat(b.price_myr || b.price) - parseFloat(a.price_myr || a.price));
+  else if (currentSort === 'new') data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+  if (!data.length) {
     empty.classList.remove('hidden');
+    grid.innerHTML = '';
     if (countEl) countEl.textContent = '0 Items';
     return;
   }
 
+  empty.classList.add('hidden');
   if (countEl) countEl.textContent = `${data.length} Items`;
 
   grid.innerHTML = data.map(p => `
@@ -238,6 +254,18 @@ async function loadProducts() {
     </div>
   `).join('');
 }
+
+function setSort(sort) {
+  currentSort = sort;
+  renderProducts();
+  document.querySelectorAll('.sort-btn').forEach(btn => {
+    btn.classList.remove('text-primary', 'border-b-2', 'border-primary');
+    btn.classList.add('text-on-surface-variant');
+  });
+  event.target.classList.add('text-primary', 'border-b-2', 'border-primary');
+  event.target.classList.remove('text-on-surface-variant');
+}
+window.setSort = setSort;
 
 loadProducts();
 </script>
