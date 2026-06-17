@@ -15,8 +15,8 @@ const SCENE_CONFIGS = {
     style: "lifestyle editorial, warm tones, aspirational Korean aesthetic",
   },
   flatlay: {
-    scene: "an elegant flat lay on a clean cream linen surface, surrounded by minimal props like dried flowers and a small ceramic dish, top-down shot",
-    style: "minimalist flat lay, natural side lighting, soft shadows, Instagram-worthy composition",
+    scene: "a Korean fashion blogger style complete outfit flat lay shot from directly above. The clothing item is the centerpiece, styled with coordinating accessories: a matching small handbag placed to the left, a pair of cute shoes or ballet flats to the right, and optional accessories like leg warmers or hair clips. All items arranged neatly on a warm natural surface — either a light oak wooden floor, a cream linen cloth, or a woven rattan mat. The composition mirrors popular Xiaohongshu (小红书) and Douyin outfit flat lay posts",
+    style: "top-down flat lay, Korean fashion blogger aesthetic, warm natural surface, complete outfit set with bag and shoes, soft natural daylight, cozy and aspirational mood, Xiaohongshu style",
   },
   detail: {
     scene: "an extreme close-up macro shot highlighting the fabric texture, stitching details, and material quality of the item",
@@ -58,7 +58,7 @@ export default async function handler(req, res) {
           { type: "image", source: imageSource },
           {
             type: "text",
-            text: `You are a professional fashion product photographer. Analyze this clothing/accessory item and describe it in precise detail for an AI image generation prompt. Include: item type, colors, fabric texture, pattern, cut/silhouette, key design details (collars, buttons, embroidery, etc.), and overall style. Be specific and concise. Output only the product description, no extra commentary.`,
+            text: `You are a professional Korean fashion stylist and product photographer. Analyze this clothing/accessory item and describe it precisely for an AI image generation prompt. Include: item type, colors, fabric texture, pattern, cut/silhouette, key design details (collars, buttons, embroidery, etc.), and overall style. Then suggest 2-3 coordinating accessories (bag style, shoe style, optional extras) that would pair well with this item for a complete Korean fashion outfit. Be specific and concise. Output only the product description and styling suggestions, no extra commentary.`,
           },
         ],
       }],
