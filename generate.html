@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>cippy | AI 产品图生成</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @font-face {
+    font-family: "JF Open Huninn";
+    src: url("assets/jf-openhuninn.ttf") format("truetype");
+    font-display: swap;
+  }
+  body { font-family: "JF Open Huninn", sans-serif; background: #faf7f5; }
+  .drop-zone { border: 2px dashed #C4928A; transition: background 0.2s; }
+  .drop-zone.drag-over { background: #fdf0ed; }
+</style>
+</head>
+<body class="min-h-screen p-8">
+
+<div class="max-w-2xl mx-auto">
+  <a href="index.html" class="text-sm text-stone-400 hover:text-stone-600 mb-8 inline-block">← 返回网站</a>
+
+  <h1 class="text-3xl font-bold text-stone-800 mb-2">AI 产品展示图生成</h1>
+  <p class="text-stone-500 mb-8">上传单品图，自动生成高质量展示图</p>
+
+  <!-- Upload -->
+  <div class="drop-zone rounded-lg p-12 text-center cursor-pointer mb-6" id="dropZone">
+    <input type="file" id="fileInput" accept="image/*" class="hidden"/>
+    <div id="uploadPrompt">
+      <div class="text-4xl mb-3">📸</div>
+      <p class="text-stone-600 font-medium">点击上传或拖放产品图</p>
+      <p class="text-stone-400 text-sm mt-1">JPG / PNG，建议白底或纯色背景</p>
+    </div>
+    <img id="preview" class="hidden max-h-64 mx-auto rounded-lg object-contain"/>
+  </div>
+
+  <!-- Type selector -->
+  <div class="grid grid-cols-2 gap-3 mb-6">
+    <label class="type-btn cursor-pointer">
+      <input type="radio" name="type" value="background" checked class="hidden"/>
+      <div class="border-2 border-[#C4928A] bg-[#C4928A] text-white rounded-lg p-3 text-center text-sm font-medium type-label">
+        🏙 换背景/场景
+      </div>
+    </label>
+    <label class="type-btn cursor-pointer">
+      <input type="radio" name="type" value="tryOn" class="hidden"/>
+      <div class="border-2 border-stone-200 rounded-lg p-3 text-center text-sm font-medium text-stone-600 type-label">
+        👗 模特上身效果
+      </div>
+    </label>
+    <label class="type-btn cursor-pointer">
+      <input type="radio" name="type" value="flatlay" class="hidden"/>
+      <div class="border-2 border-stone-200 rounded-lg p-3 text-center text-sm font-medium text-stone-600 type-label">
+        🫧 平铺摆拍
+      </div>
+    </label>
+    <label class="type-btn cursor-pointer">
+      <input type="radio" name="type" value="detail" class="hidden"/>
+      <div class="border-2 border-stone-200 rounded-lg p-3 text-center text-sm font-medium text-stone-600 type-label">
+        🔍 细节特写
+      </div>
+    </label>
+  </div>
+
+  <!-- Generate button -->
+  <button id="generateBtn" disabled
+    class="w-full py-4 bg-[#C4928A] text-white font-bold rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition-opacity text-lg">
+    生成展示图
+  </button>
+
+  <!-- Status -->
+  <div id="status" class="hidden mt-6 text-center text-stone-500 text-sm">
+    <div class="inline-flex items-center gap-2">
+      <svg class="animate-spin h-4 w-4 text-[#C4928A]" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+      </svg>
+      <span id="statusText">Claude 正在分析产品…</span>
+    </div>
+  </div>
+
+  <!-- Result -->
+  <div id="result" class="hidden mt-8">
+    <h2 class="font-bold text-stone-700 mb-3">生成结果</h2>
+    <img id="resultImg" class="w-full rounded-xl shadow-lg"/>
+    <div class="mt-4 flex gap-3">
+      <a id="downloadBtn" download="cippy-showcase.png"
+        class="flex-1 py-3 border-2 border-[#C4928A] text-[#C4928A] rounded-lg text-center font-medium hover:bg-[#fdf0ed] transition-colors">
+        下载图片
+      </a>
+      <button id="regenerateBtn"
+        class="flex-1 py-3 bg-[#C4928A] text-white rounded-lg font-medium hover:opacity-90 transition-opacity">
+        重新生成
+      </button>
+    </div>
+    <details class="mt-4">
+      <summary class="text-xs text-stone-400 cursor-pointer">查看 AI 分析描述</summary>
+      <p id="productDesc" class="text-xs text-stone-500 mt-2 bg-stone-100 p-3 rounded-lg leading-relaxed"></p>
+    </details>
+  </div>
+
+  <!-- Error -->
+  <div id="error" class="hidden mt-6 bg-red-50 border border-red-200 rounded-lg p-4 text-red-600 text-sm"></div>
+</div>
+
+<script>
+let imageBase64 = null;
+
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const preview = document.getElementById('preview');
+const uploadPrompt = document.getElementById('uploadPrompt');
+const generateBtn = document.getElementById('generateBtn');
+const status = document.getElementById('status');
+const statusText = document.getElementById('statusText');
+const result = document.getElementById('result');
+const resultImg = document.getElementById('resultImg');
+const downloadBtn = document.getElementById('downloadBtn');
+const errorDiv = document.getElementById('error');
+
+// Upload handling
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  handleFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+
+function handleFile(file) {
+  if (!file || !file.type.startsWith('image/')) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    imageBase64 = e.target.result;
+    preview.src = imageBase64;
+    preview.classList.remove('hidden');
+    uploadPrompt.classList.add('hidden');
+    generateBtn.disabled = false;
+  };
+  reader.readAsDataURL(file);
+}
+
+// Type selector styling
+document.querySelectorAll('input[name="type"]').forEach(radio => {
+  radio.addEventListener('change', () => {
+    document.querySelectorAll('.type-label').forEach(el => {
+      el.className = 'border-2 border-stone-200 rounded-lg p-3 text-center text-sm font-medium text-stone-600 type-label';
+    });
+    radio.nextElementSibling.className = 'border-2 border-[#C4928A] bg-[#C4928A] text-white rounded-lg p-3 text-center text-sm font-medium type-label';
+  });
+});
+
+// Generate
+generateBtn.addEventListener('click', generate);
+document.getElementById('regenerateBtn').addEventListener('click', generate);
+
+async function generate() {
+  if (!imageBase64) return;
+  const type = document.querySelector('input[name="type"]:checked').value;
+
+  errorDiv.classList.add('hidden');
+  result.classList.add('hidden');
+  status.classList.remove('hidden');
+  generateBtn.disabled = true;
+
+  const typeLabels = { background: '构建场景', tryOn: '生成模特效果', flatlay: '排版平铺图', detail: '放大细节' };
+  statusText.textContent = `Claude 正在分析产品… 然后 OpenAI 将${typeLabels[type]}`;
+
+  try {
+    const res = await fetch('/api/generate-showcase', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ imageBase64, type }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Unknown error');
+
+    const imgSrc = data.image.url || `data:image/png;base64,${data.image.base64}`;
+    resultImg.src = imgSrc;
+    downloadBtn.href = imgSrc;
+    document.getElementById('productDesc').textContent = data.productDescription;
+
+    status.classList.add('hidden');
+    result.classList.remove('hidden');
+  } catch (err) {
+    status.classList.add('hidden');
+    errorDiv.textContent = `生成失败：${err.message}`;
+    errorDiv.classList.remove('hidden');
+  } finally {
+    generateBtn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>
