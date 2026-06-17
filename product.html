@@ -205,6 +205,22 @@
 </div>
 </div>
 </div>
+<!-- Specs + Detail Images -->
+<section id="detailSection" class="mt-xl border-t border-surface-container-highest pt-xl space-y-xl hidden">
+  <!-- Specs Table -->
+  <div id="specsBlock" class="hidden">
+    <h2 class="font-headline-md text-on-surface mb-4">参数信息</h2>
+    <table class="w-full text-sm border-collapse">
+      <tbody id="specsTable" class="divide-y divide-surface-container-highest">
+      </tbody>
+    </table>
+  </div>
+  <!-- Detail Images -->
+  <div id="detailImgsBlock" class="hidden">
+    <h2 class="font-headline-md text-on-surface mb-4">图文详情</h2>
+    <div id="detailImgsList" class="space-y-3"></div>
+  </div>
+</section>
 <!-- Accessories CTA -->
 <section class="mt-xl border-t border-surface-container-highest pt-xl flex items-center justify-between">
 <p class="font-headline-md text-on-surface-variant">搭配单品</p>
@@ -431,6 +447,35 @@ async function loadProduct() {
       }
       sizeBtns.appendChild(btn);
     });
+  }
+
+  // Specs table
+  const specs = [];
+  if (p.clothing_type) specs.push(['类型', p.clothing_type]);
+  if (p.fabric) specs.push(['面料', p.fabric]);
+  if (p.series) specs.push(['系列', p.series]);
+  if (p.sizes && p.sizes.length) specs.push(['尺码', p.sizes.map(s => s.size).join(' / ')]);
+
+  if (specs.length) {
+    document.getElementById('specsBlock').classList.remove('hidden');
+    document.getElementById('specsTable').innerHTML = specs.map(([k, v]) => `
+      <tr>
+        <td class="py-3 pr-6 text-on-surface-variant w-24 font-label-sm">${k}</td>
+        <td class="py-3 text-on-surface">${v}</td>
+      </tr>`).join('');
+  }
+
+  // Detail images
+  const detailImgs = p.detail_images || [];
+  if (detailImgs.length) {
+    document.getElementById('detailImgsBlock').classList.remove('hidden');
+    document.getElementById('detailImgsList').innerHTML = detailImgs.map(url =>
+      `<img src="${url}" class="w-full rounded-lg" loading="lazy"/>`
+    ).join('');
+  }
+
+  if (specs.length || detailImgs.length) {
+    document.getElementById('detailSection').classList.remove('hidden');
   }
 
   // Apply name/desc based on current lang, then re-collect for badge translation
