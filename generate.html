@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>cippy | AI 产品图生成</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   @font-face {
     font-family: "JF Open Huninn";
@@ -136,7 +137,7 @@ function handleFile(file) {
   const url = URL.createObjectURL(file);
   img.onload = () => {
     // Resize to max 1024px and compress to stay under 4MB
-    const MAX = 1024;
+    const MAX = 800;
     let w = img.width, h = img.height;
     if (w > MAX || h > MAX) {
       if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
@@ -145,7 +146,7 @@ function handleFile(file) {
     const canvas = document.createElement('canvas');
     canvas.width = w; canvas.height = h;
     canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-    imageBase64 = canvas.toDataURL('image/jpeg', 0.85);
+    imageBase64 = canvas.toDataURL('image/jpeg', 0.75);
     preview.src = imageBase64;
     preview.classList.remove('hidden');
     uploadPrompt.classList.add('hidden');
