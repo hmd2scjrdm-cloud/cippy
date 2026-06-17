@@ -213,16 +213,17 @@
         <input id="fNotes" type="text" placeholder="例：发货慢，提前备货" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4928A]"/>
       </div>
 
-      <!-- Sizes -->
+      <!-- Sizes with stock -->
       <div>
-        <label class="text-xs text-stone-500 mb-2 block">尺码</label>
-        <div class="flex gap-3 flex-wrap">
-          <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="size" value="XS" class="w-4 h-4 accent-[#C4928A]"/><span class="text-sm text-stone-600">XS</span></label>
-          <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="size" value="S" class="w-4 h-4 accent-[#C4928A]"/><span class="text-sm text-stone-600">S</span></label>
-          <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="size" value="M" class="w-4 h-4 accent-[#C4928A]"/><span class="text-sm text-stone-600">M</span></label>
-          <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="size" value="L" class="w-4 h-4 accent-[#C4928A]"/><span class="text-sm text-stone-600">L</span></label>
-          <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="size" value="XL" class="w-4 h-4 accent-[#C4928A]"/><span class="text-sm text-stone-600">XL</span></label>
-          <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="size" value="FREE" class="w-4 h-4 accent-[#C4928A]"/><span class="text-sm text-stone-600">均码</span></label>
+        <label class="text-xs text-stone-500 mb-2 block">尺码 + 各尺码库存</label>
+        <div class="space-y-2">
+          <div class="flex gap-2 text-xs text-stone-400 font-medium px-1 mb-1"><span class="w-20">尺码</span><span>库存数量</span></div>
+          <div class="flex items-center gap-3"><label class="flex items-center gap-2 w-20 cursor-pointer"><input type="checkbox" name="size" value="XS" class="size-cb w-4 h-4 accent-[#C4928A]"/><span class="text-sm text-stone-700">XS</span></label><input type="number" id="stock_XS" placeholder="0" min="0" class="w-24 border border-stone-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-[#C4928A] disabled:opacity-30" disabled/></div>
+          <div class="flex items-center gap-3"><label class="flex items-center gap-2 w-20 cursor-pointer"><input type="checkbox" name="size" value="S" class="size-cb w-4 h-4 accent-[#C4928A]"/><span class="text-sm text-stone-700">S</span></label><input type="number" id="stock_S" placeholder="0" min="0" class="w-24 border border-stone-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-[#C4928A] disabled:opacity-30" disabled/></div>
+          <div class="flex items-center gap-3"><label class="flex items-center gap-2 w-20 cursor-pointer"><input type="checkbox" name="size" value="M" class="size-cb w-4 h-4 accent-[#C4928A]"/><span class="text-sm text-stone-700">M</span></label><input type="number" id="stock_M" placeholder="0" min="0" class="w-24 border border-stone-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-[#C4928A] disabled:opacity-30" disabled/></div>
+          <div class="flex items-center gap-3"><label class="flex items-center gap-2 w-20 cursor-pointer"><input type="checkbox" name="size" value="L" class="size-cb w-4 h-4 accent-[#C4928A]"/><span class="text-sm text-stone-700">L</span></label><input type="number" id="stock_L" placeholder="0" min="0" class="w-24 border border-stone-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-[#C4928A] disabled:opacity-30" disabled/></div>
+          <div class="flex items-center gap-3"><label class="flex items-center gap-2 w-20 cursor-pointer"><input type="checkbox" name="size" value="XL" class="size-cb w-4 h-4 accent-[#C4928A]"/><span class="text-sm text-stone-700">XL</span></label><input type="number" id="stock_XL" placeholder="0" min="0" class="w-24 border border-stone-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-[#C4928A] disabled:opacity-30" disabled/></div>
+          <div class="flex items-center gap-3"><label class="flex items-center gap-2 w-20 cursor-pointer"><input type="checkbox" name="size" value="FREE" class="size-cb w-4 h-4 accent-[#C4928A]"/><span class="text-sm text-stone-700">均码</span></label><input type="number" id="stock_FREE" placeholder="0" min="0" class="w-24 border border-stone-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-[#C4928A] disabled:opacity-30" disabled/></div>
         </div>
       </div>
 
@@ -349,6 +350,14 @@ function calcCost() {
 ['fCostRmb', 'fShippingRmb', 'fPriceMyr'].forEach(id =>
   document.getElementById(id).addEventListener('input', calcCost));
 
+// Enable stock input when size is checked
+document.querySelectorAll('.size-cb').forEach(cb => {
+  cb.addEventListener('change', () => {
+    const stockInput = document.getElementById('stock_' + cb.value);
+    if (stockInput) { stockInput.disabled = !cb.checked; if (!cb.checked) stockInput.value = ''; }
+  });
+});
+
 document.getElementById('fImageFile').addEventListener('change', async (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -435,8 +444,11 @@ async function editProduct(id) {
   document.getElementById('fSeries').value = p.series || '';
   document.getElementById('fIsNew').checked = p.is_new ?? true;
   document.getElementById('fInStock').checked = p.in_stock ?? true;
-  document.querySelectorAll('input[name="size"]').forEach(cb => {
-    cb.checked = (p.sizes || []).includes(cb.value);
+  document.querySelectorAll('.size-cb').forEach(cb => {
+    const entry = (p.sizes || []).find(s => s.size === cb.value);
+    cb.checked = !!entry;
+    const stockInput = document.getElementById('stock_' + cb.value);
+    if (stockInput) { stockInput.disabled = !entry; stockInput.value = entry ? entry.stock : ''; }
   });
   if (p.image_url) {
     document.getElementById('imagePreview').src = p.image_url;
@@ -482,7 +494,10 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
     notes: document.getElementById('fNotes').value || null,
     is_new: document.getElementById('fIsNew').checked,
     in_stock: document.getElementById('fInStock').checked,
-    sizes: Array.from(document.querySelectorAll('input[name="size"]:checked')).map(el => el.value),
+    sizes: Array.from(document.querySelectorAll('.size-cb:checked')).map(cb => ({
+      size: cb.value,
+      stock: parseInt(document.getElementById('stock_' + cb.value)?.value) || 0
+    })),
     series: document.getElementById('fSeries').value || null,
   };
 

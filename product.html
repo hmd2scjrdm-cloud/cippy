@@ -152,61 +152,39 @@
 <main class="pt-32 pb-xl px-6 md:px-margin-desktop max-w-[1440px] mx-auto">
 <!-- Product Hero Section -->
 <div class="flex flex-col md:grid md:grid-cols-12 gap-gutter lg:gap-xl">
-<!-- Left: Vertical Image Gallery -->
+<!-- Left: Image -->
 <div class="md:col-span-7 flex flex-col-reverse md:flex-row gap-4">
-<!-- Thumbnails -->
-<div class="flex md:flex-col gap-3 overflow-x-auto md:overflow-y-auto hide-scrollbar shrink-0 md:w-24">
-<div class="aspect-[3/4] w-20 md:w-full bg-surface-container-high rounded-lg cursor-pointer border-2 border-primary transition-all overflow-hidden">
-<img class="w-full h-full object-cover" data-alt="A close-up vertical shot of a minimalist Korean-style midi dress in a soft ivory linen fabric." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPG0saG52AD55Njo7yqrVF7WfYSdV0iCP1eH1uCpoqz5QQGxFaqeJCceZbZ2j1SxartNSJ7AyODowMGDf3Y9GfjpkKyO3K7MzraG0BlIBK_frk8i2LYVqFEtH7ZcH2wEqRYx-bs-a6G5fUKYQJz21zlzJMYxF9INwkZLd49TFU5jH72BUlZIlNxJOk_Rk9ukQ7x19VEvwpdsyJq_vOeYLISIRFpzC0vOZBb_DvP_T_uul7g9AaCPL44NivS32EbBD7PFShLqjX0ZU"/>
-</div>
-<div class="aspect-[3/4] w-20 md:w-full bg-surface-container-high rounded-lg cursor-pointer hover:border-outline-variant border-2 border-transparent transition-all overflow-hidden">
-<img class="w-full h-full object-cover" data-alt="Detail shot of a minimalist fashion garment showing the fine texture of high-quality fabric." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmmn-ajuwmriKlVBefFyiD9BD9B0cqVETDp9oVi5dwviUXCeFFUzxi2Ju-9KHKpE2s2pyULERoIN2j7WqgPjgSuLu48JZymJqANhzrzlk4gYU30aWX_5SCQ5gLR70KtUvvtTyqrhN75esx0jYiLgHoeGnmQBzSGCigUXLAFryBK1EEySNaE5vDs0ntIgcuHcP_7-F3lom4EDRYt1hiZvhOX5k7xTbsRfIHWv-DL9t6ZnaY5P9II6QgAgvq2HyW9JBanoRXqFd6txI"/>
-</div>
-<div class="aspect-[3/4] w-20 md:w-full bg-surface-container-high rounded-lg cursor-pointer hover:border-outline-variant border-2 border-transparent transition-all overflow-hidden">
-<img class="w-full h-full object-cover" data-alt="Fashion photography of a model from behind, showcasing the elegant back detail of a chic dress." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRsLZ6bdB5L8cpjuNeQ68svg0UkJpWyEhXSu8j4ML1tGTt8hni34zR0HrxzvUUj49bvfTCdid0rK61LIQPczfWMzkGXWNW_LPEfTll0j7I79KjaDqXXa_sjoMcLH46voUzv3MDdFz6ateBeJS44wRRm2VDe0E3-ZoXgqDABoYYCZGIUahqU765mOqcavckmzYBItDAMG99g8VH3SmgxyD8WVJar1H4XC1fFMEIBVZzUOwt1J2z_jzQAaoSL53Uo1qjb-9VxxSHkg8"/>
-</div>
-</div>
-<!-- Main Image -->
-<div class="flex-grow aspect-[3/4] bg-surface-container rounded-xl overflow-hidden shadow-sm product-image-zoom transition-all duration-500">
-<img class="w-full h-full object-cover transition-transform duration-700 ease-out" data-alt="Full-length fashion portrait of a stylish woman wearing a minimalist ivory midi dress." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBcBXz_FlOskjqXFun4sAoSsK0iPkjl0NrRnWNdiftyPr-Ghb8n7JlhMSLaiZc7525kgNaUvV_Prtmi_4IMiEmJn_L08Bdjqa8hTCWxm3YBxtSXrSysHRsqK3Ec37pvVVkb_q2hBgi-ChZ77YRZJAf5AIKvwG9PskxQPKd4lEQ0YDDFVp-xJjNP-UANfxzJGQFFhmmpEtA4Do4E0hyoR1HG8Vbe60hJ0WbEBr8jBJ3DNMKQ0gA2-1TDwP0r8UGFC-7U0CpSDzh7gs"/>
+<div class="flex-grow aspect-[3/4] bg-surface-container rounded-xl overflow-hidden shadow-sm">
+<img id="productImg" class="w-full h-full object-cover" src="" alt=""/>
 </div>
 </div>
 <!-- Right: Sticky Product Info -->
 <div class="md:col-span-5 h-fit md:sticky md:top-32 space-y-base">
+<div id="productNotFound" class="hidden py-24 text-center text-on-surface-variant">找不到此商品</div>
+<div id="productInfo">
 <div class="space-y-2">
-<span class="font-label-sm text-label-sm text-primary bg-[#f0f0f0] px-3 py-1">New Arrival</span>
-<h1 class="font-headline-lg text-headline-lg text-on-surface">Lumière Linen Midi Dress</h1>
+<span id="productBadge" class="hidden font-label-sm text-label-sm text-primary bg-primary-fixed px-3 py-1">新品</span>
+<h1 id="productName" class="font-headline-lg text-headline-lg text-on-surface">载入中…</h1>
 <div class="flex items-baseline gap-4">
-<p class="font-headline-md text-headline-md text-on-surface">RM 249.00</p>
-<p class="font-body-md text-body-md text-outline line-through">RM 320.00</p>
+<p id="productPrice" class="font-headline-md text-headline-md text-on-surface"></p>
 </div>
 </div>
 <div class="pt-lg pb-4 border-b border-surface-container-highest">
-<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-                    An effortlessly chic staple for the modern Malaysian wardrobe. Crafted from breathable organic linen, featuring a minimalist silhouette and a flattering tie-back detail. Perfect for sun-soaked afternoons at Bukit Bintang or evening gallery hops.
-                </p>
+<p id="productDesc" class="font-body-md text-body-md text-on-surface-variant leading-relaxed"></p>
 </div>
 <!-- Size Selector -->
-<div class="pt-md space-y-4">
-<div class="flex justify-between items-center">
-<span class="font-label-md text-label-md uppercase tracking-wider">Select Size</span>
-<button class="text-primary font-label-sm text-label-sm underline decoration-primary/30">Size Guide</button>
-</div>
-<div class="flex gap-3">
-<button class="flex-1 py-4 border border-outline-variant rounded-xl font-label-md hover:bg-surface-container transition-colors">S</button>
-<button class="flex-1 py-4 border-2 border-primary bg-[#f0f0f0] rounded-xl font-label-md text-primary">M</button>
-<button class="flex-1 py-4 border border-outline-variant rounded-xl font-label-md hover:bg-surface-container transition-colors">L</button>
-</div>
+<div class="pt-md space-y-4" id="sizeSection">
+<span class="font-label-md text-label-md uppercase tracking-wider">选择尺码</span>
+<div id="sizeBtns" class="flex gap-3 flex-wrap"></div>
+<p id="sizeStock" class="text-xs text-on-surface-variant"></p>
 </div>
 <!-- Add to Bag -->
 <div class="pt-lg space-y-4">
-<button class="w-full py-5 bg-primary text-on-primary rounded-none font-headline-md hover:opacity-80 active:scale-95 transition-all">
-                    Add to Bag
-                </button>
+<button class="w-full py-5 bg-primary text-on-primary rounded-none font-headline-md hover:opacity-80 active:scale-95 transition-all">加入购物车</button>
 <button class="w-full py-4 border border-outline-variant text-on-surface rounded-none font-label-md flex items-center justify-center gap-2 hover:bg-surface-container-low transition-colors">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">favorite</span>
-                    Save to Wishlist
-                </button>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">favorite</span>收藏
+</button>
+</div>
 </div>
 <!-- Shipping Info -->
 <div class="pt-lg space-y-3">
@@ -439,36 +417,82 @@
 </div>
 </div>
 </footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-    // Simple Thumbnail Switcher
-    document.querySelectorAll('.aspect-\\[3\\/4\\]').forEach(thumb => {
-        thumb.addEventListener('click', function() {
-            const mainImg = document.querySelector('.product-image-zoom img');
-            const newSrc = this.querySelector('img').getAttribute('src');
-            const newAlt = this.querySelector('img').getAttribute('data-alt');
-            
-            // Fade out/in effect
-            mainImg.style.opacity = '0';
-            setTimeout(() => {
-                mainImg.src = newSrc;
-                mainImg.setAttribute('data-alt', newAlt);
-                mainImg.style.opacity = '1';
-            }, 200);
+const SUPABASE_URL = 'https://ilzeziznxzaxxudzhdmu.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-            // Update active thumbnail border
-            document.querySelectorAll('.aspect-\\[3\\/4\\]').forEach(t => t.classList.remove('border-primary'));
-            this.classList.add('border-primary');
+let selectedSize = null;
+
+async function loadProduct() {
+  const id = new URLSearchParams(window.location.search).get('id');
+  if (!id) { showNotFound(); return; }
+
+  const { data: p, error } = await sb.from('products').select('*').eq('id', id).single();
+  if (error || !p) { showNotFound(); return; }
+
+  // Image
+  const img = document.getElementById('productImg');
+  img.src = p.image_url || '';
+  img.alt = p.name || '';
+
+  // Badge
+  if (p.is_new) document.getElementById('productBadge').classList.remove('hidden');
+
+  // Name (prefer Chinese if available)
+  document.getElementById('productName').textContent = p.name_zh || p.name || '';
+
+  // Price
+  document.getElementById('productPrice').textContent = p.price_myr ? `RM ${parseFloat(p.price_myr).toFixed(2)}` : (p.price ? `RM ${parseFloat(p.price).toFixed(2)}` : '');
+
+  // Description
+  document.getElementById('productDesc').textContent = p.description || '';
+
+  // Sizes
+  const sizes = p.sizes || [];
+  const sizeBtns = document.getElementById('sizeBtns');
+  const sizeStock = document.getElementById('sizeStock');
+
+  if (sizes.length === 0) {
+    document.getElementById('sizeSection').classList.add('hidden');
+  } else {
+    sizeBtns.innerHTML = '';
+    sizes.forEach(({ size, stock }) => {
+      const inStock = stock > 0;
+      const btn = document.createElement('button');
+      btn.textContent = size;
+      btn.dataset.size = size;
+      btn.dataset.stock = stock;
+      btn.className = `flex-1 py-4 border rounded-xl font-label-md transition-colors ${inStock ? 'border-outline-variant hover:bg-surface-container cursor-pointer' : 'border-outline-variant text-outline opacity-40 cursor-not-allowed line-through'}`;
+      if (inStock) {
+        btn.addEventListener('click', () => {
+          selectedSize = size;
+          sizeBtns.querySelectorAll('button').forEach(b => {
+            b.classList.remove('border-2', 'border-primary', 'bg-[#f0f0f0]', 'text-primary');
+            b.classList.add('border', 'border-outline-variant');
+          });
+          btn.classList.add('border-2', 'border-primary', 'bg-[#f0f0f0]', 'text-primary');
+          btn.classList.remove('border', 'border-outline-variant');
+          sizeStock.textContent = stock <= 3 ? `仅剩 ${stock} 件` : '';
         });
+      } else {
+        btn.disabled = true;
+      }
+      sizeBtns.appendChild(btn);
     });
+  }
 
-    // Sticky Info Parallax (Subtle)
-    window.addEventListener('scroll', () => {
-        const scrolled = window.pageYOffset;
-        const heroImage = document.querySelector('.product-image-zoom img');
-        if (heroImage) {
-            heroImage.style.transform = `translateY(${scrolled * 0.02}px)`;
-        }
-    });
+  // Page title
+  document.title = `cippy | ${p.name_zh || p.name || '商品'}`;
+}
+
+function showNotFound() {
+  document.getElementById('productInfo').classList.add('hidden');
+  document.getElementById('productNotFound').classList.remove('hidden');
+}
+
+loadProduct();
 </script>
 <script src="i18n.js"></script>
 </body></html>
