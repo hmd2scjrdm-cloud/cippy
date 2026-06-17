@@ -71,16 +71,21 @@ export default async function handler(req, res) {
     const productDescription = analysis.content[0].text;
     const scene = SCENE_CONFIGS[type];
 
-    // Step 2: Build OpenAI image generation prompt
-    const prompt = `High-quality fashion photography: ${productDescription}. Scene: ${scene.scene}. Style: ${scene.style}. Premium Korean fashion brand aesthetic, soft warm lighting, clean and aspirational mood.`;
+    // Step 2: Build edit prompt — instruct AI to keep the product exactly as-is
+    const prompt = `Keep the clothing/product EXACTLY as it appears in the original image — do not change its design, color, pattern, cut, or any detail. Only change the setting and composition: ${scene.scene}. Style: ${scene.style}. The product must be pixel-accurate to the original. Premium Korean fashion brand aesthetic.`;
 
-    // Step 3: Generate showcase image with OpenAI
-    const generation = await openai.images.generate({
+    // Step 3: Edit the actual product image (image-to-image, not text-to-image)
+    // Convert base64 to Buffer for OpenAI
+    const rawBase64 = (imageBase64 || "").replace(/^data:image\/\w+;base64,/, "");
+    const imageBuffer = Buffer.from(rawBase64, "base64");
+    const imageFile = await OpenAI.toFile(imageBuffer, "product.jpg", { type: "image/jpeg" });
+
+    const generation = await openai.images.edit({
       model: "gpt-image-1",
+      image: imageFile,
       prompt,
       n: 1,
       size: "1024x1024",
-      quality: "high",
     });
 
     const resultImage = generation.data[0];
