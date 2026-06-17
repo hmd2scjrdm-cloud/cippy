@@ -112,6 +112,18 @@
         </div>
       </div>
 
+      <!-- Series -->
+      <div>
+        <label class="text-xs text-stone-500 mb-1 block">系列</label>
+        <select id="fSeries" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4928A]">
+          <option value="">无系列</option>
+          <option value="Cippy Essential">Cippy Essential</option>
+          <option value="Cippy Sweet">Cippy Sweet</option>
+          <option value="Cippy Summer">Cippy Summer</option>
+          <option value="Cippy Daily">Cippy Daily</option>
+        </select>
+      </div>
+
       <!-- Category + SKU -->
       <div class="grid grid-cols-2 gap-4">
         <div>
@@ -420,6 +432,7 @@ async function editProduct(id) {
   document.getElementById('fSupplierUrl').value = p.supplier_url || '';
   document.getElementById('fDescription').value = p.description || '';
   document.getElementById('fNotes').value = p.notes || '';
+  document.getElementById('fSeries').value = p.series || '';
   document.getElementById('fIsNew').checked = p.is_new ?? true;
   document.getElementById('fInStock').checked = p.in_stock ?? true;
   document.querySelectorAll('input[name="size"]').forEach(cb => {
@@ -470,6 +483,7 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
     is_new: document.getElementById('fIsNew').checked,
     in_stock: document.getElementById('fInStock').checked,
     sizes: Array.from(document.querySelectorAll('input[name="size"]:checked')).map(el => el.value),
+    series: document.getElementById('fSeries').value || null,
   };
 
   const editId = document.getElementById('editId').value;
