@@ -133,7 +133,7 @@
 
       <!-- Cost Section -->
       <div class="bg-amber-50 rounded-xl p-4 space-y-3">
-        <p class="text-xs font-bold text-amber-700 uppercase tracking-wide">💰 成本计算（人民币 → 马币 × 1.65）</p>
+        <p class="text-xs font-bold text-amber-700 uppercase tracking-wide">💰 成本计算（人民币 ÷ 1.65 = 马币）</p>
         <div class="grid grid-cols-3 gap-3">
           <div>
             <label class="text-xs text-stone-500 mb-1 block">进货价 (RMB ¥)</label>
@@ -226,7 +226,7 @@
 const SUPABASE_URL = 'https://ilzeziznxzaxxudzhdmu.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI';
 const ALLOWED_EMAILS = ['cippy.kl@gmail.com'];
-const RMB_TO_MYR = 1.65;
+const RMB_TO_MYR = 1.65; // MYR = RMB ÷ 1.65
 
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -267,7 +267,7 @@ async function loadProducts() {
   }
 
   tbody.innerHTML = data.map(p => {
-    const costMyr = ((parseFloat(p.cost_rmb) || 0) + (parseFloat(p.shipping_cost_rmb) || 0)) * RMB_TO_MYR;
+    const costMyr = ((parseFloat(p.cost_rmb) || 0) + (parseFloat(p.shipping_cost_rmb) || 0)) / RMB_TO_MYR;
     const margin = p.price_myr && costMyr ? Math.round((p.price_myr - costMyr) / p.price_myr * 100) : null;
     const marginColor = margin > 40 ? 'text-green-600' : margin > 20 ? 'text-amber-500' : 'text-red-500';
     return `
@@ -307,7 +307,7 @@ async function loadProducts() {
 function calcCost() {
   const costRmb = parseFloat(document.getElementById('fCostRmb').value) || 0;
   const shippingRmb = parseFloat(document.getElementById('fShippingRmb').value) || 0;
-  const totalMyr = (costRmb + shippingRmb) * RMB_TO_MYR;
+  const totalMyr = (costRmb + shippingRmb) / RMB_TO_MYR;
   document.getElementById('calcCostMyr').textContent = `RM ${totalMyr.toFixed(2)}`;
 
   const priceMyr = parseFloat(document.getElementById('fPriceMyr').value) || 0;
@@ -411,7 +411,7 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
 
   const costRmb = parseFloat(document.getElementById('fCostRmb').value) || null;
   const shippingRmb = parseFloat(document.getElementById('fShippingRmb').value) || null;
-  const costMyr = ((costRmb || 0) + (shippingRmb || 0)) * RMB_TO_MYR;
+  const costMyr = ((costRmb || 0) + (shippingRmb || 0)) / RMB_TO_MYR;
   const priceMyr = parseFloat(document.getElementById('fPriceMyr').value) || 0;
 
   const payload = {
