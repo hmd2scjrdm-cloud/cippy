@@ -314,7 +314,18 @@
 
   window.toggleCippyLang = function () {
     var cur = localStorage.getItem(STORAGE_KEY) || "en";
-    apply(cur === "zh" ? "en" : "zh");
+    var next = cur === "zh" ? "en" : "zh";
+    apply(next);
+    if (window.onCippyLangChange) window.onCippyLangChange(next);
+  };
+
+  window.getCippyLang = function () {
+    return localStorage.getItem(STORAGE_KEY) || "en";
+  };
+
+  window.recollectCippyLang = function () {
+    collect();
+    apply(localStorage.getItem(STORAGE_KEY) || "en");
   };
 
   document.addEventListener("DOMContentLoaded", function () {

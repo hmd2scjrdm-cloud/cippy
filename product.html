@@ -163,7 +163,7 @@
 <div id="productNotFound" class="hidden py-24 text-center text-on-surface-variant">找不到此商品</div>
 <div id="productInfo">
 <div class="space-y-2">
-<span id="productBadge" class="hidden font-label-sm text-label-sm text-primary bg-primary-fixed px-3 py-1">新品</span>
+<span id="productBadge" class="hidden font-label-sm text-label-sm text-primary bg-primary-fixed px-3 py-1">New Arrival</span>
 <h1 id="productName" class="font-headline-lg text-headline-lg text-on-surface">载入中…</h1>
 <div class="flex items-baseline gap-4">
 <p id="productPrice" class="font-headline-md text-headline-md text-on-surface"></p>
@@ -424,6 +424,17 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let selectedSize = null;
+let _productData = null;
+
+function applyProductLang(lang) {
+  if (!_productData) return;
+  const p = _productData;
+  document.getElementById('productName').textContent = lang === 'zh' && p.name_zh ? p.name_zh : (p.name || '');
+  document.getElementById('productDesc').textContent = p.description || '';
+  document.title = `cippy | ${lang === 'zh' && p.name_zh ? p.name_zh : (p.name || '商品')}`;
+}
+
+window.onCippyLangChange = applyProductLang;
 
 async function loadProduct() {
   const id = new URLSearchParams(window.location.search).get('id');
@@ -431,6 +442,7 @@ async function loadProduct() {
 
   const { data: p, error } = await sb.from('products').select('*').eq('id', id).single();
   if (error || !p) { showNotFound(); return; }
+  _productData = p;
 
   // Image
   const img = document.getElementById('productImg');
@@ -440,14 +452,8 @@ async function loadProduct() {
   // Badge
   if (p.is_new) document.getElementById('productBadge').classList.remove('hidden');
 
-  // Name (prefer Chinese if available)
-  document.getElementById('productName').textContent = p.name_zh || p.name || '';
-
   // Price
   document.getElementById('productPrice').textContent = p.price_myr ? `RM ${parseFloat(p.price_myr).toFixed(2)}` : (p.price ? `RM ${parseFloat(p.price).toFixed(2)}` : '');
-
-  // Description
-  document.getElementById('productDesc').textContent = p.description || '';
 
   // Sizes
   const sizes = p.sizes || [];
@@ -483,8 +489,9 @@ async function loadProduct() {
     });
   }
 
-  // Page title
-  document.title = `cippy | ${p.name_zh || p.name || '商品'}`;
+  // Apply name/desc based on current lang, then re-collect for badge translation
+  applyProductLang(window.getCippyLang ? window.getCippyLang() : 'en');
+  if (window.recollectCippyLang) window.recollectCippyLang();
 }
 
 function showNotFound() {
