@@ -164,7 +164,7 @@
 <div id="productInfo">
 <div class="space-y-2">
 <span id="productBadge" class="hidden font-label-sm text-label-sm text-primary bg-primary-fixed px-3 py-1">New Arrival</span>
-<h1 id="productName" class="font-headline-lg text-headline-lg text-on-surface">载入中…</h1>
+<h1 id="productName" class="font-headline-lg text-headline-lg text-on-surface">Loading…</h1>
 <div class="flex items-baseline gap-4">
 <p id="productPrice" class="font-headline-md text-headline-md text-on-surface"></p>
 </div>
@@ -174,15 +174,15 @@
 </div>
 <!-- Size Selector -->
 <div class="pt-md space-y-4" id="sizeSection">
-<span class="font-label-md text-label-md uppercase tracking-wider">选择尺码</span>
+<span class="font-label-md text-label-md uppercase tracking-wider">Select Size</span>
 <div id="sizeBtns" class="flex gap-3 flex-wrap"></div>
 <p id="sizeStock" class="text-xs text-on-surface-variant"></p>
 </div>
 <!-- Add to Bag -->
 <div class="pt-lg space-y-4">
-<button class="w-full py-5 bg-primary text-on-primary rounded-none font-headline-md hover:opacity-80 active:scale-95 transition-all">加入购物车</button>
+<button class="w-full py-5 bg-primary text-on-primary rounded-none font-headline-md hover:opacity-80 active:scale-95 transition-all">Add to Bag</button>
 <button class="w-full py-4 border border-outline-variant text-on-surface rounded-none font-label-md flex items-center justify-center gap-2 hover:bg-surface-container-low transition-colors">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">favorite</span>收藏
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">favorite</span>Save to Wishlist
 </button>
 </div>
 </div>
@@ -209,7 +209,7 @@
 <section id="detailSection" class="mt-xl border-t border-surface-container-highest pt-xl space-y-xl hidden">
   <!-- Specs Table -->
   <div id="specsBlock" class="hidden">
-    <h2 class="font-headline-md text-on-surface mb-4">参数信息</h2>
+    <h2 class="font-headline-md text-on-surface mb-4">Product Details</h2>
     <table class="w-full text-sm border-collapse">
       <tbody id="specsTable" class="divide-y divide-surface-container-highest">
       </tbody>
@@ -217,13 +217,13 @@
   </div>
   <!-- Detail Images -->
   <div id="detailImgsBlock" class="hidden">
-    <h2 class="font-headline-md text-on-surface mb-4">图文详情</h2>
+    <h2 class="font-headline-md text-on-surface mb-4">Detail Photos</h2>
     <div id="detailImgsList" class="space-y-3"></div>
   </div>
 </section>
 <!-- Accessories CTA -->
 <section class="mt-xl border-t border-surface-container-highest pt-xl flex items-center justify-between">
-<p class="font-headline-md text-on-surface-variant">搭配单品</p>
+<p class="font-headline-md text-on-surface-variant">Complete the Look</p>
 <a href="products.html?category=Accessories" class="group flex items-center gap-2 font-label-md text-primary hover:opacity-70 transition-opacity">
   查看更多必备单品
   <span class="material-symbols-outlined transition-transform group-hover:translate-x-1">arrow_forward</span>
@@ -440,7 +440,8 @@ async function loadProduct() {
           });
           btn.classList.add('border-2', 'border-primary', 'bg-[#f0f0f0]', 'text-primary');
           btn.classList.remove('border', 'border-outline-variant');
-          sizeStock.textContent = stock <= 3 ? `仅剩 ${stock} 件` : '';
+          const lang = window.getCippyLang ? window.getCippyLang() : 'en';
+          sizeStock.textContent = stock <= 3 ? (lang === 'zh' ? `仅剩 ${stock} 件` : `Only ${stock} left`) : '';
         });
       } else {
         btn.disabled = true;

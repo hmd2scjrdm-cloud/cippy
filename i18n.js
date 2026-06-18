@@ -260,7 +260,16 @@
   "Write your heartfelt message here...": "在这里写下你的祝福...",
   "Email address": "电子邮箱",
   "Search trends...": "搜索潮流...",
-  "Get 10% off your first order.": "首单立享9折优惠。"
+  "Get 10% off your first order.": "首单立享9折优惠。",
+  "Loading…": "载入中…",
+  "Select Size": "选择尺码",
+  "Add to Bag": "加入购物袋",
+  "Save to Wishlist": "收藏",
+  "Product Details": "参数信息",
+  "Detail Photos": "图文详情",
+  "Complete the Look": "搭配单品",
+  "Complete The Look": "搭配全套造型",
+  "View More Essentials": "查看更多必备单品"
 };
 
   var textNodes = [];
