@@ -428,6 +428,11 @@ document.getElementById('fImageUrl').addEventListener('input', (e) => {
 function openModal(title) {
   document.getElementById('modalTitle').textContent = title;
   document.getElementById('modal').classList.remove('hidden');
+  if (!document.getElementById('editId').value) {
+    currentDetailImages = [];
+    renderDetailPreviews([]);
+    document.getElementById('fDetailImgs').value = '';
+  }
 }
 function closeModal() {
   document.getElementById('modal').classList.add('hidden');
@@ -558,16 +563,6 @@ function removeDetailImg(i) {
 }
 window.removeDetailImg = removeDetailImg;
 
-// Reset detail images when modal opens for new product
-const origOpenModal = openModal;
-function openModal(title) {
-  if (!document.getElementById('editId').value) {
-    currentDetailImages = [];
-    renderDetailPreviews([]);
-    document.getElementById('fDetailImgs').value = '';
-  }
-  origOpenModal(title);
-}
 
 document.getElementById('fDetailImgs').addEventListener('change', async (e) => {
   const files = Array.from(e.target.files);
