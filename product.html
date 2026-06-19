@@ -211,11 +211,16 @@
     <div class="overflow-x-auto">
       <table class="w-full text-sm text-center border-collapse">
         <thead><tr class="bg-surface-container-low text-xs text-on-surface-variant">
-          <th class="py-2 px-3 text-left">Size</th>
-          <th class="py-2 px-3">Bust</th>
-          <th class="py-2 px-3">Waist</th>
-          <th class="py-2 px-3">Hip</th>
-          <th class="py-2 px-3">Length</th>
+          <th class="py-2 px-3 text-left">尺码</th>
+          <th class="py-2 px-3">胸围</th>
+          <th class="py-2 px-3">肩宽</th>
+          <th class="py-2 px-3">腰围</th>
+          <th class="py-2 px-3">臀围</th>
+          <th class="py-2 px-3">腿围</th>
+          <th class="py-2 px-3">衣长</th>
+          <th class="py-2 px-3">裤长</th>
+          <th class="py-2 px-3">裙长</th>
+          <th class="py-2 px-3">袖长</th>
         </tr></thead>
         <tbody id="sizeGuideTable" class="divide-y divide-surface-container-highest"></tbody>
       </table>
@@ -603,13 +608,11 @@ async function loadProduct() {
   const sizeGuide = p.size_guide || [];
   if (sizeGuide.length) {
     document.getElementById('sizeGuideBtn').classList.remove('hidden');
+    const sgFields = ['bust','shoulder','waist','hip','thigh','length','pants','skirt','sleeve'];
     document.getElementById('sizeGuideTable').innerHTML = sizeGuide.map(r => `
       <tr class="hover:bg-surface-container-low">
         <td class="py-2 px-3 text-left font-medium">${r.size}</td>
-        <td class="py-2 px-3">${r.bust || '—'}</td>
-        <td class="py-2 px-3">${r.waist || '—'}</td>
-        <td class="py-2 px-3">${r.hip || '—'}</td>
-        <td class="py-2 px-3">${r.length || '—'}</td>
+        ${sgFields.map(f => `<td class="py-2 px-3">${r[f] != null ? r[f] : '—'}</td>`).join('')}
       </tr>`).join('');
   }
 

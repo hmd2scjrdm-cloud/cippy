@@ -262,10 +262,15 @@
           <table class="w-full text-xs border-collapse mb-2">
             <thead><tr class="bg-stone-50">
               <th class="border border-stone-200 px-2 py-1 text-left text-stone-500">尺码</th>
-              <th class="border border-stone-200 px-2 py-1 text-stone-500">胸围(cm)</th>
-              <th class="border border-stone-200 px-2 py-1 text-stone-500">腰围(cm)</th>
-              <th class="border border-stone-200 px-2 py-1 text-stone-500">臀围(cm)</th>
-              <th class="border border-stone-200 px-2 py-1 text-stone-500">衣长(cm)</th>
+              <th class="border border-stone-200 px-2 py-1 text-stone-500">胸围</th>
+              <th class="border border-stone-200 px-2 py-1 text-stone-500">肩宽</th>
+              <th class="border border-stone-200 px-2 py-1 text-stone-500">腰围</th>
+              <th class="border border-stone-200 px-2 py-1 text-stone-500">臀围</th>
+              <th class="border border-stone-200 px-2 py-1 text-stone-500">腿围</th>
+              <th class="border border-stone-200 px-2 py-1 text-stone-500">衣长</th>
+              <th class="border border-stone-200 px-2 py-1 text-stone-500">裤长</th>
+              <th class="border border-stone-200 px-2 py-1 text-stone-500">裙长</th>
+              <th class="border border-stone-200 px-2 py-1 text-stone-500">袖长</th>
               <th class="border border-stone-200 px-2 py-1"></th>
             </tr></thead>
             <tbody id="sizeGuideRows"></tbody>
@@ -755,33 +760,41 @@ document.getElementById('fExtraImgs').addEventListener('change', async (e) => {
 });
 
 // Size guide
-function addSizeGuideRow(size='', bust='', waist='', hip='', length='') {
+function addSizeGuideRow(size='', bust='', shoulder='', waist='', hip='', thigh='', length='', pants='', skirt='', sleeve='') {
   const tr = document.createElement('tr');
   tr.className = 'size-guide-row';
+  const inp = (cls, val, ph) => `<td class="border border-stone-200 p-1"><input type="number" value="${val}" placeholder="${ph}" class="${cls} w-12 text-xs px-1 py-0.5 focus:outline-none"/></td>`;
   tr.innerHTML = `
-    <td class="border border-stone-200 p-1"><input type="text" value="${size}" placeholder="S" class="sg-size w-full text-xs px-1 py-0.5 focus:outline-none"/></td>
-    <td class="border border-stone-200 p-1"><input type="number" value="${bust}" placeholder="86" class="sg-bust w-full text-xs px-1 py-0.5 focus:outline-none"/></td>
-    <td class="border border-stone-200 p-1"><input type="number" value="${waist}" placeholder="66" class="sg-waist w-full text-xs px-1 py-0.5 focus:outline-none"/></td>
-    <td class="border border-stone-200 p-1"><input type="number" value="${hip}" placeholder="92" class="sg-hip w-full text-xs px-1 py-0.5 focus:outline-none"/></td>
-    <td class="border border-stone-200 p-1"><input type="number" value="${length}" placeholder="95" class="sg-length w-full text-xs px-1 py-0.5 focus:outline-none"/></td>
+    <td class="border border-stone-200 p-1"><input type="text" value="${size}" placeholder="S" class="sg-size w-10 text-xs px-1 py-0.5 focus:outline-none"/></td>
+    ${inp('sg-bust', bust, '86')}
+    ${inp('sg-shoulder', shoulder, '38')}
+    ${inp('sg-waist', waist, '66')}
+    ${inp('sg-hip', hip, '92')}
+    ${inp('sg-thigh', thigh, '54')}
+    ${inp('sg-length', length, '95')}
+    ${inp('sg-pants', pants, '100')}
+    ${inp('sg-skirt', skirt, '70')}
+    ${inp('sg-sleeve', sleeve, '58')}
     <td class="border border-stone-200 p-1"><button type="button" onclick="this.closest('tr').remove()" class="text-red-300 hover:text-red-500 text-sm px-1">×</button></td>`;
   document.getElementById('sizeGuideRows').appendChild(tr);
 }
 window.addSizeGuideRow = addSizeGuideRow;
 
 function getSizeGuide() {
-  return Array.from(document.querySelectorAll('.size-guide-row')).map(tr => ({
-    size: tr.querySelector('.sg-size').value.trim(),
-    bust: parseFloat(tr.querySelector('.sg-bust').value) || null,
-    waist: parseFloat(tr.querySelector('.sg-waist').value) || null,
-    hip: parseFloat(tr.querySelector('.sg-hip').value) || null,
-    length: parseFloat(tr.querySelector('.sg-length').value) || null,
-  })).filter(r => r.size);
+  return Array.from(document.querySelectorAll('.size-guide-row')).map(tr => {
+    const v = cls => { const el = tr.querySelector('.'+cls); return el ? (parseFloat(el.value) || null) : null; };
+    return {
+      size: tr.querySelector('.sg-size').value.trim(),
+      bust: v('sg-bust'), shoulder: v('sg-shoulder'), waist: v('sg-waist'),
+      hip: v('sg-hip'), thigh: v('sg-thigh'), length: v('sg-length'),
+      pants: v('sg-pants'), skirt: v('sg-skirt'), sleeve: v('sg-sleeve'),
+    };
+  }).filter(r => r.size);
 }
 
 function renderSizeGuide(rows) {
   document.getElementById('sizeGuideRows').innerHTML = '';
-  rows.forEach(r => addSizeGuideRow(r.size, r.bust||'', r.waist||'', r.hip||'', r.length||''));
+  rows.forEach(r => addSizeGuideRow(r.size, r.bust||'', r.shoulder||'', r.waist||'', r.hip||'', r.thigh||'', r.length||'', r.pants||'', r.skirt||'', r.sleeve||''));
 }
 
 init();
