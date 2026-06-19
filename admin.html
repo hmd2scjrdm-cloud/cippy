@@ -279,6 +279,20 @@
         <button type="button" onclick="addSizeGuideRow()" class="text-xs text-[#C4928A] border border-[#C4928A] px-3 py-1 rounded-lg hover:bg-[#fdf0ed]">+ 添加尺码行</button>
       </div>
 
+      <!-- 推荐搭配 -->
+      <div class="border border-stone-200 rounded-lg p-3 space-y-2">
+        <label class="text-xs font-semibold text-stone-600 block">推荐搭配（选填）</label>
+        <div class="flex gap-2 items-center">
+          <select id="fPairingProductId" class="flex-1 border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4928A]">
+            <option value="">— 选择搭配商品 —</option>
+          </select>
+          <span class="text-xs text-stone-400 whitespace-nowrap">套装优惠 RM</span>
+          <input id="fPairingDiscount" type="number" step="0.01" min="0" placeholder="0.00"
+            class="w-20 border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4928A]"/>
+        </div>
+        <p class="text-[11px] text-stone-400">两件同时加购时，自动扣减以上金额</p>
+      </div>
+
       <!-- Toggles -->
       <div class="flex gap-6">
         <label class="flex items-center gap-2 cursor-pointer">
@@ -343,6 +357,13 @@ async function loadProducts() {
     tbody.innerHTML = '<tr><td colspan="9" class="text-center py-12 text-stone-400">还没有商品，点击「+ 添加商品」开始</td></tr>';
     return;
   }
+
+  // Populate pairing dropdown
+  const sel = document.getElementById('fPairingProductId');
+  const curVal = sel.value;
+  sel.innerHTML = '<option value="">— 选择搭配商品 —</option>' +
+    data.map(p => `<option value="${p.id}">${p.name_zh || p.name}</option>`).join('');
+  sel.value = curVal;
 
   tbody.innerHTML = data.map(p => {
     const costMyr = ((parseFloat(p.cost_rmb) || 0) + (parseFloat(p.shipping_cost_rmb) || 0)) / RMB_TO_MYR;
@@ -540,6 +561,8 @@ function closeModal() {
   document.getElementById('sizeGuideRows').innerHTML = '';
   currentDetailImages = [];
   currentExtraImages = [];
+  document.getElementById('fPairingProductId').value = '';
+  document.getElementById('fPairingDiscount').value = '';
   renderDetailPreviews([]);
   renderExtraPreviews([]);
 }
@@ -574,6 +597,8 @@ async function editProduct(id) {
   renderSizeGuide(p.size_guide || []);
   document.getElementById('fIsNew').checked = p.is_new ?? true;
   document.getElementById('fInStock').checked = p.in_stock ?? true;
+  document.getElementById('fPairingProductId').value = p.pairing_product_id || '';
+  document.getElementById('fPairingDiscount').value = p.pairing_discount_myr || '';
   // Restore color×size matrix
   document.getElementById('colorSizeMatrix').innerHTML = '';
   const colorGroups = {};
@@ -639,6 +664,8 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
     detail_images: currentDetailImages,
     images: currentExtraImages,
     size_guide: getSizeGuide(),
+    pairing_product_id: document.getElementById('fPairingProductId').value || null,
+    pairing_discount_myr: parseFloat(document.getElementById('fPairingDiscount').value) || null,
   };
 
   const editId = document.getElementById('editId').value;

@@ -312,7 +312,17 @@ Free standard shipping on orders over MYR 150.00
             return;
           }
           empty.classList.add('hidden');
-          list.innerHTML = cart.map((item, i) => `
+          list.innerHTML = cart.map((item, i) => item._is_discount ? `
+            <div class="py-3 flex items-center justify-between bg-primary-fixed/20 rounded-xl px-md my-1">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-sm">redeem</span>
+                <span class="font-label-md text-sm text-primary">套装优惠</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <p class="font-label-md text-sm text-primary">- MYR ${Math.abs(item.price_myr).toFixed(2)}</p>
+                <button onclick="removeItem(${i})" class="material-symbols-outlined text-outline hover:text-error transition-colors text-sm">close</button>
+              </div>
+            </div>` : `
             <div class="py-md flex gap-md items-start" data-idx="${i}">
               <div class="w-24 h-32 md:w-32 md:h-40 flex-shrink-0 bg-surface-container-low rounded-lg overflow-hidden">
                 ${item.image_url ? `<img src="${item.image_url}" class="w-full h-full object-cover"/>` : '<div class="w-full h-full flex items-center justify-center text-4xl">👗</div>'}
