@@ -108,7 +108,7 @@
 <span class="material-symbols-outlined text-sm">grid_view</span>
 <span class="text-label-sm" id="productCount">— Items</span>
 </div>
-</div><div class="flex items-center gap-md mb-md pb-2 overflow-x-auto no-scrollbar border-b border-outline-variant/30"><span class="text-label-sm font-bold text-secondary uppercase tracking-widest whitespace-nowrap">Series:</span><div class="flex gap-md"><button class="text-label-md text-on-surface-variant hover:text-primary whitespace-nowrap transition-colors">Cippy Essential</button><button class="text-label-md text-on-surface-variant hover:text-primary whitespace-nowrap transition-colors">Cippy Sweet</button><button class="text-label-md text-on-surface-variant hover:text-primary whitespace-nowrap transition-colors">Cippy Summer</button><button class="text-label-md text-on-surface-variant hover:text-primary whitespace-nowrap transition-colors">Cippy Daily</button></div></div><div class="waterfall-grid">
+</div><div class="flex items-center gap-md mb-md pb-2 overflow-x-auto no-scrollbar border-b border-outline-variant/30"><span class="text-label-sm font-bold text-secondary uppercase tracking-widest whitespace-nowrap">Series:</span><div class="flex gap-md" id="seriesBtns"><button class="series-btn text-label-md text-on-surface-variant hover:text-primary whitespace-nowrap transition-colors" data-series="">All</button><button class="series-btn text-label-md text-on-surface-variant hover:text-primary whitespace-nowrap transition-colors" data-series="Cippy Essential">Cippy Essential</button><button class="series-btn text-label-md text-on-surface-variant hover:text-primary whitespace-nowrap transition-colors" data-series="Cippy Sweet">Cippy Sweet</button><button class="series-btn text-label-md text-on-surface-variant hover:text-primary whitespace-nowrap transition-colors" data-series="Cippy Summer">Cippy Summer</button><button class="series-btn text-label-md text-on-surface-variant hover:text-primary whitespace-nowrap transition-colors" data-series="Cippy Daily">Cippy Daily</button></div></div><div class="waterfall-grid">
 <div id="productsGrid" class="contents"></div>
 <div id="productsEmpty" class="hidden col-span-full py-24 text-center text-on-surface-variant">正在上新，敬请期待 ✨</div>
 </div>
@@ -117,30 +117,31 @@
 <footer class="bg-surface-container-low py-xl w-full">
 <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-6 md:px-margin-desktop w-full max-w-[1440px] mx-auto">
 <div class="col-span-1 md:col-span-1 mb-lg md:mb-0">
-<h3 class="font-headline-md text-headline-md text-on-surface mb-md">cippy</h3>
+<a href="index.html"><img src="assets/cippy-logo.png" alt="cippy" class="h-16 w-auto mb-4"/></a>
 <p class="font-body-sm text-body-sm text-on-surface-variant">Defining the new standard of effortless chic for Gen Z Malaysia. Community-driven, trend-conscious, and always evolving.</p>
 </div>
 <div>
 <h4 class="font-label-md text-label-md text-secondary mb-md uppercase tracking-widest">Shop</h4>
 <ul class="space-y-sm">
-<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">New Arrivals</a></li>
-<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Best Sellers</a></li>
-<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Instagram Shop</a></li>
+<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="products.html">New Arrivals</a></li>
+<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="products.html">Best Sellers</a></li>
+<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="https://instagram.com/cippy.kl" target="_blank">Instagram</a></li>
 </ul>
 </div>
 <div>
 <h4 class="font-label-md text-label-md text-secondary mb-md uppercase tracking-widest">Support</h4>
 <ul class="space-y-sm">
-<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Shipping &amp; Returns</a></li>
-<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a></li>
-<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a></li>
+<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="mailto:cippy.kl@gmail.com">Shipping &amp; Returns</a></li>
+<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="mailto:cippy.kl@gmail.com">Privacy Policy</a></li>
+<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="mailto:cippy.kl@gmail.com">Terms of Service</a></li>
 </ul>
 </div>
 <div>
 <h4 class="font-label-md text-label-md text-secondary mb-md uppercase tracking-widest">Connect</h4>
 <div class="flex gap-md mb-md">
-<a class="text-on-surface-variant hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined">alternate_email</span></a>
-<a class="text-on-surface-variant hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined">language</span></a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="https://instagram.com/cippy.kl" target="_blank"><span class="material-symbols-outlined">photo_camera</span></a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="https://wa.me/601119058658" target="_blank"><span class="material-symbols-outlined">chat</span></a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="mailto:cippy.kl@gmail.com"><span class="material-symbols-outlined">mail</span></a>
 </div>
 <p class="font-body-sm text-body-sm text-on-surface-variant">© 2024 cippy Malaysia. All Rights Reserved.</p>
 </div>
@@ -230,6 +231,7 @@ const sb = createClient(
 let allProducts = [];
 let currentSort = 'default';
 let currentCategory = new URLSearchParams(window.location.search).get('category') || '';
+let currentSeries = '';
 
 async function loadProducts() {
   const { data, error } = await sb
@@ -254,6 +256,7 @@ function renderProducts() {
   const q = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
   if (q) data = data.filter(p => (p.name || '').toLowerCase().includes(q) || (p.name_zh || '').toLowerCase().includes(q));
   if (currentCategory) data = data.filter(p => (p.category || '').toLowerCase() === currentCategory.toLowerCase());
+  if (currentSeries) data = data.filter(p => (p.series || '') === currentSeries);
   if (currentSort === 'price_asc') data.sort((a, b) => parseFloat(a.price_myr || a.price) - parseFloat(b.price_myr || b.price));
   else if (currentSort === 'price_desc') data.sort((a, b) => parseFloat(b.price_myr || b.price) - parseFloat(a.price_myr || a.price));
   else if (currentSort === 'new') data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -293,6 +296,21 @@ function setCategory(cat) {
   setActiveCategory(cat);
   renderProducts();
 }
+
+function setSeries(s) {
+  currentSeries = s;
+  document.querySelectorAll('.series-btn').forEach(btn => {
+    const active = btn.dataset.series === s;
+    btn.classList.toggle('text-primary', active);
+    btn.classList.toggle('font-bold', active);
+    btn.classList.toggle('text-on-surface-variant', !active);
+  });
+  renderProducts();
+}
+
+document.querySelectorAll('.series-btn').forEach(btn => {
+  btn.addEventListener('click', () => setSeries(btn.dataset.series));
+});
 
 function setActiveCategory(cat) {
   document.querySelectorAll('.cat-btn').forEach(btn => {

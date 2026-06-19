@@ -202,8 +202,8 @@
 <h2 class="font-display-lg text-display-lg text-on-surface mb-4">Join the Club</h2>
 <p class="text-on-surface-variant font-body-lg mb-8">Sign up for early access to drops and exclusive 'Red' inspired styling tips. Get 10% off your first order!</p>
 <div class="flex flex-col sm:flex-row gap-base">
-<input class="flex-1 bg-white border-none rounded-full px-lg py-md focus:ring-2 focus:ring-primary" placeholder="Email address" type="email"/>
-<button class="bg-primary text-on-primary px-xl py-md rounded-none font-label-md text-label-md hover:opacity-80 transition-opacity">Subscribe</button>
+<input id="newsletterEmail" class="flex-1 bg-white border-none rounded-full px-lg py-md focus:ring-2 focus:ring-primary" placeholder="Email address" type="email"/>
+<button onclick="(function(){const v=document.getElementById('newsletterEmail').value.trim();if(!v||!v.includes('@')){alert('Please enter a valid email address');return;}window.open('mailto:cippy.kl@gmail.com?subject=Newsletter Signup&body=Please add me to your list: '+encodeURIComponent(v));document.getElementById('newsletterEmail').value='';const btn=event.target;btn.textContent='Subscribed ✓';btn.disabled=true;setTimeout(()=>{btn.textContent='Subscribe';btn.disabled=false;},3000);})()" class="bg-primary text-on-primary px-xl py-md rounded-none font-label-md text-label-md hover:opacity-80 transition-opacity">Subscribe</button>
 </div>
 </div>
 <div class="flex-1 hidden md:block z-10">
@@ -215,32 +215,32 @@
 <footer class="bg-surface-container-low dark:bg-surface-container-lowest w-full py-xl">
 <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-desktop w-full max-w-[1440px] mx-auto">
 <div class="mb-lg md:mb-0">
-<img alt="cippy Brand Logo" class="h-16 w-auto mb-6" src="https://lh3.googleusercontent.com/aida/AP1WRLtQBwZuQbt8NMGFCqA38Z4fLcnS-eI4jFkX3F_XnIvoyfy3DK6kggLkUhmIbFrRnWxxPTO8hoRa5-a362Rji-o_1kmfuzXUHNP2c_CRNuU-wJ0_sIVuGMewxyMS2WxioGsty0LpZO3aGpmlg_FGHwyamw8hWnmwvCNxRviVoQI7k589X7EwTCUBtbb4m15bdHO-cxqT-yszZhFb5-BFJGzgLHazf6D56KUzorQViLoJ0Akoqq4nc3Iw4g"/>
+<a href="index.html"><img src="assets/cippy-logo.png" alt="cippy" class="h-16 w-auto mb-6"/></a>
 <p class="text-on-surface-variant font-body-sm text-body-sm mb-6 max-w-xs">
                     Curating effortless Korean aesthetic for the modern Malaysian woman. Quality pieces for your everyday vibe.
                 </p>
 <div class="flex gap-md">
-<span class="material-symbols-outlined text-secondary cursor-pointer hover:text-primary transition-colors">face_nod</span>
-<span class="material-symbols-outlined text-secondary cursor-pointer hover:text-primary transition-colors">brand_awareness</span>
-<span class="material-symbols-outlined text-secondary cursor-pointer hover:text-primary transition-colors">share</span>
+<a href="https://instagram.com/cippy.kl" target="_blank" class="material-symbols-outlined text-secondary hover:text-primary transition-colors">photo_camera</a>
+<a href="https://wa.me/601119058658" target="_blank" class="material-symbols-outlined text-secondary hover:text-primary transition-colors">chat</a>
+<a href="mailto:cippy.kl@gmail.com" class="material-symbols-outlined text-secondary hover:text-primary transition-colors">mail</a>
 </div>
 </div>
 <div>
 <h5 class="font-label-md text-label-md mb-lg text-on-surface uppercase tracking-widest">Shop</h5>
 <ul class="flex flex-col gap-sm">
-<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">New Arrivals</a></li>
-<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Best Sellers</a></li>
+<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="products.html">New Arrivals</a></li>
+<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="products.html">Best Sellers</a></li>
 <li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="products.html">Clothing</a></li>
-<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="products.html">Accessories</a></li>
+<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="products.html?category=Accessories">Accessories</a></li>
 </ul>
 </div>
 <div>
 <h5 class="font-label-md text-label-md mb-lg text-on-surface uppercase tracking-widest">Help</h5>
 <ul class="flex flex-col gap-sm">
-<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Shipping &amp; Returns</a></li>
-<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a></li>
-<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a></li>
-<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Contact Us</a></li>
+<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="mailto:cippy.kl@gmail.com">Shipping &amp; Returns</a></li>
+<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="mailto:cippy.kl@gmail.com">Privacy Policy</a></li>
+<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="mailto:cippy.kl@gmail.com">Terms of Service</a></li>
+<li class=""><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="mailto:cippy.kl@gmail.com">Contact Us</a></li>
 </ul>
 </div>
 <div>
