@@ -179,9 +179,9 @@
         </div>
       </div>
 
-      <!-- Image -->
+      <!-- Cover Image -->
       <div>
-        <label class="text-xs text-stone-500 mb-1 block">商品图片</label>
+        <label class="text-xs text-stone-500 mb-1 block">封面图（主图）</label>
         <div class="flex gap-3 items-start">
           <input id="fImageUrl" type="text" placeholder="图片URL 或 上传后自动填入" class="flex-1 border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4928A]"/>
           <label class="cursor-pointer bg-stone-100 hover:bg-stone-200 px-3 py-2 rounded-lg text-sm text-stone-600 transition-colors whitespace-nowrap">
@@ -193,6 +193,14 @@
           <img id="imagePreview" class="h-24 rounded-lg object-cover border border-stone-200"/>
         </div>
         <p id="uploadStatus" class="text-xs text-stone-400 mt-1 hidden">上传中…</p>
+      </div>
+
+      <!-- Extra Product Images -->
+      <div>
+        <label class="text-xs text-stone-500 mb-1 block">商品图集（多角度图，可多选）</label>
+        <input id="fExtraImgs" type="file" accept="image/*" multiple class="w-full text-sm text-stone-500 file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:bg-stone-100 file:text-stone-600 hover:file:opacity-80"/>
+        <p id="extraUploadStatus" class="text-xs text-stone-400 mt-1 hidden">上传中…</p>
+        <div id="extraPreviewList" class="flex flex-wrap gap-2 mt-2"></div>
       </div>
 
       <!-- Supplier URL -->
@@ -245,6 +253,25 @@
         <label class="text-xs text-stone-500 mb-2 block">款式选项（选填，例：上装 / 下装 / 套装）</label>
         <div id="variantsList" class="space-y-2"></div>
         <button type="button" onclick="addVariantRow()" class="mt-2 text-xs text-[#C4928A] border border-[#C4928A] px-3 py-1 rounded-lg hover:bg-[#fdf0ed]">+ 添加款式</button>
+      </div>
+
+      <!-- Size Guide -->
+      <div>
+        <label class="text-xs text-stone-500 mb-2 block">尺码指南（选填）</label>
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs border-collapse mb-2">
+            <thead><tr class="bg-stone-50">
+              <th class="border border-stone-200 px-2 py-1 text-left text-stone-500">尺码</th>
+              <th class="border border-stone-200 px-2 py-1 text-stone-500">胸围(cm)</th>
+              <th class="border border-stone-200 px-2 py-1 text-stone-500">腰围(cm)</th>
+              <th class="border border-stone-200 px-2 py-1 text-stone-500">臀围(cm)</th>
+              <th class="border border-stone-200 px-2 py-1 text-stone-500">衣长(cm)</th>
+              <th class="border border-stone-200 px-2 py-1"></th>
+            </tr></thead>
+            <tbody id="sizeGuideRows"></tbody>
+          </table>
+        </div>
+        <button type="button" onclick="addSizeGuideRow()" class="text-xs text-[#C4928A] border border-[#C4928A] px-3 py-1 rounded-lg hover:bg-[#fdf0ed]">+ 添加尺码行</button>
       </div>
 
       <!-- Toggles -->
@@ -501,8 +528,11 @@ function closeModal() {
   document.getElementById('uploadStatus').classList.add('hidden');
   document.getElementById('colorSizeMatrix').innerHTML = '';
   document.getElementById('variantsList').innerHTML = '';
+  document.getElementById('sizeGuideRows').innerHTML = '';
   currentDetailImages = [];
+  currentExtraImages = [];
   renderDetailPreviews([]);
+  renderExtraPreviews([]);
 }
 
 document.getElementById('addBtn').addEventListener('click', () => openModal('添加商品'));
@@ -531,6 +561,8 @@ async function editProduct(id) {
   document.getElementById('fFabric').value = p.fabric || '';
   document.getElementById('fClothingType').value = p.clothing_type || '';
   renderDetailPreviews(p.detail_images || []);
+  renderExtraPreviews(p.images || []);
+  renderSizeGuide(p.size_guide || []);
   document.getElementById('fIsNew').checked = p.is_new ?? true;
   document.getElementById('fInStock').checked = p.in_stock ?? true;
   // Restore color×size matrix
@@ -596,6 +628,8 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
     fabric: document.getElementById('fFabric').value || null,
     clothing_type: document.getElementById('fClothingType').value || null,
     detail_images: currentDetailImages,
+    images: currentExtraImages,
+    size_guide: getSizeGuide(),
   };
 
   const editId = document.getElementById('editId').value;
@@ -668,6 +702,87 @@ document.getElementById('fDetailImgs').addEventListener('change', async (e) => {
   renderDetailPreviews(currentDetailImages);
   e.target.value = '';
 });
+
+// Extra product images
+let currentExtraImages = [];
+
+function renderExtraPreviews(urls) {
+  currentExtraImages = urls || [];
+  const el = document.getElementById('extraPreviewList');
+  el.innerHTML = currentExtraImages.map((url, i) => `
+    <div class="relative group">
+      <img src="${url}" class="w-20 h-20 object-cover rounded border border-stone-200"/>
+      <button type="button" onclick="removeExtraImg(${i})" class="absolute -top-1 -right-1 w-5 h-5 bg-red-400 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">×</button>
+    </div>`).join('');
+}
+
+function removeExtraImg(i) { currentExtraImages.splice(i, 1); renderExtraPreviews(currentExtraImages); }
+window.removeExtraImg = removeExtraImg;
+
+async function compressAndUpload(file, prefix) {
+  const compressed = await new Promise(resolve => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      const MAX = 1200;
+      let w = img.width, h = img.height;
+      if (w > MAX || h > MAX) { if (w > h) { h = Math.round(h*MAX/w); w = MAX; } else { w = Math.round(w*MAX/h); h = MAX; } }
+      const c = document.createElement('canvas'); c.width = w; c.height = h;
+      c.getContext('2d').drawImage(img, 0, 0, w, h);
+      c.toBlob(b => resolve(b), 'image/jpeg', 0.85);
+      URL.revokeObjectURL(url);
+    };
+    img.src = url;
+  });
+  const filename = `${prefix}_${Date.now()}.jpg`;
+  const { error } = await sb.storage.from('product-images').upload(filename, compressed, { contentType: 'image/jpeg', upsert: true });
+  if (error) return null;
+  return sb.storage.from('product-images').getPublicUrl(filename).data.publicUrl;
+}
+
+document.getElementById('fExtraImgs').addEventListener('change', async (e) => {
+  const files = Array.from(e.target.files);
+  if (!files.length) return;
+  const status = document.getElementById('extraUploadStatus');
+  status.classList.remove('hidden');
+  for (let i = 0; i < files.length; i++) {
+    status.textContent = `上传中 ${i+1}/${files.length}…`;
+    const url = await compressAndUpload(files[i], 'img');
+    if (url) currentExtraImages.push(url);
+  }
+  status.textContent = `已上传 ${currentExtraImages.length} 张`;
+  renderExtraPreviews(currentExtraImages);
+  e.target.value = '';
+});
+
+// Size guide
+function addSizeGuideRow(size='', bust='', waist='', hip='', length='') {
+  const tr = document.createElement('tr');
+  tr.className = 'size-guide-row';
+  tr.innerHTML = `
+    <td class="border border-stone-200 p-1"><input type="text" value="${size}" placeholder="S" class="sg-size w-full text-xs px-1 py-0.5 focus:outline-none"/></td>
+    <td class="border border-stone-200 p-1"><input type="number" value="${bust}" placeholder="86" class="sg-bust w-full text-xs px-1 py-0.5 focus:outline-none"/></td>
+    <td class="border border-stone-200 p-1"><input type="number" value="${waist}" placeholder="66" class="sg-waist w-full text-xs px-1 py-0.5 focus:outline-none"/></td>
+    <td class="border border-stone-200 p-1"><input type="number" value="${hip}" placeholder="92" class="sg-hip w-full text-xs px-1 py-0.5 focus:outline-none"/></td>
+    <td class="border border-stone-200 p-1"><input type="number" value="${length}" placeholder="95" class="sg-length w-full text-xs px-1 py-0.5 focus:outline-none"/></td>
+    <td class="border border-stone-200 p-1"><button type="button" onclick="this.closest('tr').remove()" class="text-red-300 hover:text-red-500 text-sm px-1">×</button></td>`;
+  document.getElementById('sizeGuideRows').appendChild(tr);
+}
+window.addSizeGuideRow = addSizeGuideRow;
+
+function getSizeGuide() {
+  return Array.from(document.querySelectorAll('.size-guide-row')).map(tr => ({
+    size: tr.querySelector('.sg-size').value.trim(),
+    bust: parseFloat(tr.querySelector('.sg-bust').value) || null,
+    waist: parseFloat(tr.querySelector('.sg-waist').value) || null,
+    hip: parseFloat(tr.querySelector('.sg-hip').value) || null,
+    length: parseFloat(tr.querySelector('.sg-length').value) || null,
+  })).filter(r => r.size);
+}
+
+function renderSizeGuide(rows) {
+  document.getElementById('sizeGuideRows').innerHTML = '';
+  rows.forEach(r => addSizeGuideRow(r.size, r.bust||'', r.waist||'', r.hip||'', r.length||''));
+}
 
 init();
 </script>

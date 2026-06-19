@@ -40,6 +40,7 @@
         Free shipping in Malaysia on all orders above RM150 • Shop Now
     </div>
 <!-- TopNavBar -->
+<div id="announcementBar" class="hidden w-full bg-primary text-on-primary text-center text-xs py-2 px-4 font-label-sm sticky top-0 z-[60]"></div>
 <nav class="fixed top-0 w-full z-50 shadow-sm" style="background:#faf7f5">
 <div class="flex justify-between items-center px-margin-desktop py-4 w-full max-w-[1440px] mx-auto">
 <div class="flex items-center gap-lg">
@@ -354,6 +355,17 @@
   }
 
   loadHome();
+})();
+</script>
+<script>
+(async function() {
+  const sb2 = supabase.createClient('https://ilzeziznxzaxxudzhdmu.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI');
+  const { data } = await sb2.from('settings').select('value').eq('key','announcement').single();
+  if (data?.value) {
+    const bar = document.getElementById('announcementBar');
+    bar.textContent = data.value;
+    bar.classList.remove('hidden');
+  }
 })();
 </script>
 <script src="i18n.js"></script>

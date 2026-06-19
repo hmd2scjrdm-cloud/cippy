@@ -57,6 +57,7 @@
 </head>
 <body class="font-body-md selection:bg-primary-fixed">
 <!-- Top Navigation Bar -->
+<div id="announcementBar" class="hidden w-full bg-primary text-on-primary text-center text-xs py-2 px-4 font-label-sm sticky top-0 z-[60]"></div>
 <nav class="fixed top-0 w-full z-50 shadow-sm" style="background:#faf7f5"><div class="flex justify-between items-center px-6 md:px-margin-desktop py-4 w-full max-w-[1440px] mx-auto">
 <div class="flex items-center gap-lg">
 <a class="flex items-center shrink-0" href="index.html">
@@ -65,11 +66,18 @@
 <div class="hidden md:flex gap-md items-center"><a class="text-primary border-b-2 border-primary pb-1 font-label-md text-label-md" href="index.html">New In</a><a class="text-on-surface-variant hover:text-primary transition-opacity duration-300 font-label-md text-label-md" href="products.html">Clothing</a><a class="text-on-surface-variant hover:text-primary transition-opacity duration-300 font-label-md text-label-md" href="products.html">Accessories</a><a class="text-on-surface-variant hover:text-primary transition-opacity duration-300 font-label-md text-label-md" href="products.html">Sale</a><a class="text-on-surface-variant hover:text-primary transition-opacity duration-300 font-label-md text-label-md" href="account.html">Community</a></div>
 </div>
 <div class="flex items-center gap-md">
-<button class="material-symbols-outlined text-on-surface hover:opacity-70 transition-opacity">search</button>
+<button class="material-symbols-outlined text-on-surface hover:opacity-70 transition-opacity" onclick="document.getElementById('searchBar').classList.toggle('hidden')">search</button>
 <button class="material-symbols-outlined text-on-surface hover:opacity-70 transition-opacity" onclick="location.href='cart.html'">shopping_bag</button>
 <button class="font-label-sm text-label-sm font-semibold px-2 hover:text-primary transition-colors" data-lang-toggle="" onclick="toggleCippyLang()">中文</button><button class="material-symbols-outlined text-on-surface hover:opacity-70 transition-opacity" onclick="location.href='account.html'">person</button>
 </div>
 </div></nav>
+<div id="searchBar" class="hidden fixed top-[72px] left-0 w-full z-40 bg-white/95 backdrop-blur border-b border-outline-variant px-6 py-3 shadow-sm">
+  <div class="max-w-[1440px] mx-auto flex items-center gap-3">
+    <span class="material-symbols-outlined text-on-surface-variant">search</span>
+    <input id="searchInput" type="text" placeholder="Search products…" class="flex-1 bg-transparent outline-none font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant" oninput="renderProducts()">
+    <button class="material-symbols-outlined text-on-surface-variant hover:text-primary" onclick="document.getElementById('searchInput').value='';renderProducts();document.getElementById('searchBar').classList.add('hidden')">close</button>
+  </div>
+</div>
 <main class="pt-32 pb-xl px-6 md:px-margin-desktop max-w-[1440px] mx-auto">
 <!-- Header & Filters -->
 <header class="mb-lg flex flex-col md:flex-row md:items-end justify-between gap-gutter">
@@ -202,6 +210,17 @@
 <script src="i18n.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+(async function() {
+  const sb2 = supabase.createClient('https://ilzeziznxzaxxudzhdmu.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI');
+  const { data } = await sb2.from('settings').select('value').eq('key','announcement').single();
+  if (data?.value) {
+    const bar = document.getElementById('announcementBar');
+    bar.textContent = data.value;
+    bar.classList.remove('hidden');
+  }
+})();
+</script>
+<script>
 const { createClient } = supabase;
 const sb = createClient(
   'https://ilzeziznxzaxxudzhdmu.supabase.co',
@@ -232,6 +251,8 @@ function renderProducts() {
 
   let data = [...allProducts];
 
+  const q = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+  if (q) data = data.filter(p => (p.name || '').toLowerCase().includes(q) || (p.name_zh || '').toLowerCase().includes(q));
   if (currentCategory) data = data.filter(p => (p.category || '').toLowerCase() === currentCategory.toLowerCase());
   if (currentSort === 'price_asc') data.sort((a, b) => parseFloat(a.price_myr || a.price) - parseFloat(b.price_myr || b.price));
   else if (currentSort === 'price_desc') data.sort((a, b) => parseFloat(b.price_myr || b.price) - parseFloat(a.price_myr || a.price));
