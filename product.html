@@ -165,18 +165,33 @@
 <div class="space-y-2">
 <span id="productBadge" class="hidden font-label-sm text-label-sm text-primary bg-primary-fixed px-3 py-1">New Arrival</span>
 <h1 id="productName" class="font-headline-lg text-headline-lg text-on-surface">Loading…</h1>
-<div class="flex items-baseline gap-4">
+<div class="flex items-baseline gap-3">
 <p id="productPrice" class="font-headline-md text-headline-md text-on-surface"></p>
+<p id="productPriceNote" class="hidden text-xs text-on-surface-variant">起 · 按款式定价</p>
 </div>
 </div>
 <div class="pt-lg pb-4 border-b border-surface-container-highest">
 <p id="productDesc" class="font-body-md text-body-md text-on-surface-variant leading-relaxed"></p>
 </div>
+<!-- Outfit photo disclaimer -->
+<p id="outfitDisclaimer" class="hidden text-xs text-on-surface-variant bg-surface-container-low rounded-lg px-3 py-2">
+  📸 图片为穿搭参考，实际购买为所选单件商品
+</p>
+<!-- Variant Selector (上装/下装/套装) -->
+<div class="pt-md space-y-3" id="variantSection" style="display:none">
+  <span class="font-label-md text-label-md uppercase tracking-wider">Select Style</span>
+  <div id="variantBtns" class="flex gap-3 flex-wrap"></div>
+</div>
+<!-- Color Selector -->
+<div class="pt-md space-y-3" id="colorSection" style="display:none">
+  <span class="font-label-md text-label-md uppercase tracking-wider">Select Color</span>
+  <div id="colorBtns" class="flex gap-3 flex-wrap"></div>
+</div>
 <!-- Size Selector -->
-<div class="pt-md space-y-4" id="sizeSection">
-<span class="font-label-md text-label-md uppercase tracking-wider">Select Size</span>
-<div id="sizeBtns" class="flex gap-3 flex-wrap"></div>
-<p id="sizeStock" class="text-xs text-on-surface-variant"></p>
+<div class="pt-md space-y-3" id="sizeSection" style="display:none">
+  <span class="font-label-md text-label-md uppercase tracking-wider">Select Size</span>
+  <div id="sizeBtns" class="flex gap-3 flex-wrap"></div>
+  <p id="sizeStock" class="text-xs text-on-surface-variant"></p>
 </div>
 <!-- Add to Bag -->
 <div class="pt-lg space-y-4">
@@ -412,42 +427,85 @@ async function loadProduct() {
   // Badge
   if (p.is_new) document.getElementById('productBadge').classList.remove('hidden');
 
-  // Price
-  document.getElementById('productPrice').textContent = p.price_myr ? `RM ${parseFloat(p.price_myr).toFixed(2)}` : (p.price ? `RM ${parseFloat(p.price).toFixed(2)}` : '');
+  // Variants (上装/下装/套装)
+  const variants = p.variants || [];
+  const priceEl = document.getElementById('productPrice');
+  const priceNote = document.getElementById('productPriceNote');
+  const disclaimer = document.getElementById('outfitDisclaimer');
 
-  // Sizes
+  if (variants.length) {
+    // Show lowest price as starting price
+    const minPrice = Math.min(...variants.map(v => parseFloat(v.price_myr) || 0));
+    priceEl.textContent = `From RM ${minPrice.toFixed(2)}`;
+    priceNote.classList.remove('hidden');
+    disclaimer.classList.remove('hidden');
+    document.getElementById('variantSection').style.display = '';
+    const variantBtns = document.getElementById('variantBtns');
+    variantBtns.innerHTML = '';
+    variants.forEach(v => {
+      const btn = document.createElement('button');
+      btn.textContent = `${v.name}  ·  RM ${parseFloat(v.price_myr).toFixed(2)}`;
+      btn.className = 'px-4 py-2 border border-outline-variant rounded-xl font-label-md text-sm hover:bg-surface-container transition-colors';
+      btn.addEventListener('click', () => {
+        variantBtns.querySelectorAll('button').forEach(b => b.classList.remove('border-2','border-primary','bg-[#f0f0f0]','text-primary'));
+        btn.classList.add('border-2','border-primary','bg-[#f0f0f0]','text-primary');
+        priceEl.textContent = `RM ${parseFloat(v.price_myr).toFixed(2)}`;
+        priceNote.classList.add('hidden');
+      });
+      variantBtns.appendChild(btn);
+    });
+  } else {
+    priceEl.textContent = p.price_myr ? `RM ${parseFloat(p.price_myr).toFixed(2)}` : (p.price ? `RM ${parseFloat(p.price).toFixed(2)}` : '');
+  }
+
+  // Colors & Sizes
   const sizes = p.sizes || [];
+  const colors = [...new Set(sizes.map(s => s.color).filter(Boolean))];
   const sizeBtns = document.getElementById('sizeBtns');
   const sizeStock = document.getElementById('sizeStock');
 
-  if (sizes.length === 0) {
-    document.getElementById('sizeSection').classList.add('hidden');
-  } else {
+  function renderSizes(color) {
+    const filtered = color ? sizes.filter(s => s.color === color) : sizes;
     sizeBtns.innerHTML = '';
-    sizes.forEach(({ size, stock }) => {
+    sizeStock.textContent = '';
+    if (!filtered.length) { document.getElementById('sizeSection').style.display = 'none'; return; }
+    document.getElementById('sizeSection').style.display = '';
+    filtered.forEach(({ size, stock }) => {
       const inStock = stock > 0;
       const btn = document.createElement('button');
       btn.textContent = size;
-      btn.dataset.size = size;
-      btn.dataset.stock = stock;
-      btn.className = `flex-1 py-4 border rounded-xl font-label-md transition-colors ${inStock ? 'border-outline-variant hover:bg-surface-container cursor-pointer' : 'border-outline-variant text-outline opacity-40 cursor-not-allowed line-through'}`;
+      btn.className = `px-5 py-3 border rounded-xl font-label-md transition-colors ${inStock ? 'border-outline-variant hover:bg-surface-container cursor-pointer' : 'border-outline-variant text-outline opacity-40 cursor-not-allowed line-through'}`;
       if (inStock) {
         btn.addEventListener('click', () => {
           selectedSize = size;
-          sizeBtns.querySelectorAll('button').forEach(b => {
-            b.classList.remove('border-2', 'border-primary', 'bg-[#f0f0f0]', 'text-primary');
-            b.classList.add('border', 'border-outline-variant');
-          });
-          btn.classList.add('border-2', 'border-primary', 'bg-[#f0f0f0]', 'text-primary');
-          btn.classList.remove('border', 'border-outline-variant');
+          sizeBtns.querySelectorAll('button').forEach(b => b.classList.remove('border-2','border-primary','bg-[#f0f0f0]','text-primary'));
+          btn.classList.add('border-2','border-primary','bg-[#f0f0f0]','text-primary');
           const lang = window.getCippyLang ? window.getCippyLang() : 'en';
           sizeStock.textContent = stock <= 3 ? (lang === 'zh' ? `仅剩 ${stock} 件` : `Only ${stock} left`) : '';
         });
-      } else {
-        btn.disabled = true;
-      }
+      } else { btn.disabled = true; }
       sizeBtns.appendChild(btn);
     });
+  }
+
+  if (colors.length) {
+    document.getElementById('colorSection').style.display = '';
+    const colorBtns = document.getElementById('colorBtns');
+    colorBtns.innerHTML = '';
+    colors.forEach(color => {
+      const btn = document.createElement('button');
+      btn.textContent = color;
+      btn.className = 'px-4 py-2 border border-outline-variant rounded-xl font-label-md text-sm hover:bg-surface-container transition-colors';
+      btn.addEventListener('click', () => {
+        colorBtns.querySelectorAll('button').forEach(b => b.classList.remove('border-2','border-primary','bg-[#f0f0f0]','text-primary'));
+        btn.classList.add('border-2','border-primary','bg-[#f0f0f0]','text-primary');
+        renderSizes(color);
+      });
+      colorBtns.appendChild(btn);
+    });
+    colorBtns.firstChild?.click();
+  } else if (sizes.length) {
+    renderSizes('');
   }
 
   // Specs table

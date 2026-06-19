@@ -233,18 +233,18 @@
         <input id="fNotes" type="text" placeholder="例：发货慢，提前备货" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4928A]"/>
       </div>
 
-      <!-- Sizes with stock -->
+      <!-- Colors × Sizes × Stock -->
       <div>
-        <label class="text-xs text-stone-500 mb-2 block">尺码 + 各尺码库存</label>
-        <div class="space-y-2">
-          <div class="flex gap-2 text-xs text-stone-400 font-medium px-1 mb-1"><span class="w-20">尺码</span><span>库存数量</span></div>
-          <div class="flex items-center gap-3"><label class="flex items-center gap-2 w-20 cursor-pointer"><input type="checkbox" name="size" value="XS" class="size-cb w-4 h-4 accent-[#C4928A]"/><span class="text-sm text-stone-700">XS</span></label><input type="number" id="stock_XS" placeholder="0" min="0" class="w-24 border border-stone-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-[#C4928A] disabled:opacity-30" disabled/></div>
-          <div class="flex items-center gap-3"><label class="flex items-center gap-2 w-20 cursor-pointer"><input type="checkbox" name="size" value="S" class="size-cb w-4 h-4 accent-[#C4928A]"/><span class="text-sm text-stone-700">S</span></label><input type="number" id="stock_S" placeholder="0" min="0" class="w-24 border border-stone-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-[#C4928A] disabled:opacity-30" disabled/></div>
-          <div class="flex items-center gap-3"><label class="flex items-center gap-2 w-20 cursor-pointer"><input type="checkbox" name="size" value="M" class="size-cb w-4 h-4 accent-[#C4928A]"/><span class="text-sm text-stone-700">M</span></label><input type="number" id="stock_M" placeholder="0" min="0" class="w-24 border border-stone-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-[#C4928A] disabled:opacity-30" disabled/></div>
-          <div class="flex items-center gap-3"><label class="flex items-center gap-2 w-20 cursor-pointer"><input type="checkbox" name="size" value="L" class="size-cb w-4 h-4 accent-[#C4928A]"/><span class="text-sm text-stone-700">L</span></label><input type="number" id="stock_L" placeholder="0" min="0" class="w-24 border border-stone-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-[#C4928A] disabled:opacity-30" disabled/></div>
-          <div class="flex items-center gap-3"><label class="flex items-center gap-2 w-20 cursor-pointer"><input type="checkbox" name="size" value="XL" class="size-cb w-4 h-4 accent-[#C4928A]"/><span class="text-sm text-stone-700">XL</span></label><input type="number" id="stock_XL" placeholder="0" min="0" class="w-24 border border-stone-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-[#C4928A] disabled:opacity-30" disabled/></div>
-          <div class="flex items-center gap-3"><label class="flex items-center gap-2 w-20 cursor-pointer"><input type="checkbox" name="size" value="FREE" class="size-cb w-4 h-4 accent-[#C4928A]"/><span class="text-sm text-stone-700">均码</span></label><input type="number" id="stock_FREE" placeholder="0" min="0" class="w-24 border border-stone-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-[#C4928A] disabled:opacity-30" disabled/></div>
-        </div>
+        <label class="text-xs text-stone-500 mb-2 block">颜色 × 尺码 × 库存</label>
+        <div id="colorSizeMatrix" class="space-y-3"></div>
+        <button type="button" onclick="addColorRow()" class="mt-2 text-xs text-[#C4928A] border border-[#C4928A] px-3 py-1 rounded-lg hover:bg-[#fdf0ed]">+ 添加颜色</button>
+      </div>
+
+      <!-- Variants (上装/下装/套装 etc.) -->
+      <div>
+        <label class="text-xs text-stone-500 mb-2 block">款式选项（选填，例：上装 / 下装 / 套装）</label>
+        <div id="variantsList" class="space-y-2"></div>
+        <button type="button" onclick="addVariantRow()" class="mt-2 text-xs text-[#C4928A] border border-[#C4928A] px-3 py-1 rounded-lg hover:bg-[#fdf0ed]">+ 添加款式</button>
       </div>
 
       <!-- Toggles -->
@@ -371,12 +371,69 @@ function calcCost() {
   document.getElementById(id).addEventListener('input', calcCost));
 
 // Enable stock input when size is checked
-document.querySelectorAll('.size-cb').forEach(cb => {
-  cb.addEventListener('change', () => {
-    const stockInput = document.getElementById('stock_' + cb.value);
-    if (stockInput) { stockInput.disabled = !cb.checked; if (!cb.checked) stockInput.value = ''; }
+// Color × Size Matrix
+const SIZE_OPTIONS = ['XS','S','M','L','XL','均码'];
+
+function addColorRow(color='', sizes=[]) {
+  const id = Date.now() + Math.random();
+  const div = document.createElement('div');
+  div.className = 'color-row border border-stone-200 rounded-lg p-3 space-y-2';
+  div.dataset.id = id;
+  div.innerHTML = `
+    <div class="flex items-center gap-2">
+      <input type="text" placeholder="颜色（例：黑色）" value="${color}"
+        class="color-name flex-1 border border-stone-200 rounded px-2 py-1 text-sm focus:outline-none focus:border-[#C4928A]"/>
+      <button type="button" onclick="this.closest('.color-row').remove()" class="text-red-300 hover:text-red-500 text-lg leading-none">×</button>
+    </div>
+    <div class="grid grid-cols-3 gap-2">
+      ${SIZE_OPTIONS.map(sz => {
+        const entry = sizes.find(s => s.size === sz);
+        return `<label class="flex flex-col gap-1">
+          <span class="text-xs text-stone-400">${sz}</span>
+          <input type="number" data-size="${sz}" placeholder="库存" min="0" value="${entry ? entry.stock : ''}"
+            class="size-stock w-full border border-stone-200 rounded px-2 py-1 text-sm focus:outline-none focus:border-[#C4928A]"/>
+        </label>`;
+      }).join('')}
+    </div>`;
+  document.getElementById('colorSizeMatrix').appendChild(div);
+}
+window.addColorRow = addColorRow;
+
+function getColorSizes() {
+  const result = [];
+  document.querySelectorAll('.color-row').forEach(row => {
+    const color = row.querySelector('.color-name').value.trim();
+    if (!color) return;
+    row.querySelectorAll('.size-stock').forEach(inp => {
+      if (inp.value !== '') {
+        result.push({ color, size: inp.dataset.size, stock: parseInt(inp.value) || 0 });
+      }
+    });
   });
-});
+  return result;
+}
+
+// Variants
+function addVariantRow(name='', price='') {
+  const div = document.createElement('div');
+  div.className = 'variant-row flex items-center gap-2';
+  div.innerHTML = `
+    <input type="text" placeholder="款式名（例：上装）" value="${name}"
+      class="variant-name flex-1 border border-stone-200 rounded px-2 py-1 text-sm focus:outline-none focus:border-[#C4928A]"/>
+    <span class="text-xs text-stone-400">RM</span>
+    <input type="number" placeholder="价格" value="${price}" step="0.01" min="0"
+      class="variant-price w-24 border border-stone-200 rounded px-2 py-1 text-sm focus:outline-none focus:border-[#C4928A]"/>
+    <button type="button" onclick="this.closest('.variant-row').remove()" class="text-red-300 hover:text-red-500 text-lg leading-none">×</button>`;
+  document.getElementById('variantsList').appendChild(div);
+}
+window.addVariantRow = addVariantRow;
+
+function getVariants() {
+  return Array.from(document.querySelectorAll('.variant-row')).map(row => ({
+    name: row.querySelector('.variant-name').value.trim(),
+    price_myr: parseFloat(row.querySelector('.variant-price').value) || 0,
+  })).filter(v => v.name);
+}
 
 document.getElementById('fImageFile').addEventListener('change', async (e) => {
   const file = e.target.files[0];
@@ -442,6 +499,10 @@ function closeModal() {
   document.getElementById('calcMargin').textContent = '—';
   document.getElementById('imagePreviewWrap').classList.add('hidden');
   document.getElementById('uploadStatus').classList.add('hidden');
+  document.getElementById('colorSizeMatrix').innerHTML = '';
+  document.getElementById('variantsList').innerHTML = '';
+  currentDetailImages = [];
+  renderDetailPreviews([]);
 }
 
 document.getElementById('addBtn').addEventListener('click', () => openModal('添加商品'));
@@ -472,12 +533,19 @@ async function editProduct(id) {
   renderDetailPreviews(p.detail_images || []);
   document.getElementById('fIsNew').checked = p.is_new ?? true;
   document.getElementById('fInStock').checked = p.in_stock ?? true;
-  document.querySelectorAll('.size-cb').forEach(cb => {
-    const entry = (p.sizes || []).find(s => s.size === cb.value);
-    cb.checked = !!entry;
-    const stockInput = document.getElementById('stock_' + cb.value);
-    if (stockInput) { stockInput.disabled = !entry; stockInput.value = entry ? entry.stock : ''; }
+  // Restore color×size matrix
+  document.getElementById('colorSizeMatrix').innerHTML = '';
+  const colorGroups = {};
+  (p.sizes || []).forEach(s => {
+    if (!colorGroups[s.color]) colorGroups[s.color] = [];
+    colorGroups[s.color].push(s);
   });
+  if (Object.keys(colorGroups).length) {
+    Object.entries(colorGroups).forEach(([color, sizes]) => addColorRow(color, sizes));
+  }
+  // Restore variants
+  document.getElementById('variantsList').innerHTML = '';
+  (p.variants || []).forEach(v => addVariantRow(v.name, v.price_myr));
   if (p.image_url) {
     document.getElementById('imagePreview').src = p.image_url;
     document.getElementById('imagePreviewWrap').classList.remove('hidden');
@@ -522,10 +590,8 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
     notes: document.getElementById('fNotes').value || null,
     is_new: document.getElementById('fIsNew').checked,
     in_stock: document.getElementById('fInStock').checked,
-    sizes: Array.from(document.querySelectorAll('.size-cb:checked')).map(cb => ({
-      size: cb.value,
-      stock: parseInt(document.getElementById('stock_' + cb.value)?.value) || 0
-    })),
+    sizes: getColorSizes(),
+    variants: getVariants(),
     series: document.getElementById('fSeries').value || null,
     fabric: document.getElementById('fFabric').value || null,
     clothing_type: document.getElementById('fClothingType').value || null,
