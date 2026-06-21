@@ -455,7 +455,12 @@ function addColorRow(color='', sizes=[], imageUrl='') {
       </label>
       <button type="button" onclick="this.closest('.color-row').remove()" class="text-red-300 hover:text-red-500 text-lg leading-none">×</button>
     </div>
-    ${imageUrl ? `<div class="color-img-preview flex items-center gap-2"><img src="${imageUrl}" class="h-12 w-10 object-cover rounded"/><span class="text-xs text-stone-400 color-img-status">已上传</span></div>` : `<div class="color-img-preview hidden flex items-center gap-2"><img src="" class="h-12 w-10 object-cover rounded"/><span class="text-xs text-stone-400 color-img-status"></span></div>`}
+    <div class="flex items-center gap-2">
+      <input type="url" placeholder="或粘贴图片链接…" class="color-url-input flex-1 border border-stone-200 rounded px-2 py-1 text-xs focus:outline-none focus:border-[#C4928A]" value="${imageUrl}"/>
+      <button type="button" class="color-url-btn text-xs bg-stone-100 hover:bg-stone-200 px-2 py-1 rounded whitespace-nowrap">确认链接</button>
+      ${imageUrl ? `<img class="color-img-preview h-10 w-8 object-cover rounded" src="${imageUrl}"/>` : `<img class="color-img-preview h-10 w-8 object-cover rounded hidden" src=""/>`}
+      <span class="text-xs text-stone-400 color-img-status">${imageUrl ? '✓' : ''}</span>
+    </div>
     <div class="grid grid-cols-3 gap-2">
       ${SIZE_OPTIONS.map(sz => {
         const entry = sizes.find(s => s.size === sz);
@@ -468,18 +473,31 @@ function addColorRow(color='', sizes=[], imageUrl='') {
     </div>`;
 
   const fileInput = div.querySelector('.color-img-file');
-  const preview = div.querySelector('.color-img-preview');
+  const imgPreview = div.querySelector('.color-img-preview');
   const statusEl = div.querySelector('.color-img-status');
+  const urlInput = div.querySelector('.color-url-input');
+  const urlBtn = div.querySelector('.color-url-btn');
+
+  function applyColorImg(url) {
+    div.dataset.imageUrl = url;
+    imgPreview.src = url; imgPreview.classList.remove('hidden');
+    statusEl.textContent = '✓';
+  }
+
   fileInput.addEventListener('change', async (e) => {
     const file = e.target.files[0]; if (!file) return;
-    statusEl.textContent = '上传中…'; preview.classList.remove('hidden');
+    statusEl.textContent = '上传中…'; imgPreview.classList.remove('hidden');
     const url = await compressAndUpload(file, 'color');
-    if (url) {
-      div.dataset.imageUrl = url;
-      preview.querySelector('img').src = url;
-      statusEl.textContent = '✓';
-    } else { statusEl.textContent = '失败'; }
+    if (url) { urlInput.value = url; applyColorImg(url); }
+    else { statusEl.textContent = '失败'; }
   });
+
+  urlBtn.addEventListener('click', () => {
+    const url = urlInput.value.trim(); if (!url) return;
+    applyColorImg(url);
+  });
+
+  urlInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); urlBtn.click(); } });
 
   document.getElementById('colorSizeMatrix').appendChild(div);
 }
@@ -525,27 +543,43 @@ function addVariantRow(name='', price='', cost='', imageUrl='') {
         class="variant-price w-20 border border-stone-200 rounded px-2 py-1 text-sm focus:outline-none focus:border-[#C4928A]"/>
       <button type="button" onclick="this.closest('.variant-row').remove()" class="text-red-300 hover:text-red-500 text-lg leading-none">×</button>
     </div>
-    <div class="flex items-center gap-2">
-      <label class="cursor-pointer text-xs text-[#C4928A] border border-[#C4928A] px-2 py-1 rounded hover:bg-[#fdf0ed]">
-        📷 款式图
+    <div class="flex items-center gap-2 flex-wrap">
+      <label class="cursor-pointer text-xs text-[#C4928A] border border-[#C4928A] px-2 py-1 rounded hover:bg-[#fdf0ed] whitespace-nowrap">
+        📷 上传
         <input type="file" accept="image/*" class="hidden variant-img-file"/>
       </label>
-      ${imageUrl ? `<img src="${imageUrl}" class="variant-img-preview h-10 w-8 object-cover rounded"/><span class="text-xs text-stone-400 variant-img-status">已上传</span>` : `<img src="" class="variant-img-preview h-10 w-8 object-cover rounded hidden"/><span class="text-xs text-stone-400 variant-img-status"></span>`}
+      <input type="url" placeholder="或粘贴图片链接…" class="variant-url-input flex-1 min-w-[120px] border border-stone-200 rounded px-2 py-1 text-xs focus:outline-none focus:border-[#C4928A]" value="${imageUrl}"/>
+      <button type="button" class="variant-url-btn text-xs bg-stone-100 hover:bg-stone-200 px-2 py-1 rounded whitespace-nowrap">确认</button>
+      ${imageUrl ? `<img class="variant-img-preview h-10 w-8 object-cover rounded" src="${imageUrl}"/>` : `<img class="variant-img-preview h-10 w-8 object-cover rounded hidden" src=""/>`}
+      <span class="text-xs text-stone-400 variant-img-status">${imageUrl ? '✓' : ''}</span>
     </div>`;
 
   const fileInput = div.querySelector('.variant-img-file');
   const imgEl = div.querySelector('.variant-img-preview');
   const statusEl = div.querySelector('.variant-img-status');
+  const urlInput = div.querySelector('.variant-url-input');
+  const urlBtn = div.querySelector('.variant-url-btn');
+
+  function applyVariantImg(url) {
+    div.dataset.imageUrl = url;
+    imgEl.src = url; imgEl.classList.remove('hidden');
+    statusEl.textContent = '✓';
+  }
+
   fileInput.addEventListener('change', async (e) => {
     const file = e.target.files[0]; if (!file) return;
     statusEl.textContent = '上传中…';
     const url = await compressAndUpload(file, 'variant');
-    if (url) {
-      div.dataset.imageUrl = url;
-      imgEl.src = url; imgEl.classList.remove('hidden');
-      statusEl.textContent = '✓';
-    } else { statusEl.textContent = '失败'; }
+    if (url) { urlInput.value = url; applyVariantImg(url); }
+    else { statusEl.textContent = '失败'; }
   });
+
+  urlBtn.addEventListener('click', () => {
+    const url = urlInput.value.trim(); if (!url) return;
+    applyVariantImg(url);
+  });
+
+  urlInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); urlBtn.click(); } });
 
   document.getElementById('variantsList').appendChild(div);
 }
