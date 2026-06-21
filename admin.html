@@ -197,8 +197,14 @@
 
       <!-- Extra Product Images -->
       <div>
-        <label class="text-xs text-stone-500 mb-1 block">商品图集（多角度图，可多选）</label>
-        <input id="fExtraImgs" type="file" accept="image/*" multiple class="w-full text-sm text-stone-500 file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:bg-stone-100 file:text-stone-600 hover:file:opacity-80"/>
+        <label class="text-xs text-stone-500 mb-1 block">商品图集（多角度图）</label>
+        <div class="flex gap-2 mb-1">
+          <input id="fExtraImgs" type="file" accept="image/*" multiple class="flex-1 text-sm text-stone-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-stone-100 file:text-stone-600 hover:file:opacity-80"/>
+        </div>
+        <div class="flex gap-2">
+          <input id="extraUrlInput" type="url" placeholder="或粘贴图片链接…" class="flex-1 border border-stone-200 rounded px-2 py-1 text-sm focus:outline-none focus:border-[#C4928A]"/>
+          <button type="button" onclick="addExtraUrl()" class="text-xs bg-stone-100 hover:bg-stone-200 px-3 py-1 rounded whitespace-nowrap">+ 添加链接</button>
+        </div>
         <p id="extraUploadStatus" class="text-xs text-stone-400 mt-1 hidden">上传中…</p>
         <div id="extraPreviewList" class="flex flex-wrap gap-2 mt-2"></div>
       </div>
@@ -229,8 +235,14 @@
 
       <!-- Detail Images -->
       <div>
-        <label class="text-xs text-stone-500 mb-1 block">详情图（可多选，顺序即展示顺序）</label>
-        <input id="fDetailImgs" type="file" accept="image/*" multiple class="w-full text-sm text-stone-500 file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:bg-[#f0e8e6] file:text-[#C4928A] hover:file:opacity-80"/>
+        <label class="text-xs text-stone-500 mb-1 block">详情图（顺序即展示顺序）</label>
+        <div class="flex gap-2 mb-1">
+          <input id="fDetailImgs" type="file" accept="image/*" multiple class="flex-1 text-sm text-stone-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-[#f0e8e6] file:text-[#C4928A] hover:file:opacity-80"/>
+        </div>
+        <div class="flex gap-2">
+          <input id="detailUrlInput" type="url" placeholder="或粘贴图片链接…" class="flex-1 border border-stone-200 rounded px-2 py-1 text-sm focus:outline-none focus:border-[#C4928A]"/>
+          <button type="button" onclick="addDetailUrl()" class="text-xs bg-[#f0e8e6] hover:bg-[#e8d8d4] text-[#C4928A] px-3 py-1 rounded whitespace-nowrap">+ 添加链接</button>
+        </div>
         <p id="detailUploadStatus" class="text-xs text-stone-400 mt-1 hidden">上传中…</p>
         <div id="detailPreviewList" class="flex flex-wrap gap-2 mt-2"></div>
       </div>
@@ -812,6 +824,26 @@ function renderExtraPreviews(urls) {
 
 function removeExtraImg(i) { currentExtraImages.splice(i, 1); renderExtraPreviews(currentExtraImages); }
 window.removeExtraImg = removeExtraImg;
+
+function addExtraUrl() {
+  const input = document.getElementById('extraUrlInput');
+  const url = input.value.trim();
+  if (!url) return;
+  currentExtraImages.push(url);
+  renderExtraPreviews(currentExtraImages);
+  input.value = '';
+}
+window.addExtraUrl = addExtraUrl;
+
+function addDetailUrl() {
+  const input = document.getElementById('detailUrlInput');
+  const url = input.value.trim();
+  if (!url) return;
+  currentDetailImages.push(url);
+  renderDetailPreviews(currentDetailImages);
+  input.value = '';
+}
+window.addDetailUrl = addDetailUrl;
 
 async function compressAndUpload(file, prefix) {
   const compressed = await new Promise(resolve => {
