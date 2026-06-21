@@ -236,6 +236,22 @@
 </button>
 </div>
 </div>
+<!-- Mini Pairing Widget -->
+<div id="miniPairingWidget" class="hidden pt-lg">
+  <p class="font-label-md text-xs text-on-surface-variant uppercase tracking-widest mb-2">推荐搭配</p>
+  <a id="miniPairingLink" href="#" class="flex items-center gap-3 p-3 bg-surface-container-low rounded-xl hover:bg-surface-container transition-colors group">
+    <img id="miniPairingImg" src="" alt="" class="w-12 h-16 object-cover rounded-lg flex-none"/>
+    <div class="flex-1 min-w-0">
+      <p id="miniPairingName" class="font-label-md text-sm text-on-surface leading-tight line-clamp-2"></p>
+      <p id="miniPairingPrice" class="text-xs text-primary mt-1"></p>
+    </div>
+    <div class="text-center flex-none">
+      <p class="text-[10px] text-on-surface-variant">套装省</p>
+      <p id="miniPairingSave" class="font-label-md text-sm text-primary font-bold"></p>
+    </div>
+    <span class="material-symbols-outlined text-on-surface-variant text-sm group-hover:translate-x-1 transition-transform">arrow_forward_ios</span>
+  </a>
+</div>
 <!-- Shipping Info -->
 <div class="pt-lg space-y-3">
 <div class="flex items-center gap-3 p-4 bg-surface-container-low rounded-xl">
@@ -721,6 +737,15 @@ async function loadProduct() {
 
       window._pairingData = { pair, thisPrice, otherPrice, discount, bundlePrice };
       document.getElementById('pairingSection').classList.remove('hidden');
+
+      // Mini widget
+      document.getElementById('miniPairingLink').href = `product.html?id=${pair.id}`;
+      document.getElementById('miniPairingImg').src = pair.image_url || '';
+      document.getElementById('miniPairingImg').alt = pair.name_zh || pair.name || '';
+      document.getElementById('miniPairingName').textContent = pair.name_zh || pair.name || '';
+      document.getElementById('miniPairingPrice').textContent = `RM ${otherPrice.toFixed(2)}`;
+      document.getElementById('miniPairingSave').textContent = `RM ${discount.toFixed(2)}`;
+      document.getElementById('miniPairingWidget').classList.remove('hidden');
     }
   }
 
