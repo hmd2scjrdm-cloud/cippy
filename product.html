@@ -467,6 +467,20 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let selectedSize = null;
 let selectedColor = null;
+
+function switchMainImage(url) {
+  const mainImg = document.getElementById('productImg');
+  mainImg.style.opacity = '0';
+  setTimeout(() => { mainImg.src = url; mainImg.style.opacity = '1'; }, 150);
+  // highlight matching thumbnail if exists
+  document.querySelectorAll('#thumbList div').forEach(d => {
+    const img = d.querySelector('img');
+    if (img && img.src === url) {
+      document.querySelectorAll('#thumbList div').forEach(x => x.classList.replace('border-primary','border-transparent'));
+      d.classList.replace('border-transparent','border-primary');
+    }
+  });
+}
 let selectedVariant = null;
 let selectedPrice = null;
 let _productData = null;
@@ -577,6 +591,7 @@ async function loadProduct() {
         priceNote.classList.add('hidden');
         selectedVariant = v;
         selectedPrice = parseFloat(v.price_myr);
+        if (v.image_url) switchMainImage(v.image_url);
       });
       variantBtns.appendChild(btn);
     });
@@ -628,6 +643,8 @@ async function loadProduct() {
         selectedColor = color;
         selectedSize = null;
         renderSizes(color);
+        const colorImg = (p.color_images || {})[color];
+        if (colorImg) switchMainImage(colorImg);
       });
       colorBtns.appendChild(btn);
     });

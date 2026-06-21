@@ -427,17 +427,23 @@ function calcCost() {
 // Color × Size Matrix
 const SIZE_OPTIONS = ['XS','S','M','L','XL','均码'];
 
-function addColorRow(color='', sizes=[]) {
-  const id = Date.now() + Math.random();
+function addColorRow(color='', sizes=[], imageUrl='') {
+  const id = 'cr_' + Date.now() + '_' + Math.round(Math.random()*9999);
   const div = document.createElement('div');
   div.className = 'color-row border border-stone-200 rounded-lg p-3 space-y-2';
   div.dataset.id = id;
+  div.dataset.imageUrl = imageUrl;
   div.innerHTML = `
     <div class="flex items-center gap-2">
       <input type="text" placeholder="颜色（例：黑色）" value="${color}"
         class="color-name flex-1 border border-stone-200 rounded px-2 py-1 text-sm focus:outline-none focus:border-[#C4928A]"/>
+      <label class="cursor-pointer text-xs text-[#C4928A] border border-[#C4928A] px-2 py-1 rounded hover:bg-[#fdf0ed] whitespace-nowrap">
+        📷 配色图
+        <input type="file" accept="image/*" class="hidden color-img-file"/>
+      </label>
       <button type="button" onclick="this.closest('.color-row').remove()" class="text-red-300 hover:text-red-500 text-lg leading-none">×</button>
     </div>
+    ${imageUrl ? `<div class="color-img-preview flex items-center gap-2"><img src="${imageUrl}" class="h-12 w-10 object-cover rounded"/><span class="text-xs text-stone-400 color-img-status">已上传</span></div>` : `<div class="color-img-preview hidden flex items-center gap-2"><img src="" class="h-12 w-10 object-cover rounded"/><span class="text-xs text-stone-400 color-img-status"></span></div>`}
     <div class="grid grid-cols-3 gap-2">
       ${SIZE_OPTIONS.map(sz => {
         const entry = sizes.find(s => s.size === sz);
@@ -448,6 +454,21 @@ function addColorRow(color='', sizes=[]) {
         </label>`;
       }).join('')}
     </div>`;
+
+  const fileInput = div.querySelector('.color-img-file');
+  const preview = div.querySelector('.color-img-preview');
+  const statusEl = div.querySelector('.color-img-status');
+  fileInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0]; if (!file) return;
+    statusEl.textContent = '上传中…'; preview.classList.remove('hidden');
+    const url = await compressAndUpload(file, 'color');
+    if (url) {
+      div.dataset.imageUrl = url;
+      preview.querySelector('img').src = url;
+      statusEl.textContent = '✓';
+    } else { statusEl.textContent = '失败'; }
+  });
+
   document.getElementById('colorSizeMatrix').appendChild(div);
 }
 window.addColorRow = addColorRow;
@@ -466,20 +487,54 @@ function getColorSizes() {
   return result;
 }
 
+function getColorImages() {
+  const map = {};
+  document.querySelectorAll('.color-row').forEach(row => {
+    const color = row.querySelector('.color-name').value.trim();
+    if (color && row.dataset.imageUrl) map[color] = row.dataset.imageUrl;
+  });
+  return Object.keys(map).length ? map : null;
+}
+
 // Variants
-function addVariantRow(name='', price='', cost='') {
+function addVariantRow(name='', price='', cost='', imageUrl='') {
   const div = document.createElement('div');
-  div.className = 'variant-row flex items-center gap-2 flex-wrap';
+  div.className = 'variant-row border border-stone-200 rounded-lg p-2 space-y-2';
+  div.dataset.imageUrl = imageUrl;
   div.innerHTML = `
-    <input type="text" placeholder="款式名（例：上装）" value="${name}"
-      class="variant-name flex-1 min-w-[100px] border border-stone-200 rounded px-2 py-1 text-sm focus:outline-none focus:border-[#C4928A]"/>
-    <span class="text-xs text-stone-400">¥成本</span>
-    <input type="number" placeholder="0.00" value="${cost}" step="0.01" min="0"
-      class="variant-cost w-20 border border-stone-200 rounded px-2 py-1 text-sm focus:outline-none focus:border-[#C4928A]"/>
-    <span class="text-xs text-stone-400">RM售价</span>
-    <input type="number" placeholder="0.00" value="${price}" step="0.01" min="0"
-      class="variant-price w-20 border border-stone-200 rounded px-2 py-1 text-sm focus:outline-none focus:border-[#C4928A]"/>
-    <button type="button" onclick="this.closest('.variant-row').remove()" class="text-red-300 hover:text-red-500 text-lg leading-none">×</button>`;
+    <div class="flex items-center gap-2 flex-wrap">
+      <input type="text" placeholder="款式名（例：上装）" value="${name}"
+        class="variant-name flex-1 min-w-[100px] border border-stone-200 rounded px-2 py-1 text-sm focus:outline-none focus:border-[#C4928A]"/>
+      <span class="text-xs text-stone-400">¥成本</span>
+      <input type="number" placeholder="0.00" value="${cost}" step="0.01" min="0"
+        class="variant-cost w-20 border border-stone-200 rounded px-2 py-1 text-sm focus:outline-none focus:border-[#C4928A]"/>
+      <span class="text-xs text-stone-400">RM售价</span>
+      <input type="number" placeholder="0.00" value="${price}" step="0.01" min="0"
+        class="variant-price w-20 border border-stone-200 rounded px-2 py-1 text-sm focus:outline-none focus:border-[#C4928A]"/>
+      <button type="button" onclick="this.closest('.variant-row').remove()" class="text-red-300 hover:text-red-500 text-lg leading-none">×</button>
+    </div>
+    <div class="flex items-center gap-2">
+      <label class="cursor-pointer text-xs text-[#C4928A] border border-[#C4928A] px-2 py-1 rounded hover:bg-[#fdf0ed]">
+        📷 款式图
+        <input type="file" accept="image/*" class="hidden variant-img-file"/>
+      </label>
+      ${imageUrl ? `<img src="${imageUrl}" class="variant-img-preview h-10 w-8 object-cover rounded"/><span class="text-xs text-stone-400 variant-img-status">已上传</span>` : `<img src="" class="variant-img-preview h-10 w-8 object-cover rounded hidden"/><span class="text-xs text-stone-400 variant-img-status"></span>`}
+    </div>`;
+
+  const fileInput = div.querySelector('.variant-img-file');
+  const imgEl = div.querySelector('.variant-img-preview');
+  const statusEl = div.querySelector('.variant-img-status');
+  fileInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0]; if (!file) return;
+    statusEl.textContent = '上传中…';
+    const url = await compressAndUpload(file, 'variant');
+    if (url) {
+      div.dataset.imageUrl = url;
+      imgEl.src = url; imgEl.classList.remove('hidden');
+      statusEl.textContent = '✓';
+    } else { statusEl.textContent = '失败'; }
+  });
+
   document.getElementById('variantsList').appendChild(div);
 }
 window.addVariantRow = addVariantRow;
@@ -489,6 +544,7 @@ function getVariants() {
     name: row.querySelector('.variant-name').value.trim(),
     cost_rmb: parseFloat(row.querySelector('.variant-cost').value) || null,
     price_myr: parseFloat(row.querySelector('.variant-price').value) || 0,
+    image_url: row.dataset.imageUrl || null,
   })).filter(v => v.name);
 }
 
@@ -607,11 +663,12 @@ async function editProduct(id) {
     colorGroups[s.color].push(s);
   });
   if (Object.keys(colorGroups).length) {
-    Object.entries(colorGroups).forEach(([color, sizes]) => addColorRow(color, sizes));
+    const colorImgs = p.color_images || {};
+    Object.entries(colorGroups).forEach(([color, sizes]) => addColorRow(color, sizes, colorImgs[color] || ''));
   }
   // Restore variants
   document.getElementById('variantsList').innerHTML = '';
-  (p.variants || []).forEach(v => addVariantRow(v.name, v.price_myr, v.cost_rmb || ''));
+  (p.variants || []).forEach(v => addVariantRow(v.name, v.price_myr, v.cost_rmb || '', v.image_url || ''));
   if (p.image_url) {
     document.getElementById('imagePreview').src = p.image_url;
     document.getElementById('imagePreviewWrap').classList.remove('hidden');
@@ -664,6 +721,7 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
     detail_images: currentDetailImages,
     images: currentExtraImages,
     size_guide: getSizeGuide(),
+    color_images: getColorImages(),
     pairing_product_id: document.getElementById('fPairingProductId').value || null,
     pairing_discount_myr: parseFloat(document.getElementById('fPairingDiscount').value) || null,
   };
