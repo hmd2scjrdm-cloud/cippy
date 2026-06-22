@@ -271,11 +271,14 @@ function renderProducts() {
   empty.classList.add('hidden');
   if (countEl) countEl.textContent = `${data.length} Items`;
 
-  grid.innerHTML = data.map(p => `
-    <div class="product-card group cursor-pointer" onclick="location.href='product.html?id=${p.id}'">
+  grid.innerHTML = data.map(p => {
+    const allImgs = [p.image_url, ...(Array.isArray(p.images) ? p.images : [])].filter(Boolean);
+    const imgsAttr = allImgs.length > 1 ? `data-images='${JSON.stringify(allImgs)}'` : '';
+    return `
+    <div class="product-card group cursor-pointer" onclick="location.href='product.html?id=${p.id}'" ${imgsAttr}>
       <div class="relative overflow-hidden rounded-xl bg-surface-container-low shadow-sm transition-all duration-300 hover:shadow-xl">
         ${p.image_url
-          ? `<img class="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105" src="${p.image_url}" alt="${p.name_zh || p.name}"/>`
+          ? `<div class="w-full aspect-[3/4] overflow-hidden"><img class="card-img w-full h-full object-cover transition-opacity duration-300" src="${p.image_url}" alt="${p.name_zh || p.name}"/></div>`
           : `<div class="w-full aspect-[3/4] bg-surface-container flex items-center justify-center text-on-surface-variant/30 text-5xl">📦</div>`
         }
         <button class="absolute top-4 right-4 z-10 w-10 h-10 bg-white/60 backdrop-blur-md rounded-full flex items-center justify-center text-primary transition-all hover:bg-white active:scale-90" onclick="event.stopPropagation();toggleHeart(this)">
@@ -287,8 +290,33 @@ function renderProducts() {
           <p class="font-label-md text-on-surface mb-2">MYR ${parseFloat(p.price_myr || p.price).toFixed(2)}</p>
         </div>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
+
+  // Attach hover slideshow to cards with multiple images
+  document.querySelectorAll('.product-card[data-images]').forEach(card => {
+    const imgs = JSON.parse(card.dataset.images);
+    const imgEl = card.querySelector('.card-img');
+    if (!imgEl || imgs.length < 2) return;
+    let hoverTimer = null, slideTimer = null, idx = 0;
+    card.addEventListener('mouseenter', () => {
+      hoverTimer = setTimeout(() => {
+        slideTimer = setInterval(() => {
+          idx = (idx + 1) % imgs.length;
+          imgEl.style.opacity = '0';
+          setTimeout(() => { imgEl.src = imgs[idx]; imgEl.style.opacity = '1'; }, 150);
+        }, 1000);
+      }, 2000);
+    });
+    card.addEventListener('mouseleave', () => {
+      clearTimeout(hoverTimer);
+      clearInterval(slideTimer);
+      hoverTimer = slideTimer = null;
+      idx = 0;
+      imgEl.style.opacity = '1';
+      imgEl.src = imgs[0];
+    });
+  });
 }
 
 function setCategory(cat) {
