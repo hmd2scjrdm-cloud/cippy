@@ -255,7 +255,14 @@ function renderProducts() {
 
   const q = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
   if (q) data = data.filter(p => (p.name || '').toLowerCase().includes(q) || (p.name_zh || '').toLowerCase().includes(q));
-  if (currentCategory) data = data.filter(p => (p.category || '').toLowerCase() === currentCategory.toLowerCase());
+  if (currentCategory) {
+    const catMap = { dress:'dresses', top:'tops', bottom:'pants', outerwear:'outerwear', set:'sets', accessories:'accessories' };
+    data = data.filter(p => {
+      const c = (p.category || '').toLowerCase();
+      const normalized = catMap[c] || c;
+      return normalized === currentCategory.toLowerCase();
+    });
+  }
   if (currentSeries) data = data.filter(p => (p.series || '') === currentSeries);
   if (currentSort === 'price_asc') data.sort((a, b) => parseFloat(a.price_myr || a.price) - parseFloat(b.price_myr || b.price));
   else if (currentSort === 'price_desc') data.sort((a, b) => parseFloat(b.price_myr || b.price) - parseFloat(a.price_myr || a.price));
