@@ -102,28 +102,37 @@ const pendingRaw = localStorage.getItem('cippy_pending_order');
 const lastRaw = localStorage.getItem('cippy_last_order');
 
 if (pendingRaw) {
-  // Coming back from Stripe — promote to last_order and clear cart
   localStorage.setItem('cippy_last_order', pendingRaw);
   localStorage.removeItem('cippy_pending_order');
   localStorage.removeItem('cippy_cart');
 
-  // Send confirmation email (best-effort)
-  if (params.get('session_id')) {
-    import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm').then(({ createClient }) => {
-      const sb = createClient('https://ilzeziznxzaxxudzhdmu.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI');
-      sb.auth.getSession().then(({ data: { session } }) => {
-        if (!session) return;
-        try {
-          const { customer, items, totals } = JSON.parse(pendingRaw);
-          fetch('/api/send-order-email', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
-            body: JSON.stringify({ customer, items, totals, orderId: params.get('order') })
-          }).catch(() => {});
-        } catch(e) {}
-      });
-    }).catch(() => {});
-  }
+  import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm').then(({ createClient }) => {
+    const sb = createClient('https://ilzeziznxzaxxudzhdmu.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI');
+    sb.auth.getSession().then(async ({ data: { session } }) => {
+      if (!session) return;
+      try {
+        const { customer, items, totals } = JSON.parse(pendingRaw);
+        const orderId = params.get('order');
+
+        // Save order to Supabase
+        await sb.from('orders').insert({
+          order_id: orderId,
+          user_id: session.user.id,
+          customer,
+          items,
+          totals,
+          status: 'paid'
+        });
+
+        // Send confirmation email (best-effort)
+        fetch('/api/send-order-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+          body: JSON.stringify({ customer, items, totals, orderId })
+        }).catch(() => {});
+      } catch(e) {}
+    });
+  }).catch(() => {});
 }
 
 const orderIdEl = document.getElementById('orderIdDisplay');
