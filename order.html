@@ -46,6 +46,15 @@
     </div>
   </div>
 
+  <!-- Progress tracker -->
+  <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl px-5 py-6">
+    <div class="relative flex items-start justify-between" id="progressTracker">
+      <!-- connecting line -->
+      <div class="absolute top-4 left-0 right-0 h-0.5 bg-outline-variant mx-8" style="z-index:0"></div>
+      <div id="progressLine" class="absolute top-4 left-0 h-0.5 bg-primary mx-8 transition-all duration-500" style="z-index:1;width:0%"></div>
+    </div>
+  </div>
+
   <!-- Items -->
   <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl overflow-hidden">
     <div class="px-5 py-4 border-b border-outline-variant">
@@ -165,6 +174,45 @@ async function loadOrder(id) {
   document.getElementById('statusIcon').style.fontVariationSettings = "'FILL' 1";
   document.getElementById('statusLabel').textContent = st.label;
   document.getElementById('orderId').textContent = order.order_id;
+
+  // Progress tracker
+  const steps = [
+    { key: 'pending',    label: '待付款', icon: 'schedule' },
+    { key: 'paid',       label: '已付款', icon: 'payments' },
+    { key: 'processing', label: '处理中', icon: 'inventory_2' },
+    { key: 'shipped',    label: '已发货', icon: 'local_shipping' },
+    { key: 'delivered',  label: '已送达', icon: 'done_all' },
+  ];
+  const cancelled = order.status === 'cancelled';
+  const currentIdx = cancelled ? -1 : steps.findIndex(s => s.key === order.status);
+  const tracker = document.getElementById('progressTracker');
+  const lineEl = document.getElementById('progressLine');
+
+  // Build step nodes
+  const nodes = steps.map((step, i) => {
+    const done = !cancelled && i <= currentIdx;
+    const active = !cancelled && i === currentIdx;
+    const circleCls = done
+      ? 'bg-primary text-on-primary border-primary'
+      : 'bg-surface-container-lowest text-on-surface-variant border-outline-variant';
+    return `
+      <div class="flex flex-col items-center gap-2 flex-1 relative" style="z-index:2">
+        <div class="w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${circleCls} ${active ? 'ring-2 ring-primary ring-offset-2' : ''}">
+          <span class="material-symbols-outlined text-[15px]" style="font-variation-settings:'FILL' ${done ? 1 : 0}">${step.icon}</span>
+        </div>
+        <p class="font-label-sm text-[10px] text-center leading-tight ${done ? 'text-primary font-bold' : 'text-on-surface-variant'}">${step.label}</p>
+      </div>`;
+  }).join('');
+
+  tracker.innerHTML = `
+    <div class="absolute top-4 left-8 right-8 h-0.5 bg-outline-variant" style="z-index:0"></div>
+    <div id="progressLine" class="absolute top-4 left-8 h-0.5 bg-primary transition-all duration-700" style="z-index:1;width:${cancelled || currentIdx <= 0 ? 0 : Math.min((currentIdx / (steps.length - 1)) * 100, 100)}%;max-width:calc(100% - 4rem)"></div>
+    ${nodes}
+  `;
+
+  if (cancelled) {
+    tracker.insertAdjacentHTML('beforeend', `<p class="w-full text-center font-label-sm text-label-sm text-on-surface-variant mt-3">订单已取消</p>`);
+  }
 
   // Items
   const items = order.items || [];
