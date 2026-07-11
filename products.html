@@ -160,7 +160,7 @@
 <a href="cart.html" class="w-14 h-14 bg-primary rounded-full -mt-10 flex items-center justify-center text-on-primary shadow-lg shadow-primary/40 active:scale-90 transition-transform">
 <span class="material-symbols-outlined text-3xl">shopping_bag</span>
 </a>
-<a href="account.html" class="flex flex-col items-center gap-1 text-on-surface-variant">
+<a href="wishlist.html" class="flex flex-col items-center gap-1 text-on-surface-variant">
 <span class="material-symbols-outlined">favorite</span>
 <span class="text-[10px] font-bold uppercase tracking-wider">Saves</span>
 </a>
@@ -170,17 +170,37 @@
 </a>
 </div>
 <script>
-        function toggleHeart(btn) {
+        function getWishlist() { return JSON.parse(localStorage.getItem('cippy_wishlist') || '[]'); }
+        function saveWishlist(arr) { localStorage.setItem('cippy_wishlist', JSON.stringify(arr)); }
+
+        function toggleHeart(btn, product) {
             const icon = btn.querySelector('.material-symbols-outlined');
-            icon.classList.toggle('active-heart');
-            if(icon.classList.contains('active-heart')) {
+            const list = getWishlist();
+            const idx = list.findIndex(p => String(p.id) === String(product.id));
+            if (idx === -1) {
+                list.push(product);
+                saveWishlist(list);
                 icon.style.fontVariationSettings = "'FILL' 1";
-                // Simple vibration/animation effect
+                icon.style.color = '#e11d48';
                 btn.style.transform = 'scale(1.2)';
                 setTimeout(() => btn.style.transform = 'scale(1)', 200);
             } else {
+                list.splice(idx, 1);
+                saveWishlist(list);
                 icon.style.fontVariationSettings = "'FILL' 0";
+                icon.style.color = '';
             }
+        }
+
+        function initHearts() {
+            const list = getWishlist();
+            document.querySelectorAll('[data-product-id]').forEach(btn => {
+                const id = btn.dataset.productId;
+                if (list.find(p => String(p.id) === String(id))) {
+                    const icon = btn.querySelector('.material-symbols-outlined');
+                    if (icon) { icon.style.fontVariationSettings = "'FILL' 1"; icon.style.color = '#e11d48'; }
+                }
+            });
         }
 
         // Horizontal scroll animation for filters
@@ -287,7 +307,7 @@ function renderProducts() {
           ? `<div class="w-full aspect-[3/4] overflow-hidden"><img class="card-img w-full h-full object-cover transition-opacity duration-300" src="${p.image_url}" alt="${p.name_zh || p.name}"/></div>`
           : `<div class="w-full aspect-[3/4] bg-surface-container flex items-center justify-center text-on-surface-variant/30 text-5xl">📦</div>`
         }
-        <button class="absolute top-4 right-4 z-10 w-10 h-10 bg-white/60 backdrop-blur-md rounded-full flex items-center justify-center text-primary transition-all hover:bg-white active:scale-90" onclick="event.stopPropagation();toggleHeart(this)">
+        <button data-product-id="${p.id}" class="absolute top-4 right-4 z-10 w-10 h-10 bg-white/60 backdrop-blur-md rounded-full flex items-center justify-center text-primary transition-all hover:bg-white active:scale-90" onclick="event.stopPropagation();toggleHeart(this,{id:'${p.id}',name_zh:${JSON.stringify(p.name_zh||p.name||'')},name:${JSON.stringify(p.name||'')},price_myr:'${p.price_myr||p.price||0}',image_url:${JSON.stringify(p.image_url||'')}})">
           <span class="material-symbols-outlined">favorite</span>
         </button>
         <div class="p-4">
@@ -298,6 +318,8 @@ function renderProducts() {
       </div>
     </div>`;
   }).join('');
+
+  initHearts();
 
   // Attach hover slideshow to cards with multiple images
   document.querySelectorAll('.product-card[data-images]').forEach(card => {

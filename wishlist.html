@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>心愿单 — Cippy</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital@0;1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: '#1a1a1a',
+        'on-primary': '#ffffff',
+        surface: '#fafafa',
+        'surface-container': '#f2f2f2',
+        'on-surface': '#1a1a1a',
+        'on-surface-variant': '#6b6b6b',
+        'outline-variant': '#e0e0e0',
+      },
+      fontFamily: { sans: ['Inter','sans-serif'], serif: ['Playfair Display','serif'] },
+    }
+  }
+}
+</script>
+<style>
+  body { font-family: 'Inter', sans-serif; background: #fafafa; }
+  .active-heart { font-variation-settings: 'FILL' 1; color: #e11d48; }
+</style>
+</head>
+<body class="pb-24">
+
+<!-- Header -->
+<header class="sticky top-0 z-20 bg-white/90 backdrop-blur border-b border-gray-100">
+  <div class="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
+    <a href="products.html" class="text-on-surface-variant">
+      <span class="material-symbols-outlined text-2xl">arrow_back</span>
+    </a>
+    <h1 class="text-sm font-semibold tracking-widest uppercase">心愿单</h1>
+    <button id="clearAllBtn" class="text-xs text-gray-400 hover:text-red-500 transition-colors hidden">清空</button>
+  </div>
+</header>
+
+<!-- Empty state -->
+<div id="emptyState" class="hidden flex flex-col items-center justify-center min-h-[60vh] px-8 text-center">
+  <span class="material-symbols-outlined text-6xl text-gray-200 mb-4">favorite</span>
+  <p class="text-gray-500 text-sm mb-1">还没有收藏的商品</p>
+  <p class="text-gray-400 text-xs mb-6">浏览商品时点击 ♡ 收藏喜欢的单品</p>
+  <a href="products.html" class="bg-gray-900 text-white px-6 py-3 text-sm font-medium rounded-full hover:bg-gray-800 transition-colors">去逛逛</a>
+</div>
+
+<!-- Grid -->
+<main class="max-w-4xl mx-auto px-4 pt-5">
+  <p id="countText" class="text-xs text-gray-400 mb-4"></p>
+  <div id="wishlistGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"></div>
+</main>
+
+<!-- Bottom nav -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-20 pb-safe">
+  <div class="max-w-lg mx-auto flex justify-around items-center h-16">
+    <a href="index.html" class="flex flex-col items-center gap-1 text-gray-400">
+      <span class="material-symbols-outlined text-2xl">home</span>
+      <span class="text-[10px] font-bold uppercase tracking-wider">Home</span>
+    </a>
+    <a href="products.html" class="flex flex-col items-center gap-1 text-gray-400">
+      <span class="material-symbols-outlined text-2xl">explore</span>
+      <span class="text-[10px] font-bold uppercase tracking-wider">Explore</span>
+    </a>
+    <a href="cart.html" class="w-14 h-14 bg-gray-900 rounded-full -mt-10 flex items-center justify-center text-white shadow-lg active:scale-90 transition-transform">
+      <span class="material-symbols-outlined text-3xl">shopping_bag</span>
+    </a>
+    <a href="wishlist.html" class="flex flex-col items-center gap-1 text-gray-900">
+      <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1;color:#e11d48;">favorite</span>
+      <span class="text-[10px] font-bold uppercase tracking-wider">Saves</span>
+    </a>
+    <a href="account.html" class="flex flex-col items-center gap-1 text-gray-400">
+      <span class="material-symbols-outlined text-2xl">person</span>
+      <span class="text-[10px] font-bold uppercase tracking-wider">Me</span>
+    </a>
+  </div>
+</nav>
+
+<script>
+const fmt = new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' });
+
+function getWishlist() {
+  return JSON.parse(localStorage.getItem('cippy_wishlist') || '[]');
+}
+function saveWishlist(arr) {
+  localStorage.setItem('cippy_wishlist', JSON.stringify(arr));
+}
+
+function removeItem(id) {
+  const updated = getWishlist().filter(p => String(p.id) !== String(id));
+  saveWishlist(updated);
+  render();
+}
+
+function render() {
+  const items = getWishlist();
+  const grid = document.getElementById('wishlistGrid');
+  const empty = document.getElementById('emptyState');
+  const clearBtn = document.getElementById('clearAllBtn');
+  const countText = document.getElementById('countText');
+
+  if (!items.length) {
+    grid.innerHTML = '';
+    empty.classList.remove('hidden');
+    clearBtn.classList.add('hidden');
+    countText.textContent = '';
+    return;
+  }
+
+  empty.classList.add('hidden');
+  clearBtn.classList.remove('hidden');
+  countText.textContent = `${items.length} 件单品`;
+
+  grid.innerHTML = items.map(p => {
+    const name = p.name_zh || p.name || '';
+    const price = parseFloat(p.price_myr || p.price || 0);
+    const img = p.image_url || '';
+    return `
+      <div class="relative group">
+        <a href="product.html?id=${p.id}" class="block">
+          <div class="aspect-[3/4] bg-gray-100 rounded-xl overflow-hidden">
+            ${img ? `<img src="${img}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">` : ''}
+          </div>
+          <div class="pt-2 pb-1 px-0.5">
+            <p class="text-xs font-medium text-gray-900 leading-tight line-clamp-2 mb-1">${name}</p>
+            <p class="text-xs font-bold text-gray-900">${fmt.format(price)}</p>
+          </div>
+        </a>
+        <!-- Remove button -->
+        <button onclick="removeItem('${p.id}')" class="absolute top-2 right-2 w-8 h-8 bg-white/90 backdrop-blur rounded-full flex items-center justify-center shadow-sm hover:bg-red-50 transition-colors">
+          <span class="material-symbols-outlined text-[18px] text-red-400" style="font-variation-settings:'FILL' 1;">favorite</span>
+        </button>
+        <!-- Add to bag -->
+        <button onclick="addToBag(${JSON.stringify(p).replace(/"/g,'&quot;')})" class="absolute bottom-10 left-0 right-0 mx-2 py-2 bg-gray-900 text-white text-xs font-medium rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+          加入购物袋
+        </button>
+      </div>
+    `;
+  }).join('');
+}
+
+function addToBag(product) {
+  const cart = JSON.parse(localStorage.getItem('cippy_cart') || '[]');
+  const existing = cart.find(i => i.id === product.id);
+  if (existing) {
+    existing.qty = (existing.qty || 1) + 1;
+  } else {
+    cart.push({ ...product, qty: 1 });
+  }
+  localStorage.setItem('cippy_cart', JSON.stringify(cart));
+  // Brief feedback
+  const btn = event.currentTarget;
+  btn.textContent = '已添加 ✓';
+  setTimeout(() => { btn.textContent = '加入购物袋'; }, 1200);
+}
+
+document.getElementById('clearAllBtn').addEventListener('click', () => {
+  if (confirm('确定清空心愿单？')) {
+    saveWishlist([]);
+    render();
+  }
+});
+
+render();
+</script>
+</body>
+</html>

@@ -231,8 +231,8 @@
 <!-- Add to Bag -->
 <div class="pt-lg space-y-4">
 <button onclick="addToBag()" class="w-full py-5 bg-primary text-on-primary rounded-none font-headline-md hover:opacity-80 active:scale-95 transition-all">Add to Bag</button>
-<button class="w-full py-4 border border-outline-variant text-on-surface rounded-none font-label-md flex items-center justify-center gap-2 hover:bg-surface-container-low transition-colors">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">favorite</span>Save to Wishlist
+<button id="wishlistBtn" onclick="toggleWishlist()" class="w-full py-4 border border-outline-variant text-on-surface rounded-none font-label-md flex items-center justify-center gap-2 hover:bg-surface-container-low transition-colors">
+<span id="wishlistIcon" class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">favorite</span><span id="wishlistLabel">Save to Wishlist</span>
 </button>
 </div>
 </div>
@@ -508,6 +508,41 @@ function showToast(msg) {
   clearTimeout(t._timer); t._timer = setTimeout(() => { t.style.opacity = '0'; }, 2200);
 }
 
+function getWishlist() { return JSON.parse(localStorage.getItem('cippy_wishlist') || '[]'); }
+function saveWishlist(arr) { localStorage.setItem('cippy_wishlist', JSON.stringify(arr)); }
+
+function initWishlistBtn(p) {
+  const inList = getWishlist().some(w => String(w.id) === String(p.id));
+  const icon = document.getElementById('wishlistIcon');
+  const label = document.getElementById('wishlistLabel');
+  if (inList) {
+    icon.style.fontVariationSettings = "'FILL' 1";
+    icon.style.color = '#e11d48';
+    label.textContent = '已收藏';
+  } else {
+    icon.style.fontVariationSettings = "'FILL' 0";
+    icon.style.color = '';
+    label.textContent = 'Save to Wishlist';
+  }
+}
+
+function toggleWishlist() {
+  if (!_productData) return;
+  const p = _productData;
+  const list = getWishlist();
+  const idx = list.findIndex(w => String(w.id) === String(p.id));
+  if (idx === -1) {
+    list.push({ id: p.id, name_zh: p.name_zh || p.name, name: p.name, price_myr: p.price_myr || p.price || 0, image_url: p.image_url || '' });
+    saveWishlist(list);
+    showToast('已加入心愿单 ♡');
+  } else {
+    list.splice(idx, 1);
+    saveWishlist(list);
+    showToast('已移出心愿单');
+  }
+  initWishlistBtn(p);
+}
+
 function addToBag() {
   if (!_productData) return;
   const p = _productData;
@@ -554,6 +589,7 @@ async function loadProduct() {
   const { data: p, error } = await sb.from('products').select('*').eq('id', id).single();
   if (error || !p) { showNotFound(); return; }
   _productData = p;
+  initWishlistBtn(p);
 
   // Image gallery
   const mainImg = document.getElementById('productImg');
