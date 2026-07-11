@@ -133,6 +133,75 @@
 </nav>
 </header>
 <main class="pt-24 overflow-hidden">
+
+<!-- Member Dashboard (shown when logged in) -->
+<div id="memberDashboard" class="hidden min-h-screen px-4 md:px-margin-desktop pb-32 max-w-[800px] mx-auto">
+  <div class="flex items-center gap-4 py-8 border-b border-outline-variant/30 mb-8">
+    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center flex-none">
+      <span class="material-symbols-outlined text-3xl text-primary">person</span>
+    </div>
+    <div>
+      <p id="dashName" class="font-headline-md text-headline-md text-on-surface"></p>
+      <p id="dashEmail" class="font-body-sm text-body-sm text-on-surface-variant"></p>
+    </div>
+    <button id="signOutBtn" class="ml-auto text-xs text-on-surface-variant border border-outline-variant px-3 py-1.5 rounded-full hover:border-primary hover:text-primary transition-colors">退出</button>
+  </div>
+
+  <!-- Points card -->
+  <div class="bg-gradient-to-br from-primary to-secondary rounded-2xl p-6 text-white mb-6">
+    <p class="text-xs uppercase tracking-widest opacity-70 mb-1">我的积分</p>
+    <p id="dashPoints" class="text-4xl font-bold mb-3">0 pts</p>
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-sm opacity-70">filter_vintage</span>
+      <p class="text-xs opacity-70">Pink Ribbon 会员 · 每消费 RM1 得 1 积分</p>
+    </div>
+  </div>
+
+  <!-- Quick actions -->
+  <div class="grid grid-cols-3 gap-3 mb-8">
+    <button onclick="showTab('orders')" id="tabOrders" class="dash-tab bg-surface-container rounded-2xl p-4 flex flex-col items-center gap-2 border-2 border-primary">
+      <span class="material-symbols-outlined text-primary">local_shipping</span>
+      <span class="text-xs font-bold text-on-surface">我的订单</span>
+    </button>
+    <button onclick="showTab('wishlist')" id="tabWishlist" class="dash-tab bg-surface-container rounded-2xl p-4 flex flex-col items-center gap-2 border-2 border-transparent">
+      <span class="material-symbols-outlined text-on-surface-variant">favorite</span>
+      <span class="text-xs font-bold text-on-surface-variant">我的收藏</span>
+    </button>
+    <button onclick="showTab('points')" id="tabPoints" class="dash-tab bg-surface-container rounded-2xl p-4 flex flex-col items-center gap-2 border-2 border-transparent">
+      <span class="material-symbols-outlined text-on-surface-variant">star</span>
+      <span class="text-xs font-bold text-on-surface-variant">积分明细</span>
+    </button>
+  </div>
+
+  <!-- Tab content -->
+  <div id="tabContentOrders">
+    <h3 class="font-headline-md text-on-surface mb-4">我的订单</h3>
+    <div class="bg-surface-container-low rounded-2xl p-8 text-center text-on-surface-variant">
+      <span class="material-symbols-outlined text-4xl mb-2 block opacity-30">inbox</span>
+      <p class="font-body-sm text-body-sm">暂无订单记录</p>
+      <a href="products.html" class="inline-block mt-4 bg-primary text-on-primary px-6 py-2 rounded-none text-sm font-bold hover:opacity-80 transition-opacity">去逛逛</a>
+    </div>
+  </div>
+  <div id="tabContentWishlist" class="hidden">
+    <h3 class="font-headline-md text-on-surface mb-4">我的收藏</h3>
+    <div id="wishlistGrid" class="grid grid-cols-2 gap-3"></div>
+    <div id="wishlistEmpty" class="bg-surface-container-low rounded-2xl p-8 text-center text-on-surface-variant hidden">
+      <span class="material-symbols-outlined text-4xl mb-2 block opacity-30">favorite</span>
+      <p class="font-body-sm text-body-sm">还没有收藏的商品</p>
+      <a href="products.html" class="inline-block mt-4 bg-primary text-on-primary px-6 py-2 rounded-none text-sm font-bold hover:opacity-80 transition-opacity">去逛逛</a>
+    </div>
+  </div>
+  <div id="tabContentPoints" class="hidden">
+    <h3 class="font-headline-md text-on-surface mb-4">积分明细</h3>
+    <div class="bg-surface-container-low rounded-2xl p-8 text-center text-on-surface-variant">
+      <span class="material-symbols-outlined text-4xl mb-2 block opacity-30">star</span>
+      <p class="font-body-sm text-body-sm">暂无积分记录</p>
+    </div>
+  </div>
+</div>
+
+<!-- Club intro (shown when not logged in) -->
+<div id="clubIntro">
 <!-- Hero Section -->
 <section class="relative min-h-[80vh] flex items-center justify-center px-margin-mobile md:px-margin-desktop">
 <div class="absolute inset-0 z-0 transition-all duration-700 opacity-100 translate-y-0">
@@ -287,26 +356,6 @@
 <p class="font-body-md text-body-md text-secondary mb-10 max-w-lg mx-auto">
                         Create an account today and start earning rewards immediately. Your first welcome gift is waiting.
                     </p>
-<!-- Profile (logged in) -->
-<div id="profileSection" class="hidden text-center">
-  <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-    <span class="material-symbols-outlined text-4xl text-primary">person</span>
-  </div>
-  <p id="profileName" class="font-headline-md text-headline-md text-on-surface mb-1"></p>
-  <p id="profileEmail" class="font-body-sm text-body-sm text-on-surface-variant mb-6"></p>
-  <div class="bg-surface rounded-2xl p-6 text-left max-w-sm mx-auto mb-6 space-y-3">
-    <div class="flex items-center gap-3 text-on-surface-variant font-body-sm text-body-sm">
-      <span class="material-symbols-outlined text-primary text-sm">local_shipping</span> 查看订单 <span class="ml-auto text-xs text-outline">即将推出</span>
-    </div>
-    <div class="flex items-center gap-3 text-on-surface-variant font-body-sm text-body-sm">
-      <span class="material-symbols-outlined text-primary text-sm">favorite</span> 我的收藏 <span class="ml-auto text-xs text-outline">即将推出</span>
-    </div>
-    <div class="flex items-center gap-3 text-on-surface-variant font-body-sm text-body-sm">
-      <span class="material-symbols-outlined text-primary text-sm">star</span> 会员积分 <span class="ml-auto text-xs text-outline">即将推出</span>
-    </div>
-  </div>
-  <button id="signOutBtn" class="border border-outline-variant text-on-surface-variant px-8 py-3 rounded-full font-label-md text-label-md hover:border-primary hover:text-primary transition-colors">退出登录</button>
-</div>
 <!-- Auth Form (not logged in) -->
 <div id="authForm">
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left max-w-2xl mx-auto">
@@ -329,6 +378,7 @@
 </div>
 </div>
 </section>
+</div><!-- end #clubIntro -->
 </main>
 <!-- Footer -->
 <footer class="w-full py-xl bg-surface-container-low dark:bg-surface-container-lowest">
@@ -404,18 +454,52 @@
         }
 
         function handleUser(user) {
-            const authForm = document.getElementById('authForm');
-            const profileSection = document.getElementById('profileSection');
+            const dashboard = document.getElementById('memberDashboard');
+            const clubIntro = document.getElementById('clubIntro');
             if (user) {
-                authForm.classList.add('hidden');
-                profileSection.classList.remove('hidden');
-                document.getElementById('profileEmail').textContent = user.email;
-                document.getElementById('profileName').textContent = user.user_metadata?.name || user.email.split('@')[0];
+                dashboard.classList.remove('hidden');
+                clubIntro.classList.add('hidden');
+                document.getElementById('dashEmail').textContent = user.email;
+                document.getElementById('dashName').textContent = user.user_metadata?.name || user.email.split('@')[0];
+                loadWishlist();
             } else {
-                authForm.classList.remove('hidden');
-                profileSection.classList.add('hidden');
+                dashboard.classList.add('hidden');
+                clubIntro.classList.remove('hidden');
                 setStatus('注册后请查收邮件确认账号。');
             }
+        }
+
+        function showTab(tab) {
+            ['orders','wishlist','points'].forEach(t => {
+                document.getElementById('tabContent' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('hidden', t !== tab);
+                const btn = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1));
+                btn.classList.toggle('border-primary', t === tab);
+                btn.classList.toggle('border-transparent', t !== tab);
+                btn.querySelector('span.material-symbols-outlined').classList.toggle('text-primary', t === tab);
+                btn.querySelector('span.material-symbols-outlined').classList.toggle('text-on-surface-variant', t !== tab);
+                btn.querySelector('span:last-child').classList.toggle('text-on-surface', t === tab);
+                btn.querySelector('span:last-child').classList.toggle('font-bold', t === tab);
+                btn.querySelector('span:last-child').classList.toggle('text-on-surface-variant', t !== tab);
+            });
+        }
+        window.showTab = showTab;
+
+        function loadWishlist() {
+            const saved = JSON.parse(localStorage.getItem('cippy_wishlist') || '[]');
+            const grid = document.getElementById('wishlistGrid');
+            const empty = document.getElementById('wishlistEmpty');
+            if (!saved.length) { grid.classList.add('hidden'); empty.classList.remove('hidden'); return; }
+            grid.classList.remove('hidden'); empty.classList.add('hidden');
+            grid.innerHTML = saved.map(p => `
+              <a href="product.html?id=${p.id}" class="block bg-surface-container rounded-2xl overflow-hidden group">
+                <div class="aspect-[3/4] overflow-hidden">
+                  <img src="${p.image_url||''}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+                </div>
+                <div class="p-3">
+                  <p class="font-label-md text-xs text-on-surface leading-tight mb-1">${p.name_zh||p.name}</p>
+                  <p class="text-primary text-xs font-bold">MYR ${parseFloat(p.price_myr||p.price||0).toFixed(2)}</p>
+                </div>
+              </a>`).join('');
         }
 
         sb.auth.onAuthStateChange((_, session) => handleUser(session?.user || null));
