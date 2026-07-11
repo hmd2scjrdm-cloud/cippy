@@ -580,10 +580,13 @@ Free standard shipping on orders over MYR 150.00
 
           checkoutBtn.disabled = true;
           checkoutBtn.classList.add('opacity-60');
-          setCheckoutStatus('Sending your order confirmation...');
+          setCheckoutStatus('正在跳转付款页面...');
 
           try {
-            const response = await fetch('/api/send-order-email', {
+            const totals = { subtotal, shipping, total: subtotal + shipping };
+            localStorage.setItem('cippy_pending_order', JSON.stringify({ customer, items: cart, totals }));
+
+            const response = await fetch('/api/create-checkout-session', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -592,20 +595,13 @@ Free standard shipping on orders over MYR 150.00
               body: JSON.stringify({
                 customer,
                 items: cart,
-                totals: { subtotal, shipping, total: subtotal + shipping },
+                totals,
                 giftNote: document.getElementById('giftNote')?.value || ''
               })
             });
             const data = await response.json();
-            if (!response.ok) throw new Error(data.error || 'Unable to send order email');
-            localStorage.removeItem('cippy_cart');
-            localStorage.setItem('cippy_last_order', JSON.stringify({
-              orderId: data.orderId,
-              customer,
-              items: cart,
-              totals: { subtotal, shipping, total: subtotal + shipping }
-            }));
-            window.location.href = `thankyou.html?order=${data.orderId}`;
+            if (!response.ok) throw new Error(data.error || '无法创建付款');
+            window.location.href = data.url;
           } catch (error) {
             checkoutBtn.disabled = false;
             checkoutBtn.classList.remove('opacity-60');
