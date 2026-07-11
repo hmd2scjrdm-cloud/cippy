@@ -643,6 +643,10 @@ async function loadProduct() {
       } else { btn.disabled = true; }
       sizeBtns.appendChild(btn);
     });
+    // Auto-select if only one size
+    if (filtered.length === 1 && filtered[0].stock > 0) {
+      sizeBtns.querySelector('button').click();
+    }
   }
 
   if (colors.length) {
