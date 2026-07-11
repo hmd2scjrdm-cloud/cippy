@@ -462,6 +462,7 @@
                 document.getElementById('dashName').textContent = user.user_metadata?.name || user.email.split('@')[0];
                 loadWishlist();
                 loadOrders();
+                loadProfile();
             } else {
                 dashboard.classList.add('hidden');
                 clubIntro.classList.remove('hidden');
@@ -500,6 +501,21 @@
                   <p class="text-primary text-xs font-bold">MYR ${parseFloat(p.price_myr||p.price||0).toFixed(2)}</p>
                 </div>
               </a>`).join('');
+        }
+
+        const tierInfo = {
+            Classic: { label: 'Classic 会员 · 每消费 RM1 得 1 积分', multiplier: 1 },
+            Luxe:    { label: 'Luxe 会员 · 积分 1.5 倍加成',         multiplier: 1.5 },
+            Elite:   { label: 'Elite 会员 · 积分 2 倍加成',          multiplier: 2 },
+        };
+
+        async function loadProfile() {
+            const { data, error } = await sb.from('profiles').select('points,total_spent,tier').single();
+            if (error || !data) return;
+            const pts = data.points || 0;
+            const tier = data.tier || 'Classic';
+            document.getElementById('dashPoints').textContent = `${pts} pts`;
+            document.getElementById('dashTierLabel').textContent = tierInfo[tier]?.label || tier;
         }
 
         async function loadOrders() {
