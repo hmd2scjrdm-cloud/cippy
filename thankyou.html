@@ -1,94 +1,79 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Order Confirmed — Cippy</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-tailwind.config = {
-  theme: {
-    extend: {
-      colors: { primary: '#1a1a1a', surface: '#fafafa' },
-      fontFamily: { sans: ['Inter', 'sans-serif'] }
-    }
-  }
-}
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>订单确认 — Cippy</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@400;500;600;700&family=Noto+Serif+SC:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"surface-container-low": "#f5f0ee", "outline-variant": "#e0e0e0", "primary-fixed": "#ffd9dd", "on-tertiary": "#ffffff", secondary: "#77555a", "on-background": "#201a1b", "on-secondary": "#ffffff", primary: "#C4928A", outline: "#857374", "surface-container-lowest": "#ffffff", "on-secondary-fixed": "#2d1418", "surface-container-highest": "#e8e0dd", "surface-variant": "#eddfe0", "on-primary-fixed-variant": "#70343e", "surface-tint": "#8d4a55", "surface-container": "#f0ebe8", "secondary-container": "#ffd2d6", "inverse-surface": "#362f2f", "tertiary-container": "#73ae85", "on-surface": "#201a1b", "inverse-on-surface": "#fbeeee", "inverse-primary": "#ffb2bc", "surface-container-high": "#ece6e3", "on-surface-variant": "#524344", "on-tertiary-container": "#004122", "on-tertiary-fixed-variant": "#155130", "primary-fixed-dim": "#ffb2bc", "secondary-fixed": "#ffd9dd", "on-secondary-container": "#7a585c", "on-primary-fixed": "#3a0814", "on-error": "#ffffff", "on-secondary-fixed-variant": "#5e3e42", "surface-bright": "#faf7f5", "on-primary-container": "#5e252f", "primary-container": "#da8b96", error: "#ba1a1a", "tertiary-fixed": "#b3f1c3", "error-container": "#ffdad6", "on-error-container": "#93000a", "surface-dim": "#e4d7d7", "secondary-fixed-dim": "#e7bcc0", "on-tertiary-fixed": "#00210f", background: "#faf7f5", tertiary: "#306946", "on-primary": "#2d1418", surface: "#faf7f5", "tertiary-fixed-dim": "#98d4a9"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}, spacing: {"margin-desktop": "80px", xs: "4px", md: "24px", "margin-mobile": "20px", lg: "48px", xl: "64px", sm: "12px", base: "8px", gutter: "16px"}, fontFamily: {"label-md": ["Poppins", "Noto Serif SC", "serif"], "headline-lg": ["Playfair Display", "Noto Serif SC", "serif"], "body-sm": ["Poppins", "Noto Serif SC", "serif"], "headline-md": ["Playfair Display", "Noto Serif SC", "serif"], "body-lg": ["Poppins", "Noto Serif SC", "serif"], "body-md": ["Poppins", "Noto Serif SC", "serif"], "display-lg": ["Playfair Display", "Noto Serif SC", "serif"], "label-sm": ["Poppins", "Noto Serif SC", "serif"], "headline-lg-mobile": ["Playfair Display", "Noto Serif SC", "serif"], headline: ["Playfair Display", "Noto Serif SC", "serif"], display: ["Playfair Display", "Noto Serif SC", "serif"], body: ["Poppins", "Noto Serif SC", "serif"], label: ["Poppins", "Noto Serif SC", "serif"]}, fontSize: {"label-md": ["14px", {lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600"}], "headline-lg": ["32px", {lineHeight: "40px", fontWeight: "700"}], "body-sm": ["14px", {lineHeight: "20px", fontWeight: "400"}], "headline-md": ["24px", {lineHeight: "32px", fontWeight: "600"}], "body-lg": ["18px", {lineHeight: "28px", fontWeight: "400"}], "body-md": ["16px", {lineHeight: "24px", fontWeight: "400"}], "display-lg": ["48px", {lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "700"}], "label-sm": ["12px", {lineHeight: "14px", fontWeight: "500"}], "headline-lg-mobile": ["28px", {lineHeight: "36px", fontWeight: "700"}]}}}};
 </script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  body { font-family: 'Inter', sans-serif; background: #fafafa; }
+  body { background-color: #faf7f5; color: #201a1b; -webkit-font-smoothing: antialiased; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
 </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="font-body-md min-h-screen pb-16">
 
 <!-- Nav -->
-<header class="border-b border-gray-100 bg-white sticky top-0 z-10">
-  <div class="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
-    <a href="index.html" class="text-xl font-semibold tracking-widest">CIPPY</a>
-    <a href="products.html" class="text-sm text-gray-500 hover:text-gray-900 transition-colors">继续购物</a>
+<nav class="sticky top-0 z-20 border-b border-outline-variant" style="background:#faf7f5">
+  <div class="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
+    <a href="index.html">
+      <img src="assets/cippy-logo.png" alt="cippy" class="h-16 w-auto">
+    </a>
+    <a href="products.html" class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors">继续购物</a>
   </div>
-</header>
+</nav>
 
-<main class="flex-1 max-w-2xl mx-auto w-full px-6 py-16">
+<main class="max-w-2xl mx-auto px-6 py-12">
 
-  <!-- Success icon -->
+  <!-- Success -->
   <div class="text-center mb-10">
-    <div class="w-16 h-16 bg-black rounded-full flex items-center justify-center mx-auto mb-6">
-      <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-      </svg>
+    <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-6">
+      <span class="material-symbols-outlined text-3xl text-on-primary" style="font-variation-settings:'FILL' 1;">check</span>
     </div>
-    <h1 class="text-2xl font-semibold text-gray-900 mb-2">订单已确认</h1>
-    <p class="text-gray-500 text-sm">感谢您的购买！确认邮件已发送至您的邮箱。</p>
+    <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-2">订单已确认</h1>
+    <p class="font-body-md text-body-md text-on-surface-variant">感谢您的购买！确认邮件已发送至您的邮箱。</p>
   </div>
 
   <!-- Order card -->
-  <div class="bg-white border border-gray-200 rounded-2xl overflow-hidden" id="orderCard">
-    <!-- Order header -->
-    <div class="bg-gray-900 text-white px-6 py-5">
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Order Confirmation</p>
-          <p class="text-lg font-semibold tracking-wider" id="orderIdDisplay">—</p>
-        </div>
-        <svg class="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 7H4l1-7z"/>
-        </svg>
-      </div>
+  <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl overflow-hidden mb-8">
+
+    <!-- Header -->
+    <div class="bg-secondary text-on-secondary px-6 py-5">
+      <p class="font-label-sm text-label-sm uppercase tracking-widest text-on-secondary/60 mb-1">Order Confirmation</p>
+      <p class="font-headline-md text-headline-md tracking-wider" id="orderIdDisplay">—</p>
     </div>
 
     <div class="p-6 space-y-6">
 
-      <!-- Customer info -->
+      <!-- Customer -->
       <div>
-        <p class="text-xs uppercase tracking-widest text-gray-400 mb-3">寄送至</p>
-        <div class="text-sm text-gray-700 space-y-1" id="customerInfo"></div>
+        <p class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant mb-3">寄送至</p>
+        <div class="font-body-md text-body-md text-on-surface space-y-1" id="customerInfo"></div>
       </div>
 
-      <div class="border-t border-gray-100"></div>
+      <div class="border-t border-outline-variant"></div>
 
       <!-- Items -->
       <div>
-        <p class="text-xs uppercase tracking-widest text-gray-400 mb-3">商品明细</p>
-        <div class="space-y-3" id="itemsList"></div>
+        <p class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant mb-3">商品明细</p>
+        <div class="space-y-4" id="itemsList"></div>
       </div>
 
-      <div class="border-t border-gray-100"></div>
+      <div class="border-t border-outline-variant"></div>
 
       <!-- Totals -->
-      <div class="space-y-2 text-sm" id="totalsSection">
-        <div class="flex justify-between text-gray-500">
-          <span>小计</span>
-          <span id="subtotalDisplay">—</span>
+      <div class="space-y-2">
+        <div class="flex justify-between font-body-md text-body-md text-on-surface-variant">
+          <span>小计</span><span id="subtotalDisplay">—</span>
         </div>
-        <div class="flex justify-between text-gray-500">
-          <span>运费</span>
-          <span id="shippingDisplay">—</span>
+        <div class="flex justify-between font-body-md text-body-md text-on-surface-variant">
+          <span>运费</span><span id="shippingDisplay">—</span>
         </div>
-        <div class="flex justify-between font-semibold text-gray-900 text-base pt-2 border-t border-gray-100">
-          <span>合计</span>
-          <span id="totalDisplay">—</span>
+        <div class="border-t border-outline-variant pt-3 flex justify-between font-headline-md text-headline-md text-on-surface">
+          <span>合计</span><span id="totalDisplay">—</span>
         </div>
       </div>
 
@@ -96,28 +81,18 @@ tailwind.config = {
   </div>
 
   <!-- CTA -->
-  <div class="mt-8 flex flex-col sm:flex-row gap-3">
-    <a href="products.html" class="flex-1 text-center bg-gray-900 text-white py-3 rounded-xl text-sm font-medium hover:bg-gray-800 transition-colors">
+  <div class="flex flex-col sm:flex-row gap-3">
+    <a href="products.html" class="flex-1 text-center bg-primary text-on-primary py-4 font-label-md text-label-md hover:opacity-80 transition-opacity rounded-none">
       继续购物
     </a>
-    <a href="account.html" class="flex-1 text-center border border-gray-200 text-gray-700 py-3 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors">
+    <a href="account.html" class="flex-1 text-center border border-outline-variant text-on-surface py-4 font-label-md text-label-md hover:bg-surface-container transition-colors rounded-none">
       查看我的订单
     </a>
   </div>
 
 </main>
 
-<footer class="border-t border-gray-100 py-6 text-center text-xs text-gray-400">
-  © 2025 Cippy. All rights reserved.
-</footer>
-
-<script>
-const fmt = new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' });
-
-const params = new URLSearchParams(location.search);
-const orderId = params.get('order') || '';
-document.getElementById('orderIdDisplay').textContent = orderId || 'CIPPY-XXXXXXXX';
-
+<script type="module">
 // After Stripe payment, move pending order to last order and clear cart
 const params = new URLSearchParams(location.search);
 if (params.get('session_id') && localStorage.getItem('cippy_pending_order')) {
@@ -126,7 +101,6 @@ if (params.get('session_id') && localStorage.getItem('cippy_pending_order')) {
   localStorage.removeItem('cippy_pending_order');
   localStorage.removeItem('cippy_cart');
 
-  // Send confirmation email (best-effort, don't block UI)
   import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm').then(({ createClient }) => {
     const sb = createClient('https://ilzeziznxzaxxudzhdmu.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI');
     sb.auth.getSession().then(({ data: { session } }) => {
@@ -143,16 +117,22 @@ if (params.get('session_id') && localStorage.getItem('cippy_pending_order')) {
   }).catch(() => {});
 }
 
+const fmt = new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' });
+
+const orderIdEl = document.getElementById('orderIdDisplay');
+const p = new URLSearchParams(location.search);
+if (p.get('order')) orderIdEl.textContent = p.get('order');
+
 const raw = localStorage.getItem('cippy_last_order');
 if (raw) {
   try {
     const { customer, items, totals } = JSON.parse(raw);
 
     document.getElementById('customerInfo').innerHTML = `
-      <p class="font-medium text-gray-900">${customer.name || ''}</p>
-      <p>${customer.email || ''}</p>
-      <p>${customer.phone || ''}</p>
-      <p class="text-gray-500 mt-1">${(customer.address || '').replace(/\n/g, '<br>')}</p>
+      <p class="font-semibold">${customer.name || ''}</p>
+      <p class="text-on-surface-variant">${customer.email || ''}</p>
+      <p class="text-on-surface-variant">${customer.phone || ''}</p>
+      <p class="text-on-surface-variant mt-1">${(customer.address || '').replace(/\n/g, '<br>')}</p>
     `;
 
     document.getElementById('itemsList').innerHTML = (items || []).map(item => {
@@ -163,13 +143,15 @@ if (raw) {
       const img = item.image_url || '';
       return `
         <div class="flex items-center gap-4">
-          ${img ? `<img src="${img}" class="w-14 h-14 object-cover rounded-lg bg-gray-100 flex-shrink-0">` : `<div class="w-14 h-14 bg-gray-100 rounded-lg flex-shrink-0"></div>`}
+          ${img
+            ? `<img src="${img}" class="w-16 h-20 object-cover rounded-xl bg-surface-container flex-shrink-0">`
+            : `<div class="w-16 h-20 bg-surface-container rounded-xl flex-shrink-0"></div>`}
           <div class="flex-1 min-w-0">
-            <p class="text-sm font-medium text-gray-900 truncate">${name}</p>
-            ${details ? `<p class="text-xs text-gray-400 mt-0.5">${details}</p>` : ''}
-            <p class="text-xs text-gray-400">x ${qty}</p>
+            <p class="font-label-md text-label-md text-on-surface leading-tight mb-1">${name}</p>
+            ${details ? `<p class="font-label-sm text-label-sm text-on-surface-variant">${details}</p>` : ''}
+            <p class="font-label-sm text-label-sm text-on-surface-variant">x ${qty}</p>
           </div>
-          <p class="text-sm font-medium text-gray-900 flex-shrink-0">${fmt.format(price)}</p>
+          <p class="font-label-md text-label-md text-on-surface flex-shrink-0">MYR ${price.toFixed(2)}</p>
         </div>
       `;
     }).join('');
