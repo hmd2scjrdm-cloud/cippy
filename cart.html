@@ -599,13 +599,19 @@ Free standard shipping on orders over MYR 150.00
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Unable to send order email');
             localStorage.removeItem('cippy_cart');
-            renderCart();
-            setCheckoutStatus(`Order sent. Confirmation number: ${data.orderId}`);
+            localStorage.setItem('cippy_last_order', JSON.stringify({
+              orderId: data.orderId,
+              customer,
+              items: cart,
+              totals: { subtotal, shipping, total: subtotal + shipping }
+            }));
+            window.location.href = `thankyou.html?order=${data.orderId}`;
           } catch (error) {
-            setCheckoutStatus(error.message, true);
-          } finally {
             checkoutBtn.disabled = false;
             checkoutBtn.classList.remove('opacity-60');
+            checkoutStatus.textContent = error.message;
+            checkoutStatus.className = 'text-sm text-red-600 font-medium mt-2 p-3 bg-red-50 rounded-lg border border-red-200';
+            checkoutStatus.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
         });
 

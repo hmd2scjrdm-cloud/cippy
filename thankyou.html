@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Confirmed — Cippy</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: { primary: '#1a1a1a', surface: '#fafafa' },
+      fontFamily: { sans: ['Inter', 'sans-serif'] }
+    }
+  }
+}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Inter', sans-serif; background: #fafafa; }
+</style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+<!-- Nav -->
+<header class="border-b border-gray-100 bg-white sticky top-0 z-10">
+  <div class="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
+    <a href="index.html" class="text-xl font-semibold tracking-widest">CIPPY</a>
+    <a href="products.html" class="text-sm text-gray-500 hover:text-gray-900 transition-colors">继续购物</a>
+  </div>
+</header>
+
+<main class="flex-1 max-w-2xl mx-auto w-full px-6 py-16">
+
+  <!-- Success icon -->
+  <div class="text-center mb-10">
+    <div class="w-16 h-16 bg-black rounded-full flex items-center justify-center mx-auto mb-6">
+      <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+      </svg>
+    </div>
+    <h1 class="text-2xl font-semibold text-gray-900 mb-2">订单已确认</h1>
+    <p class="text-gray-500 text-sm">感谢您的购买！确认邮件已发送至您的邮箱。</p>
+  </div>
+
+  <!-- Order card -->
+  <div class="bg-white border border-gray-200 rounded-2xl overflow-hidden" id="orderCard">
+    <!-- Order header -->
+    <div class="bg-gray-900 text-white px-6 py-5">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Order Confirmation</p>
+          <p class="text-lg font-semibold tracking-wider" id="orderIdDisplay">—</p>
+        </div>
+        <svg class="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 7H4l1-7z"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="p-6 space-y-6">
+
+      <!-- Customer info -->
+      <div>
+        <p class="text-xs uppercase tracking-widest text-gray-400 mb-3">寄送至</p>
+        <div class="text-sm text-gray-700 space-y-1" id="customerInfo"></div>
+      </div>
+
+      <div class="border-t border-gray-100"></div>
+
+      <!-- Items -->
+      <div>
+        <p class="text-xs uppercase tracking-widest text-gray-400 mb-3">商品明细</p>
+        <div class="space-y-3" id="itemsList"></div>
+      </div>
+
+      <div class="border-t border-gray-100"></div>
+
+      <!-- Totals -->
+      <div class="space-y-2 text-sm" id="totalsSection">
+        <div class="flex justify-between text-gray-500">
+          <span>小计</span>
+          <span id="subtotalDisplay">—</span>
+        </div>
+        <div class="flex justify-between text-gray-500">
+          <span>运费</span>
+          <span id="shippingDisplay">—</span>
+        </div>
+        <div class="flex justify-between font-semibold text-gray-900 text-base pt-2 border-t border-gray-100">
+          <span>合计</span>
+          <span id="totalDisplay">—</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="mt-8 flex flex-col sm:flex-row gap-3">
+    <a href="products.html" class="flex-1 text-center bg-gray-900 text-white py-3 rounded-xl text-sm font-medium hover:bg-gray-800 transition-colors">
+      继续购物
+    </a>
+    <a href="account.html" class="flex-1 text-center border border-gray-200 text-gray-700 py-3 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors">
+      查看我的订单
+    </a>
+  </div>
+
+</main>
+
+<footer class="border-t border-gray-100 py-6 text-center text-xs text-gray-400">
+  © 2025 Cippy. All rights reserved.
+</footer>
+
+<script>
+const fmt = new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' });
+
+const params = new URLSearchParams(location.search);
+const orderId = params.get('order') || '';
+document.getElementById('orderIdDisplay').textContent = orderId || 'CIPPY-XXXXXXXX';
+
+const raw = localStorage.getItem('cippy_last_order');
+if (raw) {
+  try {
+    const { customer, items, totals } = JSON.parse(raw);
+
+    document.getElementById('customerInfo').innerHTML = `
+      <p class="font-medium text-gray-900">${customer.name || ''}</p>
+      <p>${customer.email || ''}</p>
+      <p>${customer.phone || ''}</p>
+      <p class="text-gray-500 mt-1">${(customer.address || '').replace(/\n/g, '<br>')}</p>
+    `;
+
+    document.getElementById('itemsList').innerHTML = (items || []).map(item => {
+      const name = item.name_zh || item.name || 'Item';
+      const details = [item.variant, item.color, item.size].filter(Boolean).join(' / ');
+      const qty = Number(item.qty || 1);
+      const price = Number(item.price_myr || 0) * qty;
+      const img = item.image_url || '';
+      return `
+        <div class="flex items-center gap-4">
+          ${img ? `<img src="${img}" class="w-14 h-14 object-cover rounded-lg bg-gray-100 flex-shrink-0">` : `<div class="w-14 h-14 bg-gray-100 rounded-lg flex-shrink-0"></div>`}
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-gray-900 truncate">${name}</p>
+            ${details ? `<p class="text-xs text-gray-400 mt-0.5">${details}</p>` : ''}
+            <p class="text-xs text-gray-400">x ${qty}</p>
+          </div>
+          <p class="text-sm font-medium text-gray-900 flex-shrink-0">${fmt.format(price)}</p>
+        </div>
+      `;
+    }).join('');
+
+    if (totals) {
+      document.getElementById('subtotalDisplay').textContent = fmt.format(totals.subtotal || 0);
+      document.getElementById('shippingDisplay').textContent = totals.shipping === 0 ? 'FREE' : fmt.format(totals.shipping || 0);
+      document.getElementById('totalDisplay').textContent = fmt.format(totals.total || 0);
+    }
+  } catch(e) {}
+}
+</script>
+</body>
+</html>
