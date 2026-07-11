@@ -1,5 +1,8 @@
 import nodemailer from "nodemailer";
 
+const SUPABASE_URL = "https://ilzeziznxzaxxudzhdmu.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI";
+
 const currency = new Intl.NumberFormat("en-MY", {
   style: "currency",
   currency: "MYR",
@@ -19,6 +22,22 @@ function formatItems(items = []) {
       return `- ${name}${details ? ` (${details})` : ""} x ${qty}: ${currency.format(price)}`;
     })
     .join("\n");
+}
+
+async function getVerifiedUser(req) {
+  const authHeader = req.headers.authorization || "";
+  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+  if (!token) return null;
+
+  const response = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) return null;
+  return response.json();
 }
 
 export default async function handler(req, res) {
@@ -44,6 +63,17 @@ export default async function handler(req, res) {
   }
   if (!Array.isArray(items) || items.length === 0) {
     return res.status(400).json({ error: "Cart is empty" });
+  }
+
+  const user = await getVerifiedUser(req);
+  if (!user) {
+    return res.status(401).json({ error: "Please sign in before checkout" });
+  }
+  if (!user.email_confirmed_at && !user.confirmed_at) {
+    return res.status(403).json({ error: "Please verify your email before checkout" });
+  }
+  if (String(user.email || "").toLowerCase() !== customerEmail) {
+    return res.status(403).json({ error: "Checkout email must match your verified account email" });
   }
 
   const orderId = `CIPPY-${Date.now().toString().slice(-8)}`;

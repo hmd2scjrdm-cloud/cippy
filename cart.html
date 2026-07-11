@@ -406,6 +406,7 @@ Free standard shipping on orders over MYR 150.00
         const checkoutBtn = document.getElementById('checkoutBtn');
         const checkoutStatus = document.getElementById('checkoutStatus');
         let currentUser = null;
+        let currentSession = null;
 
         function setCheckoutStatus(message, isError = false) {
           checkoutStatus.textContent = message;
@@ -427,6 +428,7 @@ Free standard shipping on orders over MYR 150.00
 
         async function setupCheckoutAuth() {
           const handleSession = (session) => {
+            currentSession = session || null;
             const user = session?.user || null;
             currentUser = user;
             fillCustomer(user);
@@ -472,7 +474,10 @@ Free standard shipping on orders over MYR 150.00
           try {
             const response = await fetch('/api/send-order-email', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${currentSession?.access_token || ''}`
+              },
               body: JSON.stringify({
                 customer,
                 items: cart,
