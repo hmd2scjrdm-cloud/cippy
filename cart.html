@@ -399,11 +399,9 @@ Free standard shipping on orders over MYR 150.00
         renderCart();
     </script>
 <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-        import {
-          getAuth,
-          onAuthStateChanged
-        } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+        const sb = createClient('https://ilzeziznxzaxxudzhdmu.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI');
 
         const checkoutBtn = document.getElementById('checkoutBtn');
         const checkoutStatus = document.getElementById('checkoutStatus');
@@ -424,30 +422,26 @@ Free standard shipping on orders over MYR 150.00
           const email = document.getElementById('checkoutEmail');
           const name = document.getElementById('checkoutName');
           if (!email.value) email.value = user.email || '';
-          if (!name.value) name.value = user.displayName || '';
+          if (!name.value) name.value = user.user_metadata?.name || '';
         }
 
         async function setupCheckoutAuth() {
-          try {
-            const config = await fetch('/api/firebase-config').then((res) => {
-              if (!res.ok) throw new Error('Firebase is not configured yet.');
-              return res.json();
-            });
-            const auth = getAuth(initializeApp(config));
-            onAuthStateChanged(auth, (user) => {
-              currentUser = user;
-              fillCustomer(user);
-              if (!user) {
-                setCheckoutStatus('Please create an account and verify your email before checkout.', true);
-              } else if (!user.emailVerified) {
-                setCheckoutStatus('Please verify your email before checkout. Check your Gmail inbox.', true);
-              } else {
-                setCheckoutStatus('Email verified. You can place your order.');
-              }
-            });
-          } catch (error) {
-            setCheckoutStatus('Firebase setup is needed in Vercel before checkout verification can work.', true);
-          }
+          const handleSession = (session) => {
+            const user = session?.user || null;
+            currentUser = user;
+            fillCustomer(user);
+            if (!user) {
+              setCheckoutStatus('Please create an account and verify your email before checkout.', true);
+            } else if (!user.email_confirmed_at && !user.confirmed_at) {
+              setCheckoutStatus('Please verify your email before checkout. Check your Gmail inbox.', true);
+            } else {
+              setCheckoutStatus('Email verified. You can place your order.');
+            }
+          };
+
+          const { data: { session } } = await sb.auth.getSession();
+          handleSession(session);
+          sb.auth.onAuthStateChange((_, session) => handleSession(session));
         }
 
         checkoutBtn.addEventListener('click', async () => {
@@ -463,7 +457,7 @@ Free standard shipping on orders over MYR 150.00
 
           if (!cart.length) return setCheckoutStatus('Your bag is empty.', true);
           if (!currentUser) return setCheckoutStatus('Please sign in or create an account first.', true);
-          if (!currentUser.emailVerified) return setCheckoutStatus('Please verify your email before checkout.', true);
+          if (!currentUser.email_confirmed_at && !currentUser.confirmed_at) return setCheckoutStatus('Please verify your email before checkout.', true);
           if (!customer.name || !customer.email || !customer.phone || !customer.address) {
             return setCheckoutStatus('Please fill in name, email, phone and delivery address.', true);
           }
