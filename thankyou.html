@@ -95,35 +95,41 @@
 <script type="module">
 // After Stripe payment, move pending order to last order and clear cart
 const params = new URLSearchParams(location.search);
-if (params.get('session_id') && localStorage.getItem('cippy_pending_order')) {
-  const pending = localStorage.getItem('cippy_pending_order');
-  localStorage.setItem('cippy_last_order', pending);
+const fmt = new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' });
+
+// Prefer pending order (just returned from Stripe) over last_order
+const pendingRaw = localStorage.getItem('cippy_pending_order');
+const lastRaw = localStorage.getItem('cippy_last_order');
+
+if (pendingRaw) {
+  // Coming back from Stripe — promote to last_order and clear cart
+  localStorage.setItem('cippy_last_order', pendingRaw);
   localStorage.removeItem('cippy_pending_order');
   localStorage.removeItem('cippy_cart');
 
-  import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm').then(({ createClient }) => {
-    const sb = createClient('https://ilzeziznxzaxxudzhdmu.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI');
-    sb.auth.getSession().then(({ data: { session } }) => {
-      if (!session) return;
-      try {
-        const { customer, items, totals } = JSON.parse(pending);
-        fetch('/api/send-order-email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
-          body: JSON.stringify({ customer, items, totals, orderId: params.get('order') })
-        }).catch(() => {});
-      } catch(e) {}
-    });
-  }).catch(() => {});
+  // Send confirmation email (best-effort)
+  if (params.get('session_id')) {
+    import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm').then(({ createClient }) => {
+      const sb = createClient('https://ilzeziznxzaxxudzhdmu.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI');
+      sb.auth.getSession().then(({ data: { session } }) => {
+        if (!session) return;
+        try {
+          const { customer, items, totals } = JSON.parse(pendingRaw);
+          fetch('/api/send-order-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+            body: JSON.stringify({ customer, items, totals, orderId: params.get('order') })
+          }).catch(() => {});
+        } catch(e) {}
+      });
+    }).catch(() => {});
+  }
 }
 
-const fmt = new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' });
-
 const orderIdEl = document.getElementById('orderIdDisplay');
-const p = new URLSearchParams(location.search);
-if (p.get('order')) orderIdEl.textContent = p.get('order');
+if (params.get('order')) orderIdEl.textContent = params.get('order');
 
-const raw = localStorage.getItem('cippy_last_order');
+const raw = pendingRaw || lastRaw;
 if (raw) {
   try {
     const { customer, items, totals } = JSON.parse(raw);
