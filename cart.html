@@ -572,14 +572,15 @@ Free standard shipping on orders over MYR 150.00
             address: document.getElementById('checkoutAddress').value.trim()
           };
 
-          if (!cart.length) return setCheckoutStatus('Your bag is empty.', true);
-          if (!currentUser) return setCheckoutStatus('Please sign in or create an account first.', true);
-          if (!currentUser.email_confirmed_at && !currentUser.confirmed_at) return setCheckoutStatus('Please verify your email before checkout.', true);
-          if (!customer.name || !customer.email || !customer.phone || !customer.address) {
-            return setCheckoutStatus('Please fill in name, email, phone and delivery address.', true);
-          }
+          if (!cart.length) return setCheckoutStatus('购物袋是空的', true);
+          if (!currentUser) return setCheckoutStatus('请先登录或注册账号', true);
+          if (!currentUser.email_confirmed_at && !currentUser.confirmed_at) return setCheckoutStatus('请先验证邮箱后再结账', true);
+          if (!customer.name) return setCheckoutStatus('请填写姓名', true);
+          if (!customer.email) return setCheckoutStatus('请填写电邮地址', true);
+          if (!customer.phone) return setCheckoutStatus('请填写联系电话', true);
+          if (!customer.address) return setCheckoutStatus('请选择或添加收件地址', true);
           if (customer.email.toLowerCase() !== (currentUser.email || '').toLowerCase()) {
-            return setCheckoutStatus('Checkout email must match your verified account email.', true);
+            return setCheckoutStatus('结账邮箱须与账号邮箱一致', true);
           }
 
           checkoutBtn.disabled = true;
