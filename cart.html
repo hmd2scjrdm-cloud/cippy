@@ -191,26 +191,30 @@ Free standard shipping on orders over MYR 150.00
 <textarea id="giftNote" class="w-full bg-surface-container-low border-none rounded-lg p-md text-body-md focus:ring-1 focus:ring-primary placeholder-outline" placeholder="Write your heartfelt message here..." rows="3"></textarea>
 </div>
 </section>
-<!-- Payment Methods Local Focus -->
+<!-- Payment Methods -->
 <section class="bg-white rounded-xl p-md md:p-lg border border-surface-container">
-<h3 class="font-headline-md text-headline-md text-on-surface mb-md">Payment Methods</h3>
-<div class="grid grid-cols-2 md:grid-cols-4 gap-gutter">
-<div class="border border-outline-variant rounded-xl p-md flex flex-col items-center justify-center gap-xs cursor-pointer hover:border-primary hover:bg-primary-fixed transition-all group">
-<span class="material-symbols-outlined text-secondary group-hover:text-primary">wallet</span>
-<span class="font-label-sm text-label-sm uppercase">GrabPay</span>
-</div>
-<div class="border border-outline-variant rounded-xl p-md flex flex-col items-center justify-center gap-xs cursor-pointer hover:border-primary hover:bg-primary-fixed transition-all group">
-<span class="material-symbols-outlined text-secondary group-hover:text-primary">qr_code_2</span>
-<span class="font-label-sm text-label-sm uppercase">T&amp;G eWallet</span>
-</div>
-<div class="border border-outline-variant rounded-xl p-md flex flex-col items-center justify-center gap-xs cursor-pointer hover:border-primary hover:bg-primary-fixed transition-all group">
-<span class="material-symbols-outlined text-secondary group-hover:text-primary">account_balance</span>
-<span class="font-label-sm text-label-sm uppercase">FPX</span>
-</div>
-<div class="border border-outline-variant rounded-xl p-md flex flex-col items-center justify-center gap-xs cursor-pointer hover:border-primary hover:bg-primary-fixed transition-all group">
-<span class="material-symbols-outlined text-secondary group-hover:text-primary">credit_card</span>
-<span class="font-label-sm text-label-sm uppercase">Visa/Master</span>
-</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-md">付款方式</h3>
+<div class="space-y-3">
+  <!-- Stripe -->
+  <label id="pay-stripe" class="flex items-center gap-4 border-2 border-primary bg-primary-fixed rounded-xl p-4 cursor-pointer transition-all">
+    <input type="radio" name="paymentMethod" value="stripe" class="accent-primary w-4 h-4" checked/>
+    <span class="material-symbols-outlined text-primary">credit_card</span>
+    <div class="flex-1">
+      <p class="font-label-md text-label-md text-on-surface">信用卡 / 借记卡</p>
+      <p class="font-label-sm text-label-sm text-on-surface-variant">Visa · Mastercard · PayNow (新加坡)</p>
+    </div>
+    <span class="text-xs bg-primary text-on-primary px-2 py-1 rounded-full font-label-sm">推荐</span>
+  </label>
+  <!-- Billplz (coming soon) -->
+  <label class="flex items-center gap-4 border border-outline-variant rounded-xl p-4 cursor-not-allowed opacity-50">
+    <input type="radio" name="paymentMethod" value="billplz" class="accent-primary w-4 h-4" disabled/>
+    <span class="material-symbols-outlined text-secondary">account_balance</span>
+    <div class="flex-1">
+      <p class="font-label-md text-label-md text-on-surface">FPX 网上银行 / DuitNow QR</p>
+      <p class="font-label-sm text-label-sm text-on-surface-variant">Maybank · CIMB · Public Bank 等</p>
+    </div>
+    <span class="text-xs bg-surface-container text-on-surface-variant px-2 py-1 rounded-full font-label-sm">即将推出</span>
+  </label>
 </div>
 </section>
 </div>
