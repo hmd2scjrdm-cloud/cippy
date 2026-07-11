@@ -101,10 +101,14 @@ const fmt = new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' 
 const pendingRaw = localStorage.getItem('cippy_pending_order');
 const lastRaw = localStorage.getItem('cippy_last_order');
 
+// Always clear cart when Stripe returns with session_id
+if (params.get('session_id')) {
+  localStorage.removeItem('cippy_cart');
+}
+
 if (pendingRaw) {
   localStorage.setItem('cippy_last_order', pendingRaw);
   localStorage.removeItem('cippy_pending_order');
-  localStorage.removeItem('cippy_cart');
 
   import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm').then(({ createClient }) => {
     const sb = createClient('https://ilzeziznxzaxxudzhdmu.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI');
