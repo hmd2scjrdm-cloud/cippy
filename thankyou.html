@@ -114,15 +114,10 @@ if (pendingRaw) {
         const { customer, items, totals } = JSON.parse(pendingRaw);
         const orderId = params.get('order');
 
-        // Save order to Supabase
-        await sb.from('orders').insert({
-          order_id: orderId,
-          user_id: session.user.id,
-          customer,
-          items,
-          totals,
-          status: 'paid'
-        });
+        // Mark order as paid (was saved as pending before Stripe redirect)
+        await sb.from('orders')
+          .update({ status: 'paid' })
+          .eq('order_id', orderId);
 
         // Send confirmation email (best-effort)
         fetch('/api/send-order-email', {

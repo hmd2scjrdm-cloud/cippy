@@ -12,6 +12,20 @@ async function getVerifiedUser(req) {
   return r.ok ? r.json() : null;
 }
 
+async function saveOrderToSupabase(token, order) {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/orders`, {
+    method: "POST",
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      Prefer: "return=minimal",
+    },
+    body: JSON.stringify(order),
+  });
+  return r.ok;
+}
+
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -30,12 +44,12 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Cart is empty" });
   }
 
+  const token = (req.headers.authorization || "").replace("Bearer ", "");
   const user = await getVerifiedUser(req);
   if (!user) return res.status(401).json({ error: "请先登录账号" });
   if (!user.email_confirmed_at && !user.confirmed_at) return res.status(403).json({ error: "请先验证邮箱" });
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
   const orderId = `CIPPY-${Date.now().toString().slice(-8)}`;
 
   const line_items = items.map(item => ({
@@ -77,9 +91,19 @@ export default async function handler(req, res) {
       address: String(customer.address || "").slice(0, 500),
       giftNote: String(giftNote || "").slice(0, 500),
     },
-    shipping_address_collection: undefined,
     success_url: `${origin}/thankyou.html?order=${orderId}&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/cart.html`,
+  });
+
+  // Save order to Supabase BEFORE redirecting — so it's never lost
+  await saveOrderToSupabase(token, {
+    order_id: orderId,
+    user_id: user.id,
+    customer,
+    items,
+    totals,
+    status: "pending",
+    stripe_session_id: session.id,
   });
 
   return res.status(200).json({ url: session.url, orderId });
