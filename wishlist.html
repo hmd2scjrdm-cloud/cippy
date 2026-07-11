@@ -1,101 +1,96 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>心愿单 — Cippy</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital@0;1&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
-<script>
-tailwind.config = {
-  theme: {
-    extend: {
-      colors: {
-        primary: '#1a1a1a',
-        'on-primary': '#ffffff',
-        surface: '#fafafa',
-        'surface-container': '#f2f2f2',
-        'on-surface': '#1a1a1a',
-        'on-surface-variant': '#6b6b6b',
-        'outline-variant': '#e0e0e0',
-      },
-      fontFamily: { sans: ['Inter','sans-serif'], serif: ['Playfair Display','serif'] },
-    }
-  }
-}
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@400;500;600;700&family=Noto+Serif+SC:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"surface-container-low": "#f5f0ee", "outline-variant": "#e0e0e0", "primary-fixed": "#ffd9dd", "on-tertiary": "#ffffff", secondary: "#77555a", "on-background": "#201a1b", "on-secondary": "#ffffff", primary: "#C4928A", outline: "#857374", "surface-container-lowest": "#ffffff", "on-secondary-fixed": "#2d1418", "surface-container-highest": "#e8e0dd", "surface-variant": "#eddfe0", "on-primary-fixed-variant": "#70343e", "surface-tint": "#8d4a55", "surface-container": "#f0ebe8", "secondary-container": "#ffd2d6", "inverse-surface": "#362f2f", "tertiary-container": "#73ae85", "on-surface": "#201a1b", "inverse-on-surface": "#fbeeee", "inverse-primary": "#ffb2bc", "surface-container-high": "#ece6e3", "on-surface-variant": "#524344", "on-tertiary-container": "#004122", "on-tertiary-fixed-variant": "#155130", "primary-fixed-dim": "#ffb2bc", "secondary-fixed": "#ffd9dd", "on-secondary-container": "#7a585c", "on-primary-fixed": "#3a0814", "on-error": "#ffffff", "on-secondary-fixed-variant": "#5e3e42", "surface-bright": "#faf7f5", "on-primary-container": "#5e252f", "primary-container": "#da8b96", error: "#ba1a1a", "tertiary-fixed": "#b3f1c3", "error-container": "#ffdad6", "on-error-container": "#93000a", "surface-dim": "#e4d7d7", "secondary-fixed-dim": "#e7bcc0", "on-tertiary-fixed": "#00210f", background: "#faf7f5", tertiary: "#306946", "on-primary": "#2d1418", surface: "#faf7f5", "tertiary-fixed-dim": "#98d4a9"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}, spacing: {"margin-desktop": "80px", xs: "4px", md: "24px", "margin-mobile": "20px", lg: "48px", xl: "64px", sm: "12px", base: "8px", gutter: "16px"}, fontFamily: {"label-md": ["Poppins", "Noto Serif SC", "serif"], "headline-lg": ["Playfair Display", "Noto Serif SC", "serif"], "body-sm": ["Poppins", "Noto Serif SC", "serif"], "headline-md": ["Playfair Display", "Noto Serif SC", "serif"], "body-lg": ["Poppins", "Noto Serif SC", "serif"], "body-md": ["Poppins", "Noto Serif SC", "serif"], "display-lg": ["Playfair Display", "Noto Serif SC", "serif"], "label-sm": ["Poppins", "Noto Serif SC", "serif"], "headline-lg-mobile": ["Playfair Display", "Noto Serif SC", "serif"], headline: ["Playfair Display", "Noto Serif SC", "serif"], display: ["Playfair Display", "Noto Serif SC", "serif"], body: ["Poppins", "Noto Serif SC", "serif"], label: ["Poppins", "Noto Serif SC", "serif"]}, fontSize: {"label-md": ["14px", {lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600"}], "headline-lg": ["32px", {lineHeight: "40px", fontWeight: "700"}], "body-sm": ["14px", {lineHeight: "20px", fontWeight: "400"}], "headline-md": ["24px", {lineHeight: "32px", fontWeight: "600"}], "body-lg": ["18px", {lineHeight: "28px", fontWeight: "400"}], "body-md": ["16px", {lineHeight: "24px", fontWeight: "400"}], "display-lg": ["48px", {lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "700"}], "label-sm": ["12px", {lineHeight: "14px", fontWeight: "500"}], "headline-lg-mobile": ["28px", {lineHeight: "36px", fontWeight: "700"}]}}}};
 </script>
 <style>
-  body { font-family: 'Inter', sans-serif; background: #fafafa; }
-  .active-heart { font-variation-settings: 'FILL' 1; color: #e11d48; }
+  body { background-color: #faf7f5; color: #201a1b; -webkit-font-smoothing: antialiased; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .product-card { break-inside: avoid; margin-bottom: 16px; }
+  .waterfall-grid { column-count: 2; column-gap: 16px; }
+  @media (min-width: 768px) { .waterfall-grid { column-count: 3; column-gap: 24px; } }
+  @media (min-width: 1024px) { .waterfall-grid { column-count: 4; column-gap: 24px; } }
 </style>
 </head>
-<body class="pb-24">
+<body class="font-body-md pb-24">
 
-<!-- Header -->
-<header class="sticky top-0 z-20 bg-white/90 backdrop-blur border-b border-gray-100">
-  <div class="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
-    <a href="products.html" class="text-on-surface-variant">
-      <span class="material-symbols-outlined text-2xl">arrow_back</span>
-    </a>
-    <h1 class="text-sm font-semibold tracking-widest uppercase">心愿单</h1>
-    <button id="clearAllBtn" class="text-xs text-gray-400 hover:text-red-500 transition-colors hidden">清空</button>
-  </div>
-</header>
-
-<!-- Empty state -->
-<div id="emptyState" class="hidden flex flex-col items-center justify-center min-h-[60vh] px-8 text-center">
-  <span class="material-symbols-outlined text-6xl text-gray-200 mb-4">favorite</span>
-  <p class="text-gray-500 text-sm mb-1">还没有收藏的商品</p>
-  <p class="text-gray-400 text-xs mb-6">浏览商品时点击 ♡ 收藏喜欢的单品</p>
-  <a href="products.html" class="bg-gray-900 text-white px-6 py-3 text-sm font-medium rounded-full hover:bg-gray-800 transition-colors">去逛逛</a>
-</div>
-
-<!-- Grid -->
-<main class="max-w-4xl mx-auto px-4 pt-5">
-  <p id="countText" class="text-xs text-gray-400 mb-4"></p>
-  <div id="wishlistGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"></div>
-</main>
-
-<!-- Bottom nav -->
-<nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-20 pb-safe">
-  <div class="max-w-lg mx-auto flex justify-around items-center h-16">
-    <a href="index.html" class="flex flex-col items-center gap-1 text-gray-400">
-      <span class="material-symbols-outlined text-2xl">home</span>
-      <span class="text-[10px] font-bold uppercase tracking-wider">Home</span>
-    </a>
-    <a href="products.html" class="flex flex-col items-center gap-1 text-gray-400">
-      <span class="material-symbols-outlined text-2xl">explore</span>
-      <span class="text-[10px] font-bold uppercase tracking-wider">Explore</span>
-    </a>
-    <a href="cart.html" class="w-14 h-14 bg-gray-900 rounded-full -mt-10 flex items-center justify-center text-white shadow-lg active:scale-90 transition-transform">
-      <span class="material-symbols-outlined text-3xl">shopping_bag</span>
-    </a>
-    <a href="wishlist.html" class="flex flex-col items-center gap-1 text-gray-900">
-      <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1;color:#e11d48;">favorite</span>
-      <span class="text-[10px] font-bold uppercase tracking-wider">Saves</span>
-    </a>
-    <a href="account.html" class="flex flex-col items-center gap-1 text-gray-400">
-      <span class="material-symbols-outlined text-2xl">person</span>
-      <span class="text-[10px] font-bold uppercase tracking-wider">Me</span>
-    </a>
+<!-- Top nav (mobile) -->
+<nav class="fixed top-0 w-full z-50 shadow-sm" style="background:#faf7f5">
+  <div class="flex justify-between items-center px-6 md:px-margin-desktop py-4 w-full max-w-[1440px] mx-auto">
+    <button onclick="history.back()" class="material-symbols-outlined text-on-surface hover:opacity-70 transition-opacity">arrow_back</button>
+    <h1 class="font-headline-md text-headline-md text-on-surface">心愿单</h1>
+    <button id="clearAllBtn" class="font-label-sm text-label-sm text-on-surface-variant hover:text-error transition-colors hidden">清空</button>
   </div>
 </nav>
+
+<!-- Empty state -->
+<div id="emptyState" class="hidden flex flex-col items-center justify-center min-h-screen px-8 text-center">
+  <span class="material-symbols-outlined text-6xl text-outline-variant mb-4">favorite</span>
+  <h2 class="font-headline-md text-headline-md text-on-surface mb-2">还没有收藏</h2>
+  <p class="font-body-md text-body-md text-on-surface-variant mb-lg">浏览商品时点击 ♡ 收藏喜欢的单品</p>
+  <a href="products.html" class="px-lg py-md bg-primary text-on-primary font-label-md text-label-md rounded-full hover:opacity-80 transition-opacity">去逛逛</a>
+</div>
+
+<!-- Main content -->
+<main class="pt-28 pb-xl px-6 md:px-margin-desktop max-w-[1440px] mx-auto">
+  <p id="countText" class="font-body-sm text-body-sm text-on-surface-variant mb-md"></p>
+  <div id="wishlistGrid" class="waterfall-grid"></div>
+</main>
+
+<!-- Mobile Bottom Nav -->
+<div class="md:hidden fixed bottom-0 left-0 right-0 h-20 bg-surface/80 backdrop-blur-xl flex items-center justify-around px-gutter z-50 rounded-t-[32px] shadow-[0_-10px_30px_rgba(0,0,0,0.05)] border-t border-white/20">
+  <a href="index.html" class="flex flex-col items-center gap-1 text-on-surface-variant">
+    <span class="material-symbols-outlined">home</span>
+    <span class="text-[10px] font-bold uppercase tracking-wider">Home</span>
+  </a>
+  <a href="products.html" class="flex flex-col items-center gap-1 text-on-surface-variant">
+    <span class="material-symbols-outlined">explore</span>
+    <span class="text-[10px] font-bold uppercase tracking-wider">Explore</span>
+  </a>
+  <a href="cart.html" class="w-14 h-14 bg-primary rounded-full -mt-10 flex items-center justify-center text-on-primary shadow-lg shadow-primary/40 active:scale-90 transition-transform">
+    <span class="material-symbols-outlined text-3xl">shopping_bag</span>
+  </a>
+  <a href="wishlist.html" class="flex flex-col items-center gap-1 text-primary">
+    <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">favorite</span>
+    <span class="text-[10px] font-bold uppercase tracking-wider">Saves</span>
+  </a>
+  <a href="account.html" class="flex flex-col items-center gap-1 text-on-surface-variant">
+    <span class="material-symbols-outlined">person</span>
+    <span class="text-[10px] font-bold uppercase tracking-wider">Me</span>
+  </a>
+</div>
 
 <script>
 const fmt = new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' });
 
-function getWishlist() {
-  return JSON.parse(localStorage.getItem('cippy_wishlist') || '[]');
-}
-function saveWishlist(arr) {
-  localStorage.setItem('cippy_wishlist', JSON.stringify(arr));
-}
+function getWishlist() { return JSON.parse(localStorage.getItem('cippy_wishlist') || '[]'); }
+function saveWishlist(arr) { localStorage.setItem('cippy_wishlist', JSON.stringify(arr)); }
 
 function removeItem(id) {
-  const updated = getWishlist().filter(p => String(p.id) !== String(id));
-  saveWishlist(updated);
+  saveWishlist(getWishlist().filter(p => String(p.id) !== String(id)));
   render();
+}
+
+function addToBag(product) {
+  const cart = JSON.parse(localStorage.getItem('cippy_cart') || '[]');
+  const existing = cart.find(i => i.id === product.id);
+  if (existing) { existing.qty = (existing.qty || 1) + 1; }
+  else { cart.push({ ...product, qty: 1 }); }
+  localStorage.setItem('cippy_cart', JSON.stringify(cart));
+  showToast('已加入购物袋 ✓');
+}
+
+function showToast(msg) {
+  let t = document.getElementById('cippyToast');
+  if (!t) { t = document.createElement('div'); t.id = 'cippyToast'; t.className = 'fixed bottom-24 left-1/2 -translate-x-1/2 bg-on-surface text-surface px-6 py-3 rounded-full font-label-md text-sm z-[999] opacity-0 transition-opacity duration-300 pointer-events-none whitespace-nowrap'; document.body.appendChild(t); }
+  t.textContent = msg; t.style.opacity = '1';
+  clearTimeout(t._timer); t._timer = setTimeout(() => { t.style.opacity = '0'; }, 2000);
 }
 
 function render() {
@@ -121,23 +116,25 @@ function render() {
     const name = p.name_zh || p.name || '';
     const price = parseFloat(p.price_myr || p.price || 0);
     const img = p.image_url || '';
+    const productJson = JSON.stringify(p).replace(/'/g, "\\'").replace(/"/g, '&quot;');
     return `
-      <div class="relative group">
+      <div class="product-card relative group">
         <a href="product.html?id=${p.id}" class="block">
-          <div class="aspect-[3/4] bg-gray-100 rounded-xl overflow-hidden">
-            ${img ? `<img src="${img}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">` : ''}
+          <div class="relative overflow-hidden rounded-xl bg-surface-container shadow-sm transition-all duration-300 hover:shadow-xl">
+            ${img
+              ? `<div class="w-full aspect-[3/4] overflow-hidden"><img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src="${img}" alt="${name}"/></div>`
+              : `<div class="w-full aspect-[3/4] bg-surface-container flex items-center justify-center text-on-surface-variant/30 text-5xl">📦</div>`
+            }
+            <button class="absolute top-3 right-3 z-10 w-9 h-9 bg-white/70 backdrop-blur-md rounded-full flex items-center justify-center transition-all hover:bg-white active:scale-90" onclick="event.preventDefault();event.stopPropagation();removeItem('${p.id}')">
+              <span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1;color:#bb0028;">favorite</span>
+            </button>
           </div>
-          <div class="pt-2 pb-1 px-0.5">
-            <p class="text-xs font-medium text-gray-900 leading-tight line-clamp-2 mb-1">${name}</p>
-            <p class="text-xs font-bold text-gray-900">${fmt.format(price)}</p>
+          <div class="p-3">
+            <h3 class="font-headline-md text-[15px] leading-tight mb-1 text-on-surface">${name}</h3>
+            <p class="font-label-md text-label-md text-on-surface">MYR ${price.toFixed(2)}</p>
           </div>
         </a>
-        <!-- Remove button -->
-        <button onclick="removeItem('${p.id}')" class="absolute top-2 right-2 w-8 h-8 bg-white/90 backdrop-blur rounded-full flex items-center justify-center shadow-sm hover:bg-red-50 transition-colors">
-          <span class="material-symbols-outlined text-[18px] text-red-400" style="font-variation-settings:'FILL' 1;">favorite</span>
-        </button>
-        <!-- Add to bag -->
-        <button onclick="addToBag(${JSON.stringify(p).replace(/"/g,'&quot;')})" class="absolute bottom-10 left-0 right-0 mx-2 py-2 bg-gray-900 text-white text-xs font-medium rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+        <button onclick="addToBag(JSON.parse(this.dataset.p))" data-p='${JSON.stringify(p).replace(/'/g,"&#39;")}' class="mx-3 mb-3 w-[calc(100%-24px)] py-2 bg-primary text-on-primary font-label-md text-label-md rounded-none hover:opacity-80 active:scale-95 transition-all text-center">
           加入购物袋
         </button>
       </div>
@@ -145,26 +142,8 @@ function render() {
   }).join('');
 }
 
-function addToBag(product) {
-  const cart = JSON.parse(localStorage.getItem('cippy_cart') || '[]');
-  const existing = cart.find(i => i.id === product.id);
-  if (existing) {
-    existing.qty = (existing.qty || 1) + 1;
-  } else {
-    cart.push({ ...product, qty: 1 });
-  }
-  localStorage.setItem('cippy_cart', JSON.stringify(cart));
-  // Brief feedback
-  const btn = event.currentTarget;
-  btn.textContent = '已添加 ✓';
-  setTimeout(() => { btn.textContent = '加入购物袋'; }, 1200);
-}
-
 document.getElementById('clearAllBtn').addEventListener('click', () => {
-  if (confirm('确定清空心愿单？')) {
-    saveWishlist([]);
-    render();
-  }
+  if (confirm('确定清空心愿单？')) { saveWishlist([]); render(); }
 });
 
 render();
