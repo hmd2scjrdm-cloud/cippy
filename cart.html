@@ -188,7 +188,7 @@ Free standard shipping on orders over MYR 150.00
 <span class="material-symbols-outlined ml-auto transition-transform duration-300" id="gift-chevron">expand_more</span>
 </button>
 <div class="hidden mt-md" id="gift-note-container">
-<textarea class="w-full bg-surface-container-low border-none rounded-lg p-md text-body-md focus:ring-1 focus:ring-primary placeholder-outline" placeholder="Write your heartfelt message here..." rows="3"></textarea>
+<textarea id="giftNote" class="w-full bg-surface-container-low border-none rounded-lg p-md text-body-md focus:ring-1 focus:ring-primary placeholder-outline" placeholder="Write your heartfelt message here..." rows="3"></textarea>
 </div>
 </section>
 <!-- Payment Methods Local Focus -->
@@ -220,6 +220,12 @@ Free standard shipping on orders over MYR 150.00
 <section class="bg-white rounded-xl p-md md:p-lg shadow-[0_20px_40px_rgba(118,87,75,0.08)] border border-surface-container">
 <h2 class="font-headline-md text-headline-md text-on-surface mb-lg">Order Summary</h2>
 <div class="space-y-md">
+<div class="grid grid-cols-1 gap-3">
+<input id="checkoutName" class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-body-sm focus:ring-1 focus:ring-primary" placeholder="Full name" type="text"/>
+<input id="checkoutEmail" class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-body-sm focus:ring-1 focus:ring-primary" placeholder="Email address" type="email"/>
+<input id="checkoutPhone" class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-body-sm focus:ring-1 focus:ring-primary" placeholder="Phone number" type="tel"/>
+<textarea id="checkoutAddress" class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-body-sm focus:ring-1 focus:ring-primary" placeholder="Delivery address" rows="3"></textarea>
+</div>
 <div class="flex justify-between font-body-md text-body-md text-on-surface-variant">
 <span>Subtotal</span>
 <span id="summarySubtotal">MYR 0.00</span>
@@ -238,10 +244,11 @@ Free standard shipping on orders over MYR 150.00
 <span class="font-headline-md text-headline-md text-on-surface">Total</span>
 <span class="font-headline-lg text-headline-lg text-on-surface" id="summaryTotal">MYR 0.00</span>
 </div>
-<button class="w-full bg-primary text-on-primary py-4 rounded-none font-label-md text-lg hover:opacity-80 active:scale-95 transition-all flex items-center justify-center gap-base group">
+<button id="checkoutBtn" class="w-full bg-primary text-on-primary py-4 rounded-none font-label-md text-lg hover:opacity-80 active:scale-95 transition-all flex items-center justify-center gap-base group">
                                 Secure Checkout
                                 <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
 </button>
+<p id="checkoutStatus" class="text-center text-xs font-body-sm text-secondary mt-md"></p>
 <p class="text-center text-xs font-body-sm text-outline mt-md">
                                 All transactions are secured and encrypted. <br/>
                                 GST included where applicable.
@@ -391,5 +398,108 @@ Free standard shipping on orders over MYR 150.00
 
         renderCart();
     </script>
+<script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+        import {
+          getAuth,
+          onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+
+        const checkoutBtn = document.getElementById('checkoutBtn');
+        const checkoutStatus = document.getElementById('checkoutStatus');
+        let currentUser = null;
+
+        function setCheckoutStatus(message, isError = false) {
+          checkoutStatus.textContent = message;
+          checkoutStatus.classList.toggle('text-primary', !isError);
+          checkoutStatus.classList.toggle('text-red-700', isError);
+        }
+
+        function getCheckoutCart() {
+          return JSON.parse(localStorage.getItem('cippy_cart') || '[]');
+        }
+
+        function fillCustomer(user) {
+          if (!user) return;
+          const email = document.getElementById('checkoutEmail');
+          const name = document.getElementById('checkoutName');
+          if (!email.value) email.value = user.email || '';
+          if (!name.value) name.value = user.displayName || '';
+        }
+
+        async function setupCheckoutAuth() {
+          try {
+            const config = await fetch('/api/firebase-config').then((res) => {
+              if (!res.ok) throw new Error('Firebase is not configured yet.');
+              return res.json();
+            });
+            const auth = getAuth(initializeApp(config));
+            onAuthStateChanged(auth, (user) => {
+              currentUser = user;
+              fillCustomer(user);
+              if (!user) {
+                setCheckoutStatus('Please create an account and verify your email before checkout.', true);
+              } else if (!user.emailVerified) {
+                setCheckoutStatus('Please verify your email before checkout. Check your Gmail inbox.', true);
+              } else {
+                setCheckoutStatus('Email verified. You can place your order.');
+              }
+            });
+          } catch (error) {
+            setCheckoutStatus('Firebase setup is needed in Vercel before checkout verification can work.', true);
+          }
+        }
+
+        checkoutBtn.addEventListener('click', async () => {
+          const cart = getCheckoutCart();
+          const subtotal = cart.reduce((sum, item) => sum + Number(item.price_myr || 0) * Number(item.qty || 1), 0);
+          const shipping = subtotal >= 150 ? 0 : 10;
+          const customer = {
+            name: document.getElementById('checkoutName').value.trim(),
+            email: document.getElementById('checkoutEmail').value.trim(),
+            phone: document.getElementById('checkoutPhone').value.trim(),
+            address: document.getElementById('checkoutAddress').value.trim()
+          };
+
+          if (!cart.length) return setCheckoutStatus('Your bag is empty.', true);
+          if (!currentUser) return setCheckoutStatus('Please sign in or create an account first.', true);
+          if (!currentUser.emailVerified) return setCheckoutStatus('Please verify your email before checkout.', true);
+          if (!customer.name || !customer.email || !customer.phone || !customer.address) {
+            return setCheckoutStatus('Please fill in name, email, phone and delivery address.', true);
+          }
+          if (customer.email.toLowerCase() !== (currentUser.email || '').toLowerCase()) {
+            return setCheckoutStatus('Checkout email must match your verified account email.', true);
+          }
+
+          checkoutBtn.disabled = true;
+          checkoutBtn.classList.add('opacity-60');
+          setCheckoutStatus('Sending your order confirmation...');
+
+          try {
+            const response = await fetch('/api/send-order-email', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                customer,
+                items: cart,
+                totals: { subtotal, shipping, total: subtotal + shipping },
+                giftNote: document.getElementById('giftNote')?.value || ''
+              })
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Unable to send order email');
+            localStorage.removeItem('cippy_cart');
+            renderCart();
+            setCheckoutStatus(`Order sent. Confirmation number: ${data.orderId}`);
+          } catch (error) {
+            setCheckoutStatus(error.message, true);
+          } finally {
+            checkoutBtn.disabled = false;
+            checkoutBtn.classList.remove('opacity-60');
+          }
+        });
+
+        setupCheckoutAuth();
+</script>
 <script src="i18n.js"></script>
 </body></html>

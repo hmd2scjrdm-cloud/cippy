@@ -287,10 +287,20 @@
 <p class="font-body-md text-body-md text-secondary mb-10 max-w-lg mx-auto">
                         Create an account today and start earning rewards immediately. Your first welcome gift is waiting.
                     </p>
-<div class="flex flex-col sm:flex-row gap-4 justify-center">
-<button class="bg-primary text-on-primary px-12 py-4 rounded-none font-label-md text-label-md hover:opacity-80 transition-all duration-300">Create Account</button>
-<button class="border-2 border-primary text-primary px-12 py-4 rounded-none font-label-md text-label-md hover:bg-primary/5 transition-all">Sign In</button>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left max-w-2xl mx-auto">
+<input id="authName" class="w-full bg-background border-outline-variant/30 rounded-xl px-4 py-3 text-body-sm focus:ring-primary focus:border-primary" placeholder="Name" type="text"/>
+<input id="authEmail" class="w-full bg-background border-outline-variant/30 rounded-xl px-4 py-3 text-body-sm focus:ring-primary focus:border-primary" placeholder="Email address" type="email"/>
+<input id="authPassword" class="w-full md:col-span-2 bg-background border-outline-variant/30 rounded-xl px-4 py-3 text-body-sm focus:ring-primary focus:border-primary" placeholder="Password" type="password"/>
 </div>
+<div class="flex flex-col sm:flex-row gap-4 justify-center mt-5">
+<button id="createAccountBtn" class="bg-primary text-on-primary px-12 py-4 rounded-none font-label-md text-label-md hover:opacity-80 transition-all duration-300">Create Account</button>
+<button id="signInBtn" class="border-2 border-primary text-primary px-12 py-4 rounded-none font-label-md text-label-md hover:bg-primary/5 transition-all">Sign In</button>
+</div>
+<div class="flex flex-col sm:flex-row gap-4 justify-center mt-4">
+<button id="resendVerifyBtn" class="text-primary underline font-label-md text-label-md">Resend verification email</button>
+<button id="signOutBtn" class="hidden text-secondary underline font-label-md text-label-md">Sign Out</button>
+</div>
+<p id="authStatus" class="mt-5 font-body-sm text-body-sm text-secondary text-center">Create an account, then check your Gmail inbox to confirm your email.</p>
 <p class="mt-8 font-label-sm text-label-sm text-outline-variant">
                         By joining, you agree to our <a class="underline" href="#">Terms &amp; Conditions</a>.
                     </p>
@@ -347,6 +357,105 @@
 </div>
 </div>
 </footer>
+<script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+        import {
+            createUserWithEmailAndPassword,
+            getAuth,
+            onAuthStateChanged,
+            sendEmailVerification,
+            signInWithEmailAndPassword,
+            signOut,
+            updateProfile
+        } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+
+        const statusEl = document.getElementById('authStatus');
+        const createBtn = document.getElementById('createAccountBtn');
+        const signInBtn = document.getElementById('signInBtn');
+        const signOutBtn = document.getElementById('signOutBtn');
+        const resendBtn = document.getElementById('resendVerifyBtn');
+        let auth;
+
+        function setStatus(message, isError = false) {
+            statusEl.textContent = message;
+            statusEl.classList.toggle('text-primary', !isError);
+            statusEl.classList.toggle('text-red-700', isError);
+        }
+
+        function getFields() {
+            return {
+                name: document.getElementById('authName').value.trim(),
+                email: document.getElementById('authEmail').value.trim(),
+                password: document.getElementById('authPassword').value
+            };
+        }
+
+        async function setupAuth() {
+            try {
+                const config = await fetch('/api/firebase-config').then((res) => {
+                    if (!res.ok) throw new Error('Firebase is not configured yet.');
+                    return res.json();
+                });
+                auth = getAuth(initializeApp(config));
+
+                onAuthStateChanged(auth, (user) => {
+                    if (!user) {
+                        signOutBtn.classList.add('hidden');
+                        setStatus('Create an account, then check your Gmail inbox to confirm your email.');
+                        return;
+                    }
+                    signOutBtn.classList.remove('hidden');
+                    document.getElementById('authEmail').value = user.email || '';
+                    if (user.emailVerified) {
+                        setStatus(`Signed in as ${user.email}. Email confirmed. You can checkout now.`);
+                    } else {
+                        setStatus(`Signed in as ${user.email}. Please confirm your email before checkout.`, true);
+                    }
+                });
+            } catch (error) {
+                setStatus('Firebase setup is needed in Vercel before registration can work.', true);
+            }
+        }
+
+        createBtn.addEventListener('click', async () => {
+            if (!auth) return setStatus('Firebase setup is needed in Vercel before registration can work.', true);
+            const { name, email, password } = getFields();
+            if (!email || password.length < 6) return setStatus('Enter an email and a password with at least 6 characters.', true);
+            try {
+                const result = await createUserWithEmailAndPassword(auth, email, password);
+                if (name) await updateProfile(result.user, { displayName: name });
+                await sendEmailVerification(result.user);
+                setStatus('Account created. Check your Gmail inbox and click the verification link.');
+            } catch (error) {
+                setStatus(error.message, true);
+            }
+        });
+
+        signInBtn.addEventListener('click', async () => {
+            if (!auth) return setStatus('Firebase setup is needed in Vercel before sign in can work.', true);
+            const { email, password } = getFields();
+            if (!email || !password) return setStatus('Enter your email and password.', true);
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                setStatus(error.message, true);
+            }
+        });
+
+        resendBtn.addEventListener('click', async () => {
+            if (!auth?.currentUser) return setStatus('Sign in first, then resend the verification email.', true);
+            try {
+                await sendEmailVerification(auth.currentUser);
+                setStatus('Verification email sent again. Please check your inbox or spam folder.');
+            } catch (error) {
+                setStatus(error.message, true);
+            }
+        });
+
+        signOutBtn.addEventListener('click', () => signOut(auth));
+
+        setupAuth();
+</script>
 <script>
         // Simple intersection observer for reveal animations
         const observerOptions = {
