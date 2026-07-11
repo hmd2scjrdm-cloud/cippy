@@ -37,7 +37,10 @@
   <div class="bg-white border-b border-stone-200 px-6 py-4 flex justify-between items-center sticky top-0 z-10">
     <div class="flex items-center gap-3">
       <img src="assets/cippy-logo.png" alt="cippy" class="h-8"/>
-      <span class="text-stone-400 text-sm">商品管理</span>
+      <div class="flex gap-1">
+        <button id="tabProducts" onclick="switchTab('products')" class="px-3 py-1.5 rounded-lg text-sm font-semibold bg-[#C4928A] text-white">商品</button>
+        <button id="tabOrders" onclick="switchTab('orders')" class="px-3 py-1.5 rounded-lg text-sm font-semibold text-stone-500 hover:bg-stone-100">订单</button>
+      </div>
     </div>
     <div class="flex items-center gap-4">
       <a href="index.html" class="text-sm text-stone-400 hover:text-stone-600">← 前台</a>
@@ -62,8 +65,36 @@
     </div>
   </div>
 
+  <!-- Orders Panel -->
+  <div id="ordersPanel" class="hidden px-6 pb-12 max-w-5xl mx-auto">
+    <div class="bg-white rounded-xl border border-stone-100 overflow-hidden">
+      <div class="px-5 py-4 border-b border-stone-100 flex items-center justify-between">
+        <p class="font-semibold text-stone-700">所有订单</p>
+        <button onclick="loadAdminOrders()" class="text-xs text-stone-400 hover:text-stone-600">刷新</button>
+      </div>
+      <div id="ordersLoading" class="text-center py-10 text-stone-400 text-sm">加载中...</div>
+      <div id="ordersTableWrap" class="hidden overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-stone-50 border-b border-stone-100 text-left text-stone-500 text-xs uppercase tracking-wider">
+            <tr>
+              <th class="px-4 py-3">订单号</th>
+              <th class="px-4 py-3">日期</th>
+              <th class="px-4 py-3">Gmail</th>
+              <th class="px-4 py-3">Receiver Details</th>
+              <th class="px-4 py-3">金额</th>
+              <th class="px-4 py-3">状态</th>
+              <th class="px-4 py-3">操作</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTableBody" class="divide-y divide-stone-100"></tbody>
+        </table>
+      </div>
+      <div id="ordersEmpty" class="hidden text-center py-10 text-stone-400 text-sm">暂无订单</div>
+    </div>
+  </div>
+
   <!-- Product Table -->
-  <div class="px-6 pb-12 max-w-5xl mx-auto">
+  <div id="productsPanel" class="px-6 pb-12 max-w-5xl mx-auto">
     <div class="bg-white rounded-xl border border-stone-100 overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full text-sm">
@@ -356,6 +387,71 @@ document.getElementById('loginBtn').addEventListener('click', () =>
   sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } }));
 document.getElementById('logoutBtn').addEventListener('click', () => sb.auth.signOut());
 document.getElementById('logoutBtn2').addEventListener('click', () => sb.auth.signOut());
+
+const STATUS_LABELS = { pending:'待付款', paid:'已付款', processing:'处理中', shipped:'已发货', delivered:'已送达', cancelled:'已取消' };
+const STATUS_COLORS = { pending:'bg-red-100 text-red-700', paid:'bg-pink-100 text-pink-700', processing:'bg-yellow-100 text-yellow-700', shipped:'bg-blue-100 text-blue-700', delivered:'bg-green-100 text-green-700', cancelled:'bg-stone-100 text-stone-500' };
+
+function switchTab(tab) {
+  const isOrders = tab === 'orders';
+  document.getElementById('ordersPanel').classList.toggle('hidden', !isOrders);
+  document.getElementById('productsPanel').classList.toggle('hidden', isOrders);
+  document.getElementById('addBtn').classList.toggle('hidden', isOrders);
+  document.getElementById('tabProducts').className = `px-3 py-1.5 rounded-lg text-sm font-semibold ${!isOrders ? 'bg-[#C4928A] text-white' : 'text-stone-500 hover:bg-stone-100'}`;
+  document.getElementById('tabOrders').className = `px-3 py-1.5 rounded-lg text-sm font-semibold ${isOrders ? 'bg-[#C4928A] text-white' : 'text-stone-500 hover:bg-stone-100'}`;
+  if (isOrders) loadAdminOrders();
+}
+window.switchTab = switchTab;
+
+async function loadAdminOrders() {
+  document.getElementById('ordersLoading').classList.remove('hidden');
+  document.getElementById('ordersTableWrap').classList.add('hidden');
+  document.getElementById('ordersEmpty').classList.add('hidden');
+
+  const { data, error } = await sb.from('orders').select('*').order('created_at', { ascending: false });
+
+  document.getElementById('ordersLoading').classList.add('hidden');
+  if (error || !data || !data.length) { document.getElementById('ordersEmpty').classList.remove('hidden'); return; }
+
+  const fmt = new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' });
+  document.getElementById('ordersTableWrap').classList.remove('hidden');
+  document.getElementById('ordersTableBody').innerHTML = data.map(o => {
+    const c = o.customer || {};
+    const date = new Date(o.created_at).toLocaleDateString('zh-CN', { year:'numeric', month:'2-digit', day:'2-digit' });
+    const total = fmt.format(o.totals?.total || 0);
+    const stLabel = STATUS_LABELS[o.status] || o.status;
+    const stCls = STATUS_COLORS[o.status] || 'bg-stone-100 text-stone-500';
+    const address = [c.name, c.phone, c.address].filter(Boolean).join(' · ').replace(/\n/g,' ');
+    const statusOptions = Object.entries(STATUS_LABELS).map(([v,l]) =>
+      `<option value="${v}" ${o.status===v?'selected':''}>${l}</option>`).join('');
+    return `
+      <tr class="hover:bg-stone-50 transition-colors">
+        <td class="px-4 py-3 font-mono text-xs text-stone-600 whitespace-nowrap">${o.order_id}</td>
+        <td class="px-4 py-3 text-stone-500 whitespace-nowrap text-xs">${date}</td>
+        <td class="px-4 py-3 text-stone-700 text-xs">${c.email || '—'}</td>
+        <td class="px-4 py-3 text-stone-600 text-xs max-w-[220px]">
+          <p class="font-semibold text-stone-800">${c.name || '—'}</p>
+          <p>${c.phone || ''}</p>
+          <p class="truncate">${(c.address || '').replace(/\n/g,' ')}</p>
+        </td>
+        <td class="px-4 py-3 font-semibold text-stone-800 whitespace-nowrap">${total}</td>
+        <td class="px-4 py-3">
+          <span class="px-2 py-1 rounded-full text-xs font-semibold ${stCls}">${stLabel}</span>
+        </td>
+        <td class="px-4 py-3">
+          <select onchange="updateOrderStatus('${o.id}', this.value)" class="text-xs border border-stone-200 rounded-lg px-2 py-1 focus:outline-none focus:border-[#C4928A]">
+            ${statusOptions}
+          </select>
+        </td>
+      </tr>`;
+  }).join('');
+}
+window.loadAdminOrders = loadAdminOrders;
+
+async function updateOrderStatus(id, status) {
+  const { error } = await sb.from('orders').update({ status }).eq('id', id);
+  if (error) alert('更新失败：' + error.message);
+}
+window.updateOrderStatus = updateOrderStatus;
 
 async function loadProducts() {
   const { data, error } = await sb.from('products').select('*').order('created_at', { ascending: false });
