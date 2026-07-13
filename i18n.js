@@ -44,8 +44,62 @@
   "RM 189.00": "RM 189.00",
   "Boxy Structure Blazer": "方正廓形西装外套",
   "RM 219.00": "RM 219.00",
-  "Xiaohongshu Inspiration": "小红书穿搭灵感",
-  "Styled by You #cippyGirls": "由你演绎 #cippyGirls",
+  "Free shipping over RM150 in Malaysia 🎀": "满 RM150 全马免运费 🎀",
+
+  "Recommended Pairing": "推荐搭配",
+  "Bundle Save": "套装省",
+  "Both items": "两件合计",
+  "Bundle Price": "套装优惠价",
+  "Saved ♡": "已收藏",
+  "Complete the Look": "推荐搭配",
+
+  "Type": "类型",
+  "Fabric": "面料",
+  "Lining": "内衬",
+  "Stretch": "弹性",
+  "Transparency": "透肤",
+  "Care": "洗涤",
+  "Model Info": "模特参考",
+
+  "Skirt": "裙子",
+  "Dress": "连衣裙",
+  "Top": "上衣",
+  "Pants": "长裤",
+  "Shorts": "短裤",
+  "Outerwear": "外套",
+  "Knit": "针织",
+  "Set": "套装",
+  "Polyester": "聚酯纤维",
+  "Cotton": "棉",
+  "Linen": "亚麻",
+  "Chiffon": "雪纺",
+  "Velvet": "丝绒",
+  "Denim": "牛仔",
+
+  "White Skirt": "白色裙子",
+  "Pink Skirt": "粉色裙子",
+  "Black": "黑色",
+  "White": "白色",
+  "Pink": "粉色",
+  "Blue": "蓝色",
+  "Green": "绿色",
+  "Beige": "米色",
+  "Brown": "棕色",
+  "Grey": "灰色",
+  "Purple": "紫色",
+  "Red": "红色",
+  "Yellow": "黄色",
+  "Orange": "橙色",
+  "Navy": "藏青色",
+  "Forest Green": "墨绿色",
+  "Apricot": "杏色",
+  "Khaki": "卡其色",
+  "Cream": "奶油色",
+
+  "Real Girls, Real Looks": "真实穿搭 · 真实上身",
+  "Worn & Loved": "穿搭上身图",
+  "Your photo here": "你的上身图",
+  "Follow us @cippy.kl": "关注我们 @cippy.kl",
   "@sofia_lee": "@sofia_lee",
   "@nurul.fits": "@nurul.fits",
   "@amy_wong": "@amy_wong",
@@ -119,8 +173,22 @@
   "RM 249.00": "RM 249.00",
   "RM 320.00": "RM 320.00",
   "An effortlessly chic staple for the modern Malaysian wardrobe. Crafted from breathable organic linen, featuring a minimalist silhouette and a flattering tie-back detail. Perfect for sun-soaked afternoons at Bukit Bintang or evening gallery hops.": "现代马来西亚衣橱里不费力的优雅必备款。采用透气有机亚麻面料制成，极简轮廓搭配修身的系带背部细节，无论是阳光洒满的武吉免登午后，还是傍晚的画廊漫步都恰到好处。",
+  "Select Color": "选择颜色",
   "Select Size": "选择尺码",
   "Size Guide": "尺码指南",
+  "All measurements in cm": "所有尺寸单位为 cm",
+  "Product not found": "找不到此商品",
+  "Add both to cart": "两件一起加入购物袋",
+  "Size": "尺码",
+  "Type": "类型",
+  "Fabric": "面料",
+  "Series": "系列",
+  "Added to wishlist ♡": "已加入心愿单 ♡",
+  "Removed from wishlist": "已移出心愿单",
+  "Added to bag ✓": "已加入购物袋 ✓",
+  "Outfit added to bag ✓": "套装已加入购物袋 ✓",
+  "Please select a size": "请先选择尺码",
+  "Please select a variant first": "请先选择款式",
   "S": "S",
   "M": "M",
   "L": "L",
@@ -139,25 +207,6 @@
   "RM 95.00": "RM 95.00",
   "Organza Layering Shirt": "欧根纱叠搭衬衫",
   "RM 155.00": "RM 155.00",
-  "Community Feed": "社区动态",
-  "See how our community is styling the Lumière Midi.": "看看大家如何演绎 Lumière 中长裙。",
-  "4.9/5 based on 124 reviews": "4.9/5 分，共 124 条评价",
-  "Write a Review": "撰写评价",
-  "@sophia_chen": "@sophia_chen",
-  "Kuala Lumpur • 2 days ago": "吉隆坡 • 2 天前",
-  "The quality is amazing for the price! Wore this for my birthday brunch at Bangsar and got so many compliments. The linen is actually quite soft and doesn't itch at all. ✨": "这个价格质感真的很好！我穿着它去 Bangsar 参加生日早午餐，收到了好多赞美。亚麻面料其实很柔软，完全不扎人。✨",
-  "42": "42",
-  "12": "12",
-  "@amirul_m": "@amirul_m",
-  "Penang • 5 days ago": "槛城 • 5 天前",
-  "Bought this for my sister's graduation. Shipping was super fast to Penang. The packaging was so aesthetic, felt like unboxing a gift. 10/10 service!": "为我姐姐的毕业典礼买的。寄到槛城的速度超快，包装也很有质感，像在拆礼物一样。服务满分！",
-  "28": "28",
-  "5": "5",
-  "@zara_styles": "@zara_styles",
-  "Shah Alam • 1 week ago": "沙亚南 • 1 周前",
-  "Perfect length for hijabis too if you pair it with a nice long-sleeve inner or a blazer. The material is thick enough that it's not see-through. My new fav dress.": "长度也很适合戴头巾的姐妹，搭配长袖内搭或西装外套刚刚好。面料够厚不透光，是我的新欢裙子。",
-  "156": "156",
-  "24": "24",
   "Redefining the Malaysian minimalist aesthetic for the digital generation.": "为数字时代重新定义马来西亚极简美学。",
   "Join The Inner Circle": "加入核心圈",
   "Stay updated on our latest drops and exclusive offers.": "第一时间获取最新上新与专属优惠。",
@@ -269,13 +318,82 @@
   "Detail Photos": "图文详情",
   "Complete the Look": "搭配单品",
   "Complete The Look": "搭配全套造型",
-  "View More Essentials": "查看更多必备单品"
+  "View More Essentials": "查看更多必备单品",
+
+  "Payment Methods": "付款方式",
+  "Credit / Debit Card": "信用卡 / 借记卡",
+  "Recommended": "推荐",
+  "Coming Soon": "即将推出",
+  "FPX Online Banking": "FPX 网上银行",
+  "Contact Info": "联系方式",
+  "Login to auto-fill": "登录自动填写",
+  "Full Name *": "姓名 *",
+  "Email Address *": "电邮地址 *",
+  "Phone Number * (e.g. 011-1234 5678)": "手机号码 * (e.g. 011-1234 5678)",
+  "Delivery Address": "收件地址",
+  "New Address": "新地址",
+  "Add New Address": "添加新地址",
+  "Recipient Name *": "收件人姓名 *",
+  "Phone Number *": "手机号码 *",
+  "Address Line 1 (Unit, Street) *": "地址第一行（门牌、街道）*",
+  "Address Line 2 (Apartment, Suite)": "地址第二行（公寓、单位号）",
+  "Postcode *": "邮编 *",
+  "City *": "城市 *",
+  "Select State *": "选择州属 *",
+  "Save Address": "保存地址",
+  "Cancel": "取消",
+  "Order Summary": "订单明细",
+  "Subtotal": "商品小计",
+  "Shipping": "运费",
+  "Total": "总计",
+  "Secure Checkout": "立即结账",
+  "Secure": "安全支付",
+  "Fast Shipping": "快速发货",
+  "7-Day Returns": "7天退换",
+  "Bundle Discount": "套装优惠",
+  "No saved addresses yet. Click + to add one.": "还没有保存的地址，点右上角添加。",
+  "Free shipping unlocked! 🎉": "已解锁免运费！🎉",
+  "MYR 150.00 to free shipping": "再购 MYR 150.00 即可免运费",
+  "Free standard shipping on orders over MYR 150.00": "订单满 MYR 150.00 享免费标准配送",
+  "Your bag is empty ✨": "购物袋空空如也 ✨",
+  "Start Shopping": "去逛逛",
+  "Add a gift note (Free)": "添加礼物贺卡（免费）",
+  "Write your heartfelt message here...": "在这里写下你的祝福...",
+  "Sold Out": "售罄",
+  "Email verified. You can place your order.": "邮箱已验证，可以下单。",
+
+  "How would you like to checkout?": "如何结账？",
+  "Sign in to earn points & rewards on every order.": "登录即可在每笔订单上累积积分与专属奖励。",
+  "Sign In / Create Account": "登录 / 注册账户",
+  "Earn points + 5% cashback on top-up ✨": "赚取积分 + 充值返现5% ✨",
+  "Continue as Guest": "以访客身份结账",
+  "No account needed · No points earned": "无需账户 · 不累积积分",
+  "Signed in as Member": "已登录会员",
+  "Sign out": "退出登录",
+  "Checking out as Guest": "以访客身份结账",
+  "Sign in instead": "改为登录",
+  "Points not earned ·": "不累积积分 ·",
+
+  "Visa · Mastercard · PayNow": "Visa · Mastercard · PayNow",
+  "Maybank · CIMB · Public Bank · RHB": "Maybank · CIMB · Public Bank · RHB",
+  "DuitNow QR": "DuitNow QR",
+  "Coming Soon": "即将推出",
+
+  "© 2025 cippy Malaysia. All Rights Reserved.": "© 2025 cippy Malaysia. 保留所有权利。",
+  "Effortless chic for the modern Malaysian lifestyle. Curated with love, delivered with care.": "为现代马来西亚生活方式打造的不费力优雅风格，用心精选，悉心呈递。"
 };
 
   var textNodes = [];
   var attrNodes = [];
 
+  // Reverse dict: Chinese value → English key, for restoring baselines
+  var RDICT = {};
+  Object.keys(DICT).forEach(function(k) { RDICT[DICT[k]] = k; });
+
   function collect() {
+    // Preserve English baselines for nodes already seen, to survive re-collect in zh mode
+    var existingMap = new Map(textNodes.map(function(item) { return [item.node, item.en]; }));
+    var existingAttrMap = new Map(attrNodes.map(function(item) { return [item.el + ':' + item.attr, item.en]; }));
     textNodes = [];
     attrNodes = [];
     var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
@@ -290,10 +408,15 @@
     });
     var n;
     while ((n = walker.nextNode())) {
-      textNodes.push({ node: n, en: n.textContent });
+      var cur = n.textContent;
+      // Use preserved English, or reverse-lookup if currently translated, or current text
+      var en = existingMap.get(n) || RDICT[cur.trim()] || cur;
+      textNodes.push({ node: n, en: en });
     }
     document.querySelectorAll("[placeholder]").forEach(function (el) {
-      attrNodes.push({ el: el, attr: "placeholder", en: el.getAttribute("placeholder") });
+      var cur = el.getAttribute("placeholder");
+      var en = existingAttrMap.get(el + ':placeholder') || RDICT[cur] || cur;
+      attrNodes.push({ el: el, attr: "placeholder", en: en });
     });
   }
 
@@ -317,7 +440,7 @@
     document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
     localStorage.setItem(STORAGE_KEY, lang);
     document.querySelectorAll("[data-lang-toggle]").forEach(function (btn) {
-      btn.textContent = lang === "zh" ? "EN" : "\u4e2d\u6587";
+      btn.textContent = lang === "zh" ? "\u4e2d" : "EN";
     });
   }
 

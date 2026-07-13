@@ -66,24 +66,37 @@
   </div>
 
   <!-- Orders Panel -->
-  <div id="ordersPanel" class="hidden px-6 pb-12 max-w-5xl mx-auto">
-    <div class="bg-white rounded-xl border border-stone-100 overflow-hidden">
-      <div class="px-5 py-4 border-b border-stone-100 flex items-center justify-between">
-        <p class="font-semibold text-stone-700">所有订单</p>
-        <button onclick="loadAdminOrders()" class="text-xs text-stone-400 hover:text-stone-600">刷新</button>
+  <div id="ordersPanel" class="hidden px-6 pb-12 max-w-5xl mx-auto space-y-3">
+    <!-- Search + Filter -->
+    <div class="bg-white rounded-xl border border-stone-100 px-4 py-3 flex flex-wrap gap-3 items-center">
+      <input id="orderSearch" type="text" placeholder="搜索订单号 / 姓名 / 邮箱 / 电话…"
+        oninput="filterOrders()"
+        class="flex-1 min-w-[200px] border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4928A]"/>
+      <div class="flex gap-1 flex-wrap" id="statusFilters">
+        <button onclick="setStatusFilter('')" data-status="" class="status-filter-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-[#C4928A] text-white">全部</button>
+        <button onclick="setStatusFilter('pending')" data-status="pending" class="status-filter-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-stone-100 text-stone-500">待付款</button>
+        <button onclick="setStatusFilter('paid')" data-status="paid" class="status-filter-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-stone-100 text-stone-500">已付款</button>
+        <button onclick="setStatusFilter('processing')" data-status="processing" class="status-filter-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-stone-100 text-stone-500">处理中</button>
+        <button onclick="setStatusFilter('shipped')" data-status="shipped" class="status-filter-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-stone-100 text-stone-500">已发货</button>
+        <button onclick="setStatusFilter('delivered')" data-status="delivered" class="status-filter-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-stone-100 text-stone-500">已送达</button>
       </div>
+      <button onclick="loadAdminOrders()" class="text-xs text-stone-400 hover:text-stone-600 whitespace-nowrap">↻ 刷新</button>
+    </div>
+
+    <div class="bg-white rounded-xl border border-stone-100 overflow-hidden">
       <div id="ordersLoading" class="text-center py-10 text-stone-400 text-sm">加载中...</div>
       <div id="ordersTableWrap" class="hidden overflow-x-auto">
         <table class="w-full text-sm">
           <thead class="bg-stone-50 border-b border-stone-100 text-left text-stone-500 text-xs uppercase tracking-wider">
             <tr>
+              <th class="px-4 py-3 w-6"></th>
               <th class="px-4 py-3">订单号</th>
               <th class="px-4 py-3">日期</th>
               <th class="px-4 py-3">Gmail</th>
-              <th class="px-4 py-3">Receiver Details</th>
+              <th class="px-4 py-3">收件人</th>
               <th class="px-4 py-3">金额</th>
               <th class="px-4 py-3">状态</th>
-              <th class="px-4 py-3">操作</th>
+              <th class="px-4 py-3">改状态</th>
             </tr>
           </thead>
           <tbody id="ordersTableBody" class="divide-y divide-stone-100"></tbody>
@@ -116,6 +129,27 @@
           </tbody>
         </table>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tracking Modal -->
+<div id="trackingModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background:rgba(0,0,0,0.4)">
+  <div class="bg-white rounded-2xl w-full max-w-sm p-6 space-y-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="font-bold text-stone-800">填写运单号</p>
+        <p class="text-xs text-stone-400 mt-0.5">订单 <span id="trackingOrderId"></span></p>
+      </div>
+      <button onclick="closeTrackingModal()" class="text-stone-300 hover:text-stone-500 text-2xl leading-none">&times;</button>
+    </div>
+    <input id="trackingInput" type="text" placeholder="例：MY123456789"
+      onkeydown="if(event.key==='Enter')confirmShipping()"
+      class="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#C4928A]"/>
+    <p class="text-xs text-stone-400">运单号可留空，之后在订单详情中补填</p>
+    <div class="flex gap-3">
+      <button onclick="closeTrackingModal()" class="flex-1 py-2.5 border border-stone-200 rounded-xl text-sm text-stone-500 hover:bg-stone-50">取消</button>
+      <button id="confirmShipBtn" onclick="confirmShipping()" class="flex-1 py-2.5 bg-[#C4928A] text-white rounded-xl text-sm font-semibold hover:opacity-90">确认发货</button>
     </div>
   </div>
 </div>
@@ -402,6 +436,10 @@ function switchTab(tab) {
 }
 window.switchTab = switchTab;
 
+let allOrders = [];
+let activeStatusFilter = '';
+let openDetailId = null;
+
 async function loadAdminOrders() {
   document.getElementById('ordersLoading').classList.remove('hidden');
   document.getElementById('ordersTableWrap').classList.add('hidden');
@@ -412,46 +450,236 @@ async function loadAdminOrders() {
   document.getElementById('ordersLoading').classList.add('hidden');
   if (error || !data || !data.length) { document.getElementById('ordersEmpty').classList.remove('hidden'); return; }
 
-  const fmt = new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' });
-  document.getElementById('ordersTableWrap').classList.remove('hidden');
-  document.getElementById('ordersTableBody').innerHTML = data.map(o => {
-    const c = o.customer || {};
-    const date = new Date(o.created_at).toLocaleDateString('zh-CN', { year:'numeric', month:'2-digit', day:'2-digit' });
-    const total = fmt.format(o.totals?.total || 0);
-    const stLabel = STATUS_LABELS[o.status] || o.status;
-    const stCls = STATUS_COLORS[o.status] || 'bg-stone-100 text-stone-500';
-    const address = [c.name, c.phone, c.address].filter(Boolean).join(' · ').replace(/\n/g,' ');
-    const statusOptions = Object.entries(STATUS_LABELS).map(([v,l]) =>
-      `<option value="${v}" ${o.status===v?'selected':''}>${l}</option>`).join('');
-    return `
-      <tr class="hover:bg-stone-50 transition-colors">
-        <td class="px-4 py-3 font-mono text-xs text-stone-600 whitespace-nowrap">${o.order_id}</td>
-        <td class="px-4 py-3 text-stone-500 whitespace-nowrap text-xs">${date}</td>
-        <td class="px-4 py-3 text-stone-700 text-xs">${c.email || '—'}</td>
-        <td class="px-4 py-3 text-stone-600 text-xs max-w-[220px]">
-          <p class="font-semibold text-stone-800">${c.name || '—'}</p>
-          <p>${c.phone || ''}</p>
-          <p class="truncate">${(c.address || '').replace(/\n/g,' ')}</p>
-        </td>
-        <td class="px-4 py-3 font-semibold text-stone-800 whitespace-nowrap">${total}</td>
-        <td class="px-4 py-3">
-          <span class="px-2 py-1 rounded-full text-xs font-semibold ${stCls}">${stLabel}</span>
-        </td>
-        <td class="px-4 py-3">
-          <select onchange="updateOrderStatus('${o.id}', this.value)" class="text-xs border border-stone-200 rounded-lg px-2 py-1 focus:outline-none focus:border-[#C4928A]">
-            ${statusOptions}
-          </select>
-        </td>
-      </tr>`;
-  }).join('');
+  allOrders = data;
+  renderOrders();
 }
 window.loadAdminOrders = loadAdminOrders;
 
-async function updateOrderStatus(id, status) {
+function setStatusFilter(status) {
+  activeStatusFilter = status;
+  document.querySelectorAll('.status-filter-btn').forEach(btn => {
+    const active = btn.dataset.status === status;
+    btn.className = `status-filter-btn px-3 py-1.5 rounded-full text-xs font-semibold ${active ? 'bg-[#C4928A] text-white' : 'bg-stone-100 text-stone-500'}`;
+  });
+  renderOrders();
+}
+window.setStatusFilter = setStatusFilter;
+
+function filterOrders() { renderOrders(); }
+window.filterOrders = filterOrders;
+
+function renderOrders() {
+  const q = (document.getElementById('orderSearch')?.value || '').toLowerCase();
+  let orders = allOrders;
+
+  if (activeStatusFilter) orders = orders.filter(o => o.status === activeStatusFilter);
+  if (q) orders = orders.filter(o => {
+    const c = o.customer || {};
+    return [o.order_id, c.name, c.email, c.phone, c.address].some(v => (v||'').toLowerCase().includes(q));
+  });
+
+  if (!orders.length) {
+    document.getElementById('ordersTableWrap').classList.add('hidden');
+    document.getElementById('ordersEmpty').classList.remove('hidden');
+    return;
+  }
+
+  const fmt = new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' });
+  document.getElementById('ordersTableWrap').classList.remove('hidden');
+  document.getElementById('ordersEmpty').classList.add('hidden');
+
+  document.getElementById('ordersTableBody').innerHTML = ''; // clear first
+  document.getElementById('ordersTableBody').innerHTML = orders.map(o => {
+    const c = o.customer || {};
+    const date = new Date(o.created_at).toLocaleDateString('zh-CN', { year:'numeric', month:'2-digit', day:'2-digit' });
+    const time = new Date(o.created_at).toLocaleTimeString('zh-CN', { hour:'2-digit', minute:'2-digit' });
+    const total = fmt.format(o.totals?.total || 0);
+    const stLabel = STATUS_LABELS[o.status] || o.status;
+    const stCls = STATUS_COLORS[o.status] || 'bg-stone-100 text-stone-500';
+    const statusOptions = Object.entries(STATUS_LABELS).map(([v,l]) =>
+      `<option value="${v}" ${o.status===v?'selected':''}>${l}</option>`).join('');
+    const items = o.items || [];
+    const itemsHtml = items.map(item => {
+      const detail = [item.size, item.color, item.variant].filter(Boolean).join(' / ');
+      return `<div class="flex items-center gap-2 py-1">
+        ${item.image_url ? `<img src="${item.image_url}" class="w-8 h-10 object-cover rounded flex-shrink-0"/>` : '<div class="w-8 h-10 bg-stone-100 rounded flex-shrink-0"></div>'}
+        <div>
+          <p class="text-xs font-medium text-stone-800">${item.name_zh || item.name || 'Item'}</p>
+          ${detail ? `<p class="text-xs text-stone-400">${detail}</p>` : ''}
+          <p class="text-xs text-stone-500">x${item.qty || 1} · MYR ${(Number(item.price_myr||0)*Number(item.qty||1)).toFixed(2)}</p>
+        </div>
+      </div>`;
+    }).join('');
+
+    return `
+      <tr class="hover:bg-stone-50 transition-colors cursor-pointer order-main-row" onclick="toggleOrderDetail('${o.id}')">
+        <td class="px-3 py-3 text-stone-400 text-xs">▶</td>
+        <td class="px-4 py-3 font-mono text-xs text-stone-600 whitespace-nowrap">${o.order_id}<br/><span class="text-stone-300">${time}</span></td>
+        <td class="px-4 py-3 text-stone-400 whitespace-nowrap text-xs">${date}</td>
+        <td class="px-4 py-3 text-stone-700 text-xs max-w-[140px] truncate">${c.email || '—'}</td>
+        <td class="px-4 py-3 text-stone-600 text-xs max-w-[160px]">
+          <p class="font-semibold text-stone-800">${c.name || '—'}</p>
+          <p>${c.phone || ''}</p>
+          <p class="truncate text-stone-400">${(c.address || '').replace(/\n/g,' ')}</p>
+        </td>
+        <td class="px-4 py-3 font-semibold text-stone-800 whitespace-nowrap text-sm">${total}</td>
+        <td class="px-4 py-3">
+          <span id="badge_${o.id}" class="px-2 py-1 rounded-full text-xs font-semibold ${stCls}">${stLabel}</span>
+        </td>
+        <td class="px-4 py-3" onclick="event.stopPropagation()">
+          <select onchange="updateOrderStatus('${o.id}', this.value, this)" class="text-xs border border-stone-200 rounded-lg px-2 py-1 focus:outline-none focus:border-[#C4928A]">
+            ${statusOptions}
+          </select>
+        </td>
+      </tr>
+      <tr id="detail_${o.id}" class="hidden bg-stone-50 border-b border-stone-100">
+        <td colspan="9" class="px-6 py-4">
+          <div class="flex flex-wrap gap-6">
+            <div class="flex-1 min-w-[180px]">
+              <p class="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-2">商品</p>
+              ${itemsHtml || '<p class="text-xs text-stone-400">无商品信息</p>'}
+            </div>
+            <div class="min-w-[180px]">
+              <p class="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-2">收件人</p>
+              <p class="text-sm font-semibold text-stone-800">${c.name || '—'}</p>
+              <p class="text-xs text-stone-500">${c.phone || ''}</p>
+              <p class="text-xs text-stone-500">${c.email || ''}</p>
+              <p class="text-xs text-stone-500 mt-1 whitespace-pre-line">${c.address || ''}</p>
+            </div>
+            <div class="min-w-[140px]">
+              <p class="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-2">金额明细</p>
+              <p class="text-xs text-stone-500">小计：${fmt.format(o.totals?.subtotal || 0)}</p>
+              <p class="text-xs text-stone-500">运费：${o.totals?.shipping === 0 ? 'FREE' : fmt.format(o.totals?.shipping || 0)}</p>
+              <p class="text-sm font-bold text-stone-800 mt-1">合计：${total}</p>
+            </div>
+            ${o.status === 'shipped' || o.tracking_number ? `
+            <div class="min-w-[140px]">
+              <p class="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-2">运单号</p>
+              <p id="tracking_${o.id}" class="text-sm font-mono text-stone-700">${o.tracking_number || '—'}</p>
+              <button onclick="event.stopPropagation();editTracking('${o.id}')" class="mt-2 text-xs text-[#C4928A] border border-[#C4928A] px-2 py-1 rounded hover:bg-[#fdf0ed]">修改运单号</button>
+            </div>` : ''}
+          </div>
+        </td>
+      </tr>`;
+  }).join('');
+  applyDetailState();
+}
+
+function toggleOrderDetail(id) {
+  if (openDetailId === id) {
+    openDetailId = null;
+  } else {
+    openDetailId = id;
+  }
+  applyDetailState();
+}
+window.toggleOrderDetail = toggleOrderDetail;
+
+function applyDetailState() {
+  document.querySelectorAll('[id^="detail_"]').forEach(r => r.classList.add('hidden'));
+  document.querySelectorAll('.order-main-row td:first-child').forEach(td => td.textContent = '▶');
+  if (openDetailId) {
+    const row = document.getElementById('detail_' + openDetailId);
+    if (row) {
+      row.classList.remove('hidden');
+      row.previousElementSibling.querySelector('td:first-child').textContent = '▼';
+    }
+  }
+}
+
+async function updateOrderStatus(id, status, selectEl) {
+  if (status === 'shipped') {
+    // Show tracking modal
+    pendingShipId = id;
+    pendingShipSelect = selectEl;
+    const o = allOrders.find(x => x.id === id);
+    document.getElementById('trackingInput').value = o?.tracking_number || '';
+    document.getElementById('trackingOrderId').textContent = o?.order_id || '';
+    document.getElementById('trackingModal').classList.remove('hidden');
+    document.getElementById('trackingInput').focus();
+    return;
+  }
   const { error } = await sb.from('orders').update({ status }).eq('id', id);
-  if (error) alert('更新失败：' + error.message);
+  if (error) { alert('更新失败：' + error.message); if (selectEl) { const o = allOrders.find(x=>x.id===id); selectEl.value = o?.status||status; } return; }
+  const o = allOrders.find(x => x.id === id);
+  if (o) o.status = status;
+  // Update badge in-place without full re-render
+  updateBadge(id, status);
 }
 window.updateOrderStatus = updateOrderStatus;
+
+function updateBadge(id, status) {
+  const badge = document.getElementById('badge_' + id);
+  if (!badge) return;
+  const stLabel = STATUS_LABELS[status] || status;
+  const stCls = STATUS_COLORS[status] || 'bg-stone-100 text-stone-500';
+  badge.textContent = stLabel;
+  badge.className = `px-2 py-1 rounded-full text-xs font-semibold ${stCls}`;
+}
+
+let pendingShipId = null;
+let pendingShipSelect = null;
+
+async function confirmShipping() {
+  const tracking = document.getElementById('trackingInput').value.trim();
+  const id = pendingShipId;
+  if (!id) return;
+
+  const btn = document.getElementById('confirmShipBtn');
+  btn.textContent = '保存中…'; btn.disabled = true;
+
+  const fromDropdown = !!pendingShipSelect;
+  const update = fromDropdown
+    ? { status: 'shipped', tracking_number: tracking }
+    : { tracking_number: tracking };
+
+  const { error } = await sb.from('orders').update(update).eq('id', id);
+  btn.textContent = '确认发货'; btn.disabled = false;
+  if (error) { alert('保存失败：' + error.message); return; }
+
+  const o = allOrders.find(x => x.id === id);
+  if (o) { if (fromDropdown) o.status = 'shipped'; o.tracking_number = tracking; }
+
+  if (fromDropdown) updateBadge(id, 'shipped');
+  const trackEl = document.getElementById('tracking_' + id);
+  if (trackEl) trackEl.textContent = tracking || '—';
+
+  closeTrackingModal();
+}
+window.confirmShipping = confirmShipping;
+
+function closeTrackingModal() {
+  document.getElementById('trackingModal').classList.add('hidden');
+  if (pendingShipSelect && pendingShipId) {
+    const o = allOrders.find(x => x.id === pendingShipId);
+    pendingShipSelect.value = o?.status || 'shipped';
+  }
+  pendingShipId = null;
+  pendingShipSelect = null;
+}
+window.closeTrackingModal = closeTrackingModal;
+
+function editTracking(id) {
+  const o = allOrders.find(x => x.id === id);
+  pendingShipId = id;
+  pendingShipSelect = null;
+  document.getElementById('trackingInput').value = o?.tracking_number || '';
+  document.getElementById('trackingOrderId').textContent = o?.order_id || '';
+  document.getElementById('trackingModal').classList.remove('hidden');
+  document.getElementById('trackingInput').focus();
+}
+window.editTracking = editTracking;
+
+async function saveTracking(id, value) {
+  const tracking_number = value.trim();
+  const { error } = await sb.from('orders').update({ tracking_number }).eq('id', id);
+  if (error) alert('保存失败：' + error.message);
+  else {
+    const o = allOrders.find(x => x.id === id);
+    if (o) o.tracking_number = tracking_number;
+  }
+}
+window.saveTracking = saveTracking;
 
 async function loadProducts() {
   const { data, error } = await sb.from('products').select('*').order('created_at', { ascending: false });

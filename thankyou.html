@@ -101,37 +101,38 @@ const fmt = new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' 
 const pendingRaw = localStorage.getItem('cippy_pending_order');
 const lastRaw = localStorage.getItem('cippy_last_order');
 
-// Always clear cart when Stripe returns with session_id
-if (params.get('session_id')) {
+const method = params.get('method'); // 'billplz' or null (Stripe)
+
+// Clear cart on successful payment return
+if (params.get('session_id') || method === 'billplz') {
   localStorage.removeItem('cippy_cart');
 }
+
+// Stripe: confirm payment + award points server-side
+if (params.get('session_id')) {
+  const orderId = params.get('order');
+  import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm').then(({ createClient }) => {
+    const sb = createClient('https://ilzeziznxzaxxudzhdmu.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI');
+    sb.auth.getSession().then(async ({ data: { session } }) => {
+      if (!orderId) return;
+      try {
+        await fetch('/api/confirm-order', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session?.access_token || ''}`
+          },
+          body: JSON.stringify({ orderId, sessionId: params.get('session_id') })
+        });
+      } catch(e) {}
+    });
+  }).catch(() => {});
+}
+// Billplz: already confirmed via POST callback — nothing to call here
 
 if (pendingRaw) {
   localStorage.setItem('cippy_last_order', pendingRaw);
   localStorage.removeItem('cippy_pending_order');
-
-  import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm').then(({ createClient }) => {
-    const sb = createClient('https://ilzeziznxzaxxudzhdmu.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI');
-    sb.auth.getSession().then(async ({ data: { session } }) => {
-      if (!session) return;
-      try {
-        const { customer, items, totals } = JSON.parse(pendingRaw);
-        const orderId = params.get('order');
-
-        // Mark order as paid (was saved as pending before Stripe redirect)
-        await sb.from('orders')
-          .update({ status: 'paid' })
-          .eq('order_id', orderId);
-
-        // Send confirmation email (best-effort)
-        fetch('/api/send-order-email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
-          body: JSON.stringify({ customer, items, totals, orderId })
-        }).catch(() => {});
-      } catch(e) {}
-    });
-  }).catch(() => {});
 }
 
 const orderIdEl = document.getElementById('orderIdDisplay');

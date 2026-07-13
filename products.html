@@ -3,7 +3,14 @@
 <html lang="en" style=""><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>cippy | Effortless Chic Product Listing</title>
+<title>cippy | Korean Fashion Malaysia — Petite-Friendly Dresses & Tops</title>
+<meta name="description" content="Cippy — petite-friendly Korean fashion for Malaysian women. Shop effortless chic dresses, tops & sets from RM 68. Free shipping over RM 150 in West Malaysia."/>
+<meta property="og:title" content="cippy | Korean Fashion Malaysia"/>
+<meta property="og:description" content="Petite-friendly Korean fashion. Shop dresses, tops & sets from RM 68. Free shipping over RM 150."/>
+<meta property="og:image" content="https://cippy.vercel.app/assets/cippy-logo.png"/>
+<meta property="og:url" content="https://cippy.vercel.app/products.html"/>
+<meta property="og:type" content="website"/>
+<meta name="twitter:card" content="summary_large_image"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&amp;family=Poppins:wght@400;500;600;700&amp;family=Noto+Serif+SC:wght@300;400;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
@@ -66,9 +73,9 @@
 <div class="hidden md:flex gap-md items-center"><a class="text-primary border-b-2 border-primary pb-1 font-label-md text-label-md" href="index.html">New In</a><a class="text-on-surface-variant hover:text-primary transition-opacity duration-300 font-label-md text-label-md" href="products.html">Clothing</a><a class="text-on-surface-variant hover:text-primary transition-opacity duration-300 font-label-md text-label-md" href="products.html">Accessories</a><a class="text-on-surface-variant hover:text-primary transition-opacity duration-300 font-label-md text-label-md" href="products.html">Sale</a><a class="text-on-surface-variant hover:text-primary transition-opacity duration-300 font-label-md text-label-md" href="account.html">Community</a></div>
 </div>
 <div class="flex items-center gap-md">
-<button class="material-symbols-outlined text-on-surface hover:opacity-70 transition-opacity" onclick="document.getElementById('searchBar').classList.toggle('hidden')">search</button>
-<button class="material-symbols-outlined text-on-surface hover:opacity-70 transition-opacity" onclick="location.href='cart.html'">shopping_bag</button>
-<button class="font-label-sm text-label-sm font-semibold px-2 hover:text-primary transition-colors" data-lang-toggle="" onclick="toggleCippyLang()">中文</button><button class="material-symbols-outlined text-on-surface hover:opacity-70 transition-opacity" onclick="location.href='account.html'">person</button>
+<button class="material-symbols-outlined text-on-surface hover:opacity-70 transition-opacity w-11 h-11 flex items-center justify-center" onclick="document.getElementById('searchBar').classList.toggle('hidden')">search</button>
+<button class="material-symbols-outlined text-on-surface hover:opacity-70 transition-opacity w-11 h-11 flex items-center justify-center" onclick="location.href='cart.html'">shopping_bag</button>
+<button class="font-label-sm text-label-sm font-semibold w-11 h-11 flex items-center justify-center hover:text-primary transition-colors" data-lang-toggle="" onclick="toggleCippyLang()">中文</button><button class="material-symbols-outlined text-on-surface hover:opacity-70 transition-opacity w-11 h-11 flex items-center justify-center" onclick="location.href='account.html'">person</button>
 </div>
 </div></nav>
 <div id="searchBar" class="hidden fixed top-[72px] left-0 w-full z-40 bg-white/95 backdrop-blur border-b border-outline-variant px-6 py-3 shadow-sm">
@@ -138,12 +145,12 @@
 </div>
 <div>
 <h4 class="font-label-md text-label-md text-secondary mb-md uppercase tracking-widest">Connect</h4>
-<div class="flex gap-md mb-md">
-<a class="text-on-surface-variant hover:text-primary transition-colors" href="https://instagram.com/cippy.kl" target="_blank"><span class="material-symbols-outlined">photo_camera</span></a>
-<a class="text-on-surface-variant hover:text-primary transition-colors" href="https://wa.me/601119058658" target="_blank"><span class="material-symbols-outlined">chat</span></a>
-<a class="text-on-surface-variant hover:text-primary transition-colors" href="mailto:cippy.kl@gmail.com"><span class="material-symbols-outlined">mail</span></a>
+<div class="flex gap-md mb-md flex-wrap">
+<a class="flex items-center gap-1 text-on-surface-variant hover:text-primary transition-colors font-label-sm text-label-sm" href="https://instagram.com/cippy.kl" target="_blank"><span class="material-symbols-outlined text-[18px]">photo_camera</span> @cippy.kl</a>
+<a class="flex items-center gap-1 text-on-surface-variant hover:text-primary transition-colors font-label-sm text-label-sm" href="https://wa.me/601119058658" target="_blank"><span class="material-symbols-outlined text-[18px]">chat</span> WhatsApp</a>
+<a class="flex items-center gap-1 text-on-surface-variant hover:text-primary transition-colors font-label-sm text-label-sm" href="https://tiktok.com/@cippy.kl" target="_blank"><span class="material-symbols-outlined text-[18px]">play_circle</span> TikTok</a>
 </div>
-<p class="font-body-sm text-body-sm text-on-surface-variant">© 2024 cippy Malaysia. All Rights Reserved.</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">© 2025 cippy Malaysia. All Rights Reserved.</p>
 </div>
 </div>
 </footer>
@@ -238,6 +245,7 @@
     const bar = document.getElementById('announcementBar');
     bar.textContent = data.value;
     bar.classList.remove('hidden');
+    window.recollectCippyLang?.();
   }
 })();
 </script>
@@ -261,8 +269,24 @@ async function loadProducts() {
 
   if (error || !data) return;
   allProducts = data;
+  updateCategoryBtns();
   setActiveCategory(currentCategory);
   renderProducts();
+}
+
+function updateCategoryBtns() {
+  const catMap = { dress:'dresses', top:'tops', bottom:'pants', outerwear:'outerwear', set:'sets', accessories:'accessories' };
+  document.querySelectorAll('.cat-btn[data-cat]').forEach(btn => {
+    const cat = (btn.dataset.cat || '').toLowerCase();
+    if (!cat) return; // "All" always visible
+    const hasProducts = allProducts.some(p => {
+      const c = (p.category || '').toLowerCase();
+      return (catMap[c] || c) === cat;
+    });
+    btn.classList.toggle('opacity-30', !hasProducts);
+    btn.classList.toggle('pointer-events-none', !hasProducts);
+    btn.title = hasProducts ? '' : 'Coming soon';
+  });
 }
 
 function renderProducts() {
@@ -304,15 +328,18 @@ function renderProducts() {
     <div class="product-card group cursor-pointer" onclick="location.href='product.html?id=${p.id}'" ${imgsAttr}>
       <div class="relative overflow-hidden rounded-xl bg-surface-container-low shadow-sm transition-all duration-300 hover:shadow-xl">
         ${p.image_url
-          ? `<div class="w-full aspect-[3/4] overflow-hidden"><img class="card-img w-full h-full object-cover transition-opacity duration-300" src="${p.image_url}" alt="${p.name_zh || p.name}"/></div>`
+          ? `<div class="w-full aspect-[3/4] overflow-hidden"><img class="card-img w-full h-full object-cover transition-opacity duration-300" src="${p.image_url}" alt="${p.name_zh || p.name}" loading="lazy"/></div>`
           : `<div class="w-full aspect-[3/4] bg-surface-container flex items-center justify-center text-on-surface-variant/30 text-5xl">📦</div>`
         }
         <button data-product-id="${p.id}" class="absolute top-4 right-4 z-10 w-10 h-10 bg-white/60 backdrop-blur-md rounded-full flex items-center justify-center text-primary transition-all hover:bg-white active:scale-90" onclick="event.stopPropagation();toggleHeart(this,{id:'${p.id}',name_zh:${JSON.stringify(p.name_zh||p.name||'')},name:${JSON.stringify(p.name||'')},price_myr:'${p.price_myr||p.price||0}',image_url:${JSON.stringify(p.image_url||'')}})">
           <span class="material-symbols-outlined">favorite</span>
         </button>
         <div class="p-4">
-          ${p.is_new ? `<div class="flex gap-xs mb-2"><span class="px-2 py-1 bg-primary-fixed text-on-primary-fixed-variant rounded-full text-[10px] font-bold uppercase tracking-wider">#新品</span></div>` : ''}
-          <h3 class="font-headline-md text-[18px] leading-tight mb-1">${p.name_zh || p.name}</h3>
+          <div class="flex gap-xs mb-2 flex-wrap">
+            ${p.is_new ? `<span class="px-2 py-1 bg-primary-fixed text-on-primary-fixed-variant rounded-full text-[10px] font-bold uppercase tracking-wider">${window.getCippyLang?.() === 'zh' ? '#新品' : '#New'}</span>` : ''}
+            ${!p.in_stock ? `<span class="px-2 py-1 bg-surface-container-highest text-on-surface-variant rounded-full text-[10px] font-bold uppercase tracking-wider">${window.getCippyLang?.() === 'zh' ? '售罄' : 'Sold Out'}</span>` : (p.stock > 0 && p.stock <= 5) ? `<span class="px-2 py-1 bg-error-container text-on-error-container rounded-full text-[10px] font-bold tracking-wider">${window.getCippyLang?.() === 'zh' ? `仅剩 ${p.stock} 件` : `Only ${p.stock} left`}</span>` : ''}
+          </div>
+          <h3 class="font-headline-md text-[18px] leading-tight mb-1">${window.getCippyLang?.() === 'zh' ? (p.name_zh || p.name) : (p.name || p.name_zh)}</h3>
           <p class="font-label-md text-on-surface mb-2">MYR ${parseFloat(p.price_myr || p.price).toFixed(2)}</p>
         </div>
       </div>
@@ -397,5 +424,8 @@ function setSort(sort) {
 window.setSort = setSort;
 
 loadProducts();
+
+// Re-render product cards when language toggles
+window.onCippyLangChange = () => renderProducts();
 </script>
 </body></html>

@@ -284,31 +284,43 @@
 </div>
 </div>
 <div class="flex-1 order-1 md:order-2 space-y-8">
-<h2 class="font-headline-lg text-headline-lg text-on-surface">How it Works</h2>
-<div class="space-y-8">
-<div class="flex items-start gap-6">
-<div class="w-12 h-12 flex-shrink-0 bg-primary-fixed text-primary rounded-xl flex items-center justify-center font-bold">1</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">玩法介绍</h2>
+<div class="space-y-6">
+
+<div class="flex items-start gap-5">
+<div class="w-12 h-12 flex-shrink-0 bg-primary-fixed text-primary rounded-xl flex items-center justify-center font-bold text-label-md">1</div>
 <div>
-<h4 class="font-label-md text-label-md text-on-surface mb-2">Shop &amp; Earn</h4>
-<p class="font-body-sm text-body-sm text-on-surface-variant">Every RM1 spent earns you 1 point. Accumulate points with every purchase, online or in-store.</p>
+<h4 class="font-label-md text-label-md text-on-surface mb-1">购物赚积分</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">每消费 RM1 即可赚取 1 积分，等级越高积分倍率越高。积分永不过期，随时可用。</p>
 </div>
 </div>
-<div class="flex items-start gap-6">
-<div class="w-12 h-12 flex-shrink-0 bg-primary-fixed text-primary rounded-xl flex items-center justify-center font-bold">2</div>
+
+<div class="flex items-start gap-5">
+<div class="w-12 h-12 flex-shrink-0 rounded-xl flex items-center justify-center font-bold text-label-md" style="background:#fff3cd;color:#b45309;">2</div>
 <div>
-<h4 class="font-label-md text-label-md text-on-surface mb-2">Accumulate Points</h4>
-<p class="font-body-sm text-body-sm text-on-surface-variant">Watch your points grow. 500 points can be redeemed for RM50 credit on your next haul.</p>
+<h4 class="font-label-md text-label-md text-on-surface mb-1">充值享 5% 返现 <span class="ml-1 text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full uppercase tracking-wide font-bold">限时</span></h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">充值购物金即享 <strong class="text-on-surface">5% 返现</strong>，充 RM100 到账 RM105。余额可直接抵扣购物，随时使用无门槛。</p>
 </div>
 </div>
-<div class="flex items-start gap-6">
-<div class="w-12 h-12 flex-shrink-0 bg-primary-fixed text-primary rounded-xl flex items-center justify-center font-bold">3</div>
+
+<div class="flex items-start gap-5">
+<div class="w-12 h-12 flex-shrink-0 bg-primary-fixed text-primary rounded-xl flex items-center justify-center font-bold text-label-md">3</div>
 <div>
-<h4 class="font-label-md text-label-md text-on-surface mb-2">Unlock Tiers</h4>
-<p class="font-body-sm text-body-sm text-on-surface-variant">The more you spend, the faster you climb. Higher tiers unlock multipliers and secret perks.</p>
+<h4 class="font-label-md text-label-md text-on-surface mb-1">积分兑购物金</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">累积满 100 积分即可兑换 RM10 购物金，在结账时直接抵扣，省得轻松。</p>
 </div>
 </div>
+
+<div class="flex items-start gap-5">
+<div class="w-12 h-12 flex-shrink-0 bg-primary-fixed text-primary rounded-xl flex items-center justify-center font-bold text-label-md">4</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface mb-1">消费升级，专属特权</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">消费越多等级越高。Luxe 享 1.5 倍积分 + 生日礼遇，Elite 享 2 倍积分 + 无条件包邮。</p>
 </div>
-<button class="bg-primary-container text-on-primary-container px-8 py-3 rounded-full font-label-md text-label-md mt-6 hover:opacity-90 transition-opacity">Learn More</button>
+</div>
+
+</div>
+<a href="#tiers" class="inline-block bg-primary text-on-primary px-8 py-3 rounded-none font-label-md text-label-md mt-4 hover:opacity-80 transition-opacity">查看会员等级 →</a>
 </div>
 </div>
 </section>
@@ -577,8 +589,20 @@
             }).join('');
         }
 
-        sb.auth.onAuthStateChange((_, session) => handleUser(session?.user || null));
-        sb.auth.getSession().then(({ data: { session } }) => handleUser(session?.user || null));
+        let currentUserId = null;
+        sb.auth.onAuthStateChange((event, session) => {
+          const newUserId = session?.user?.id || null;
+          // Different user logged in — clear previous user's local data
+          if (newUserId && newUserId !== currentUserId && currentUserId !== null) {
+            ['cippy_cart','cippy_last_order','cippy_pending_order','cippy_addresses'].forEach(k => localStorage.removeItem(k));
+          }
+          currentUserId = newUserId;
+          handleUser(session?.user || null);
+        });
+        sb.auth.getSession().then(({ data: { session } }) => {
+          currentUserId = session?.user?.id || null;
+          handleUser(session?.user || null);
+        });
 
         createBtn.addEventListener('click', async () => {
             const { name, email, password } = getFields();
@@ -603,7 +627,10 @@
             setStatus('验证邮件已重新发送，请查收。');
         });
 
-        signOutBtn.addEventListener('click', async () => { await sb.auth.signOut(); });
+        signOutBtn.addEventListener('click', async () => {
+          ['cippy_cart','cippy_last_order','cippy_pending_order','cippy_addresses'].forEach(k => localStorage.removeItem(k));
+          await sb.auth.signOut();
+        });
 </script>
 <script>
         // Simple intersection observer for reveal animations

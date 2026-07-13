@@ -3,7 +3,13 @@
 <html class="scroll-smooth" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>cippy | Effortless Chic Fashion</title>
+<title>cippy | Korean Fashion Malaysia</title>
+<meta name="description" content="Shop petite-friendly Korean fashion at cippy Malaysia. Effortless chic dresses, tops & sets from RM 68. Free shipping over RM 150."/>
+<meta property="og:title" content="cippy | Korean Fashion Malaysia"/>
+<meta property="og:description" content="Petite-friendly Korean fashion. Shop from RM 68. Free shipping over RM 150."/>
+<meta property="og:image" content="https://cippy.vercel.app/assets/cippy-logo.png"/>
+<meta property="og:type" content="product"/>
+<meta name="twitter:card" content="summary_large_image"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&amp;family=Poppins:wght@400;500;600;700&amp;family=Noto+Serif+SC:wght@300;400;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
@@ -164,7 +170,7 @@
 </div>
 <!-- Right: Sticky Product Info -->
 <div class="md:col-span-5 h-fit md:sticky md:top-32 space-y-base">
-<div id="productNotFound" class="hidden py-24 text-center text-on-surface-variant">找不到此商品</div>
+<div id="productNotFound" class="hidden py-24 text-center text-on-surface-variant">Product not found</div>
 <div id="productInfo">
 <div class="space-y-2">
 <span id="productBadge" class="hidden font-label-sm text-label-sm text-primary bg-primary-fixed px-3 py-1">New Arrival</span>
@@ -211,7 +217,7 @@
     <div class="overflow-x-auto">
       <table class="w-full text-sm text-center border-collapse">
         <thead><tr class="bg-surface-container-low text-xs text-on-surface-variant">
-          <th class="py-2 px-3 text-left">尺码</th>
+          <th class="py-2 px-3 text-left">Size</th>
           <th class="py-2 px-3">胸围</th>
           <th class="py-2 px-3">肩宽</th>
           <th class="py-2 px-3">腰围</th>
@@ -238,7 +244,7 @@
 </div>
 <!-- Mini Pairing Widget -->
 <div id="miniPairingWidget" class="hidden pt-lg">
-  <p class="font-label-md text-xs text-on-surface-variant uppercase tracking-widest mb-2">推荐搭配</p>
+  <p class="font-label-md text-xs text-on-surface-variant uppercase tracking-widest mb-2">Recommended Pairing</p>
   <a id="miniPairingLink" href="#" class="flex items-center gap-3 p-3 bg-surface-container-low rounded-xl hover:bg-surface-container transition-colors group">
     <img id="miniPairingImg" src="" alt="" class="w-12 h-16 object-cover rounded-lg flex-none"/>
     <div class="flex-1 min-w-0">
@@ -246,7 +252,7 @@
       <p id="miniPairingPrice" class="text-xs text-primary mt-1"></p>
     </div>
     <div class="text-center flex-none">
-      <p class="text-[10px] text-on-surface-variant">套装省</p>
+      <p class="text-[10px] text-on-surface-variant">Bundle Save</p>
       <p id="miniPairingSave" class="font-label-md text-sm text-primary font-bold"></p>
     </div>
     <span class="material-symbols-outlined text-on-surface-variant text-sm group-hover:translate-x-1 transition-transform">arrow_forward_ios</span>
@@ -289,7 +295,7 @@
 </section>
 <!-- Complete the Look / 推荐搭配 -->
 <section id="pairingSection" class="hidden mt-xl border-t border-surface-container-highest pt-xl">
-  <h2 class="font-headline-md text-on-surface mb-md">推荐搭配</h2>
+  <h2 class="font-headline-md text-on-surface mb-md">Complete the Look</h2>
   <div class="flex gap-md items-stretch bg-surface-container-low rounded-2xl p-md">
     <!-- Current product mini card -->
     <div class="flex-1 flex flex-col items-center gap-2 text-center">
@@ -313,118 +319,19 @@
   <!-- Bundle pricing -->
   <div class="mt-md p-md bg-primary-fixed/30 rounded-xl flex flex-col gap-2">
     <div class="flex justify-between items-center">
-      <span class="font-label-md text-sm text-on-surface">两件合计</span>
+      <span class="font-label-md text-sm text-on-surface">Both items</span>
       <span id="pairingTotal" class="font-label-md text-sm line-through text-on-surface-variant"></span>
     </div>
     <div class="flex justify-between items-center">
-      <span class="font-label-md text-sm text-primary font-bold">套装优惠价</span>
+      <span class="font-label-md text-sm text-primary font-bold">Bundle Price</span>
       <span id="pairingBundlePrice" class="font-headline-md text-primary"></span>
     </div>
     <p id="pairingSavings" class="text-xs text-on-surface-variant"></p>
   </div>
   <button id="pairingAddBothBtn" onclick="addBothToBag()" class="mt-md w-full py-4 bg-on-surface text-background rounded-none font-label-md hover:opacity-80 active:scale-95 transition-all flex items-center justify-center gap-2">
     <span class="material-symbols-outlined text-sm">shopping_bag</span>
-    两件一起加入购物车
+    Add both to cart
   </button>
-</section>
-<!-- Social Media Styled Reviews -->
-<section class="mt-xl border-t border-surface-container-highest pt-xl">
-<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-lg">
-<div class="space-y-2">
-<h2 class="font-headline-lg text-headline-lg">Community Feed</h2>
-<p class="font-body-md text-on-surface-variant">See how our community is styling the Lumière Midi.</p>
-</div>
-<div class="flex items-center gap-4">
-<div class="text-right">
-<div class="flex gap-1 justify-end">
-<span class="material-symbols-outlined text-on-surface-variant" style="font-variation-settings: 'FILL' 1;">star</span>
-<span class="material-symbols-outlined text-on-surface-variant" style="font-variation-settings: 'FILL' 1;">star</span>
-<span class="material-symbols-outlined text-on-surface-variant" style="font-variation-settings: 'FILL' 1;">star</span>
-<span class="material-symbols-outlined text-on-surface-variant" style="font-variation-settings: 'FILL' 1;">star</span>
-<span class="material-symbols-outlined text-on-surface-variant" style="font-variation-settings: 'FILL' 1;">star</span>
-</div>
-<p class="font-label-sm text-label-sm mt-1">4.9/5 based on 124 reviews</p>
-</div>
-<button class="px-6 py-3 bg-on-surface text-background rounded-full font-label-md">Write a Review</button>
-</div>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
-<!-- Review 1 -->
-<div class="bg-white p-6 rounded-2xl shadow-sm space-y-4">
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-full bg-secondary-fixed-dim overflow-hidden">
-<img class="w-full h-full object-cover" data-alt="Profile headshot for Sophia Chen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAckI2iIjpwaiH3E5rYTLa-uUCOnMqKXImawofgtnBE8NWqq3G29coWPdSKQo2uYHt76gKQur-wuo-Xf5Bd0nQP5trpko7cENWyOVOCLSMhhxdyPH--QolIlPAGoqWz4mOr9ig-M6guVc4cyWYd-5VRxkN0Cv4V6Kb4XnmF68BIKmuyRrZBM7HekUwBOdRveZSC2efL2ZuOGxl7LeK6NpzBT9MXEzBIBLv-iQN1-3EVzub3NcmzT1uc71YwSX8dvAB8qBfRxPcKUEw"/>
-</div>
-<div>
-<p class="font-label-md text-label-md">@sophia_chen</p>
-<p class="text-on-surface-variant text-[10px] uppercase tracking-widest">Kuala Lumpur • 2 days ago</p>
-</div>
-</div>
-<p class="font-body-md text-body-md">The quality is amazing for the price! Wore this for my birthday brunch at Bangsar and got so many compliments. The linen is actually quite soft and doesn't itch at all. ✨</p>
-<div class="aspect-square rounded-xl overflow-hidden">
-<img class="w-full h-full object-cover" data-alt="Community styling photo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6YQF0MMCYKt24XcU0LMbd7xjfRg2kgwByfd73oXJJx8YLuvqTX9VbqCfZYyqUNe4LHODNi16sFFZycU8h-66KtKyPEYMA-kmc3kCxXsbVTIFSpR8Zv4YBa_V7ETuL-Hvj0V6FntPf_he7pSpyPhodDT4dS0CDdFhwAu7DGLu1pfYn-TBogQG6z64tbJfMy64xPOUB_ZgcHG9N0Mhp5iPI1hdXGpIpAdO0jIBKySccKLh-7c56Hw_UahxZQTcT1GaJJARgJeMc_-k"/>
-</div>
-<div class="flex items-center gap-4 text-on-surface-variant">
-<button class="flex items-center gap-1 hover:text-primary transition-colors">
-<span class="material-symbols-outlined text-[18px]">favorite</span>
-<span class="text-xs">42</span>
-</button>
-<button class="flex items-center gap-1 hover:text-primary transition-colors">
-<span class="material-symbols-outlined text-[18px]">chat_bubble</span>
-<span class="text-xs">12</span>
-</button>
-</div>
-</div>
-<!-- Review 2 -->
-<div class="bg-white p-6 rounded-2xl shadow-sm space-y-4">
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-full bg-secondary-fixed-dim overflow-hidden">
-<img class="w-full h-full object-cover" data-alt="Profile headshot for Amirul M" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhqujio6doRSBxeGy-4PpPM0eVzH2iUsMO9_aSdTUKYacClZVD-JYxJImLppsbrzMwPqPV0Af2PTbZGC9ovX6OfcUMsZqrNEIyABS5PH8M6KQwVrretgd5RHqwlgn26ja-44EHzXUMBbCHTXAafTV0nX0BHqdBq22DyAnvquFlpiFYoNQ_FAQBMY-vCAKcHo_RiDajqSAmzodppm-lEbNxh2VZPhk9KUYXwtrAcWrLI0pwJaxdfmwCEiEx3NvalcywQ-qOPGY03w0"/>
-</div>
-<div>
-<p class="font-label-md text-label-md">@amirul_m</p>
-<p class="text-on-surface-variant text-[10px] uppercase tracking-widest">Penang • 5 days ago</p>
-</div>
-</div>
-<p class="font-body-md text-body-md">Bought this for my sister's graduation. Shipping was super fast to Penang. The packaging was so aesthetic, felt like unboxing a gift. 10/10 service!</p>
-<div class="flex items-center gap-4 text-on-surface-variant">
-<button class="flex items-center gap-1 hover:text-primary transition-colors">
-<span class="material-symbols-outlined text-[18px]">favorite</span>
-<span class="text-xs">28</span>
-</button>
-<button class="flex items-center gap-1 hover:text-primary transition-colors">
-<span class="material-symbols-outlined text-[18px]">chat_bubble</span>
-<span class="text-xs">5</span>
-</button>
-</div>
-</div>
-<!-- Review 3 -->
-<div class="bg-white p-6 rounded-2xl shadow-sm space-y-4">
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-full bg-secondary-fixed-dim overflow-hidden">
-<img class="w-full h-full object-cover" data-alt="Profile headshot for Zara Styles" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnyZ9jF-fozBc7n1NufiMF97X8vPNxEMY-zMbcPi7Ot-9qLlJJzJAzk0us6hC2YYRhAf3UMJv5EuK91bPtKBuuHA6uaIoA3bNOq_mQxUL1ntmesGv5gSB0dC3gc8SIV9cbagLcb4-jH_h1g3OGmFBugWCqY4tw6R3VK-y9ZCi9U2432ixNac1mFFKpxwM-f5cO241Q5_yunxMlvUI-NScqk3C4vPxQpq4NxGxqxJH9bDZ1U0nEXG3IUOTRC793ijbuuMjkop9k5Kc"/>
-</div>
-<div>
-<p class="font-label-md text-label-md">@zara_styles</p>
-<p class="text-on-surface-variant text-[10px] uppercase tracking-widest">Shah Alam • 1 week ago</p>
-</div>
-</div>
-<p class="font-body-md text-body-md">Perfect length for hijabis too if you pair it with a nice long-sleeve inner or a blazer. The material is thick enough that it's not see-through. My new fav dress.</p>
-<div class="aspect-square rounded-xl overflow-hidden">
-<img class="w-full h-full object-cover" data-alt="Styling reference photo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMfD_-pPL5koPihHx8pgul8L1477fCQB27LLH99CTMOZ9bw-WLwFU5Ff1HeCU8ZcTf1Eo--sA2xfX5fjEmNmsmiIaNt4FYtPnkB1PDI5CuLqJ_s_q4740cMoGBtxPydtq9dkczWl9xqAqkDmFFKyxnu48lvpOgX059cBzm655I0VJg3LcZqDVTe7o0uttuc8E7bKSdFGZthQPLeOHpQJg4wnxVgiunO521eFVQO3mNisLKGwejDMdSef8OrYK_3hRctWxr7BIWUG4"/>
-</div>
-<div class="flex items-center gap-4 text-on-surface-variant">
-<button class="flex items-center gap-1 hover:text-primary transition-colors">
-<span class="material-symbols-outlined text-[18px]">favorite</span>
-<span class="text-xs">156</span>
-</button>
-<button class="flex items-center gap-1 hover:text-primary transition-colors">
-<span class="material-symbols-outlined text-[18px]">chat_bubble</span>
-<span class="text-xs">24</span>
-</button>
-</div>
-</div>
-</div>
 </section>
 </main>
 <!-- Footer -->
@@ -518,11 +425,11 @@ function initWishlistBtn(p) {
   if (inList) {
     icon.style.fontVariationSettings = "'FILL' 1";
     icon.style.color = '#e11d48';
-    label.textContent = '已收藏';
+    label.textContent = window.getCippyLang?.() === 'zh' ? '已收藏' : 'Saved ♡';
   } else {
     icon.style.fontVariationSettings = "'FILL' 0";
     icon.style.color = '';
-    label.textContent = 'Save to Wishlist';
+    label.textContent = window.getCippyLang?.() === 'zh' ? '收藏到心愿单' : 'Save to Wishlist';
   }
 }
 
@@ -534,11 +441,11 @@ function toggleWishlist() {
   if (idx === -1) {
     list.push({ id: p.id, name_zh: p.name_zh || p.name, name: p.name, price_myr: p.price_myr || p.price || 0, image_url: p.image_url || '' });
     saveWishlist(list);
-    showToast('已加入心愿单 ♡');
+    showToast(window.getCippyLang?.() === 'zh' ? '已加入心愿单 ♡' : 'Added to wishlist ♡');
   } else {
     list.splice(idx, 1);
     saveWishlist(list);
-    showToast('已移出心愿单');
+    showToast(window.getCippyLang?.() === 'zh' ? '已移出心愿单' : 'Removed from wishlist');
   }
   initWishlistBtn(p);
 }
@@ -546,10 +453,11 @@ function toggleWishlist() {
 function addToBag() {
   if (!_productData) return;
   const p = _productData;
+  const zh = window.getCippyLang?.() === 'zh';
   const variants = p.variants || [];
-  if (variants.length && !selectedVariant) { showToast('Please select a variant first'); return; }
+  if (variants.length && !selectedVariant) { showToast(zh ? '请先选择款式' : 'Please select a variant first'); return; }
   const sizes = p.sizes || [];
-  if (sizes.length && !selectedSize) { showToast('Please select a size'); return; }
+  if (sizes.length && !selectedSize) { showToast(zh ? '请先选择尺码' : 'Please select a size'); return; }
   const cart = JSON.parse(localStorage.getItem('cippy_cart') || '[]');
   const key = `${p.id}|${selectedVariant?.name||''}|${selectedColor||''}|${selectedSize||''}`;
   const existing = cart.find(c => c._key === key);
@@ -569,15 +477,17 @@ function addToBag() {
     });
   }
   localStorage.setItem('cippy_cart', JSON.stringify(cart));
-  showToast('Added to bag ✓');
+  showToast(window.getCippyLang?.() === 'zh' ? '已加入购物袋 ✓' : 'Added to bag ✓');
 }
 
 function applyProductLang(lang) {
   if (!_productData) return;
   const p = _productData;
-  document.getElementById('productName').textContent = lang === 'zh' && p.name_zh ? p.name_zh : (p.name || '');
+  document.getElementById('productName').textContent = lang === 'zh' && p.name_zh ? p.name_zh : (p.name || p.name_zh || '');
   document.getElementById('productDesc').textContent = p.description || '';
-  document.title = `cippy | ${lang === 'zh' && p.name_zh ? p.name_zh : (p.name || '商品')}`;
+  document.title = `cippy | ${lang === 'zh' && p.name_zh ? p.name_zh : (p.name || p.name_zh || '商品')}`;
+  // Re-collect so spec labels/values and color buttons get re-translated
+  if (window.recollectCippyLang) window.recollectCippyLang();
 }
 
 window.onCippyLangChange = applyProductLang;
@@ -723,10 +633,19 @@ async function loadProduct() {
 
   // Specs table
   const specs = [];
-  if (p.clothing_type) specs.push(['类型', p.clothing_type]);
-  if (p.fabric) specs.push(['面料', p.fabric]);
-  if (p.series) specs.push(['系列', p.series]);
-  if (p.sizes && p.sizes.length) specs.push(['尺码', p.sizes.map(s => s.size).join(' / ')]);
+  const isZh = window.getCippyLang?.() === 'zh';
+  if (p.model_height || p.model_weight || p.model_size) {
+    const parts = [p.model_height, p.model_weight, p.model_size].filter(Boolean).join(' · ');
+    specs.push([isZh ? '模特参考' : 'Model Info', parts]);
+  }
+  if (p.clothing_type) specs.push([isZh ? '类型' : 'Type', p.clothing_type]);
+  if (p.fabric) specs.push([isZh ? '面料' : 'Fabric', p.fabric]);
+  if (p.lining != null) specs.push([isZh ? '内衬' : 'Lining', p.lining]);
+  if (p.stretch != null) specs.push([isZh ? '弹性' : 'Stretch', p.stretch]);
+  if (p.transparency != null) specs.push([isZh ? '透肤' : 'Transparency', p.transparency]);
+  if (p.care) specs.push([isZh ? '洗涤' : 'Care', p.care]);
+  if (p.series) specs.push([isZh ? '系列' : 'Series', p.series]);
+  if (p.sizes && p.sizes.length) specs.push([isZh ? '尺码' : 'Size', p.sizes.map(s => s.size).join(' / ')]);
 
   if (specs.length) {
     document.getElementById('specsBlock').classList.remove('hidden');
@@ -760,20 +679,26 @@ async function loadProduct() {
       const total = thisPrice + otherPrice;
       const bundlePrice = total - discount;
 
+      const _zh = window.getCippyLang?.() === 'zh';
+      const _pName = _zh ? (p.name_zh || p.name || '') : (p.name || p.name_zh || '');
+      const _oName = _zh ? (pair.name_zh || pair.name || '') : (pair.name || pair.name_zh || '');
+
       document.getElementById('pairingThisImg').src = p.image_url || '';
-      document.getElementById('pairingThisImg').alt = p.name_zh || p.name || '';
-      document.getElementById('pairingThisName').textContent = p.name_zh || p.name || '';
+      document.getElementById('pairingThisImg').alt = _pName;
+      document.getElementById('pairingThisName').textContent = _pName;
       document.getElementById('pairingThisPrice').textContent = `RM ${thisPrice.toFixed(2)}`;
 
       document.getElementById('pairingOtherLink').href = `product.html?id=${pair.id}`;
       document.getElementById('pairingOtherImg').src = pair.image_url || '';
-      document.getElementById('pairingOtherImg').alt = pair.name_zh || pair.name || '';
-      document.getElementById('pairingOtherName').textContent = pair.name_zh || pair.name || '';
+      document.getElementById('pairingOtherImg').alt = _oName;
+      document.getElementById('pairingOtherName').textContent = _oName;
       document.getElementById('pairingOtherPrice').textContent = `RM ${otherPrice.toFixed(2)}`;
 
       document.getElementById('pairingTotal').textContent = `RM ${total.toFixed(2)}`;
       document.getElementById('pairingBundlePrice').textContent = `RM ${bundlePrice.toFixed(2)}`;
-      document.getElementById('pairingSavings').textContent = `省 RM ${discount.toFixed(2)}，比单独购买更划算 🎉`;
+      document.getElementById('pairingSavings').textContent = _zh
+        ? `省 RM ${discount.toFixed(2)}，比单独购买更划算 🎉`
+        : `Save RM ${discount.toFixed(2)} vs buying separately 🎉`;
 
       window._pairingData = { pair, thisPrice, otherPrice, discount, bundlePrice };
       document.getElementById('pairingSection').classList.remove('hidden');
@@ -781,8 +706,8 @@ async function loadProduct() {
       // Mini widget
       document.getElementById('miniPairingLink').href = `product.html?id=${pair.id}`;
       document.getElementById('miniPairingImg').src = pair.image_url || '';
-      document.getElementById('miniPairingImg').alt = pair.name_zh || pair.name || '';
-      document.getElementById('miniPairingName').textContent = pair.name_zh || pair.name || '';
+      document.getElementById('miniPairingImg').alt = _oName;
+      document.getElementById('miniPairingName').textContent = _oName;
       document.getElementById('miniPairingPrice').textContent = `RM ${otherPrice.toFixed(2)}`;
       document.getElementById('miniPairingSave').textContent = `RM ${discount.toFixed(2)}`;
       document.getElementById('miniPairingWidget').classList.remove('hidden');
@@ -819,7 +744,7 @@ function addBothToBag() {
   }
 
   localStorage.setItem('cippy_cart', JSON.stringify(cart));
-  showToast('套装已加入购物车 ✓');
+  showToast(window.getCippyLang?.() === 'zh' ? '套装已加入购物袋 ✓' : 'Outfit added to bag ✓');
 }
 
 function showNotFound() {
@@ -837,6 +762,7 @@ loadProduct();
     const bar = document.getElementById('announcementBar');
     bar.textContent = data.value;
     bar.classList.remove('hidden');
+    window.recollectCippyLang?.();
   }
 })();
 </script>

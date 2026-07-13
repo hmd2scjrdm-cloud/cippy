@@ -148,17 +148,52 @@ export default async function handler(req, res) {
 
   if (!process.env.STRIPE_SECRET_KEY) return res.status(500).json({ error: "Stripe not configured" });
 
-  const { customer = {}, items = [], totals = {}, giftNote = "" } = req.body || {};
+  const { customer = {}, items = [], totals = {}, giftNote = "", guestMode = false } = req.body || {};
   if (!Array.isArray(items) || items.length === 0) return res.status(400).json({ error: "Cart is empty" });
 
   const token = (req.headers.authorization || "").replace("Bearer ", "");
-  const user = await getVerifiedUser(req);
-  if (!user) return res.status(401).json({ error: "请先登录账号" });
-  if (!user.email_confirmed_at && !user.confirmed_at) return res.status(403).json({ error: "请先验证邮箱" });
+  const user = token ? await getVerifiedUser(req) : null;
+  // Guest checkout allowed — only skip if neither guest nor logged in
+  if (!guestMode && !user) return res.status(401).json({ error: "请先登录账号" });
+  if (user && !user.email_confirmed_at && !user.confirmed_at) return res.status(403).json({ error: "请先验证邮箱" });
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-  const orderId = `CIPPY-${Date.now().toString().slice(-8)}`;
-  const orderTotal = Number(totals.total || 0);
+
+  // Sequential order number starting from 100010
+  const countRes = await fetch(`${SUPABASE_URL}/rest/v1/orders?select=id`, {
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${token}`, Prefer: 'count=exact', Range: '0-0' },
+  });
+  const contentRange = countRes.headers.get('content-range') || '0/0';
+  const totalOrders = parseInt(contentRange.split('/')[1] || '0', 10);
+  const orderId = String(100010 + totalOrders);
+
+  // Fetch real prices from DB — never trust frontend price
+  const productIds = [...new Set(items.map(i => i.product_id || i.id).filter(Boolean))];
+  const priceRes = await fetch(
+    `${SUPABASE_URL}/rest/v1/products?id=in.(${productIds.join(',')})&select=id,price_myr,name_zh,name,image_url`,
+    { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${token}` } }
+  );
+  const dbProducts = priceRes.ok ? await priceRes.json() : [];
+  const priceMap = Object.fromEntries(dbProducts.map(p => [p.id, p]));
+
+  // Validate every item has a known product with a real price
+  for (const item of items) {
+    const pid = item.product_id || item.id;
+    if (!pid || !priceMap[pid]) return res.status(400).json({ error: `商品不存在：${item.name_zh || pid}` });
+    const dbPrice = Number(priceMap[pid].price_myr || 0);
+    if (dbPrice <= 0) return res.status(400).json({ error: `商品价格异常：${item.name_zh}` });
+    // Use variant price if applicable (variants can have different prices)
+    const variantPrice = item.variant_price_myr ? Number(item.variant_price_myr) : null;
+    item._verified_price = variantPrice && variantPrice > 0 ? variantPrice : dbPrice;
+  }
+
+  const shipping = Number(totals.shipping || 0);
+  const verifiedSubtotal = items.reduce((s, i) => s + i._verified_price * Number(i.qty || 1), 0);
+  const verifiedTotal = verifiedSubtotal + shipping;
+  const orderTotal = verifiedTotal;
+
+  // Rebuild totals from verified prices
+  const verifiedTotals = { ...totals, subtotal: verifiedSubtotal, total: verifiedTotal };
 
   const line_items = items.map(item => ({
     price_data: {
@@ -168,12 +203,11 @@ export default async function handler(req, res) {
         description: [item.size, item.color, item.variant].filter(Boolean).join(" / ") || undefined,
         images: item.image_url ? [item.image_url] : undefined,
       },
-      unit_amount: Math.round(Number(item.price_myr || 0) * 100),
+      unit_amount: Math.round(item._verified_price * 100),
     },
     quantity: Number(item.qty || 1),
   }));
 
-  const shipping = Number(totals.shipping || 0);
   if (shipping > 0) {
     line_items.push({
       price_data: { currency: "myr", product_data: { name: "Shipping" }, unit_amount: Math.round(shipping * 100) },
@@ -185,43 +219,40 @@ export default async function handler(req, res) {
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ["card"],
     mode: "payment",
-    customer_email: user.email,
+    customer_email: user?.email || customer.email || undefined,
     line_items,
     metadata: { orderId, customerName: String(customer.name || "").slice(0, 500) },
     success_url: `${origin}/thankyou.html?order=${orderId}&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/cart.html`,
   });
 
-  // Save order to Supabase
+  // Save order to Supabase with verified prices
   await sbPost("orders", {
     order_id: orderId,
-    user_id: user.id,
+    user_id: user?.id || null,
+    guest_email: user ? null : (customer.email || null),
     customer,
-    items,
-    totals,
+    items: items.map(i => ({ ...i, price_myr: i._verified_price })),
+    totals: verifiedTotals,
     status: "pending",
     stripe_session_id: session.id,
   }, token);
 
-  // Update points
-  let pointsInfo = { pointsEarned: 0 };
-  try { pointsInfo = await updatePoints(token, user.id, orderTotal); } catch (e) {}
-
-  // Send confirmation email
+  // Send confirmation email (points not yet awarded — awarded after payment on thankyou.html)
   if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
     try {
       const transporter = nodemailer.createTransport({
         service: "gmail",
         auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD },
       });
-      const html = buildEmailHtml({ orderId, customer, items, totals, pointsEarned: pointsInfo.pointsEarned });
+      const html = buildEmailHtml({ orderId, customer, items, totals, pointsEarned: 0 });
       await transporter.sendMail({
         from: `Cippy <${process.env.GMAIL_USER}>`,
         to: user.email,
         bcc: process.env.ORDER_NOTIFY_EMAIL || process.env.GMAIL_USER,
         subject: `Cippy 订单确认 ${orderId}`,
         html,
-        text: `订单 ${orderId}\n\n顾客：${clean(customer.name)}\n电话：${clean(customer.phone)}\n地址：${clean(customer.address)}\n\n合计：${fmt.format(orderTotal)}\n获得积分：${pointsInfo.pointsEarned} pts`,
+        text: `订单 ${orderId}\n\n顾客：${clean(customer.name)}\n电话：${clean(customer.phone)}\n地址：${clean(customer.address)}\n\n合计：${fmt.format(orderTotal)}`,
       });
     } catch (e) {
       console.error("Email error:", e.message);

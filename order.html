@@ -111,6 +111,18 @@
     </div>
   </div>
 
+  <!-- Repay (pending only) -->
+  <div id="repaySection" class="hidden">
+    <div class="bg-error-container rounded-2xl px-5 py-5 text-center space-y-3">
+      <p class="font-label-md text-label-md text-on-error-container">订单待付款，请在时限内完成付款</p>
+      <p class="font-headline-md text-headline-md text-error" id="repayCountdown">20:00</p>
+      <button id="repayBtn" onclick="repay()" class="w-full bg-primary text-on-primary py-4 font-label-md text-label-md rounded-none hover:opacity-80 active:scale-95 transition-all">
+        立即付款
+      </button>
+      <p id="repayExpired" class="hidden font-label-sm text-label-sm text-on-surface-variant">订单已过期，请重新下单</p>
+    </div>
+  </div>
+
   <!-- Help -->
   <p class="text-center font-label-sm text-label-sm text-on-surface-variant pt-2">
     如有问题请联系 <a href="https://wa.me/601119058658" class="text-primary underline">WhatsApp 客服</a>
@@ -252,7 +264,59 @@ async function loadOrder(id) {
   document.getElementById('orderDate').textContent = new Date(order.created_at).toLocaleString('zh-CN', {
     year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
   });
+
+  // Repay section for pending orders
+  if (order.status === 'pending') {
+    const createdAt = new Date(order.created_at).getTime();
+    const expiresAt = createdAt + 20 * 60 * 1000;
+    const section = document.getElementById('repaySection');
+    const countdown = document.getElementById('repayCountdown');
+    const btn = document.getElementById('repayBtn');
+    const expiredMsg = document.getElementById('repayExpired');
+
+    window._repayOrderId = order.id;
+    window._repayToken = (await sb.auth.getSession()).data.session?.access_token;
+
+    function tick() {
+      const remaining = expiresAt - Date.now();
+      if (remaining <= 0) {
+        countdown.textContent = '00:00';
+        btn.disabled = true;
+        btn.classList.add('opacity-40', 'cursor-not-allowed');
+        expiredMsg.classList.remove('hidden');
+        return;
+      }
+      const m = Math.floor(remaining / 60000);
+      const s = Math.floor((remaining % 60000) / 1000);
+      countdown.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      setTimeout(tick, 1000);
+    }
+
+    section.classList.remove('hidden');
+    tick();
+  }
 }
+
+async function repay() {
+  const btn = document.getElementById('repayBtn');
+  btn.disabled = true;
+  btn.textContent = '跳转中...';
+  try {
+    const res = await fetch('/api/repay-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${window._repayToken}` },
+      body: JSON.stringify({ orderId: window._repayOrderId })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || '无法创建付款');
+    window.location.href = data.url;
+  } catch (e) {
+    alert(e.message);
+    btn.disabled = false;
+    btn.textContent = '立即付款';
+  }
+}
+window.repay = repay;
 
 function showError() {
   document.getElementById('loadingState').classList.add('hidden');
