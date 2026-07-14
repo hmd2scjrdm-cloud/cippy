@@ -388,10 +388,10 @@
     <div class="flex-1 px-5 py-4 flex items-center gap-4">
       <div class="text-3xl flex-shrink-0">✨</div>
       <div class="flex-1 min-w-0">
-        <p class="font-label-md text-label-md text-on-secondary leading-snug">充值享 <span class="text-primary-fixed font-bold text-base">5% 返现</span></p>
-        <p class="text-xs text-on-secondary/70 mt-0.5">充 RM100 到账 RM105 · 积分翻倍 · 升级专属福利</p>
+        <p class="font-label-md text-label-md text-on-secondary leading-snug" id="promoBannerTitle">Top-up &amp; Get <span class="text-primary-fixed font-bold text-base">5% Cashback</span></p>
+        <p class="text-xs text-on-secondary/70 mt-0.5" id="promoBannerSub">Top up RM100, get RM105 · Double points · Exclusive perks</p>
       </div>
-      <a href="account.html#tiers" class="flex-shrink-0 bg-primary text-on-primary px-4 py-2 rounded-full font-label-md text-label-md text-xs hover:opacity-90 transition-opacity whitespace-nowrap">了解更多</a>
+      <a href="account.html#tiers" class="flex-shrink-0 bg-primary text-on-primary px-4 py-2 rounded-full font-label-md text-label-md text-xs hover:opacity-90 transition-opacity whitespace-nowrap" id="promoBannerBtn">Learn More</a>
       <button onclick="closePromo()" class="flex-shrink-0 text-on-secondary/40 hover:text-on-secondary transition-colors text-xl leading-none ml-1">×</button>
     </div>
   </div>
@@ -411,6 +411,20 @@ function closePromo() {
   el.style.transform = 'translateY(120%)';
   sessionStorage.setItem('cippy_promo_closed', '1');
 }
+function applyPromoBannerLang(lang) {
+  const zh = lang === 'zh';
+  const t = document.getElementById('promoBannerTitle');
+  const s = document.getElementById('promoBannerSub');
+  const b = document.getElementById('promoBannerBtn');
+  if (t) t.innerHTML = zh ? '充值享 <span class="text-primary-fixed font-bold text-base">5% 返现</span>' : 'Top-up &amp; Get <span class="text-primary-fixed font-bold text-base">5% Cashback</span>';
+  if (s) s.textContent = zh ? '充 RM100 到账 RM105 · 积分翻倍 · 升级专属福利' : 'Top up RM100, get RM105 · Double points · Exclusive perks';
+  if (b) b.textContent = zh ? '了解更多' : 'Learn More';
+}
+(function() {
+  const prev = window.onCippyLangChange;
+  window.onCippyLangChange = function(lang) { if (prev) prev(lang); applyPromoBannerLang(lang); };
+  if (window.getCippyLang) applyPromoBannerLang(window.getCippyLang());
+})();
 </script>
 
 </body></html>
