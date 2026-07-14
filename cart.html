@@ -733,7 +733,10 @@ Free standard shipping on orders over MYR 150.00
               })
             });
             const data = await response.json();
-            if (!response.ok) throw new Error(data.error || (isZh ? '无法创建付款' : 'Unable to create payment session'));
+            if (!response.ok) {
+              const detail = data.details ? JSON.stringify(data.details) : '';
+              throw new Error((data.error || (isZh ? '无法创建付款' : 'Unable to create payment session')) + (detail ? ` — ${detail}` : ''));
+            }
             window.location.href = data.url;
           } catch (error) {
             checkoutBtn.disabled = false;
