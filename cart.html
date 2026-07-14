@@ -208,25 +208,24 @@ Free standard shipping on orders over MYR 150.00
       <p class="font-label-sm text-label-sm text-on-surface-variant">Visa · Mastercard</p>
     </div>
   </label>
-  <!-- DuitNow (coming soon) -->
-  <label class="flex items-center gap-4 border border-outline-variant rounded-xl p-4 cursor-not-allowed opacity-50">
-    <input type="radio" name="paymentMethod" value="duitnow" class="accent-primary w-4 h-4" disabled/>
-    <span class="material-symbols-outlined text-secondary">qr_code_2</span>
+  <!-- DuitNow QR -->
+  <label id="pay-duitnow" class="pay-option flex items-center gap-4 border-2 border-primary bg-primary-fixed rounded-xl p-4 cursor-pointer transition-all">
+    <input type="radio" name="paymentMethod" value="duitnow" class="accent-primary w-4 h-4" checked/>
+    <span class="material-symbols-outlined text-primary">qr_code_2</span>
     <div class="flex-1">
       <p class="font-label-md text-label-md text-on-surface">DuitNow QR</p>
-      <p class="font-label-sm text-label-sm text-on-surface-variant">Coming Soon</p>
+      <p class="font-label-sm text-label-sm text-on-surface-variant">Scan &amp; Pay · Instant</p>
     </div>
-    <span class="text-xs bg-surface-container text-on-surface-variant px-2 py-1 rounded-full font-label-sm">Coming Soon</span>
+    <span class="text-xs bg-primary text-on-primary px-2 py-1 rounded-full font-label-sm">Recommended</span>
   </label>
   <!-- FPX via Billplz -->
-  <label id="pay-billplz" class="pay-option flex items-center gap-4 border-2 border-primary bg-primary-fixed rounded-xl p-4 cursor-pointer transition-all">
-    <input type="radio" name="paymentMethod" value="billplz" class="accent-primary w-4 h-4" checked/>
-    <span class="material-symbols-outlined text-primary">account_balance</span>
+  <label id="pay-billplz" class="pay-option flex items-center gap-4 border-2 border-outline-variant rounded-xl p-4 cursor-pointer transition-all hover:border-primary/40">
+    <input type="radio" name="paymentMethod" value="billplz" class="accent-primary w-4 h-4"/>
+    <span class="material-symbols-outlined text-secondary">account_balance</span>
     <div class="flex-1">
       <p class="font-label-md text-label-md text-on-surface">FPX Online Banking</p>
       <p class="font-label-sm text-label-sm text-on-surface-variant">Maybank · CIMB · Public Bank · RHB</p>
     </div>
-    <span class="text-xs bg-primary text-on-primary px-2 py-1 rounded-full font-label-sm">Recommended</span>
   </label>
 </div>
 </section>
@@ -717,6 +716,18 @@ Free standard shipping on orders over MYR 150.00
             const totals = { subtotal, shipping, total: subtotal + shipping };
             localStorage.setItem('cippy_pending_order', JSON.stringify({ customer, items: cart, totals }));
 
+            if (paymentMethod === 'duitnow') {
+              // Static DuitNow QR — save order locally, show QR modal
+              const orderId = 'DN' + Date.now();
+              localStorage.setItem('cippy_duitnow_order', JSON.stringify({ orderId, customer, items: cart, totals, giftNote: document.getElementById('giftNote')?.value || '' }));
+              localStorage.removeItem('cippy_cart');
+              checkoutBtn.disabled = false;
+              checkoutBtn.classList.remove('opacity-60');
+              setCheckoutStatus('');
+              showDuitNowModal(orderId, totals.total);
+              return;
+            }
+
             const endpoint = paymentMethod === 'billplz' ? '/api/create-billplz-bill' : '/api/create-checkout-session';
             const response = await fetch(endpoint, {
               method: 'POST',
@@ -777,4 +788,58 @@ Free standard shipping on orders over MYR 150.00
         };
 </script>
 <script src="i18n.js"></script>
+
+<!-- DuitNow QR Modal -->
+<div id="duitnowModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center">
+    <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
+      <span class="material-symbols-outlined text-primary">qr_code_2</span>
+    </div>
+    <h2 class="font-headline-md text-lg font-bold text-on-surface mb-1">DuitNow QR Payment</h2>
+    <p class="text-xs text-on-surface-variant mb-4">Scan with any Malaysian banking app or e-wallet</p>
+
+    <!-- QR Image -->
+    <div class="bg-surface-container rounded-xl p-4 mb-4 flex items-center justify-center">
+      <img id="duitnowQrImg" src="images/duitnow-qr.png" alt="DuitNow QR" class="w-52 h-52 object-contain"/>
+    </div>
+
+    <!-- Amount + Order ID -->
+    <div class="bg-primary/5 rounded-xl p-3 mb-4 text-left space-y-1">
+      <div class="flex justify-between text-sm">
+        <span class="text-on-surface-variant">Amount</span>
+        <span id="duitnowAmount" class="font-bold text-primary"></span>
+      </div>
+      <div class="flex justify-between text-sm">
+        <span class="text-on-surface-variant">Reference / Ref No.</span>
+        <span id="duitnowOrderId" class="font-mono font-bold text-on-surface"></span>
+      </div>
+    </div>
+
+    <p class="text-xs text-on-surface-variant mb-5">After payment, screenshot your receipt and send to us via WhatsApp or Instagram. Your order will be confirmed within 1 hour.</p>
+
+    <div class="space-y-2">
+      <a id="duitnowWhatsapp" href="#" target="_blank"
+        class="flex items-center justify-center gap-2 w-full bg-[#25D366] text-white rounded-full py-2.5 font-label-md text-sm font-semibold hover:opacity-90 transition-opacity">
+        <span class="material-symbols-outlined text-base">chat</span> Send Receipt via WhatsApp
+      </a>
+      <button onclick="document.getElementById('duitnowModal').classList.add('hidden'); location.href='index.html'"
+        class="w-full border border-outline-variant text-on-surface-variant rounded-full py-2.5 text-sm hover:bg-surface-container transition-colors">
+        Done
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+function showDuitNowModal(orderId, total) {
+  const fmt = n => 'RM ' + parseFloat(n).toFixed(2);
+  document.getElementById('duitnowAmount').textContent = fmt(total);
+  document.getElementById('duitnowOrderId').textContent = orderId;
+  // WhatsApp link — replace number with yours
+  const waNum = '601120861073';
+  const msg = encodeURIComponent(`Hi! I've paid for my Cippy order.\nOrder ID: ${orderId}\nAmount: ${fmt(total)}`);
+  document.getElementById('duitnowWhatsapp').href = `https://wa.me/${waNum}?text=${msg}`;
+  document.getElementById('duitnowModal').classList.remove('hidden');
+}
+</script>
 </body></html>
