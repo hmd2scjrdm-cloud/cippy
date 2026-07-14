@@ -717,14 +717,21 @@ Free standard shipping on orders over MYR 150.00
             localStorage.setItem('cippy_pending_order', JSON.stringify({ customer, items: cart, totals }));
 
             if (paymentMethod === 'duitnow') {
-              // Static DuitNow QR — save order locally, show QR modal
-              const orderId = 'DN' + Date.now();
-              localStorage.setItem('cippy_duitnow_order', JSON.stringify({ orderId, customer, items: cart, totals, giftNote: document.getElementById('giftNote')?.value || '' }));
+              setCheckoutStatus(isZh ? '正在创建订单...' : 'Creating order...');
+              const dnRes = await fetch('/api/create-duitnow-order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${currentSession?.access_token || ''}` },
+                body: JSON.stringify({ customer, items: cart, totals, guestMode, giftNote: document.getElementById('giftNote')?.value || '' })
+              });
+              const dnData = await dnRes.json();
+              if (!dnRes.ok) throw new Error(dnData.error || (isZh ? '无法创建订单' : 'Unable to create order'));
               localStorage.removeItem('cippy_cart');
+              cart.length = 0;
+              renderCart();
               checkoutBtn.disabled = false;
               checkoutBtn.classList.remove('opacity-60');
               setCheckoutStatus('');
-              showDuitNowModal(orderId, totals.total);
+              showDuitNowModal(dnData.orderId, dnData.total);
               return;
             }
 
