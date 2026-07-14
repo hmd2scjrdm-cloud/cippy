@@ -200,14 +200,13 @@ Free standard shipping on orders over MYR 150.00
 <h3 class="font-headline-md text-headline-md text-on-surface mb-md">Payment Methods</h3>
 <div class="space-y-3">
   <!-- Stripe -->
-  <label id="pay-stripe" class="flex items-center gap-4 border-2 border-primary bg-primary-fixed rounded-xl p-4 cursor-pointer transition-all">
-    <input type="radio" name="paymentMethod" value="stripe" class="accent-primary w-4 h-4" checked/>
-    <span class="material-symbols-outlined text-primary">credit_card</span>
+  <label id="pay-stripe" class="pay-option flex items-center gap-4 border-2 border-outline-variant rounded-xl p-4 cursor-pointer transition-all hover:border-primary/40">
+    <input type="radio" name="paymentMethod" value="stripe" class="accent-primary w-4 h-4"/>
+    <span class="material-symbols-outlined text-secondary">credit_card</span>
     <div class="flex-1">
       <p class="font-label-md text-label-md text-on-surface">Credit / Debit Card</p>
-      <p class="font-label-sm text-label-sm text-on-surface-variant">Visa · Mastercard · PayNow</p>
+      <p class="font-label-sm text-label-sm text-on-surface-variant">Visa · Mastercard</p>
     </div>
-    <span class="text-xs bg-primary text-on-primary px-2 py-1 rounded-full font-label-sm">Recommended</span>
   </label>
   <!-- DuitNow (coming soon) -->
   <label class="flex items-center gap-4 border border-outline-variant rounded-xl p-4 cursor-not-allowed opacity-50">
@@ -220,13 +219,14 @@ Free standard shipping on orders over MYR 150.00
     <span class="text-xs bg-surface-container text-on-surface-variant px-2 py-1 rounded-full font-label-sm">Coming Soon</span>
   </label>
   <!-- FPX via Billplz -->
-  <label class="flex items-center gap-4 border border-outline-variant rounded-xl p-4 cursor-pointer transition-all hover:border-primary/40">
-    <input type="radio" name="paymentMethod" value="billplz" class="accent-primary w-4 h-4"/>
-    <span class="material-symbols-outlined text-secondary">account_balance</span>
+  <label id="pay-billplz" class="pay-option flex items-center gap-4 border-2 border-primary bg-primary-fixed rounded-xl p-4 cursor-pointer transition-all">
+    <input type="radio" name="paymentMethod" value="billplz" class="accent-primary w-4 h-4" checked/>
+    <span class="material-symbols-outlined text-primary">account_balance</span>
     <div class="flex-1">
       <p class="font-label-md text-label-md text-on-surface">FPX Online Banking</p>
       <p class="font-label-sm text-label-sm text-on-surface-variant">Maybank · CIMB · Public Bank · RHB</p>
     </div>
+    <span class="text-xs bg-primary text-on-primary px-2 py-1 rounded-full font-label-sm">Recommended</span>
   </label>
 </div>
 </section>
@@ -745,6 +745,23 @@ Free standard shipping on orders over MYR 150.00
             checkoutStatus.className = 'text-sm text-red-600 font-medium mt-2 p-3 bg-red-50 rounded-lg border border-red-200';
             checkoutStatus.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
+        });
+
+        // Payment method radio highlight
+        document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => {
+          radio.addEventListener('change', () => {
+            document.querySelectorAll('.pay-option').forEach(el => {
+              el.classList.remove('border-primary','bg-primary-fixed');
+              el.classList.add('border-outline-variant');
+              el.querySelector('.material-symbols-outlined')?.classList.replace('text-primary','text-secondary');
+            });
+            const selected = document.getElementById('pay-' + radio.value);
+            if (selected) {
+              selected.classList.add('border-primary','bg-primary-fixed');
+              selected.classList.remove('border-outline-variant');
+              selected.querySelector('.material-symbols-outlined')?.classList.replace('text-secondary','text-primary');
+            }
+          });
         });
 
         setupCheckoutAuth();
