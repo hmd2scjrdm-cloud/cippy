@@ -1,196 +1,442 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en" class="scroll-smooth">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>帮助中心 | cippy</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>cippy | 政策与帮助 · Help & Policies</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@400;500;600;700&family=Noto+Serif+SC:wght@300;400;600;700&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-tailwind.config = {
-  theme: { extend: {
-    colors: {
-      "primary": "#bb0028", "on-primary": "#2d1418", "primary-fixed": "#ffdad8",
-      "surface": "#faf7f5", "surface-container-low": "#f5f0ee",
-      "surface-container": "#f5ece7", "surface-container-high": "#efe6e2",
-      "on-surface": "#1e1b18", "on-surface-variant": "#5e3f3e",
-      "outline-variant": "#e0e0e0", "secondary": "#76574b",
-    },
-    fontFamily: {
-      "label-md": ["Poppins","Noto Serif SC","serif"],
-      "headline-md": ["Playfair Display","Noto Serif SC","serif"],
-      "body-md": ["Poppins","Noto Serif SC","serif"],
-    },
-    fontSize: {
-      "label-md": ["14px",{lineHeight:"16px",letterSpacing:"0.05em",fontWeight:"600"}],
-      "headline-md": ["24px",{lineHeight:"32px",fontWeight:"600"}],
-      "body-md": ["16px",{lineHeight:"24px",fontWeight:"400"}],
-    },
-    spacing: { "margin-desktop": "80px", "xl": "64px", "lg": "48px", "md": "24px", "sm": "12px" }
-  }}
-}
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"surface-container-low": "#f5f0ee", "outline-variant": "#e0e0e0", "primary-fixed": "#ffd9dd", "on-tertiary": "#ffffff", secondary: "#77555a", "on-background": "#201a1b", "on-secondary": "#ffffff", primary: "#C4928A", outline: "#857374", "surface-container-lowest": "#ffffff", "on-secondary-fixed": "#2d1418", "surface-container-highest": "#e8e0dd", "surface-variant": "#eddfe0", "on-primary-fixed-variant": "#70343e", "surface-tint": "#8d4a55", "surface-container": "#f0ebe8", "secondary-container": "#ffd2d6", "inverse-surface": "#362f2f", "tertiary-container": "#73ae85", "on-surface": "#201a1b", "inverse-on-surface": "#fbeeee", "inverse-primary": "#ffb2bc", "surface-container-high": "#ece6e3", "on-surface-variant": "#524344", "on-tertiary-container": "#004122", "on-tertiary-fixed-variant": "#155130", "primary-fixed-dim": "#ffb2bc", "secondary-fixed": "#ffd9dd", "on-secondary-container": "#7a585c", "on-primary-fixed": "#3a0814", "on-error": "#ffffff", "on-secondary-fixed-variant": "#5e3e42", "surface-bright": "#faf7f5", "on-primary-container": "#5e252f", "primary-container": "#da8b96", error: "#ba1a1a", "tertiary-fixed": "#b3f1c3", "error-container": "#ffdad6", "on-error-container": "#93000a", "surface-dim": "#e4d7d7", "secondary-fixed-dim": "#e7bcc0", "on-tertiary-fixed": "#00210f", background: "#faf7f5", tertiary: "#306946", "on-primary": "#2d1418", surface: "#faf7f5", "tertiary-fixed-dim": "#98d4a9"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}, spacing: {"margin-desktop": "80px", xs: "4px", md: "24px", "margin-mobile": "20px", lg: "48px", xl: "64px", sm: "12px", base: "8px", gutter: "16px"}, fontFamily: {"label-md": ["Poppins", "JF Open Huninn", "Noto Serif SC", "serif"], "headline-lg": ["Playfair Display", "Noto Serif SC", "serif"], "body-sm": ["Poppins", "JF Open Huninn", "Noto Serif SC", "serif"], "headline-md": ["Playfair Display", "Noto Serif SC", "serif"], "body-lg": ["Poppins", "JF Open Huninn", "Noto Serif SC", "serif"], "body-md": ["Poppins", "JF Open Huninn", "Noto Serif SC", "serif"], "display-lg": ["Playfair Display", "Noto Serif SC", "serif"], "label-sm": ["Poppins", "JF Open Huninn", "Noto Serif SC", "serif"], "headline-lg-mobile": ["Playfair Display", "Noto Serif SC", "serif"], headline: ["Playfair Display", "Noto Serif SC", "serif"], display: ["Playfair Display", "Noto Serif SC", "serif"], body: ["Poppins", "Noto Serif SC", "serif"], label: ["Poppins", "Noto Serif SC", "serif"]}, fontSize: {"label-md": ["14px", {lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600"}], "headline-lg": ["32px", {lineHeight: "40px", fontWeight: "700"}], "body-sm": ["14px", {lineHeight: "20px", fontWeight: "400"}], "headline-md": ["24px", {lineHeight: "32px", fontWeight: "600"}], "body-lg": ["18px", {lineHeight: "28px", fontWeight: "400"}], "body-md": ["16px", {lineHeight: "24px", fontWeight: "400"}], "display-lg": ["48px", {lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "700"}], "label-sm": ["12px", {lineHeight: "14px", fontWeight: "500"}], "headline-lg-mobile": ["28px", {lineHeight: "36px", fontWeight: "700"}]}}}};
 </script>
+<style>
+  @font-face { font-family:"JF Open Huninn"; src:url("assets/jf-openhuninn.ttf") format("truetype"); font-display:swap; }
+  .material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }
+  .sidebar-link { border-left: 2px solid transparent; }
+  .sidebar-link.active { color: #C4928A; border-left-color: #C4928A; background: #fff5f4; }
+  .policy-section { scroll-margin-top: 100px; }
+  .policy-item { border-left: 3px solid #e0e0e0; padding-left: 16px; margin-bottom: 20px; }
+  .policy-item h4 { font-family:'Poppins',sans-serif; font-size:13px; font-weight:600; color:#201a1b; margin-bottom:4px; }
+  .policy-item p, .policy-item li { font-size:13.5px; color:#524344; line-height:1.75; }
+  .policy-item ul { padding-left:16px; list-style:disc; }
+  .policy-item li { margin-bottom:2px; }
+  .tag-ok { background:#d4f0de; color:#1a5c33; font-size:11px; font-weight:600; padding:2px 10px; border-radius:100px; display:inline-block; margin-left:6px; }
+  .tag-no { background:#fde8e8; color:#991b1b; font-size:11px; font-weight:600; padding:2px 10px; border-radius:100px; display:inline-block; margin-left:6px; }
+  #mobilePolicyMenu { max-height:0; overflow:hidden; transition:max-height 0.3s ease; }
+  #mobilePolicyMenu.open { max-height:9999px; }
+  html { scroll-padding-top: 96px; }
+</style>
 </head>
-<body class="bg-surface text-on-surface font-body-md">
+<body class="bg-background text-on-surface font-body-md selection:bg-primary-fixed selection:text-on-primary-fixed">
 
-<!-- Nav -->
-<nav class="fixed top-0 w-full z-50 shadow-sm bg-surface">
-  <div class="flex justify-between items-center px-6 md:px-margin-desktop py-4 max-w-[1440px] mx-auto">
-    <a href="index.html"><img src="assets/cippy-logo.png" alt="cippy" class="h-16 w-auto"/></a>
-    <a href="index.html" class="flex items-center gap-1 text-on-surface-variant hover:text-primary transition-colors font-label-md text-sm">
-      <span class="material-symbols-outlined text-base">arrow_back</span> 返回首页
-    </a>
-  </div>
+<nav class="fixed top-0 w-full z-50 shadow-sm" style="background:#faf7f5">
+<div class="flex justify-between items-center px-6 md:px-margin-desktop py-4 w-full max-w-[1440px] mx-auto">
+<div class="flex items-center gap-lg">
+<a class="flex items-center shrink-0" href="index.html"><img src="assets/cippy-logo.png" alt="cippy" class="h-24 w-auto"></a>
+<div class="hidden md:flex gap-8 items-center">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-opacity duration-300" href="products.html?sort=new">New In</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-opacity duration-300" href="products.html">Clothing</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-opacity duration-300" href="account.html">Community</a>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="font-label-sm text-label-sm font-semibold w-11 h-11 flex items-center justify-center hover:text-primary transition-colors" data-lang-toggle="" onclick="toggleCippyLang()">中文</button>
+<button class="material-symbols-outlined text-on-surface hover:text-primary transition-colors w-11 h-11 flex items-center justify-center" onclick="location.href='account.html'">person</button>
+<button class="relative w-11 h-11 flex items-center justify-center text-on-surface hover:text-primary transition-colors" onclick="location.href='cart.html'">
+  <span class="material-symbols-outlined">shopping_bag</span>
+  <span id="cartBadge" class="hidden absolute -top-0.5 -right-0.5 bg-primary text-on-primary text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold leading-none"></span>
+</button>
+</div>
+</div>
 </nav>
 
-<main class="pt-32 pb-xl px-6 md:px-margin-desktop max-w-[800px] mx-auto">
+<main class="pt-28 pb-xl">
+<div class="max-w-[1440px] mx-auto px-6 md:px-margin-desktop">
 
-  <!-- Tab nav -->
-  <div class="flex gap-0 border-b border-outline-variant mb-xl overflow-x-auto">
-    <a href="#shipping" onclick="showTab('shipping')" id="tab-shipping" class="tab-btn px-md py-3 font-label-md text-sm whitespace-nowrap border-b-2 border-primary text-primary">配送与退换货</a>
-    <a href="#privacy" onclick="showTab('privacy')" id="tab-privacy" class="tab-btn px-md py-3 font-label-md text-sm whitespace-nowrap border-b-2 border-transparent text-on-surface-variant hover:text-primary">隐私政策</a>
-    <a href="#terms" onclick="showTab('terms')" id="tab-terms" class="tab-btn px-md py-3 font-label-md text-sm whitespace-nowrap border-b-2 border-transparent text-on-surface-variant hover:text-primary">服务条款</a>
+  <div class="mb-lg">
+    <p class="font-label-sm text-label-sm text-primary uppercase tracking-widest mb-2">Help Center · 帮助中心</p>
+    <h1 class="font-headline-lg text-headline-lg text-on-surface mb-3">政策与帮助 <span class="text-on-surface-variant font-body-md text-body-md align-middle">Policies & Help</span></h1>
+    <p class="font-body-sm text-body-sm text-on-surface-variant max-w-xl">购物前请阅读我们的政策。如有疑问，随时联系我们。<br>Please read our policies before shopping. Contact us anytime.</p>
   </div>
 
-  <!-- Shipping -->
-  <section id="shipping" class="info-section space-y-lg">
-    <h1 class="font-headline-md text-headline-md">配送与退换货</h1>
-
-    <div class="space-y-sm">
-      <h2 class="font-label-md text-sm uppercase tracking-widest text-secondary">配送范围</h2>
-      <p class="text-on-surface-variant leading-relaxed">目前仅支持马来西亚西马地区（Peninsular Malaysia）配送。</p>
+  <!-- Mobile dropdown -->
+  <div class="md:hidden mb-lg">
+    <button onclick="document.getElementById('mobilePolicyMenu').classList.toggle('open')" class="w-full flex items-center justify-between bg-surface-container border border-outline-variant rounded-xl px-5 py-4">
+      <span class="font-label-md text-label-md text-on-surface" id="mobileNavLabel">选择政策 · Select Policy</span>
+      <span class="material-symbols-outlined text-primary">expand_more</span>
+    </button>
+    <div id="mobilePolicyMenu" class="bg-surface border border-outline-variant border-t-0 rounded-b-xl">
+      <div class="p-2" id="mobileNavGrid"></div>
     </div>
+  </div>
 
-    <div class="space-y-sm">
-      <h2 class="font-label-md text-sm uppercase tracking-widest text-secondary">运费</h2>
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm border-collapse">
-          <thead><tr class="bg-surface-container text-on-surface-variant">
-            <th class="text-left py-3 px-4 font-label-md">订单金额</th>
-            <th class="text-left py-3 px-4 font-label-md">运费</th>
-            <th class="text-left py-3 px-4 font-label-md">时效</th>
-          </tr></thead>
-          <tbody class="divide-y divide-outline-variant">
-            <tr><td class="py-3 px-4">RM 0 – RM 149.99</td><td class="py-3 px-4">RM 10.00</td><td class="py-3 px-4">3–7 个工作日</td></tr>
-            <tr><td class="py-3 px-4">RM 150 及以上</td><td class="py-3 px-4 text-primary font-semibold">免运费</td><td class="py-3 px-4">3–7 个工作日</td></tr>
-          </tbody>
-        </table>
-      </div>
+  <div class="flex gap-xl items-start">
+
+    <!-- Sidebar -->
+    <aside class="hidden md:block w-56 flex-shrink-0 sticky top-28">
+      <nav class="flex flex-col gap-xs" id="sidebarNav"></nav>
+    </aside>
+
+    <!-- Content -->
+    <div class="flex-1 min-w-0 space-y-[64px]">
+
+      <!-- 1 -->
+      <section class="policy-section" id="shopping">
+        <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+          <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">1</span>
+          <div><h2 class="font-headline-md text-headline-md">购物须知</h2><p class="font-label-sm text-label-sm text-on-surface-variant">Shopping Guide</p></div>
+        </div>
+        <div class="policy-item"><h4>下单前须知</h4><p>请在下单前仔细阅读商品描述、尺寸表及面料说明，确认符合您的需求。一旦下单即表示您已阅读并同意本店所有政策。</p></div>
+        <div class="policy-item"><h4>商品颜色说明</h4><p>由于屏幕色彩差异，实物颜色可能与图片存在轻微色差，属正常现象，不属于质量问题。如需参考实色，可联系客服索取更多照片。</p></div>
+        <div class="policy-item"><h4>尺寸说明</h4><p>每件商品均附有尺寸表，为人工实际测量，可能存在 1–3cm 误差。建议参考尺寸表和模特数据后再下单，如拿不准请联系客服。</p></div>
+        <div class="policy-item"><h4>商品图片说明</h4><p>商品图片均为本店实拍，部分经过轻度色彩调整以呈现最佳效果，实物与图片可能存在轻微差异。</p></div>
+        <div class="policy-item"><h4>面料说明</h4><p>商品页面列明面料成分，如需了解手感、垂坠度、弹性等更多细节，欢迎联系客服咨询。</p></div>
+        <div class="policy-item"><h4>人工测量误差</h4><p>所有尺寸均为手工平铺测量，允许 ±1–3cm 误差，此误差属正常范围，不接受以此理由申请退换货。</p></div>
+        <div class="policy-item"><h4>库存说明</h4><p>商品库存实时更新。如下单后商品售罄，我们会第一时间联系您协商（补货或退款）。建议心仪商品尽早下单。</p></div>
+        <div class="policy-item"><h4>下单后是否可取消</h4><p>未付款订单可随时取消。已付款订单若尚未开始包装，可联系客服申请取消。已开始包装或已发货的订单不接受取消。</p></div>
+        <div class="policy-item"><h4>订单修改说明</h4><p>订单提交后如需修改（地址、尺寸、颜色），请在付款后 <strong>2 小时内</strong> 联系客服。包装完成后将无法修改。</p></div>
+      </section>
+
+      <!-- 2 -->
+      <section class="policy-section" id="shipping">
+        <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+          <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">2</span>
+          <div><h2 class="font-headline-md text-headline-md">配送政策</h2><p class="font-label-sm text-label-sm text-on-surface-variant">Shipping Policy</p></div>
+        </div>
+        <div class="policy-item"><h4>发货时间</h4><p>付款确认后，我们将在 <strong>1–3 个工作日</strong> 内完成包装并交付快递。如遇节日假期或大促期间，时间可能延长，我们会提前公告。</p></div>
+        <div class="policy-item"><h4>预购商品时间</h4><p>预购商品的预计发货时间在商品页面注明，通常为下单后 7–21 个工作日，以商品页面为准。</p></div>
+        <div class="policy-item"><h4>现货商品时间</h4><p>现货商品付款确认后 1–3 个工作日内发货。</p></div>
+        <div class="policy-item"><h4>节日期间说明</h4><p>农历新年、开斋节、圣诞节等主要节假日前后，发货时间可能延长 3–7 天。我们会在节日前于社媒及邮件提前告知。</p></div>
+        <div class="policy-item"><h4>Courier 公司</h4><p>目前使用 J&amp;T Express、Poslaju 等主要快递公司配送。快递公司选择视地区和库存情况而定，我们保留选择配送商的权利。</p></div>
+        <div class="policy-item"><h4>运费计算</h4><ul><li>西马：RM 8（满 RM 150 免运）</li><li>东马（沙巴/砂拉越）：RM 15（满 RM 250 免运）</li><li>运费在结账时自动计算</li></ul></div>
+        <div class="policy-item"><h4>国际配送</h4><p>目前暂不提供国际配送服务。如有特殊需求，请联系客服咨询。</p></div>
+        <div class="policy-item"><h4>包裹遗失处理</h4><p>如快递追踪显示包裹遗失，请第一时间联系我们，我们将协助向快递公司提出索赔，处理时间约 7–14 个工作日。</p></div>
+        <div class="policy-item"><h4>包裹延误说明</h4><p>如遇恶劣天气、节假日或快递异常导致延误，我们无法对快递时效作出保证，但会尽力协助跟进。</p></div>
+        <div class="policy-item"><h4>地址填写错误</h4><p>因买家填写地址错误导致包裹无法送达，重新投递费用由买家承担。请在下单前仔细核对收件地址。</p></div>
+      </section>
+
+      <!-- 3 -->
+      <section class="policy-section" id="returns">
+        <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+          <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">3</span>
+          <div><h2 class="font-headline-md text-headline-md">退换货政策</h2><p class="font-label-sm text-label-sm text-on-surface-variant">Return & Exchange Policy</p></div>
+        </div>
+        <div class="policy-item"><h4>哪些情况可以申请<span class="tag-ok">可申请</span></h4><ul><li>收到商品与描述严重不符</li><li>商品存在明显制造缺陷（非正常误差）</li><li>收到错误商品（款式/颜色/尺码与下单不符）</li><li>提供完整未剪辑开箱视频</li></ul></div>
+        <div class="policy-item"><h4>哪些情况不能申请<span class="tag-no">不接受</span></h4><ul><li>不喜欢颜色或款式（主观原因）</li><li>尺寸误差在 1–3cm 范围内</li><li>轻微色差（属正常颜色显示差异）</li><li>商品已穿着、洗涤或去除吊牌</li><li>无完整开箱视频</li><li>特卖/Sale 商品</li><li>配饰类商品（耳环、项链等）</li></ul></div>
+        <div class="policy-item"><h4>申请期限</h4><p>请在收货后 <strong>7天内</strong> 联系客服提出申请，逾期恕不受理。</p></div>
+        <div class="policy-item"><h4>换货流程</h4><ul><li>WhatsApp 客服说明情况，附上开箱视频及商品照片</li><li>客服审核后告知是否批准换货</li><li>将商品寄回指定地址（附快递单号）</li><li>我们收到并检查商品后，安排寄出换货商品</li></ul></div>
+        <div class="policy-item"><h4>换货次数</h4><p>每笔订单最多申请换货 <strong>1次</strong>。</p></div>
+        <div class="policy-item"><h4>运费承担</h4><p>若属本店责任（错货/质量问题），来回运费由本店承担。若属买家原因，退货运费由买家承担，换货寄出运费本店承担。</p></div>
+        <div class="policy-item"><h4>商品检查标准</h4><p>退回商品须保持全新未穿着状态，附原吊牌，无气味、无污渍。检查不合格将原件寄回，不予退换。</p></div>
+        <div class="policy-item"><h4>二次销售标准</h4><p>退回商品经检查符合全新标准后，方可接受退换。商品如有任何使用痕迹，将不接受退换。</p></div>
+      </section>
+
+      <!-- 4 -->
+      <section class="policy-section" id="refund">
+        <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+          <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">4</span>
+          <div><h2 class="font-headline-md text-headline-md">退款政策</h2><p class="font-label-sm text-label-sm text-on-surface-variant">Refund Policy</p></div>
+        </div>
+        <div class="policy-item"><h4>哪些情况可以退款<span class="tag-ok">可退款</span></h4><ul><li>商品存在明显质量问题且无法换货</li><li>缺货且顾客不接受等待</li><li>错发商品且顾客不接受换货</li></ul></div>
+        <div class="policy-item"><h4>退款方式</h4><p>退款将原路退回：信用卡退回原卡、DuitNow/FPX 退回原银行账户。</p></div>
+        <div class="policy-item"><h4>退款时间</h4><p>退款申请审核通过后，处理时间为 <strong>5–10 个工作日</strong>，到账时间视银行而定。</p></div>
+        <div class="policy-item"><h4>退款金额</h4><p>退款金额为实际支付商品金额，不包含已使用优惠折扣差额。</p></div>
+        <div class="policy-item"><h4>优惠券是否退回</h4><p>退款后，已使用的优惠券及折扣码不予退回，仅退回实付金额。</p></div>
+        <div class="policy-item"><h4>运费是否退款</h4><p>若退款原因属本店责任，运费一并退回。若属顾客个人原因，运费不予退款。</p></div>
+        <div class="policy-item"><h4>无法退款情况<span class="tag-no">不接受</span></h4><ul><li>商品已穿着使用</li><li>特卖/Sale 商品</li><li>无开箱视频证明</li><li>超过申请期限（7天）</li></ul></div>
+      </section>
+
+      <!-- 5 -->
+      <section class="policy-section" id="quality">
+        <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+          <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">5</span>
+          <div><h2 class="font-headline-md text-headline-md">商品质量标准</h2><p class="font-label-sm text-label-sm text-on-surface-variant">Quality Standards</p></div>
+        </div>
+        <div class="bg-surface-container rounded-xl p-5 mb-lg">
+          <p class="font-label-sm text-label-sm text-secondary uppercase tracking-widest mb-4">以下情况不属于质量问题 · Not considered defects</p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="policy-item" style="margin-bottom:0"><h4>少量线头</h4><p>布料剪裁后的正常现象，可自行修剪。</p></div>
+            <div class="policy-item" style="margin-bottom:0"><h4>轻微褶皱</h4><p>运输产生的正常折叠痕迹，熨烫后可消除。</p></div>
+            <div class="policy-item" style="margin-bottom:0"><h4>轻微色差</h4><p>屏幕色彩设置及拍摄光线差异所致。</p></div>
+            <div class="policy-item" style="margin-bottom:0"><h4>印刷位置轻微偏差</h4><p>手工印刷工艺，允许 ±0.5cm 位置误差。</p></div>
+            <div class="policy-item" style="margin-bottom:0"><h4>1–3cm 尺寸误差</h4><p>手工测量误差范围内，属正常情况。</p></div>
+            <div class="policy-item" style="margin-bottom:0"><h4>布料纹路不同</h4><p>天然面料纹理各有差异，每件均为独特。</p></div>
+            <div class="policy-item" style="margin-bottom:0"><h4>染色批次不同</h4><p>不同批次面料染色可能存在轻微色调差异。</p></div>
+            <div class="policy-item" style="margin-bottom:0"><h4>牛仔洗水不同</h4><p>牛仔面料每批洗水效果略有差异。</p></div>
+            <div class="policy-item" style="margin-bottom:0"><h4>针织弹性差异</h4><p>针织面料弹性因松紧度不同而存在差异。</p></div>
+          </div>
+        </div>
+        <div class="policy-item"><h4>什么才算质量问题<span class="tag-ok">可申请退换</span></h4><ul><li>明显缝合断裂或开线（非边缘线头）</li><li>拉链或扣子无法正常使用</li><li>面料有明显破洞或损坏</li><li>印花大面积脱落或错印</li></ul></div>
+      </section>
+
+      <!-- 6 -->
+      <section class="policy-section" id="unboxing">
+        <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+          <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">6</span>
+          <div><h2 class="font-headline-md text-headline-md">开箱政策</h2><p class="font-label-sm text-label-sm text-on-surface-variant">Unboxing Policy</p></div>
+        </div>
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-lg">
+          <p class="font-label-md text-label-md text-amber-800">⚠️ 所有退换货申请均需提供完整开箱视频，否则无法受理。</p>
+        </div>
+        <div class="policy-item"><h4>建议全程录影</h4><p>收到包裹后，强烈建议在 <strong>拆包前</strong> 开始录制，直到完整展示所有商品内容。此视频是申请退换货的重要凭证。</p></div>
+        <div class="policy-item"><h4>如何录影</h4><ul><li>将包裹放在光线充足的环境下</li><li>确保视频清晰，包裹外箱完整出镜</li><li>从包裹封口状态开始录制，<strong>中途不可暂停</strong></li></ul></div>
+        <div class="policy-item"><h4>如何拍摄</h4><ul><li>拍摄商品正面、背面及吊牌</li><li>如有色差，放在自然光下拍摄对比</li><li>如有质量问题，特写拍摄问题部位</li></ul></div>
+        <div class="policy-item"><h4>什么时候联系客服</h4><p>如发现商品有问题，请在收货后 <strong>24小时内</strong> 联系客服，并附上开箱视频及照片。</p></div>
+        <div class="policy-item"><h4>影片保存多久</h4><p>建议保存至少 <strong>14天</strong>，以备不时之需。</p></div>
+        <div class="policy-item"><h4>审核流程</h4><ul><li>提交视频及照片后，客服将在 1–2 个工作日内审核</li><li>审核通过后，告知退换货方案</li><li>审核不通过将说明原因</li></ul></div>
+      </section>
+
+      <!-- 7 -->
+      <section class="policy-section" id="cancellation">
+        <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+          <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">7</span>
+          <div><h2 class="font-headline-md text-headline-md">订单取消政策</h2><p class="font-label-sm text-label-sm text-on-surface-variant">Cancellation Policy</p></div>
+        </div>
+        <div class="policy-item"><h4>未付款多久取消</h4><p>DuitNow/FPX 订单创建后 <strong>24小时内</strong> 未收到付款截图，订单将自动取消，库存恢复。</p></div>
+        <div class="policy-item"><h4>已付款能否取消</h4><p>付款确认后，如包装尚未开始，可联系客服申请取消并全额退款。</p></div>
+        <div class="policy-item"><h4>已包装能否取消</h4><p>包装完成后原则上不接受取消，如有特殊情况请联系客服协商。</p></div>
+        <div class="policy-item"><h4>已寄出不可取消</h4><p>商品一经发出不可取消，如需退货请按退换货流程处理。</p></div>
+        <div class="policy-item"><h4>预购取消规则</h4><p>预购商品在发货前均可取消并全额退款，发货后不可取消。</p></div>
+      </section>
+
+      <!-- 8 -->
+      <section class="policy-section" id="sizing">
+        <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+          <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">8</span>
+          <div><h2 class="font-headline-md text-headline-md">尺寸政策</h2><p class="font-label-sm text-label-sm text-on-surface-variant">Sizing Policy</p></div>
+        </div>
+        <div class="policy-item"><h4>如何量尺寸</h4><p>请参考我们的量身指南，测量胸围、腰围、臀围及身高，与商品尺寸表对照选择最合适的尺码。</p></div>
+        <div class="policy-item"><h4>推荐参考</h4><p>建议优先参考尺寸表中的"实际尺寸"，而非标注的 S/M/L 尺码，因各款版型不同。</p></div>
+        <div class="policy-item"><h4>Model 资料</h4><p>每款商品均注明模特身高、体重及所穿尺码，供参考。</p></div>
+        <div class="policy-item"><h4>不接受尺寸理由退款<span class="tag-no">不接受</span></h4><p>因个人对尺寸把握不准或个人喜好导致的不合身，不接受退款申请。建议下单前联系客服确认尺寸。</p></div>
+        <div class="policy-item"><h4>建议联系客服</h4><p>如对尺寸有任何疑问，欢迎在下单前 WhatsApp 客服，我们会根据您的身材数据给出建议。</p></div>
+      </section>
+
+      <!-- 9 -->
+      <section class="policy-section" id="privacy">
+        <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+          <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">9</span>
+          <div><h2 class="font-headline-md text-headline-md">隐私政策</h2><p class="font-label-sm text-label-sm text-on-surface-variant">Privacy Policy</p></div>
+        </div>
+        <div class="policy-item"><h4>收集什么资料</h4><ul><li>姓名、联系电话、收件地址</li><li>邮箱地址</li><li>订单及支付记录</li><li>网站浏览行为（匿名）</li></ul></div>
+        <div class="policy-item"><h4>如何使用</h4><ul><li>处理及配送您的订单</li><li>发送订单确认及更新通知</li><li>改善我们的服务</li></ul></div>
+        <div class="policy-item"><h4>是否分享第三方</h4><p>我们不会将您的个人资料出售给任何第三方，仅会与配送服务商共享必要的配送信息。</p></div>
+        <div class="policy-item"><h4>Email 用途</h4><p>您的邮箱仅用于发送订单相关通知（确认、发货、退款等）。</p></div>
+        <div class="policy-item"><h4>Marketing 用途</h4><p>如您选择订阅，我们可能发送新品及促销信息。您可随时点击邮件底部"退订"取消。</p></div>
+      </section>
+
+      <!-- 10 -->
+      <section class="policy-section" id="terms">
+        <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+          <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">10</span>
+          <div><h2 class="font-headline-md text-headline-md">服务条款</h2><p class="font-label-sm text-label-sm text-on-surface-variant">Terms & Conditions</p></div>
+        </div>
+        <div class="policy-item"><h4>使用网站规则</h4><p>您同意以合法目的使用本网站，不得进行任何欺诈、骚扰或违法行为。</p></div>
+        <div class="policy-item"><h4>下单代表同意政策</h4><p>提交订单即表示您已阅读并同意本店所有政策，包括退换货、配送及付款政策。</p></div>
+        <div class="policy-item"><h4>商品版权</h4><p>所有商品设计版权归 Cippy Malaysia 所有，未经授权不得复制、仿制或销售。</p></div>
+        <div class="policy-item"><h4>图片版权</h4><p>网站所有图片版权归 Cippy Malaysia 所有，未经书面授权不得转载使用。</p></div>
+        <div class="policy-item"><h4>保留修改权利</h4><p>Cippy Malaysia 保留随时修改本政策的权利，修改后将在网站公告，继续使用即视为接受更新条款。</p></div>
+        <div class="policy-item"><h4>法律适用（Malaysia）</h4><p>本条款受马来西亚法律管辖，任何争议将在马来西亚法院解决。</p></div>
+      </section>
+
+      <!-- 11 -->
+      <section class="policy-section" id="payment">
+        <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+          <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">11</span>
+          <div><h2 class="font-headline-md text-headline-md">付款政策</h2><p class="font-label-sm text-label-sm text-on-surface-variant">Payment Policy</p></div>
+        </div>
+        <div class="policy-item"><h4>接受哪些付款方式</h4><ul><li>DuitNow QR（推荐）</li><li>FPX 网络银行</li><li>信用卡 / 借记卡（Visa、Mastercard）</li></ul></div>
+        <div class="policy-item"><h4>支付期限</h4><p>DuitNow 及 FPX 订单请在 <strong>24小时内</strong> 完成付款，否则订单自动取消。</p></div>
+        <div class="policy-item"><h4>未付款订单</h4><p>超过 24 小时未付款，订单将自动取消，已保留库存恢复正常销售。</p></div>
+        <div class="policy-item"><h4>汇率说明</h4><p>所有价格以马来西亚令吉（MYR）计算。</p></div>
+        <div class="policy-item"><h4>付款失败</h4><p>如付款失败，请检查账户余额或联系银行。可重新下单或联系客服协助。</p></div>
+      </section>
+
+      <!-- 12 -->
+      <section class="policy-section" id="membership">
+        <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+          <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">12</span>
+          <div><h2 class="font-headline-md text-headline-md">会员政策</h2><p class="font-label-sm text-label-sm text-on-surface-variant">Membership Policy</p></div>
+        </div>
+        <div class="policy-item"><h4>积分规则</h4><p>每消费 RM 1 获得 1 积分，积分可用于抵扣消费（兑换比率另行公告）。</p></div>
+        <div class="policy-item"><h4>Luxe 会员</h4><p>累计消费满 RM 800 升级，享 1.5倍积分、专属优先购买权。</p></div>
+        <div class="policy-item"><h4>Elite 会员</h4><p>累计消费满 RM 2,000 升级，享 2倍积分、免费运费、专属新品预览。</p></div>
+        <div class="policy-item"><h4>积分有效期</h4><p>积分自获得之日起 <strong>12个月</strong> 内有效，逾期作废。</p></div>
+        <div class="policy-item"><h4>升级规则</h4><p>升级以累计消费金额计算，无时间限制。</p></div>
+        <div class="policy-item"><h4>降级规则</h4><p>目前不设降级机制，累计消费等级永久保留。</p></div>
+      </section>
+
+      <!-- 13 -->
+      <section class="policy-section" id="promotions">
+        <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+          <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">13</span>
+          <div><h2 class="font-headline-md text-headline-md">优惠券政策</h2><p class="font-label-sm text-label-sm text-on-surface-variant">Promotion Policy</p></div>
+        </div>
+        <div class="policy-item"><h4>是否可叠加</h4><p>每笔订单只能使用 <strong>一张</strong> 优惠码，不可与其他折扣叠加使用。</p></div>
+        <div class="policy-item"><h4>使用期限</h4><p>优惠码有使用期限，逾期自动失效，不可延期。</p></div>
+        <div class="policy-item"><h4>最低消费</h4><p>部分优惠码设有最低消费门槛，使用前请阅读优惠说明。</p></div>
+        <div class="policy-item"><h4>特价商品</h4><p>Sale 特价商品不适用于任何优惠码折扣。</p></div>
+        <div class="policy-item"><h4>退款后优惠处理</h4><p>订单退款后，已使用的优惠码不予恢复或退还。</p></div>
+      </section>
+
+      <!-- 14 -->
+      <section class="policy-section" id="aftersales">
+        <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+          <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">14</span>
+          <div><h2 class="font-headline-md text-headline-md">售后服务政策</h2><p class="font-label-sm text-label-sm text-on-surface-variant">After-sales Service</p></div>
+        </div>
+        <div class="policy-item"><h4>客服时间</h4><p>周一至周六 10:00am – 6:00pm（马来西亚时间）。公共假日可能延迟回复。</p></div>
+        <div class="policy-item"><h4>回复时间</h4><p>WhatsApp 消息通常在 1–4 小时内回复，邮件在 1 个工作日内回复。</p></div>
+        <div class="policy-item"><h4>售后申请方式</h4><p>请通过 WhatsApp <strong>+601120861073</strong> 联系我们，附上订单号及问题描述/照片/视频。</p></div>
+        <div class="policy-item"><h4>审核流程</h4><p>客服收到申请后 1–2 个工作日内完成初步审核，告知是否符合退换货条件。</p></div>
+        <div class="policy-item"><h4>处理时间</h4><p>换货商品审核通过后 3–5 个工作日内寄出，退款处理时间为 5–10 个工作日。</p></div>
+        <div class="policy-item"><h4>客服联系方式</h4><ul><li>WhatsApp：+601120861073</li><li>Instagram DM：@cippy.kl</li></ul></div>
+      </section>
+
+      <!-- 15 -->
+      <section class="policy-section" id="care">
+        <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+          <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">15</span>
+          <div><h2 class="font-headline-md text-headline-md">洗涤保养说明</h2><p class="font-label-sm text-label-sm text-on-surface-variant">Care Guide</p></div>
+        </div>
+        <div class="policy-item"><h4>洗涤方式</h4><ul><li>建议手洗或洗衣机柔洗模式，水温不超过 30°C</li><li>深色衣物第一次洗涤前建议单独浸泡10分钟</li></ul></div>
+        <div class="policy-item"><h4>熨烫方式</h4><ul><li>雪纺、蕾丝类：低温（110°C），垫布保护</li><li>棉麻类：中温，反面熨烫效果更佳</li><li>针织类：不建议熨烫，悬挂整理即可</li></ul></div>
+        <div class="policy-item"><h4>深浅色分开</h4><p>深色衣物请勿与浅色混洗，避免染色。新购深色衣物前几次建议单独清洗。</p></div>
+        <div class="policy-item"><h4>针织保养</h4><p>针织衣物建议平铺晾干，避免悬挂变形。洗涤时放入洗衣袋保护。</p></div>
+        <div class="policy-item"><h4>蕾丝保养</h4><p>蕾丝衣物建议手洗，不可机洗，避免钩丝。洗后平铺阴干。</p></div>
+        <div class="policy-item"><h4>晾晒方式</h4><p>建议阴凉通风处晾干，避免阳光直射褪色。针织及雪纺建议平铺晾干。</p></div>
+      </section>
+
+      <!-- 16 FAQ -->
+      <section class="policy-section" id="faq">
+        <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+          <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">16</span>
+          <div><h2 class="font-headline-md text-headline-md">常见问题</h2><p class="font-label-sm text-label-sm text-on-surface-variant">FAQ</p></div>
+        </div>
+        <div id="faqList" class="space-y-3"></div>
+      </section>
+
     </div>
-
-    <div class="space-y-sm">
-      <h2 class="font-label-md text-sm uppercase tracking-widest text-secondary">发货时间</h2>
-      <p class="text-on-surface-variant leading-relaxed">订单确认后 1–3 个工作日内发货。发货后将通过 WhatsApp 通知快递单号。</p>
-    </div>
-
-    <div class="space-y-sm">
-      <h2 class="font-label-md text-sm uppercase tracking-widest text-secondary">退换货政策</h2>
-      <ul class="text-on-surface-variant leading-relaxed space-y-2 list-disc list-inside">
-        <li>收到商品后 <strong>7 天内</strong>如有品质问题，可申请退换货。</li>
-        <li>商品须保持未穿着、未洗涤、吊牌完好的原始状态。</li>
-        <li>因尺寸不合适的换货，运费由买家承担。</li>
-        <li>定制商品、促销商品恕不接受退换。</li>
-      </ul>
-    </div>
-
-    <div class="space-y-sm">
-      <h2 class="font-label-md text-sm uppercase tracking-widest text-secondary">申请退换货</h2>
-      <p class="text-on-surface-variant leading-relaxed">请通过 WhatsApp 联系我们，注明订单编号及问题描述，附上商品照片。</p>
-      <a href="https://wa.me/601119058658" target="_blank" class="inline-flex items-center gap-2 bg-primary text-white px-lg py-3 rounded-none font-label-md text-sm hover:opacity-80 transition-opacity">
-        <span class="material-symbols-outlined text-sm">chat</span> WhatsApp 联系我们
-      </a>
-    </div>
-  </section>
-
-  <!-- Privacy -->
-  <section id="privacy" class="info-section hidden space-y-lg">
-    <h1 class="font-headline-md text-headline-md">隐私政策</h1>
-    <p class="text-on-surface-variant leading-relaxed">本政策说明 cippy 如何收集、使用及保护您的个人信息。</p>
-
-    <div class="space-y-sm">
-      <h2 class="font-label-md text-sm uppercase tracking-widest text-secondary">我们收集的信息</h2>
-      <ul class="text-on-surface-variant leading-relaxed space-y-2 list-disc list-inside">
-        <li>下单时提供的姓名、联系方式及收货地址。</li>
-        <li>浏览记录及设备信息（用于改善用户体验）。</li>
-        <li>通过 Google 账户登录的基本账户信息。</li>
-      </ul>
-    </div>
-
-    <div class="space-y-sm">
-      <h2 class="font-label-md text-sm uppercase tracking-widest text-secondary">信息用途</h2>
-      <ul class="text-on-surface-variant leading-relaxed space-y-2 list-disc list-inside">
-        <li>处理订单及安排配送。</li>
-        <li>发送订单通知及售后服务信息。</li>
-        <li>改善网站功能及购物体验。</li>
-      </ul>
-    </div>
-
-    <div class="space-y-sm">
-      <h2 class="font-label-md text-sm uppercase tracking-widest text-secondary">信息安全</h2>
-      <p class="text-on-surface-variant leading-relaxed">您的个人信息将严格保密，不会出售或共享给第三方，除非法律要求或配送服务所需。</p>
-    </div>
-
-    <div class="space-y-sm">
-      <h2 class="font-label-md text-sm uppercase tracking-widest text-secondary">联系我们</h2>
-      <p class="text-on-surface-variant leading-relaxed">如有隐私相关疑问，请通过 <a href="mailto:cippy.kl@gmail.com" class="text-primary underline">cippy.kl@gmail.com</a> 联系我们。</p>
-    </div>
-  </section>
-
-  <!-- Terms -->
-  <section id="terms" class="info-section hidden space-y-lg">
-    <h1 class="font-headline-md text-headline-md">服务条款</h1>
-    <p class="text-on-surface-variant leading-relaxed">使用 cippy 网站即表示您同意以下条款。</p>
-
-    <div class="space-y-sm">
-      <h2 class="font-label-md text-sm uppercase tracking-widest text-secondary">订单与付款</h2>
-      <ul class="text-on-surface-variant leading-relaxed space-y-2 list-disc list-inside">
-        <li>所有价格以马币（MYR）计算，含 SST（如适用）。</li>
-        <li>订单确认后，付款须在 24 小时内完成，否则订单将自动取消。</li>
-        <li>我们接受 GrabPay、Touch 'n Go eWallet、FPX 及 Visa/Mastercard。</li>
-      </ul>
-    </div>
-
-    <div class="space-y-sm">
-      <h2 class="font-label-md text-sm uppercase tracking-widest text-secondary">商品描述</h2>
-      <p class="text-on-surface-variant leading-relaxed">我们尽力确保商品图片和描述的准确性。由于拍摄环境及屏幕差异，实际颜色可能略有偏差。</p>
-    </div>
-
-    <div class="space-y-sm">
-      <h2 class="font-label-md text-sm uppercase tracking-widest text-secondary">知识产权</h2>
-      <p class="text-on-surface-variant leading-relaxed">网站所有内容（包括图片、文字、设计）均为 cippy 所有，未经授权不得转载或商业使用。</p>
-    </div>
-
-    <div class="space-y-sm">
-      <h2 class="font-label-md text-sm uppercase tracking-widest text-secondary">免责声明</h2>
-      <p class="text-on-surface-variant leading-relaxed">cippy 对因不可抗力（如自然灾害、物流延误等）导致的订单延误不承担责任。</p>
-    </div>
-
-    <div class="space-y-sm">
-      <h2 class="font-label-md text-sm uppercase tracking-widest text-secondary">条款更新</h2>
-      <p class="text-on-surface-variant leading-relaxed">cippy 保留随时更新本条款的权利，更新后继续使用本网站即视为接受新条款。</p>
-    </div>
-  </section>
-
+  </div>
+</div>
 </main>
 
+<footer class="bg-surface-container-low border-t border-outline-variant py-lg mt-xl">
+  <div class="px-6 md:px-margin-desktop max-w-[1440px] mx-auto text-center">
+    <p class="font-body-sm text-body-sm text-on-surface-variant">© 2025 Cippy Malaysia · All Rights Reserved</p>
+    <p class="font-label-sm text-label-sm text-primary mt-2">
+      <a href="https://wa.me/601120861073" target="_blank">WhatsApp +601120861073</a> &nbsp;·&nbsp;
+      <a href="https://instagram.com/cippy.kl" target="_blank">@cippy.kl</a>
+    </p>
+  </div>
+</footer>
+
+<script src="i18n.js"></script>
 <script>
-function showTab(id) {
-  document.querySelectorAll('.info-section').forEach(s => s.classList.add('hidden'));
-  document.getElementById(id).classList.remove('hidden');
-  document.querySelectorAll('.tab-btn').forEach(b => {
-    b.classList.remove('border-primary','text-primary');
-    b.classList.add('border-transparent','text-on-surface-variant');
-  });
-  const active = document.getElementById('tab-' + id);
-  active.classList.add('border-primary','text-primary');
-  active.classList.remove('border-transparent','text-on-surface-variant');
+const POLICIES = [
+  { id:'shopping',     zh:'购物须知',     en:'Shopping Guide' },
+  { id:'shipping',     zh:'配送政策',     en:'Shipping Policy' },
+  { id:'returns',      zh:'退换货政策',   en:'Return & Exchange' },
+  { id:'refund',       zh:'退款政策',     en:'Refund Policy' },
+  { id:'quality',      zh:'商品质量标准', en:'Quality Standards' },
+  { id:'unboxing',     zh:'开箱政策',     en:'Unboxing Policy' },
+  { id:'cancellation', zh:'订单取消政策', en:'Cancellation Policy' },
+  { id:'sizing',       zh:'尺寸政策',     en:'Sizing Policy' },
+  { id:'privacy',      zh:'隐私政策',     en:'Privacy Policy' },
+  { id:'terms',        zh:'服务条款',     en:'Terms & Conditions' },
+  { id:'payment',      zh:'付款政策',     en:'Payment Policy' },
+  { id:'membership',   zh:'会员政策',     en:'Membership Policy' },
+  { id:'promotions',   zh:'优惠券政策',   en:'Promotion Policy' },
+  { id:'aftersales',   zh:'售后服务',     en:'After-sales Service' },
+  { id:'care',         zh:'洗涤保养',     en:'Care Guide' },
+  { id:'faq',          zh:'常见问题',     en:'FAQ' },
+];
+
+const FAQS = [
+  { q:'可以退货吗？/ Can I return?', a:'可以，但需满足退换货条件，且需提供完整开箱视频。请查阅退换货政策了解详情。' },
+  { q:'可以换尺寸吗？/ Can I exchange size?', a:'可以申请换尺码，前提是有开箱视频、商品未穿着、收货7天内联系客服。' },
+  { q:'可以换颜色吗？/ Can I exchange color?', a:'换颜色视库存情况而定，请联系客服确认是否有货。' },
+  { q:'没有库存怎么办？/ Item out of stock?', a:'如下单后发现缺货，我们会联系您协商：等待补货或全额退款。' },
+  { q:'发货多久？/ When will it ship?', a:'现货商品付款后 1–3 个工作日内发货，预购商品以商品页面注明时间为准。' },
+  { q:'可以修改地址吗？/ Can I change address?', a:'付款后 2 小时内可联系客服修改，包装完成后无法修改。' },
+  { q:'可以合并订单吗？/ Can I combine orders?', a:'如两笔订单在同一天下单且尚未开始包装，可联系客服尝试合并，但不保证成功。' },
+  { q:'有国际配送吗？/ International shipping?', a:'目前暂不提供国际配送。如有特殊需求请联系客服咨询。' },
+  { q:'怎么联系客服？/ How to contact support?', a:'WhatsApp +601120861073（周一至周六 10am–6pm），或 Instagram DM @cippy.kl。' },
+];
+
+function buildSidebar() {
+  const zh = window.getCippyLang?.() === 'zh';
+  const nav = document.getElementById('sidebarNav');
+  const mobileGrid = document.getElementById('mobileNavGrid');
+  if (nav) nav.innerHTML = POLICIES.map((p,i) => `
+    <a href="#${p.id}" class="sidebar-link flex items-center gap-2 px-3 py-2 text-sm text-on-surface-variant hover:text-primary rounded-lg transition-all font-label-sm">
+      <span class="text-[10px] font-bold text-primary/60 w-5 flex-shrink-0">${String(i+1).padStart(2,'0')}</span>
+      <span>${zh ? p.zh : p.en}</span>
+    </a>`).join('');
+  if (mobileGrid) mobileGrid.innerHTML = POLICIES.map((p,i) => `
+    <a href="#${p.id}" onclick="closeMobileMenu()" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-surface-container text-sm text-on-surface font-label-sm transition-colors">
+      <span class="text-[10px] font-bold text-primary w-5 flex-shrink-0">${String(i+1).padStart(2,'0')}</span>
+      <span>${zh ? p.zh : p.en}</span>
+    </a>`).join('');
 }
 
-// Auto-open tab from hash
-const hash = window.location.hash.replace('#','');
-if (['shipping','privacy','terms'].includes(hash)) showTab(hash);
+function closeMobileMenu() {
+  document.getElementById('mobilePolicyMenu').classList.remove('open');
+}
+
+function buildFaq() {
+  const list = document.getElementById('faqList');
+  if (!list) return;
+  list.innerHTML = FAQS.map((f,i) => `
+    <div class="border border-outline-variant rounded-xl overflow-hidden">
+      <button onclick="toggleFaq(${i})" class="w-full flex items-center justify-between px-5 py-4 text-left bg-surface hover:bg-surface-container transition-colors gap-3">
+        <span class="font-label-md text-label-md text-on-surface">${f.q}</span>
+        <span class="material-symbols-outlined text-primary flex-shrink-0 faq-icon-${i}">expand_more</span>
+      </button>
+      <div id="faq-${i}" class="hidden px-5 pb-4 pt-1 bg-surface-container-low">
+        <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">${f.a}</p>
+      </div>
+    </div>`).join('');
+}
+
+function toggleFaq(i) {
+  const el = document.getElementById('faq-'+i);
+  const icon = document.querySelector('.faq-icon-'+i);
+  const open = !el.classList.contains('hidden');
+  el.classList.toggle('hidden', open);
+  if (icon) icon.textContent = open ? 'expand_more' : 'expand_less';
+}
+
+function updateActive() {
+  const sections = document.querySelectorAll('.policy-section');
+  const links = document.querySelectorAll('.sidebar-link');
+  let current = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 120) current = s.id; });
+  links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#'+current));
+}
+
+window.addEventListener('scroll', updateActive, { passive:true });
+
+buildSidebar();
+buildFaq();
+updateActive();
+
+const _prev = window.onCippyLangChange;
+window.onCippyLangChange = function(lang) { if (_prev) _prev(lang); buildSidebar(); };
 </script>
-<script src="i18n.js"></script>
+<script>
+(function(){
+  function updateCartBadge(){
+    var cart=JSON.parse(localStorage.getItem("cippy_cart")||"[]");
+    var count=cart.reduce(function(s,i){return s+(i._is_discount?0:(Number(i.qty)||1));},0);
+    var b=document.getElementById("cartBadge");
+    if(!b)return;
+    if(count>0){b.textContent=count>99?"99+":count;b.classList.remove("hidden");}
+    else{b.classList.add("hidden");}
+  }
+  updateCartBadge();
+  window.addEventListener("storage",updateCartBadge);
+})();
+</script>
 </body>
 </html>
