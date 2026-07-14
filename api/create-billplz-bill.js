@@ -23,12 +23,13 @@ async function sbGet(path) {
   return r.ok ? r.json() : null;
 }
 
-async function sbPost(path, body, authToken) {
+async function sbPost(path, body, useServiceKey = false) {
+  const key = useServiceKey ? (process.env.SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY) : SUPABASE_ANON_KEY;
   return fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
     method: "POST",
     headers: {
-      apikey: SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${authToken || SUPABASE_ANON_KEY}`,
+      apikey: key,
+      Authorization: `Bearer ${key}`,
       "Content-Type": "application/json",
       Prefer: "resolution=merge-duplicates,return=minimal",
     },
@@ -87,7 +88,7 @@ export default async function handler(req, res) {
   });
   const contentRange = countRes.headers.get("content-range") || "0/0";
   const totalOrders = parseInt(contentRange.split("/")[1] || "0", 10);
-  const orderId = String(100010 + totalOrders);
+  const orderId = String(10010 + totalOrders);
 
   const origin = req.headers.origin || "https://cippy.vercel.app";
   const BILLPLZ_BASE = process.env.BILLPLZ_SANDBOX === "true"
@@ -123,7 +124,7 @@ export default async function handler(req, res) {
 
   const bill = await billRes.json();
 
-  // Save order
+  // Save order (use service role key to bypass RLS)
   await sbPost("orders", {
     order_id: orderId,
     user_id: user?.id || null,
@@ -134,7 +135,7 @@ export default async function handler(req, res) {
     status: "pending",
     payment_method: "billplz",
     billplz_bill_id: bill.id,
-  }, token || null);
+  }, true);
 
   // Send order email
   if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {

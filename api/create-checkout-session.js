@@ -18,12 +18,13 @@ async function getVerifiedUser(req) {
   return r.ok ? r.json() : null;
 }
 
-async function sbPost(path, body, token) {
+async function sbPost(path, body, token, useServiceKey = false) {
+  const key = useServiceKey ? (process.env.SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY) : SUPABASE_ANON_KEY;
   return fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
     method: "POST",
     headers: {
-      apikey: SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${token}`,
+      apikey: key,
+      Authorization: `Bearer ${useServiceKey ? key : (token || SUPABASE_ANON_KEY)}`,
       "Content-Type": "application/json",
       Prefer: "resolution=merge-duplicates,return=minimal",
     },
@@ -165,7 +166,7 @@ export default async function handler(req, res) {
   });
   const contentRange = countRes.headers.get('content-range') || '0/0';
   const totalOrders = parseInt(contentRange.split('/')[1] || '0', 10);
-  const orderId = String(100010 + totalOrders);
+  const orderId = String(10010 + totalOrders);
 
   // Fetch real prices from DB — never trust frontend price
   const productIds = [...new Set(items.map(i => i.product_id || i.id).filter(Boolean))];
@@ -237,7 +238,7 @@ export default async function handler(req, res) {
     totals: verifiedTotals,
     status: "pending",
     stripe_session_id: session.id,
-  }, token);
+  }, token, true);
 
   // Send confirmation email (points not yet awarded — awarded after payment on thankyou.html)
   if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {

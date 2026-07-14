@@ -91,11 +91,13 @@ export default async function handler(req, res) {
   });
   const contentRange = countRes.headers.get("content-range") || "0/0";
   const totalOrders = parseInt(contentRange.split("/")[1] || "0", 10);
-  const orderId = String(100010 + totalOrders);
+  const orderId = String(10010 + totalOrders);
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY;
 
-  // Save order to Supabase
+  // Save order to Supabase (service role key bypasses RLS)
   await sbFetch("orders", {
     method: "POST",
+    serviceKey,
     body: JSON.stringify({
       order_id: orderId,
       user_id: user?.id || null,
@@ -110,7 +112,6 @@ export default async function handler(req, res) {
   });
 
   // Deduct inventory immediately (optimistic — item is reserved)
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   await deductInventory(items, serviceKey);
 
   // Send confirmation email to customer
