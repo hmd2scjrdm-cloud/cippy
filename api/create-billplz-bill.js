@@ -23,6 +23,33 @@ async function sbGet(path) {
   return r.ok ? r.json() : null;
 }
 
+async function deductInventory(items, serviceKey) {
+  if (!serviceKey) return;
+  for (const item of items) {
+    if (item._is_discount) continue;
+    const pid = item.product_id || item.id;
+    if (!pid) continue;
+    const qty = Number(item.qty || 1);
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/products?id=eq.${pid}&select=stock,sizes`, {
+      headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
+    });
+    if (!r.ok) continue;
+    const [prod] = await r.json();
+    if (!prod) continue;
+    const newStock = Math.max(0, Number(prod.stock || 0) - qty);
+    const newSizes = (prod.sizes || []).map(s =>
+      s.color === item.color && s.size === item.size
+        ? { ...s, stock: Math.max(0, Number(s.stock || 0) - qty) }
+        : s
+    );
+    await fetch(`${SUPABASE_URL}/rest/v1/products?id=eq.${pid}`, {
+      method: "PATCH",
+      headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}`, "Content-Type": "application/json", Prefer: "return=minimal" },
+      body: JSON.stringify({ stock: newStock, in_stock: newStock > 0, sizes: newSizes }),
+    });
+  }
+}
+
 async function sbPost(path, body, useServiceKey = false) {
   const key = useServiceKey ? (process.env.SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY) : SUPABASE_ANON_KEY;
   return fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
@@ -124,8 +151,10 @@ export default async function handler(req, res) {
 
   const bill = await billRes.json();
 
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY;
+
   // Save order (use service role key to bypass RLS)
-  await sbPost("orders", {
+  const saveRes = await sbPost("orders", {
     order_id: orderId,
     user_id: user?.id || null,
     guest_email: user ? null : (customer.email || null),
@@ -136,6 +165,13 @@ export default async function handler(req, res) {
     payment_method: "billplz",
     billplz_bill_id: bill.id,
   }, true);
+  if (!saveRes.ok) {
+    const saveErr = await saveRes.text().catch(() => "");
+    console.error("Order save failed:", saveRes.status, saveErr);
+  }
+
+  // Deduct inventory immediately (reserved on order placement)
+  await deductInventory(items, serviceKey);
 
   // Send order email
   if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {

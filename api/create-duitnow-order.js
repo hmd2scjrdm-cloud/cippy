@@ -95,7 +95,7 @@ export default async function handler(req, res) {
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY;
 
   // Save order to Supabase (service role key bypasses RLS)
-  await sbFetch("orders", {
+  const saveRes = await sbFetch("orders", {
     method: "POST",
     serviceKey,
     body: JSON.stringify({
@@ -110,8 +110,13 @@ export default async function handler(req, res) {
       gift_note: giftNote || null,
     }),
   });
+  if (!saveRes.ok) {
+    const saveErr = await saveRes.text().catch(() => "");
+    console.error("DuitNow order save failed:", saveRes.status, saveErr);
+    return res.status(500).json({ error: "订单保存失败", details: saveErr });
+  }
 
-  // Deduct inventory immediately (optimistic — item is reserved)
+  // Deduct inventory immediately (reserved on order placement)
   await deductInventory(items, serviceKey);
 
   // Send confirmation email to customer
