@@ -49,28 +49,24 @@
 <!-- TopNavBar -->
 <div id="announcementBar" class="hidden w-full bg-primary text-on-primary text-center text-xs py-2 px-4 font-label-sm sticky top-0 z-[60]"></div>
 <nav class="fixed top-0 w-full z-50 shadow-sm" style="background:#faf7f5">
-<div class="flex justify-between items-center px-margin-desktop py-4 w-full max-w-[1440px] mx-auto">
+<div class="flex justify-between items-center px-6 md:px-margin-desktop py-4 w-full max-w-[1440px] mx-auto">
 <div class="flex items-center gap-lg">
 <a class="flex items-center shrink-0" href="index.html">
 <img src="assets/cippy-logo.png" alt="cippy" class="h-24 w-auto">
 </a>
 <div class="hidden md:flex gap-8 items-center">
-<a class="font-label-md text-label-md text-primary border-b-2 border-primary pb-1 transition-all" href="products.html?sort=new">New In</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-opacity duration-300" href="products.html?sort=new">New In</a>
 <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-opacity duration-300" href="products.html">Clothing</a>
-<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-opacity duration-300" href="index.html#community">Community</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-opacity duration-300" href="account.html">Community</a>
 </div>
 </div>
 <div class="flex items-center gap-md">
-<div class="hidden lg:flex items-center bg-surface-container px-4 py-2 rounded-full border border-outline-variant/30">
-<span class="material-symbols-outlined text-on-surface-variant text-[20px]">search</span>
-<input class="bg-transparent border-none focus:ring-0 text-label-sm placeholder:text-on-surface-variant/50 w-32 xl:w-48" placeholder="Search trends..." type="text"/>
-</div>
-<button class="font-label-sm text-label-sm font-semibold w-11 h-11 flex items-center justify-center hover:text-primary transition-colors" data-lang-toggle="" onclick="toggleCippyLang()">中文</button><button class="material-symbols-outlined text-on-surface hover:text-primary transition-colors w-11 h-11 flex items-center justify-center" onclick="location.href='account.html'">person</button>
+<button class="font-label-sm text-label-sm font-semibold w-11 h-11 flex items-center justify-center hover:text-primary transition-colors" data-lang-toggle="" onclick="toggleCippyLang()">中文</button>
+<button class="material-symbols-outlined text-on-surface hover:text-primary transition-colors w-11 h-11 flex items-center justify-center" onclick="location.href='account.html'">person</button>
 <button class="relative w-11 h-11 flex items-center justify-center text-on-surface hover:text-primary transition-colors" onclick="location.href='cart.html'">
   <span class="material-symbols-outlined">shopping_bag</span>
   <span id="cartBadge" class="hidden absolute -top-0.5 -right-0.5 bg-primary text-on-primary text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold leading-none"></span>
 </button>
-<button class="md:hidden material-symbols-outlined text-on-surface">menu</button>
 </div>
 </div>
 </nav>
