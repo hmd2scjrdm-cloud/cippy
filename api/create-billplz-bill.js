@@ -67,6 +67,7 @@ export default async function handler(req, res) {
   const priceMap = Object.fromEntries(dbProducts.map(p => [p.id, p]));
 
   for (const item of items) {
+    if (item._is_discount) { item._verified_price = item.price_myr || 0; continue; }
     const pid = item.product_id || item.id;
     if (!pid || !priceMap[pid]) return res.status(400).json({ error: `商品不存在：${item.name_zh || pid}` });
     const dbPrice = Number(priceMap[pid].price_myr || 0);
