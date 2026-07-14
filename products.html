@@ -70,7 +70,7 @@
 <a class="flex items-center shrink-0" href="index.html">
 <img src="assets/cippy-logo.png" alt="cippy" class="h-24 w-auto">
 </a>
-<div class="hidden md:flex gap-md items-center"><a class="text-primary border-b-2 border-primary pb-1 font-label-md text-label-md" href="index.html">New In</a><a class="text-on-surface-variant hover:text-primary transition-opacity duration-300 font-label-md text-label-md" href="products.html">Clothing</a><a class="text-on-surface-variant hover:text-primary transition-opacity duration-300 font-label-md text-label-md" href="products.html">Accessories</a><a class="text-on-surface-variant hover:text-primary transition-opacity duration-300 font-label-md text-label-md" href="products.html">Sale</a><a class="text-on-surface-variant hover:text-primary transition-opacity duration-300 font-label-md text-label-md" href="account.html">Community</a></div>
+<div class="hidden md:flex gap-md items-center"><a class="text-on-surface-variant hover:text-primary transition-opacity duration-300 font-label-md text-label-md" href="products.html?sort=new">New In</a><a class="text-on-surface-variant hover:text-primary transition-opacity duration-300 font-label-md text-label-md" href="products.html">Clothing</a><a class="text-on-surface-variant hover:text-primary transition-opacity duration-300 font-label-md text-label-md" href="products.html?category=Accessories">Accessories</a><a class="text-on-surface-variant hover:text-primary transition-opacity duration-300 font-label-md text-label-md" href="products.html?sale=1">Sale</a><a class="text-on-surface-variant hover:text-primary transition-opacity duration-300 font-label-md text-label-md" href="index.html#community">Community</a></div>
 </div>
 <div class="flex items-center gap-md">
 <button class="material-symbols-outlined text-on-surface hover:opacity-70 transition-opacity w-11 h-11 flex items-center justify-center" onclick="document.getElementById('searchBar').classList.toggle('hidden')">search</button>
@@ -257,8 +257,10 @@ const sb = createClient(
 );
 
 let allProducts = [];
-let currentSort = 'default';
-let currentCategory = new URLSearchParams(window.location.search).get('category') || '';
+const _params = new URLSearchParams(window.location.search);
+let currentSort = _params.get('sort') === 'new' ? 'new' : 'default';
+let currentCategory = _params.get('category') || '';
+let currentSale = _params.get('sale') === '1';
 let currentSeries = '';
 
 async function loadProducts() {
@@ -307,6 +309,7 @@ function renderProducts() {
     });
   }
   if (currentSeries) data = data.filter(p => (p.series || '') === currentSeries);
+  if (currentSale) data = data.filter(p => p.sale_price || p.is_sale);
   if (currentSort === 'price_asc') data.sort((a, b) => parseFloat(a.price_myr || a.price) - parseFloat(b.price_myr || b.price));
   else if (currentSort === 'price_desc') data.sort((a, b) => parseFloat(b.price_myr || b.price) - parseFloat(a.price_myr || a.price));
   else if (currentSort === 'new') data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
