@@ -17,6 +17,7 @@
   "Trending Now": "当下流行",
   "Dresses": "连衣裙",
   "Bottoms": "下装",
+  "Tops + Outerwear": "上装",
   "Knitwear": "针织衫",
   "Shoes": "鞋履",
   "Weekly Drop": "每周新品",

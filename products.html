@@ -105,6 +105,8 @@
 <div class="flex gap-sm overflow-x-auto pb-2 no-scrollbar" id="categoryBtns">
 <button class="cat-btn px-md py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-md text-label-md whitespace-nowrap hover:bg-secondary-container transition-colors" data-cat="">All</button>
 <button class="cat-btn px-md py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-md text-label-md whitespace-nowrap hover:bg-secondary-container transition-colors" data-cat="Dresses">Dresses</button>
+<button class="cat-btn px-md py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-md text-label-md whitespace-nowrap hover:bg-secondary-container transition-colors" data-cat="Bottoms">Bottoms</button>
+<button class="cat-btn px-md py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-md text-label-md whitespace-nowrap hover:bg-secondary-container transition-colors" data-cat="TopsOuterwear">Tops + Outerwear</button>
 <button class="cat-btn px-md py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-md text-label-md whitespace-nowrap hover:bg-secondary-container transition-colors" data-cat="Skirts">Skirts</button>
 <button class="cat-btn px-md py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-md text-label-md whitespace-nowrap hover:bg-secondary-container transition-colors" data-cat="Tops">Tops</button>
 <button class="cat-btn px-md py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-md text-label-md whitespace-nowrap hover:bg-secondary-container transition-colors" data-cat="Pants">Pants</button>
@@ -302,18 +304,58 @@ async function loadProducts() {
 }
 
 function updateCategoryBtns() {
-  const catMap = { dress:'dresses', top:'tops', bottom:'pants', outerwear:'outerwear', set:'sets', accessories:'accessories' };
   document.querySelectorAll('.cat-btn[data-cat]').forEach(btn => {
-    const cat = (btn.dataset.cat || '').toLowerCase();
+    const cat = btn.dataset.cat || '';
     if (!cat) return; // "All" always visible
-    const hasProducts = allProducts.some(p => {
-      const c = (p.category || '').toLowerCase();
-      return (catMap[c] || c) === cat;
-    });
+    const hasProducts = allProducts.some(p => categoryMatches(p, cat));
     btn.classList.toggle('opacity-30', !hasProducts);
     btn.classList.toggle('pointer-events-none', !hasProducts);
     btn.title = hasProducts ? '' : 'Coming soon';
   });
+}
+
+function normalizeCategory(product) {
+  const c = (product.category || '').toLowerCase().trim();
+  const catMap = {
+    dress: 'dresses',
+    dresses: 'dresses',
+    skirt: 'skirts',
+    skirts: 'skirts',
+    top: 'tops',
+    tops: 'tops',
+    bottom: 'bottoms',
+    bottoms: 'bottoms',
+    pant: 'pants',
+    pants: 'pants',
+    shorts: 'shorts',
+    short: 'shorts',
+    outerwear: 'outerwear',
+    jacket: 'outerwear',
+    set: 'sets',
+    sets: 'sets',
+    accessories: 'accessories',
+    accessory: 'accessories'
+  };
+  return catMap[c] || c;
+}
+
+function categoryMatches(product, selected) {
+  const cat = (selected || '').toLowerCase();
+  const normalized = normalizeCategory(product);
+  const typeText = `${product.clothing_type || ''} ${product.name_zh || ''} ${product.name || ''}`.toLowerCase();
+  if (!cat) return true;
+  if (cat === 'bottoms') {
+    if (['bottoms', 'skirts', 'pants', 'shorts'].includes(normalized)) return true;
+    if (normalized === 'dresses' || normalized === 'sets') return false;
+    return /半身裙|短裙|包臀裙|长裤|短裤|休闲裤|热裤|pants|shorts|skirt/.test(typeText);
+  }
+  if (cat === 'topsouterwear') {
+    if (['tops', 'outerwear'].includes(normalized)) return true;
+    if (['dresses', 'sets', 'bottoms', 'skirts', 'pants', 'shorts'].includes(normalized)) return false;
+    if (/连衣裙|dress/.test(typeText)) return false;
+    return /上衣|外套|开衫|抹胸|top|blouse|shirt|outerwear|cardigan|jacket/.test(typeText);
+  }
+  return normalized === cat;
 }
 
 function renderProducts() {
@@ -326,12 +368,7 @@ function renderProducts() {
   const q = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
   if (q) data = data.filter(p => (p.name || '').toLowerCase().includes(q) || (p.name_zh || '').toLowerCase().includes(q));
   if (currentCategory) {
-    const catMap = { dress:'dresses', top:'tops', bottom:'pants', outerwear:'outerwear', set:'sets', accessories:'accessories' };
-    data = data.filter(p => {
-      const c = (p.category || '').toLowerCase();
-      const normalized = catMap[c] || c;
-      return normalized === currentCategory.toLowerCase();
-    });
+    data = data.filter(p => categoryMatches(p, currentCategory));
   }
   if (currentSeries) data = data.filter(p => (p.series || '') === currentSeries);
   if (currentSale) data = data.filter(p => p.sale_price || p.is_sale);
