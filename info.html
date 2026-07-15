@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>cippy | 政策与帮助 · Help & Policies</title>
+<title>cippy | Help & Policies</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@400;500;600;700&family=Noto+Serif+SC:wght@300;400;600;700&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
@@ -54,15 +54,15 @@
 <div class="max-w-[1440px] mx-auto px-6 md:px-margin-desktop">
 
   <div class="mb-lg">
-    <p class="font-label-sm text-label-sm text-primary uppercase tracking-widest mb-2">Help Center · 帮助中心</p>
-    <h1 class="font-headline-lg text-headline-lg text-on-surface mb-3">政策与帮助 <span class="text-on-surface-variant font-body-md text-body-md align-middle">Policies & Help</span></h1>
-    <p class="font-body-sm text-body-sm text-on-surface-variant max-w-xl">购物前请阅读我们的政策。如有疑问，随时联系我们。<br>Please read our policies before shopping. Contact us anytime.</p>
+    <p id="infoEyebrow" class="font-label-sm text-label-sm text-primary uppercase tracking-widest mb-2">Help Center</p>
+    <h1 id="infoTitle" class="font-headline-lg text-headline-lg text-on-surface mb-3">Help & Policies</h1>
+    <p id="infoIntro" class="font-body-sm text-body-sm text-on-surface-variant max-w-xl">Please read our policies before shopping. Contact us anytime if you need help.</p>
   </div>
 
   <!-- Mobile dropdown -->
   <div class="md:hidden mb-lg">
     <button onclick="document.getElementById('mobilePolicyMenu').classList.toggle('open')" class="w-full flex items-center justify-between bg-surface-container border border-outline-variant rounded-xl px-5 py-4">
-      <span class="font-label-md text-label-md text-on-surface" id="mobileNavLabel">选择政策 · Select Policy</span>
+      <span class="font-label-md text-label-md text-on-surface" id="mobileNavLabel">Select Policy</span>
       <span class="material-symbols-outlined text-primary">expand_more</span>
     </button>
     <div id="mobilePolicyMenu" class="bg-surface border border-outline-variant border-t-0 rounded-b-xl">
@@ -353,16 +353,207 @@ const POLICIES = [
 ];
 
 const FAQS = [
-  { q:'可以退货吗？/ Can I return?', a:'可以，但需满足退换货条件，且需提供完整开箱视频。请查阅退换货政策了解详情。' },
-  { q:'可以换尺寸吗？/ Can I exchange size?', a:'不接受换尺寸，请在下单前仔细参考尺寸表，如有疑问请先联系客服。' },
-  { q:'可以换颜色吗？/ Can I exchange color?', a:'下单后原则上不接受换颜色。如确有需要，请在付款后2小时内通过WhatsApp联系客服，视情况而定。' },
-  { q:'没有库存怎么办？/ Item out of stock?', a:'如下单后发现缺货，我们会联系您协商：等待补货或全额退款。' },
-  { q:'发货多久？/ When will it ship?', a:'现货商品付款后 1–3 个工作日内发货，预购商品以商品页面注明时间为准。' },
-  { q:'可以修改地址吗？/ Can I change address?', a:'付款后 2 小时内可联系客服修改，包装完成后无法修改。' },
-  { q:'可以合并订单吗？/ Can I combine orders?', a:'如两笔订单在同一天下单且尚未开始包装，可联系客服尝试合并，但不保证成功。' },
-  { q:'有国际配送吗？/ International shipping?', a:'目前暂不提供国际配送。如有特殊需求请联系客服咨询。' },
-  { q:'怎么联系客服？/ How to contact support?', a:'WhatsApp +601120861073（周一至周五 10am–6pm）。' },
+  { qZh:'可以退货吗？', qEn:'Can I return an item?', aZh:'可以，但需满足退换货条件，且需提供完整开箱视频。请查阅退换货政策了解详情。', aEn:'Yes, if the request meets our return conditions and you can provide a complete unboxing video. Please check the Return & Exchange Policy for details.' },
+  { qZh:'可以换尺寸吗？', qEn:'Can I exchange for another size?', aZh:'不接受换尺寸，请在下单前仔细参考尺寸表，如有疑问请先联系客服。', aEn:'Size exchanges are not accepted. Please check the size chart carefully before ordering, or contact us before checkout if you are unsure.' },
+  { qZh:'可以换颜色吗？', qEn:'Can I exchange for another colour?', aZh:'下单后原则上不接受换颜色。如确有需要，请在付款后2小时内通过WhatsApp联系客服，视情况而定。', aEn:'Colour exchanges are generally not accepted after ordering. If needed, please contact us on WhatsApp within 2 hours after payment. Approval depends on packing status and stock.' },
+  { qZh:'没有库存怎么办？', qEn:'What if an item is out of stock?', aZh:'如下单后发现缺货，我们会联系您协商：等待补货或全额退款。', aEn:'If an item becomes unavailable after your order, we will contact you to arrange restock waiting or a full refund.' },
+  { qZh:'发货多久？', qEn:'When will my order ship?', aZh:'现货商品付款后 1–3 个工作日内发货，预购商品以商品页面注明时间为准。', aEn:'Ready-stock items ship within 1-3 working days after payment confirmation. Pre-order timing follows the product page.' },
+  { qZh:'可以修改地址吗？', qEn:'Can I change my address?', aZh:'付款后 2 小时内可联系客服修改，包装完成后无法修改。', aEn:'You may contact us within 2 hours after payment to request an address change. Once packing is completed, the address cannot be changed.' },
+  { qZh:'可以合并订单吗？', qEn:'Can I combine orders?', aZh:'如两笔订单在同一天下单且尚未开始包装，可联系客服尝试合并，但不保证成功。', aEn:'If both orders were placed on the same day and packing has not started, we can try to combine them. This is not guaranteed.' },
+  { qZh:'有国际配送吗？', qEn:'Do you offer international shipping?', aZh:'目前提供配送至新加坡。如有其他国际配送需求请联系客服咨询。', aEn:'We currently ship to Singapore. For other international destinations, please contact us before ordering.' },
+  { qZh:'怎么联系客服？', qEn:'How do I contact support?', aZh:'WhatsApp +601120861073（周一至周五 10am–6pm）。', aEn:'WhatsApp +601120861073, Monday to Friday, 10am-6pm Malaysia time.' },
 ];
+
+const ZH_POLICY_HTML = {};
+document.querySelectorAll('.policy-section').forEach(section => {
+  ZH_POLICY_HTML[section.id] = section.innerHTML;
+});
+
+const EN_POLICY_HTML = {
+  shopping: `
+    <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+      <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">1</span>
+      <div><h2 class="font-headline-md text-headline-md">Shopping Guide</h2><p class="font-label-sm text-label-sm text-on-surface-variant">Before You Order</p></div>
+    </div>
+    <div class="policy-item"><h4>Before ordering</h4><p>Please read the product description, size chart and fabric notes carefully before placing an order. By ordering, you agree to Cippy Malaysia's store policies.</p></div>
+    <div class="policy-item"><h4>Colour difference</h4><p>Product colours may appear slightly different due to screen settings and lighting. Minor colour difference is normal and is not considered a defect. You may contact us for more photos before ordering.</p></div>
+    <div class="policy-item"><h4>Sizing</h4><p>All measurements are taken manually and may have a 1-3cm difference. Please compare the size chart and model details before choosing a size.</p></div>
+    <div class="policy-item"><h4>Fabric notes</h4><p>Fabric information is listed on product pages where available. For feel, stretch, thickness or lining details, please contact us before checkout.</p></div>
+    <div class="policy-item"><h4>Manual measurement</h4><p>A 1-3cm measurement difference is considered normal and cannot be used as a return or exchange reason.</p></div>
+    <div class="policy-item"><h4>Stock availability</h4><p>Stock is updated as accurately as possible. If an item is sold out after checkout, we will contact you to arrange restock waiting or refund.</p></div>
+    <div class="policy-item"><h4>Order cancellation</h4><p>Unpaid orders can be cancelled anytime. Paid orders can only be cancelled before packing starts. Once packed or shipped, cancellation is not accepted.</p></div>
+    <div class="policy-item"><h4>Order changes</h4><p>Please contact us within <strong>2 hours</strong> after payment if you need to change address, size or colour. Changes cannot be made after packing begins.</p></div>`,
+  shipping: `
+    <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+      <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">2</span>
+      <div><h2 class="font-headline-md text-headline-md">Shipping Policy</h2><p class="font-label-sm text-label-sm text-on-surface-variant">Malaysia & Singapore Delivery</p></div>
+    </div>
+    <div class="policy-item"><h4>Processing time</h4><p>Ready-stock orders are packed and handed to courier within <strong>1-3 working days</strong> after payment confirmation.</p></div>
+    <div class="policy-item"><h4>Pre-order timing</h4><p>Pre-order items follow the estimated shipping period shown on the product page, usually 7-21 working days.</p></div>
+    <div class="policy-item"><h4>Holiday delays</h4><p>During festive seasons or major sale periods, processing may take 3-7 extra days. We will announce important delays where possible.</p></div>
+    <div class="policy-item"><h4>Courier</h4><p>We use <strong>DHL Express</strong> for delivery where available.</p></div>
+    <div class="policy-item"><h4>Shipping fees</h4><ul><li>West Malaysia: RM 10</li><li>East Malaysia, Sabah/Sarawak: RM 15</li><li>Singapore: RM 30</li><li>Shipping is calculated automatically at checkout.</li></ul></div>
+    <div class="policy-item"><h4>International shipping</h4><p>We currently ship to <strong>Singapore</strong>. For other countries, please contact us before ordering.</p></div>
+    <div class="policy-item"><h4>Lost parcel</h4><p>If tracking shows that a parcel is lost, contact us immediately. We will help raise a claim with the courier. Investigation usually takes 7-14 working days.</p></div>
+    <div class="policy-item"><h4>Courier delays</h4><p>Weather, holidays and courier disruptions may cause delays. We will assist with follow-up but cannot guarantee courier delivery speed.</p></div>
+    <div class="policy-item"><h4>Wrong address</h4><p>If the address entered by the customer is incorrect, re-delivery or return shipping costs will be borne by the customer.</p></div>`,
+  returns: `
+    <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+      <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">3</span>
+      <div><h2 class="font-headline-md text-headline-md">Return & Exchange Policy</h2><p class="font-label-sm text-label-sm text-on-surface-variant">Eligibility & Process</p></div>
+    </div>
+    <div class="policy-item"><h4>Accepted reasons<span class="tag-ok">Accepted</span></h4><ul><li>Item is significantly different from the description</li><li>Clear manufacturing defect</li><li>Wrong item, colour or size was sent</li><li>Complete unedited unboxing video is provided</li></ul></div>
+    <div class="policy-item"><h4>Not accepted<span class="tag-no">Not accepted</span></h4><ul><li>Change of mind, colour or style preference</li><li>1-3cm measurement difference</li><li>Minor colour difference caused by lighting or screen settings</li><li>Item has been worn, washed, scented or tag removed</li><li>No complete unboxing video</li><li>Sale items</li><li>Accessories such as earrings and necklaces</li></ul></div>
+    <div class="policy-item"><h4>Request period</h4><p>Please contact us within <strong>3 days</strong> after receiving your parcel. Late requests cannot be accepted.</p></div>
+    <div class="policy-item"><h4>Exchange process</h4><ul><li>WhatsApp us with your order number, photos and unboxing video</li><li>We review the request and confirm eligibility</li><li>Return the item to the given address with tracking</li><li>After inspection, we arrange the approved exchange</li></ul></div>
+    <div class="policy-item"><h4>Exchange limit</h4><p>Each order can request exchange once only.</p></div>
+    <div class="policy-item"><h4>Shipping cost</h4><p>If the issue is caused by us, we cover return and replacement shipping. If caused by customer reason, return shipping is borne by the customer.</p></div>
+    <div class="policy-item"><h4>Returned item condition</h4><p>Items must be brand new, unworn, unwashed, with tag attached, free from stain, scent and damage. Failed inspection items will be returned to the customer.</p></div>`,
+  refund: `
+    <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+      <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">4</span>
+      <div><h2 class="font-headline-md text-headline-md">Refund Policy</h2><p class="font-label-sm text-label-sm text-on-surface-variant">Refund Method & Timing</p></div>
+    </div>
+    <div class="policy-item"><h4>Refundable cases<span class="tag-ok">Refundable</span></h4><ul><li>Approved defect case where replacement is unavailable</li><li>Item is out of stock and customer does not wish to wait</li><li>Wrong item was sent and customer does not accept exchange, subject to return inspection</li></ul></div>
+    <div class="policy-item"><h4>Refund method</h4><p>Refunds are returned to the original payment method where possible, such as card, FPX or bank account.</p></div>
+    <div class="policy-item"><h4>Processing time</h4><p>Approved refunds are processed within <strong>5-10 working days</strong>. Actual bank posting time depends on the bank or payment provider.</p></div>
+    <div class="policy-item"><h4>Refund amount</h4><p>The refund amount is based on the actual amount paid for the item. Used discounts or voucher value are not refunded separately.</p></div>
+    <div class="policy-item"><h4>Voucher handling</h4><p>Used vouchers or discount codes will not be restored after refund.</p></div>
+    <div class="policy-item"><h4>Shipping fee</h4><p>Shipping is refunded only when the issue is caused by Cippy Malaysia. For customer reasons, shipping fees are not refundable.</p></div>
+    <div class="policy-item"><h4>Non-refundable cases<span class="tag-no">Not accepted</span></h4><ul><li>Item has been worn or washed</li><li>Sale items</li><li>No unboxing video proof</li><li>Request is made after the 3-day period</li></ul></div>`,
+  quality: `
+    <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+      <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">5</span>
+      <div><h2 class="font-headline-md text-headline-md">Quality Standards</h2><p class="font-label-sm text-label-sm text-on-surface-variant">What Counts As A Defect</p></div>
+    </div>
+    <div class="bg-surface-container rounded-xl p-5 mb-lg">
+      <p class="font-label-sm text-label-sm text-secondary uppercase tracking-widest mb-4">The following are not considered defects</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="policy-item" style="margin-bottom:0"><h4>Loose threads</h4><p>Small loose threads from cutting and sewing can be trimmed.</p></div>
+        <div class="policy-item" style="margin-bottom:0"><h4>Minor wrinkles</h4><p>Wrinkles from folding and delivery can be removed by steaming or ironing.</p></div>
+        <div class="policy-item" style="margin-bottom:0"><h4>Minor colour difference</h4><p>Caused by lighting and screen display settings.</p></div>
+        <div class="policy-item" style="margin-bottom:0"><h4>Small print position difference</h4><p>Manual print or embroidery placement may have slight differences.</p></div>
+        <div class="policy-item" style="margin-bottom:0"><h4>1-3cm size difference</h4><p>Manual measurement differences are normal.</p></div>
+        <div class="policy-item" style="margin-bottom:0"><h4>Fabric texture variation</h4><p>Some fabrics naturally have small texture differences.</p></div>
+        <div class="policy-item" style="margin-bottom:0"><h4>Dye batch variation</h4><p>Different batches may have slightly different tones.</p></div>
+        <div class="policy-item" style="margin-bottom:0"><h4>Denim wash variation</h4><p>Denim wash may vary by batch.</p></div>
+      </div>
+    </div>
+    <div class="policy-item"><h4>Accepted defect examples<span class="tag-ok">Eligible</span></h4><ul><li>Major seam breakage</li><li>Zip or button cannot be used</li><li>Visible fabric hole or damage</li><li>Large print peeling or wrong print</li></ul></div>`,
+  unboxing: `
+    <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+      <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">6</span>
+      <div><h2 class="font-headline-md text-headline-md">Unboxing Policy</h2><p class="font-label-sm text-label-sm text-on-surface-variant">Required For After-sales Requests</p></div>
+    </div>
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-lg"><p class="font-label-md text-label-md text-amber-800">All return or exchange requests require a complete unboxing video.</p></div>
+    <div class="policy-item"><h4>Record before opening</h4><p>Please start recording before opening the parcel and continue until all items are clearly shown.</p></div>
+    <div class="policy-item"><h4>How to record</h4><ul><li>Record in a bright place</li><li>Show the sealed parcel clearly</li><li>Do not pause or cut the video</li></ul></div>
+    <div class="policy-item"><h4>What to show</h4><ul><li>Front, back and tag of each item</li><li>Natural-light comparison for colour issue</li><li>Close-up of any suspected defect</li></ul></div>
+    <div class="policy-item"><h4>When to contact us</h4><p>If there is an issue, contact us within <strong>24 hours</strong> after receiving the parcel with video and photos.</p></div>
+    <div class="policy-item"><h4>How long to keep the video</h4><p>Please keep the video for at least <strong>14 days</strong>.</p></div>
+    <div class="policy-item"><h4>Review process</h4><p>We review submitted proof within 1-2 working days and advise the next step.</p></div>`,
+  cancellation: `
+    <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+      <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">7</span>
+      <div><h2 class="font-headline-md text-headline-md">Cancellation Policy</h2><p class="font-label-sm text-label-sm text-on-surface-variant">Before Packing & Shipping</p></div>
+    </div>
+    <div class="policy-item"><h4>Unpaid orders</h4><p>DuitNow or FPX orders without payment proof within <strong>24 hours</strong> may be cancelled automatically and stock will be released.</p></div>
+    <div class="policy-item"><h4>Paid orders</h4><p>Paid orders may be cancelled only if packing has not started.</p></div>
+    <div class="policy-item"><h4>Packed orders</h4><p>Once packing is completed, cancellation is generally not accepted.</p></div>
+    <div class="policy-item"><h4>Shipped orders</h4><p>Shipped orders cannot be cancelled.</p></div>
+    <div class="policy-item"><h4>Pre-orders</h4><p>Pre-orders can be cancelled before shipment. After shipping, cancellation is not accepted.</p></div>`,
+  sizing: `
+    <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+      <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">8</span>
+      <div><h2 class="font-headline-md text-headline-md">Sizing Policy</h2><p class="font-label-sm text-label-sm text-on-surface-variant">Petite-fit Guidance</p></div>
+    </div>
+    <div class="policy-item"><h4>How to measure</h4><p>Please measure bust, waist, hip and height, then compare with the product's actual measurements.</p></div>
+    <div class="policy-item"><h4>What to follow</h4><p>Prioritise the actual garment measurements instead of only S/M/L labels, as each cutting may be different.</p></div>
+    <div class="policy-item"><h4>Model details</h4><p>Model height, weight and try-on size are shown where available for reference.</p></div>
+    <div class="policy-item"><h4>No size exchange<span class="tag-no">Not accepted</span></h4><p>Size exchange is not accepted after ordering. Please contact us before checkout if you are unsure.</p></div>
+    <div class="policy-item"><h4>No colour exchange<span class="tag-no">Not accepted</span></h4><p>Colour exchange is generally not accepted after ordering. Contact us within <strong>2 hours</strong> after payment if there is an urgent request.</p></div>
+    <div class="policy-item"><h4>Need help?</h4><p>WhatsApp us at <strong>+601120861073</strong> before ordering. We can suggest sizing based on your body measurements.</p></div>`,
+  privacy: `
+    <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+      <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">9</span>
+      <div><h2 class="font-headline-md text-headline-md">Privacy Policy</h2><p class="font-label-sm text-label-sm text-on-surface-variant">How We Use Your Data</p></div>
+    </div>
+    <div class="policy-item"><h4>Information collected</h4><ul><li>Name, phone number and shipping address</li><li>Email address</li><li>Order and payment records</li><li>Anonymous browsing behaviour</li></ul></div>
+    <div class="policy-item"><h4>How we use it</h4><ul><li>To process and deliver orders</li><li>To send order confirmation and updates</li><li>To improve our service</li></ul></div>
+    <div class="policy-item"><h4>Third parties</h4><p>We do not sell personal data. Necessary delivery details may be shared with courier partners.</p></div>
+    <div class="policy-item"><h4>Email use</h4><p>Email is used for order confirmation, shipment updates, refund notices and support communication.</p></div>
+    <div class="policy-item"><h4>Marketing</h4><p>If you subscribe, we may send new arrival or promotion emails. You may unsubscribe anytime.</p></div>`,
+  terms: `
+    <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+      <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">10</span>
+      <div><h2 class="font-headline-md text-headline-md">Terms & Conditions</h2><p class="font-label-sm text-label-sm text-on-surface-variant">Website & Order Terms</p></div>
+    </div>
+    <div class="policy-item"><h4>Website use</h4><p>You agree to use this website for lawful purposes only and not for fraud, harassment or illegal activity.</p></div>
+    <div class="policy-item"><h4>Ordering means agreement</h4><p>Submitting an order means you have read and agreed to our shipping, payment, return and store policies.</p></div>
+    <div class="policy-item"><h4>Product copyright</h4><p>Product designs and selections belong to Cippy Malaysia where applicable and may not be copied or resold without permission.</p></div>
+    <div class="policy-item"><h4>Image copyright</h4><p>Website images belong to Cippy Malaysia and cannot be reused without written permission.</p></div>
+    <div class="policy-item"><h4>Policy updates</h4><p>Cippy Malaysia may update these terms at any time. Continued website use means acceptance of the updated terms.</p></div>
+    <div class="policy-item"><h4>Governing law</h4><p>These terms are governed by Malaysia law.</p></div>`,
+  payment: `
+    <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+      <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">11</span>
+      <div><h2 class="font-headline-md text-headline-md">Payment Policy</h2><p class="font-label-sm text-label-sm text-on-surface-variant">Accepted Payment Methods</p></div>
+    </div>
+    <div class="policy-item"><h4>Accepted payment methods</h4><ul><li>DuitNow QR</li><li>FPX online banking</li><li>Credit or debit card, Visa and Mastercard</li></ul></div>
+    <div class="policy-item"><h4>Payment deadline</h4><p>DuitNow and FPX orders must be paid within <strong>24 hours</strong>, otherwise the order may be cancelled.</p></div>
+    <div class="policy-item"><h4>Unpaid orders</h4><p>Unpaid orders are automatically cancelled after the payment period and reserved stock will be released.</p></div>
+    <div class="policy-item"><h4>Currency</h4><p>All prices are charged in Malaysian Ringgit, MYR.</p></div>
+    <div class="policy-item"><h4>Payment failure</h4><p>If payment fails, please check your account or contact your bank. You may reorder or contact us for help.</p></div>`,
+  membership: `
+    <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+      <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">12</span>
+      <div><h2 class="font-headline-md text-headline-md">Membership Policy</h2><p class="font-label-sm text-label-sm text-on-surface-variant">Points & Tiers</p></div>
+    </div>
+    <div class="policy-item"><h4>Points</h4><p>Earn 1 point for every RM 1 spent. Redemption rate may be announced separately.</p></div>
+    <div class="policy-item"><h4>Luxe member</h4><p>Upgrade after RM 800 accumulated spend. Enjoy 1.5x points and priority access.</p></div>
+    <div class="policy-item"><h4>Elite member</h4><p>Upgrade after RM 2,000 accumulated spend. Enjoy 2x points, free shipping and exclusive previews.</p></div>
+    <div class="policy-item"><h4>Points validity</h4><p>Points are valid for <strong>12 months</strong> from the date earned.</p></div>
+    <div class="policy-item"><h4>Upgrade rule</h4><p>Tier upgrades are based on accumulated spend.</p></div>
+    <div class="policy-item"><h4>Downgrade rule</h4><p>Current membership tiers do not downgrade once achieved.</p></div>`,
+  promotions: `
+    <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+      <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">13</span>
+      <div><h2 class="font-headline-md text-headline-md">Promotion Policy</h2><p class="font-label-sm text-label-sm text-on-surface-variant">Vouchers & Discounts</p></div>
+    </div>
+    <div class="policy-item"><h4>Stacking</h4><p>Only <strong>one</strong> discount code can be used per order unless stated otherwise.</p></div>
+    <div class="policy-item"><h4>Expiry</h4><p>Discount codes have expiry dates and cannot be extended after expiry.</p></div>
+    <div class="policy-item"><h4>Minimum spend</h4><p>Some codes require a minimum spend. Please read the promotion details before using.</p></div>
+    <div class="policy-item"><h4>Sale items</h4><p>Sale items are not eligible for additional discount codes unless stated otherwise.</p></div>
+    <div class="policy-item"><h4>After refund</h4><p>Used codes will not be restored or returned after an order refund.</p></div>`,
+  aftersales: `
+    <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+      <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">14</span>
+      <div><h2 class="font-headline-md text-headline-md">After-sales Service</h2><p class="font-label-sm text-label-sm text-on-surface-variant">Support Contact</p></div>
+    </div>
+    <div class="policy-item"><h4>Service hours</h4><p>Monday to Friday, 10:00am-6:00pm Malaysia time. Replies may be slower on public holidays.</p></div>
+    <div class="policy-item"><h4>Reply time</h4><p>WhatsApp messages are usually replied within 1-4 hours during service hours.</p></div>
+    <div class="policy-item"><h4>How to request support</h4><p>WhatsApp <strong>+601120861073</strong> with your order number, issue description, photos and video if needed.</p></div>
+    <div class="policy-item"><h4>Review process</h4><p>We review after-sales requests within 1-2 working days and advise whether the case is eligible.</p></div>
+    <div class="policy-item"><h4>Processing time</h4><p>Approved exchange items ship within 3-5 working days. Refunds take 5-10 working days to process.</p></div>
+    <div class="policy-item"><h4>Contact</h4><ul><li>WhatsApp: +601120861073, Monday to Friday</li></ul></div>`,
+  care: `
+    <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+      <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">15</span>
+      <div><h2 class="font-headline-md text-headline-md">Care Guide</h2><p class="font-label-sm text-label-sm text-on-surface-variant">Washing & Storage</p></div>
+    </div>
+    <div class="policy-item"><h4>Washing</h4><ul><li>Hand wash or use gentle machine cycle below 30°C</li><li>Soak dark colours separately before first wash</li></ul></div>
+    <div class="policy-item"><h4>Ironing</h4><ul><li>Chiffon and lace: low heat with cloth protection</li><li>Cotton and linen: medium heat, iron inside out</li><li>Knitwear: steaming or hanging is preferred</li></ul></div>
+    <div class="policy-item"><h4>Separate colours</h4><p>Wash dark and light colours separately to avoid colour transfer.</p></div>
+    <div class="policy-item"><h4>Knitwear care</h4><p>Lay flat to dry and avoid hanging heavy knitwear when wet.</p></div>
+    <div class="policy-item"><h4>Lace care</h4><p>Hand wash lace items gently and avoid machine washing to prevent snagging.</p></div>
+    <div class="policy-item"><h4>Drying</h4><p>Dry in a cool shaded place. Avoid direct sunlight for delicate fabrics.</p></div>`,
+  faq: `
+    <div class="flex items-center gap-3 mb-lg border-b border-outline-variant pb-4">
+      <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-sm">16</span>
+      <div><h2 class="font-headline-md text-headline-md">FAQ</h2><p class="font-label-sm text-label-sm text-on-surface-variant">Frequently Asked Questions</p></div>
+    </div>
+    <div id="faqList" class="space-y-3"></div>`
+};
 
 function buildSidebar() {
   const zh = window.getCippyLang?.() === 'zh';
@@ -387,16 +578,53 @@ function closeMobileMenu() {
 function buildFaq() {
   const list = document.getElementById('faqList');
   if (!list) return;
+  const zh = window.getCippyLang?.() === 'zh';
   list.innerHTML = FAQS.map((f,i) => `
     <div class="border border-outline-variant rounded-xl overflow-hidden">
       <button onclick="toggleFaq(${i})" class="w-full flex items-center justify-between px-5 py-4 text-left bg-surface hover:bg-surface-container transition-colors gap-3">
-        <span class="font-label-md text-label-md text-on-surface">${f.q}</span>
+        <span class="font-label-md text-label-md text-on-surface">${zh ? f.qZh : f.qEn}</span>
         <span class="material-symbols-outlined text-primary flex-shrink-0 faq-icon-${i}">expand_more</span>
       </button>
       <div id="faq-${i}" class="hidden px-5 pb-4 pt-1 bg-surface-container-low">
-        <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">${f.a}</p>
+        <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">${zh ? f.aZh : f.aEn}</p>
       </div>
     </div>`).join('');
+}
+
+function applyPolicyLanguage() {
+  const zh = window.getCippyLang?.() === 'zh';
+  document.title = zh ? 'cippy | 政策与帮助' : 'cippy | Help & Policies';
+  const eyebrow = document.getElementById('infoEyebrow');
+  const title = document.getElementById('infoTitle');
+  const intro = document.getElementById('infoIntro');
+  const mobileLabel = document.getElementById('mobileNavLabel');
+  if (eyebrow) eyebrow.textContent = zh ? '帮助中心' : 'Help Center';
+  if (title) title.textContent = zh ? '政策与帮助' : 'Help & Policies';
+  if (intro) intro.textContent = zh ? '购物前请阅读我们的政策。如有疑问，随时联系我们。' : 'Please read our policies before shopping. Contact us anytime if you need help.';
+  if (mobileLabel) mobileLabel.textContent = zh ? '选择政策' : 'Select Policy';
+
+  document.querySelectorAll('.policy-section').forEach(section => {
+    section.innerHTML = zh ? (ZH_POLICY_HTML[section.id] || section.innerHTML) : (EN_POLICY_HTML[section.id] || section.innerHTML);
+    if (zh) {
+      const subtitle = section.querySelector(':scope > .flex p.font-label-sm');
+      if (subtitle) subtitle.remove();
+      section.querySelectorAll('*').forEach(el => {
+        el.childNodes.forEach(node => {
+          if (node.nodeType !== Node.TEXT_NODE) return;
+          node.textContent = node.textContent
+            .replace(' · Not considered defects', '')
+            .replace(/Courier 公司/g, '快递公司')
+            .replace(/Model 资料/g, '模特资料')
+            .replace(/特卖\s*\/\s*Sale 商品/g, '特卖商品')
+            .replace(/Sale 特价商品/g, '特价商品')
+            .replace(/Email 用途/g, '邮箱用途')
+            .replace(/Marketing 用途/g, '营销用途')
+            .replace(/法律适用（Malaysia）/g, '法律适用（马来西亚）');
+        });
+      });
+    }
+  });
+  buildFaq();
 }
 
 function toggleFaq(i) {
@@ -417,12 +645,17 @@ function updateActive() {
 
 window.addEventListener('scroll', updateActive, { passive:true });
 
+applyPolicyLanguage();
 buildSidebar();
-buildFaq();
 updateActive();
 
 const _prev = window.onCippyLangChange;
-window.onCippyLangChange = function(lang) { if (_prev) _prev(lang); buildSidebar(); };
+window.onCippyLangChange = function(lang) {
+  if (_prev) _prev(lang);
+  applyPolicyLanguage();
+  buildSidebar();
+  updateActive();
+};
 </script>
 <script>
 (function(){

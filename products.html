@@ -350,19 +350,26 @@ function renderProducts() {
   }
 
   empty.classList.add('hidden');
-  if (countEl) countEl.textContent = `${data.length} Items`;
+  if (countEl) countEl.textContent = window.getCippyLang?.() === 'zh' ? `${data.length} 件` : `${data.length} Items`;
 
   grid.innerHTML = data.map(p => {
     const allImgs = [p.image_url, ...(Array.isArray(p.images) ? p.images : [])].filter(Boolean);
     const imgsAttr = allImgs.length > 1 ? `data-images='${JSON.stringify(allImgs)}'` : '';
+    const heartPayload = JSON.stringify({
+      id: p.id,
+      name_zh: p.name_zh || p.name || '',
+      name: p.name || '',
+      price_myr: p.price_myr || p.price || 0,
+      image_url: p.image_url || ''
+    }).replace(/'/g, '\\u0027');
     return `
     <div class="product-card group cursor-pointer" onclick="location.href='product.html?id=${p.id}'" ${imgsAttr}>
       <div class="relative overflow-hidden rounded-xl bg-surface-container-low shadow-sm transition-all duration-300 hover:shadow-xl">
         ${p.image_url
-          ? `<div class="w-full aspect-[3/4] overflow-hidden"><img class="card-img w-full h-full object-cover transition-opacity duration-300" src="${p.image_url}" alt="${p.name_zh || p.name}" loading="lazy"/></div>`
+          ? `<div class="w-full aspect-[3/4] overflow-hidden"><img class="card-img w-full h-full object-cover transition-opacity duration-300" src="${p.image_url}" alt="${window.cippyProductName ? window.cippyProductName(p) : (p.name_zh || p.name)}" loading="lazy"/></div>`
           : `<div class="w-full aspect-[3/4] bg-surface-container flex items-center justify-center text-on-surface-variant/30 text-5xl">📦</div>`
         }
-        <button data-product-id="${p.id}" class="absolute top-4 right-4 z-10 w-10 h-10 bg-white/60 backdrop-blur-md rounded-full flex items-center justify-center text-primary transition-all hover:bg-white active:scale-90" onclick="event.stopPropagation();toggleHeart(this,{id:'${p.id}',name_zh:${JSON.stringify(p.name_zh||p.name||'')},name:${JSON.stringify(p.name||'')},price_myr:'${p.price_myr||p.price||0}',image_url:${JSON.stringify(p.image_url||'')}})">
+        <button data-product-id="${p.id}" class="absolute top-4 right-4 z-10 w-10 h-10 bg-white/60 backdrop-blur-md rounded-full flex items-center justify-center text-primary transition-all hover:bg-white active:scale-90" onclick='event.stopPropagation();toggleHeart(this,${heartPayload})'>
           <span class="material-symbols-outlined">favorite</span>
         </button>
         <div class="p-4">
@@ -370,7 +377,7 @@ function renderProducts() {
             ${p.is_new ? `<span class="px-2 py-1 bg-primary-fixed text-on-primary-fixed-variant rounded-full text-[10px] font-bold uppercase tracking-wider">${window.getCippyLang?.() === 'zh' ? '#新品' : '#New'}</span>` : ''}
             ${!p.in_stock ? `<span class="px-2 py-1 bg-surface-container-highest text-on-surface-variant rounded-full text-[10px] font-bold uppercase tracking-wider">${window.getCippyLang?.() === 'zh' ? '售罄' : 'Sold Out'}</span>` : (p.stock > 0 && p.stock <= 5) ? `<span class="px-2 py-1 bg-error-container text-on-error-container rounded-full text-[10px] font-bold tracking-wider">${window.getCippyLang?.() === 'zh' ? `仅剩 ${p.stock} 件` : `Only ${p.stock} left`}</span>` : ''}
           </div>
-          <h3 class="font-headline-md text-[18px] leading-tight mb-1">${window.getCippyLang?.() === 'zh' ? (p.name_zh || p.name) : (p.name || p.name_zh)}</h3>
+          <h3 class="font-headline-md text-[18px] leading-tight mb-1">${window.cippyProductName ? window.cippyProductName(p) : (window.getCippyLang?.() === 'zh' ? (p.name_zh || p.name) : (p.name || p.name_zh))}</h3>
           <p class="font-label-md text-on-surface mb-2">MYR ${parseFloat(p.price_myr || p.price).toFixed(2)}</p>
         </div>
       </div>

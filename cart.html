@@ -441,7 +441,7 @@ Free standard shipping on orders over MYR 150.00
               <div class="flex-grow flex flex-col justify-between h-32 md:h-40">
                 <div class="flex justify-between items-start">
                   <div>
-                    <h3 class="font-headline-md text-[16px] leading-tight text-on-surface">${zh ? (item.name_zh || item.name) : (item.name || item.name_zh)}</h3>
+                    <h3 class="font-headline-md text-[16px] leading-tight text-on-surface">${window.cippyProductName ? window.cippyProductName(item) : (zh ? (item.name_zh || item.name) : (item.name || item.name_zh))}</h3>
                     <p class="text-body-sm text-on-surface-variant mt-1">${[item.variant, item.color, item.size].filter(Boolean).join(' · ')}</p>
                   </div>
                   <button onclick="removeItem(${i})" class="material-symbols-outlined text-outline hover:text-error transition-colors">delete</button>

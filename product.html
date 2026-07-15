@@ -283,21 +283,21 @@
 <!-- Return Policy Mini Card -->
 <div class="pt-lg">
 <div class="p-4 bg-surface-container-low rounded-xl space-y-3">
-  <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">退换货政策 · Return &amp; Exchange Policy</p>
+  <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Return &amp; Exchange Policy</p>
   <ul class="space-y-1.5 font-body-sm text-body-sm text-on-surface">
-    <li class="flex items-start gap-2"><span class="text-secondary font-bold mt-0.5">✓</span><span>收货后 <strong>7天内</strong> 可申请退换货</span></li>
-    <li class="flex items-start gap-2"><span class="text-secondary font-bold mt-0.5">✓</span><span>商品须保持全新未穿着状态，附原吊牌</span></li>
-    <li class="flex items-start gap-2"><span class="text-secondary font-bold mt-0.5">✓</span><span>退换须提供<strong>完整开箱视频</strong>作为凭证</span></li>
-    <li class="flex items-start gap-2"><span class="text-secondary font-bold mt-0.5">✓</span><span>退货运费由顾客自行承担</span></li>
+    <li class="flex items-start gap-2"><span class="text-secondary font-bold mt-0.5">✓</span><span>Return or exchange within 7 days after receiving your parcel.</span></li>
+    <li class="flex items-start gap-2"><span class="text-secondary font-bold mt-0.5">✓</span><span>Items must be unworn, unwashed, and kept with original tags.</span></li>
+    <li class="flex items-start gap-2"><span class="text-secondary font-bold mt-0.5">✓</span><span>A complete unboxing video is required for return/exchange claims.</span></li>
+    <li class="flex items-start gap-2"><span class="text-secondary font-bold mt-0.5">✓</span><span>Return shipping is borne by the customer unless it is our mistake.</span></li>
   </ul>
   <ul class="space-y-1.5 font-body-sm text-body-sm text-on-surface-variant">
-    <li class="flex items-start gap-2"><span class="font-bold mt-0.5">✗</span><span class="line-through">特卖 / Sale 商品</span></li>
-    <li class="flex items-start gap-2"><span class="font-bold mt-0.5">✗</span><span class="line-through">配饰类（耳环、项链等）</span></li>
-    <li class="flex items-start gap-2"><span class="font-bold mt-0.5">✗</span><span class="line-through">已穿着 / 洗涤过的商品</span></li>
-    <li class="flex items-start gap-2"><span class="font-bold mt-0.5">✗</span><span class="line-through">无开箱视频的情况</span></li>
+    <li class="flex items-start gap-2"><span class="font-bold mt-0.5">✗</span><span class="line-through">Sale items</span></li>
+    <li class="flex items-start gap-2"><span class="font-bold mt-0.5">✗</span><span class="line-through">Accessories such as earrings and necklaces</span></li>
+    <li class="flex items-start gap-2"><span class="font-bold mt-0.5">✗</span><span class="line-through">Worn or washed items</span></li>
+    <li class="flex items-start gap-2"><span class="font-bold mt-0.5">✗</span><span class="line-through">Claims without an unboxing video</span></li>
   </ul>
-  <p class="font-body-sm text-body-sm text-on-surface border-t border-outline-variant pt-3">如需申请退换货，请 WhatsApp <strong>+601120861073</strong> 并附上订单号及开箱视频。</p>
-  <a href="info.html#returns" class="inline-flex items-center gap-1 font-label-sm text-label-sm text-primary hover:underline">更多退换货政策请按这里 <span class="material-symbols-outlined text-sm">arrow_forward</span></a>
+  <p class="font-body-sm text-body-sm text-on-surface border-t border-outline-variant pt-3">To request a return or exchange, WhatsApp +601120861073 with your order number and unboxing video.</p>
+  <a href="info.html#returns" class="inline-flex items-center gap-1 font-label-sm text-label-sm text-primary hover:underline">Read the full return policy here <span class="material-symbols-outlined text-sm">arrow_forward</span></a>
 </div>
 </div>
 <!-- Specs + Detail Images -->
@@ -507,9 +507,10 @@ function addToBag() {
 function applyProductLang(lang) {
   if (!_productData) return;
   const p = _productData;
-  document.getElementById('productName').textContent = lang === 'zh' && p.name_zh ? p.name_zh : (p.name || p.name_zh || '');
+  const displayName = window.cippyProductName ? window.cippyProductName(p) : (lang === 'zh' && p.name_zh ? p.name_zh : (p.name || p.name_zh || ''));
+  document.getElementById('productName').textContent = displayName;
   document.getElementById('productDesc').textContent = p.description || '';
-  document.title = `cippy | ${lang === 'zh' && p.name_zh ? p.name_zh : (p.name || p.name_zh || '商品')}`;
+  document.title = `cippy | ${displayName || (lang === 'zh' ? '商品' : 'Product')}`;
   // Re-collect so spec labels/values and color buttons get re-translated
   if (window.recollectCippyLang) window.recollectCippyLang();
 }
@@ -704,8 +705,8 @@ async function loadProduct() {
       const bundlePrice = total - discount;
 
       const _zh = window.getCippyLang?.() === 'zh';
-      const _pName = _zh ? (p.name_zh || p.name || '') : (p.name || p.name_zh || '');
-      const _oName = _zh ? (pair.name_zh || pair.name || '') : (pair.name || pair.name_zh || '');
+      const _pName = window.cippyProductName ? window.cippyProductName(p) : (_zh ? (p.name_zh || p.name || '') : (p.name || p.name_zh || ''));
+      const _oName = window.cippyProductName ? window.cippyProductName(pair) : (_zh ? (pair.name_zh || pair.name || '') : (pair.name || pair.name_zh || ''));
 
       document.getElementById('pairingThisImg').src = p.image_url || '';
       document.getElementById('pairingThisImg').alt = _pName;

@@ -319,7 +319,7 @@
   );
 
   function productCard(p, large) {
-    const name = window.getCippyLang?.() === 'zh' ? (p.name_zh || p.name || '') : (p.name || p.name_zh || '');
+    const name = window.cippyProductName ? window.cippyProductName(p) : (window.getCippyLang?.() === 'zh' ? (p.name_zh || p.name || '') : (p.name || p.name_zh || ''));
     const price = parseFloat(p.price_myr || p.price || 0).toFixed(2);
     const img = p.image_url || '';
     if (large) {

@@ -116,6 +116,7 @@
   "Privacy Policy": "隐私政策",
   "Terms of Service": "服务条款",
   "Contact Us": "联系我们",
+  "WhatsApp Us": "WhatsApp 客服",
   "Contact": "联系方式",
   "Bangsar Village II,": "Bangsar Village II,",
   "Kuala Lumpur, Malaysia": "马来西亚吉隆坡",
@@ -138,6 +139,7 @@
   "Price: High to Low": "价格：从高到低",
   "6 Items": "6 件商品",
   "Series:": "系列：",
+  "SERIES:": "系列：",
   "Cippy Essential": "Cippy 基础系列",
   "Cippy Sweet": "Cippy 甜美系列",
   "Cippy Summer": "Cippy 夏日系列",
@@ -310,7 +312,39 @@
   "Email address": "电子邮箱",
   "Search trends...": "搜索潮流...",
   "Get 10% off your first order.": "首单立享9折优惠。",
+  "Help": "帮助",
+  "Latest new arrivals": "最新上新单品",
+  "View All": "查看全部",
+  "All Pieces": "全部单品",
+  "View More": "查看更多",
+  "Top-up & Get": "充值享",
+  "5% Cashback": "5% 返现",
+  "Top up RM100, get RM105 · Double points · Exclusive perks": "充 RM100 到账 RM105 · 积分翻倍 · 升级专属福利",
+
   "Loading…": "载入中…",
+  "Starting from · priced by style": "起 · 按款式定价",
+  "Photo is for styling reference. Purchase applies to the selected single item.": "📸 图片为穿搭参考，实际购买为所选单件商品",
+  "Bust": "胸围",
+  "Shoulder": "肩宽",
+  "Waist": "腰围",
+  "Hip": "臀围",
+  "Thigh": "腿围",
+  "Length": "衣长",
+  "Pants Length": "裤长",
+  "Skirt Length": "裙长",
+  "Sleeve": "袖长",
+  "Return & Exchange Policy": "退换货政策",
+  "Return or exchange within 7 days after receiving your parcel.": "收货后 7天内 可申请退换货",
+  "Items must be unworn, unwashed, and kept with original tags.": "商品须保持全新未穿着状态，附原吊牌",
+  "A complete unboxing video is required for return/exchange claims.": "退换须提供完整开箱视频作为凭证",
+  "Return shipping is borne by the customer unless it is our mistake.": "退货运费由顾客自行承担",
+  "Sale items": "特卖商品",
+  "Accessories such as earrings and necklaces": "配饰类（耳环、项链等）",
+  "Worn or washed items": "已穿着 / 洗涤过的商品",
+  "Claims without an unboxing video": "无开箱视频的情况",
+  "To request a return or exchange, WhatsApp +601120861073 with your order number and unboxing video.": "如需申请退换货，请 WhatsApp +601120861073 并附上订单号及开箱视频。",
+  "Read the full return policy here": "更多退换货政策请按这里",
+
   "Select Size": "选择尺码",
   "Add to Bag": "加入购物袋",
   "Save to Wishlist": "收藏",
@@ -361,6 +395,23 @@
   "Write your heartfelt message here...": "在这里写下你的祝福...",
   "Sold Out": "售罄",
   "Email verified. You can place your order.": "邮箱已验证，可以下单。",
+  "Please fill in all required fields (*)": "请填写所有必填项（*）",
+  "Please enter a valid phone number (e.g. 0123456789)": "请填写有效的电话号码（例：0123456789）",
+  "Postcode must be 5 digits (e.g. 50000)": "邮编必须是5位数字（例：50000）",
+  "Please verify your email before checkout. Check your Gmail inbox.": "请先验证邮箱后再结账，请查看您的 Gmail 收件箱。",
+  "Your bag is empty": "购物袋是空的",
+  "Please log in or continue as guest": "请先登录或选择访客结账",
+  "Please verify your email before checkout": "请先验证邮箱后再结账",
+  "Please enter your name": "请填写姓名",
+  "Please enter your email address": "请填写电邮地址",
+  "Please enter a valid email address": "请填写有效的电邮地址",
+  "Please enter your phone number": "请填写联系电话",
+  "Please select or add a delivery address": "请选择或添加收件地址",
+  "Checkout email must match your account email": "结账邮箱须与账号邮箱一致",
+  "Redirecting to payment...": "正在跳转付款页面...",
+  "Creating order...": "正在创建订单...",
+  "Unable to create order": "无法创建订单",
+  "Unable to create payment session": "无法创建付款",
 
   "How would you like to checkout?": "如何结账？",
   "Sign in to earn points & rewards on every order.": "登录即可在每笔订单上累积积分与专属奖励。",
@@ -370,6 +421,7 @@
   "No account needed · No points earned": "无需账户 · 不累积积分",
   "Signed in as Member": "已登录会员",
   "Sign out": "退出登录",
+  "Sign Out": "退出",
   "Checking out as Guest": "以访客身份结账",
   "Sign in instead": "改为登录",
   "Points not earned ·": "不累积积分 ·",
@@ -377,7 +429,87 @@
   "Visa · Mastercard · PayNow": "Visa · Mastercard · PayNow",
   "Maybank · CIMB · Public Bank · RHB": "Maybank · CIMB · Public Bank · RHB",
   "DuitNow QR": "DuitNow QR",
+  "Scan & Pay · Instant": "扫码付款 · 即时处理",
   "Coming Soon": "即将推出",
+
+  "Wishlist": "心愿单",
+  "Clear": "清空",
+  "No saved items yet": "还没有收藏",
+  "Tap ♡ while browsing to save pieces you love.": "浏览商品时点击 ♡ 收藏喜欢的单品。",
+  "Clear all saved items?": "确定清空心愿单？",
+  "Added to bag ✓": "已加入购物袋 ✓",
+
+  "Order Confirmation": "订单确认",
+  "Order Confirmed": "订单已确认",
+  "Thank you for your order. A confirmation email has been sent to your inbox.": "感谢您的购买！确认邮件已发送至您的邮箱。",
+  "Ship To": "寄送至",
+  "Items": "商品明细",
+  "Continue Shopping": "继续购物",
+  "View My Orders": "查看我的订单",
+
+  "Order Details": "订单详情",
+  "Loading...": "加载中...",
+  "Order not found": "找不到订单",
+  "Back to Account": "返回账号",
+  "Receiver Details": "收件人资料",
+  "Order Date": "下单时间",
+  "Payment Method": "付款方式",
+  "Stripe Card": "Stripe 信用卡",
+  "Pending Payment": "待付款",
+  "Paid": "已付款",
+  "Processing": "处理中",
+  "Shipped": "已发货",
+  "Delivered": "已送达",
+  "Cancelled": "已取消",
+  "Pending": "待付款",
+  "Qty": "数量",
+  "Payment pending. Please complete payment before it expires.": "订单待付款，请在时限内完成付款。",
+  "Pay Now": "立即付款",
+  "This order has expired. Please place a new order.": "订单已过期，请重新下单。",
+  "Need help? Contact us on": "如有问题请联系",
+  "WhatsApp": "WhatsApp 客服",
+  "Redirecting...": "跳转中...",
+  "Unable to create payment": "无法创建付款",
+
+  "My Points": "我的积分",
+  "Classic Member · Earn 1 point per RM1 · 10 points = RM1": "Classic 会员 · 每消费 RM1 得 1 积分 · 10积分 = RM1",
+  "My Orders": "我的订单",
+  "My Wishlist": "我的收藏",
+  "Points History": "积分明细",
+  "No orders yet": "暂无订单记录",
+  "No saved products yet": "还没有收藏的商品",
+  "No points history yet": "暂无积分记录",
+  "Membership Tiers": "会员等级",
+  "10 points = RM 1 credit": "10 积分 = RM 1 抵扣",
+  "Free to Join": "免费加入",
+  "First top-up gets 5% cashback": "新人首次充值返现 5%",
+  "No top-up required": "无需充值",
+  "One-time top-up": "一次性充值",
+  "1.5x points bonus": "积分 1.5 倍加成",
+  "Birthday reward RM20": "生日礼遇 RM20",
+  "Free shipping over RM100": "免运费（满 RM100）",
+  "Top up RM 800": "充值 RM 800",
+  "2x points bonus": "积分 2 倍加成",
+  "Birthday reward RM50": "生日礼遇 RM50",
+  "Free shipping with no minimum": "无条件免运费",
+  "Top up RM 2,000": "充值 RM 2,000",
+  "How it Works": "玩法介绍",
+  "Earn Points When You Shop": "购物赚积分",
+  "Earn 1 point for every RM1 spent. Higher tiers earn faster. Points never expire and can be used anytime.": "每消费 RM1 即可赚取 1 积分，等级越高积分倍率越高。积分永不过期，随时可用。",
+  "Top-up & Get 5% Cashback": "充值享 5% 返现",
+  "Limited Time": "限时",
+  "Top up store credit and get 5% cashback. Top up RM100 and receive RM105. Use your balance anytime with no minimum spend.": "充值购物金即享 5% 返现，充 RM100 到账 RM105。余额可直接抵扣购物，随时使用无门槛。",
+  "Redeem Points for Credit": "积分兑购物金",
+  "Collect 100 points to redeem RM10 store credit directly at checkout.": "累积满 100 积分即可兑换 RM10 购物金，在结账时直接抵扣，省得轻松。",
+  "Spend More, Unlock More Perks": "消费升级，专属特权",
+  "The more you spend, the higher your tier. Luxe gets 1.5x points and birthday rewards; Elite gets 2x points and free shipping.": "消费越多等级越高。Luxe 享 1.5 倍积分 + 生日礼遇，Elite 享 2 倍积分 + 无条件包邮。",
+  "View Membership Tiers →": "查看会员等级 →",
+  "Register": "注册账号",
+  "Name (for registration)": "姓名（注册用）",
+  "Email Address": "邮箱地址",
+  "Password (min. 6 characters)": "密码（至少6位）",
+  "Resend verification email": "重新发送验证邮件",
+  "Please check your email to confirm your account after registering.": "注册后请查收邮件确认账号。",
 
   "© 2025 cippy Malaysia. All Rights Reserved.": "© 2025 cippy Malaysia. 保留所有权利。",
   "Effortless chic for the modern Malaysian lifestyle. Curated with love, delivered with care.": "为现代马来西亚生活方式打造的不费力优雅风格，用心精选，悉心呈递。"
@@ -385,6 +517,18 @@
 
   var textNodes = [];
   var attrNodes = [];
+  var PRODUCT_NAME_EN = {
+    "日常｜简约纯色高腰A字包臀短裙": "Daily | Minimal Solid High-Waist A-Line Mini Skirt",
+    "日常显腿长｜休闲垂感显瘦阔腿长裤": "Daily Leg-Lengthening | Draped Slim Wide-Leg Pants",
+    "日常必备｜抽绳休闲短裤": "Everyday Essential | Drawstring Casual Shorts",
+    "校园日记｜深蓝腊肠狗刺绣抹胸 + 灰色层叠蛋糕裙": "Campus Diary | Navy Dachshund Embroidered Tube Top + Grey Layered Ruffle Skirt",
+    "首尔街拍｜泡泡袖上衣": "Seoul Street Snap | Puff Sleeve Top",
+    "巴黎少女｜奶白波点吊带连衣裙套装": "Paris Girl | Cream Polka Dot Cami Dress Set",
+    "首尔少女｜灰棕色针织短袖 + 深棕蕾丝吊带内搭～吊带可调节": "Seoul Girl | Grey-Brown Knit Tee + Dark Brown Adjustable Lace Cami",
+    "巴厘岛午后｜抹茶绿提花吊带连衣裙～修身可调节": "Bali Afternoon | Matcha Green Jacquard Adjustable Slim Cami Dress",
+    "海军蓝缪斯｜蕾丝挂脖裙": "Navy Muse | Lace Halter Dress",
+    "初恋｜碎花蕾丝连衣裙": "First Love | Floral Lace Mini Dress"
+  };
 
   // Reverse dict: Chinese value → English key, for restoring baselines
   var RDICT = {};
@@ -453,6 +597,17 @@
 
   window.getCippyLang = function () {
     return localStorage.getItem(STORAGE_KEY) || "en";
+  };
+
+  window.cippyProductName = function (productOrName) {
+    var lang = window.getCippyLang();
+    if (typeof productOrName === "string") {
+      return lang === "zh" ? productOrName : (PRODUCT_NAME_EN[productOrName] || productOrName);
+    }
+    var p = productOrName || {};
+    if (lang === "zh") return p.name_zh || p.name || "";
+    var raw = p.name || p.name_zh || "";
+    return PRODUCT_NAME_EN[raw] || PRODUCT_NAME_EN[p.name_zh] || raw;
   };
 
   window.recollectCippyLang = function () {

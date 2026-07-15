@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>订单详情 — Cippy</title>
+<title>Order Details — Cippy</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@400;500;600;700&family=Noto+Serif+SC:wght@300;400;600;700&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="i18n.js" defer></script>
 <script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"surface-container-low": "#f5f0ee", "outline-variant": "#e0e0e0", "primary-fixed": "#ffd9dd", "on-tertiary": "#ffffff", secondary: "#77555a", "on-background": "#201a1b", "on-secondary": "#ffffff", primary: "#C4928A", outline: "#857374", "surface-container-lowest": "#ffffff", "on-secondary-fixed": "#2d1418", "surface-container-highest": "#e8e0dd", "surface-variant": "#eddfe0", "on-primary-fixed-variant": "#70343e", "surface-tint": "#8d4a55", "surface-container": "#f0ebe8", "secondary-container": "#ffd2d6", "inverse-surface": "#362f2f", "tertiary-container": "#73ae85", "on-surface": "#201a1b", "inverse-on-surface": "#fbeeee", "inverse-primary": "#ffb2bc", "surface-container-high": "#ece6e3", "on-surface-variant": "#524344", "on-tertiary-container": "#004122", "on-tertiary-fixed-variant": "#155130", "primary-fixed-dim": "#ffb2bc", "secondary-fixed": "#ffd9dd", "on-secondary-container": "#7a585c", "on-primary-fixed": "#3a0814", "on-error": "#ffffff", "on-secondary-fixed-variant": "#5e3e42", "surface-bright": "#faf7f5", "on-primary-container": "#5e252f", "primary-container": "#da8b96", error: "#ba1a1a", "tertiary-fixed": "#b3f1c3", "error-container": "#ffdad6", "on-error-container": "#93000a", "surface-dim": "#e4d7d7", "secondary-fixed-dim": "#e7bcc0", "on-tertiary-fixed": "#00210f", background: "#faf7f5", tertiary: "#306946", "on-primary": "#2d1418", surface: "#faf7f5", "tertiary-fixed-dim": "#98d4a9"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}, spacing: {"margin-desktop": "80px", xs: "4px", md: "24px", "margin-mobile": "20px", lg: "48px", xl: "64px", sm: "12px", base: "8px", gutter: "16px"}, fontFamily: {"label-md": ["Poppins", "Noto Serif SC", "serif"], "headline-lg": ["Playfair Display", "Noto Serif SC", "serif"], "body-sm": ["Poppins", "Noto Serif SC", "serif"], "headline-md": ["Playfair Display", "Noto Serif SC", "serif"], "body-lg": ["Poppins", "Noto Serif SC", "serif"], "body-md": ["Poppins", "Noto Serif SC", "serif"], "display-lg": ["Playfair Display", "Noto Serif SC", "serif"], "label-sm": ["Poppins", "Noto Serif SC", "serif"], "headline-lg-mobile": ["Playfair Display", "Noto Serif SC", "serif"], headline: ["Playfair Display", "Noto Serif SC", "serif"], display: ["Playfair Display", "Noto Serif SC", "serif"], body: ["Poppins", "Noto Serif SC", "serif"], label: ["Poppins", "Noto Serif SC", "serif"]}, fontSize: {"label-md": ["14px", {lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600"}], "headline-lg": ["32px", {lineHeight: "40px", fontWeight: "700"}], "body-sm": ["14px", {lineHeight: "20px", fontWeight: "400"}], "headline-md": ["24px", {lineHeight: "32px", fontWeight: "600"}], "body-lg": ["18px", {lineHeight: "28px", fontWeight: "400"}], "body-md": ["16px", {lineHeight: "24px", fontWeight: "400"}], "display-lg": ["48px", {lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "700"}], "label-sm": ["12px", {lineHeight: "14px", fontWeight: "500"}], "headline-lg-mobile": ["28px", {lineHeight: "36px", fontWeight: "700"}]}}}};
 </script>
 <style>
@@ -20,18 +21,18 @@
 <nav class="sticky top-0 z-20 border-b border-outline-variant" style="background:#faf7f5">
   <div class="max-w-2xl mx-auto px-6 h-14 flex items-center gap-4">
     <button onclick="history.back()" class="material-symbols-outlined text-on-surface hover:opacity-70 transition-opacity">arrow_back</button>
-    <h1 class="font-headline-md text-headline-md text-on-surface flex-1">订单详情</h1>
+	    <h1 class="font-headline-md text-headline-md text-on-surface flex-1">Order Details</h1>
   </div>
 </nav>
 
 <!-- Loading -->
-<div id="loadingState" class="text-center py-20 text-on-surface-variant font-body-sm text-body-sm">加载中...</div>
+<div id="loadingState" class="text-center py-20 text-on-surface-variant font-body-sm text-body-sm">Loading...</div>
 
 <!-- Error -->
 <div id="errorState" class="hidden text-center py-20 text-on-surface-variant">
   <span class="material-symbols-outlined text-5xl opacity-30 mb-3 block">error</span>
-  <p class="font-body-md text-body-md">找不到订单</p>
-  <a href="account.html" class="inline-block mt-4 text-primary font-label-md text-label-md underline">返回账号</a>
+	  <p class="font-body-md text-body-md">Order not found</p>
+	  <a href="account.html" class="inline-block mt-4 text-primary font-label-md text-label-md underline">Back to Account</a>
 </div>
 
 <!-- Content -->
@@ -58,18 +59,18 @@
   <!-- Items -->
   <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl overflow-hidden">
     <div class="px-5 py-4 border-b border-outline-variant">
-      <p class="font-label-md text-label-md text-on-surface">商品明细</p>
+	      <p class="font-label-md text-label-md text-on-surface">Items</p>
     </div>
     <div id="itemsList" class="divide-y divide-outline-variant px-5"></div>
     <div class="px-5 py-4 border-t border-outline-variant space-y-2">
       <div class="flex justify-between font-body-sm text-body-sm text-on-surface-variant">
-        <span>小计</span><span id="subtotal">—</span>
+	        <span>Subtotal</span><span id="subtotal">—</span>
       </div>
       <div class="flex justify-between font-body-sm text-body-sm text-on-surface-variant">
-        <span>运费</span><span id="shipping">—</span>
+	        <span>Shipping</span><span id="shipping">—</span>
       </div>
       <div class="flex justify-between font-label-md text-label-md text-on-surface pt-2 border-t border-outline-variant">
-        <span>合计</span><span id="total">—</span>
+	        <span>Total</span><span id="total">—</span>
       </div>
     </div>
   </div>
@@ -102,30 +103,30 @@
   <!-- Order info -->
   <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl px-5 py-4 space-y-2 font-body-sm text-body-sm">
     <div class="flex justify-between">
-      <span class="text-on-surface-variant">下单时间</span>
+	      <span class="text-on-surface-variant">Order Date</span>
       <span id="orderDate" class="text-on-surface"></span>
     </div>
     <div class="flex justify-between">
-      <span class="text-on-surface-variant">付款方式</span>
-      <span class="text-on-surface">Stripe 信用卡</span>
+	      <span class="text-on-surface-variant">Payment Method</span>
+	      <span class="text-on-surface">Stripe Card</span>
     </div>
   </div>
 
   <!-- Repay (pending only) -->
   <div id="repaySection" class="hidden">
     <div class="bg-error-container rounded-2xl px-5 py-5 text-center space-y-3">
-      <p class="font-label-md text-label-md text-on-error-container">订单待付款，请在时限内完成付款</p>
+	      <p class="font-label-md text-label-md text-on-error-container">Payment pending. Please complete payment before it expires.</p>
       <p class="font-headline-md text-headline-md text-error" id="repayCountdown">20:00</p>
       <button id="repayBtn" onclick="repay()" class="w-full bg-primary text-on-primary py-4 font-label-md text-label-md rounded-none hover:opacity-80 active:scale-95 transition-all">
-        立即付款
+	        Pay Now
       </button>
-      <p id="repayExpired" class="hidden font-label-sm text-label-sm text-on-surface-variant">订单已过期，请重新下单</p>
+	      <p id="repayExpired" class="hidden font-label-sm text-label-sm text-on-surface-variant">This order has expired. Please place a new order.</p>
     </div>
   </div>
 
   <!-- Help -->
   <p class="text-center font-label-sm text-label-sm text-on-surface-variant pt-2">
-    如有问题请联系 <a href="https://wa.me/601119058658" class="text-primary underline">WhatsApp 客服</a>
+	    Need help? Contact us on <a href="https://wa.me/601119058658" class="text-primary underline">WhatsApp</a>
   </p>
 
 </main>
@@ -158,14 +159,16 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const sb = createClient('https://ilzeziznxzaxxudzhdmu.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI');
 
 const fmt = new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' });
+const isZh = () => window.getCippyLang?.() === 'zh';
+function tx(en, zh) { return isZh() ? zh : en; }
 
 const statusConfig = {
-  pending:    { label: '待付款',  icon: 'schedule',        cls: 'bg-error-container text-on-error-container' },
-  paid:       { label: '已付款',  icon: 'check_circle',    cls: 'bg-secondary-container text-secondary' },
-  processing: { label: '处理中',  icon: 'inventory_2',     cls: 'bg-primary-fixed text-on-surface' },
-  shipped:    { label: '已发货',  icon: 'local_shipping',  cls: 'bg-tertiary-container text-on-tertiary-container' },
-  delivered:  { label: '已送达',  icon: 'done_all',        cls: 'bg-tertiary-container text-on-tertiary-container' },
-  cancelled:  { label: '已取消',  icon: 'cancel',          cls: 'bg-surface-container-high text-on-surface-variant' },
+  pending:    { en: 'Pending Payment', zh: '待付款', icon: 'schedule',        cls: 'bg-error-container text-on-error-container' },
+  paid:       { en: 'Paid', zh: '已付款', icon: 'check_circle',    cls: 'bg-secondary-container text-secondary' },
+  processing: { en: 'Processing', zh: '处理中', icon: 'inventory_2',     cls: 'bg-primary-fixed text-on-surface' },
+  shipped:    { en: 'Shipped', zh: '已发货', icon: 'local_shipping',  cls: 'bg-tertiary-container text-on-tertiary-container' },
+  delivered:  { en: 'Delivered', zh: '已送达', icon: 'done_all',        cls: 'bg-tertiary-container text-on-tertiary-container' },
+  cancelled:  { en: 'Cancelled', zh: '已取消', icon: 'cancel',          cls: 'bg-surface-container-high text-on-surface-variant' },
 };
 
 const id = new URLSearchParams(location.search).get('id');
@@ -179,21 +182,21 @@ async function loadOrder(id) {
   document.getElementById('orderContent').classList.remove('hidden');
 
   // Status banner
-  const st = statusConfig[order.status] || { label: order.status, icon: 'info', cls: 'bg-surface-container text-on-surface' };
+  const st = statusConfig[order.status] || { en: order.status, zh: order.status, icon: 'info', cls: 'bg-surface-container text-on-surface' };
   const banner = document.getElementById('statusBanner');
   banner.className = `rounded-2xl px-5 py-4 flex items-center gap-3 ${st.cls}`;
   document.getElementById('statusIcon').textContent = st.icon;
   document.getElementById('statusIcon').style.fontVariationSettings = "'FILL' 1";
-  document.getElementById('statusLabel').textContent = st.label;
+  document.getElementById('statusLabel').textContent = tx(st.en, st.zh);
   document.getElementById('orderId').textContent = order.order_id;
 
   // Progress tracker
   const steps = [
-    { key: 'pending',    label: '待付款', icon: 'schedule' },
-    { key: 'paid',       label: '已付款', icon: 'payments' },
-    { key: 'processing', label: '处理中', icon: 'inventory_2' },
-    { key: 'shipped',    label: '已发货', icon: 'local_shipping' },
-    { key: 'delivered',  label: '已送达', icon: 'done_all' },
+    { key: 'pending',    en: 'Pending', zh: '待付款', icon: 'schedule' },
+    { key: 'paid',       en: 'Paid', zh: '已付款', icon: 'payments' },
+    { key: 'processing', en: 'Processing', zh: '处理中', icon: 'inventory_2' },
+    { key: 'shipped',    en: 'Shipped', zh: '已发货', icon: 'local_shipping' },
+    { key: 'delivered',  en: 'Delivered', zh: '已送达', icon: 'done_all' },
   ];
   const cancelled = order.status === 'cancelled';
   const currentIdx = cancelled ? -1 : steps.findIndex(s => s.key === order.status);
@@ -212,7 +215,7 @@ async function loadOrder(id) {
         <div class="w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${circleCls} ${active ? 'ring-2 ring-primary ring-offset-2' : ''}">
           <span class="material-symbols-outlined text-[15px]" style="font-variation-settings:'FILL' ${done ? 1 : 0}">${step.icon}</span>
         </div>
-        <p class="font-label-sm text-[10px] text-center leading-tight ${done ? 'text-primary font-bold' : 'text-on-surface-variant'}">${step.label}</p>
+        <p class="font-label-sm text-[10px] text-center leading-tight ${done ? 'text-primary font-bold' : 'text-on-surface-variant'}">${tx(step.en, step.zh)}</p>
       </div>`;
   }).join('');
 
@@ -223,13 +226,13 @@ async function loadOrder(id) {
   `;
 
   if (cancelled) {
-    tracker.insertAdjacentHTML('beforeend', `<p class="w-full text-center font-label-sm text-label-sm text-on-surface-variant mt-3">订单已取消</p>`);
+    tracker.insertAdjacentHTML('beforeend', `<p class="w-full text-center font-label-sm text-label-sm text-on-surface-variant mt-3">${tx('Order cancelled', '订单已取消')}</p>`);
   }
 
   // Items
   const items = order.items || [];
   document.getElementById('itemsList').innerHTML = items.map(item => {
-    const name = item.name_zh || item.name || 'Item';
+    const name = window.cippyProductName ? window.cippyProductName(item) : (isZh() ? (item.name_zh || item.name || '商品') : (item.name || item.name_zh || 'Item'));
     const details = [item.size, item.color, item.variant].filter(Boolean).join(' · ');
     const qty = Number(item.qty || 1);
     const price = Number(item.price_myr || 0) * qty;
@@ -241,7 +244,7 @@ async function loadOrder(id) {
         <div class="flex-1 min-w-0">
           <p class="font-label-md text-label-md text-on-surface leading-tight mb-1">${name}</p>
           ${details ? `<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">${details}</p>` : ''}
-          <p class="font-label-sm text-label-sm text-on-surface-variant">数量：${qty}</p>
+          <p class="font-label-sm text-label-sm text-on-surface-variant">${tx('Qty', '数量')}：${qty}</p>
         </div>
         <p class="font-label-md text-label-md text-on-surface flex-shrink-0">MYR ${price.toFixed(2)}</p>
       </div>`;
@@ -261,7 +264,7 @@ async function loadOrder(id) {
   document.getElementById('recipientAddress').innerHTML = (c.address || '—').replace(/\n/g, '<br>');
 
   // Date
-  document.getElementById('orderDate').textContent = new Date(order.created_at).toLocaleString('zh-CN', {
+  document.getElementById('orderDate').textContent = new Date(order.created_at).toLocaleString(isZh() ? 'zh-CN' : 'en-MY', {
     year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
   });
 
@@ -300,7 +303,7 @@ async function loadOrder(id) {
 async function repay() {
   const btn = document.getElementById('repayBtn');
   btn.disabled = true;
-  btn.textContent = '跳转中...';
+  btn.textContent = tx('Redirecting...', '跳转中...');
   try {
     const res = await fetch('/api/repay-order', {
       method: 'POST',
@@ -308,12 +311,12 @@ async function repay() {
       body: JSON.stringify({ orderId: window._repayOrderId })
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || '无法创建付款');
+    if (!res.ok) throw new Error(data.error || tx('Unable to create payment', '无法创建付款'));
     window.location.href = data.url;
   } catch (e) {
     alert(e.message);
     btn.disabled = false;
-    btn.textContent = '立即付款';
+    btn.textContent = tx('Pay Now', '立即付款');
   }
 }
 window.repay = repay;
