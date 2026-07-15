@@ -79,16 +79,16 @@
       <p id="dashName" class="font-headline-md text-headline-md text-on-surface"></p>
       <p id="dashEmail" class="font-body-sm text-body-sm text-on-surface-variant"></p>
     </div>
-    <button id="signOutBtn" class="ml-auto text-xs text-on-surface-variant border border-outline-variant px-3 py-1.5 rounded-full hover:border-primary hover:text-primary transition-colors">退出</button>
+    <button id="signOutBtn" class="ml-auto text-xs text-on-surface-variant border border-outline-variant px-3 py-1.5 rounded-full hover:border-primary hover:text-primary transition-colors">Sign Out</button>
   </div>
 
   <!-- Points card -->
   <div class="bg-gradient-to-br from-primary to-secondary rounded-2xl p-6 text-white mb-6">
-    <p class="text-xs uppercase tracking-widest opacity-70 mb-1">我的积分</p>
+    <p class="text-xs uppercase tracking-widest opacity-70 mb-1">My Points</p>
     <p id="dashPoints" class="text-4xl font-bold mb-3">0 pts</p>
     <div class="flex items-center gap-2">
       <span class="material-symbols-outlined text-sm opacity-70">spa</span>
-      <p id="dashTierLabel" class="text-xs opacity-70">Classic 会员 · 每消费 RM1 得 1 积分 · 10积分 = RM1</p>
+      <p id="dashTierLabel" class="text-xs opacity-70">Classic Member · Earn 1 point per RM1 · 10 points = RM1</p>
     </div>
   </div>
 
@@ -96,43 +96,43 @@
   <div class="grid grid-cols-3 gap-3 mb-8">
     <button onclick="showTab('orders')" id="tabOrders" class="dash-tab bg-surface-container rounded-2xl p-4 flex flex-col items-center gap-2 border-2 border-primary">
       <span class="material-symbols-outlined text-primary">local_shipping</span>
-      <span class="text-xs font-bold text-on-surface">我的订单</span>
+      <span class="text-xs font-bold text-on-surface">My Orders</span>
     </button>
     <button onclick="showTab('wishlist')" id="tabWishlist" class="dash-tab bg-surface-container rounded-2xl p-4 flex flex-col items-center gap-2 border-2 border-transparent">
       <span class="material-symbols-outlined text-on-surface-variant">favorite</span>
-      <span class="text-xs font-bold text-on-surface-variant">我的收藏</span>
+      <span class="text-xs font-bold text-on-surface-variant">My Wishlist</span>
     </button>
     <button onclick="showTab('points')" id="tabPoints" class="dash-tab bg-surface-container rounded-2xl p-4 flex flex-col items-center gap-2 border-2 border-transparent">
       <span class="material-symbols-outlined text-on-surface-variant">star</span>
-      <span class="text-xs font-bold text-on-surface-variant">积分明细</span>
+      <span class="text-xs font-bold text-on-surface-variant">Points History</span>
     </button>
   </div>
 
   <!-- Tab content -->
   <div id="tabContentOrders">
-    <h3 class="font-headline-md text-on-surface mb-4">我的订单</h3>
-    <div id="ordersLoading" class="text-center py-8 text-on-surface-variant font-body-sm text-body-sm">加载中...</div>
+    <h3 class="font-headline-md text-on-surface mb-4">My Orders</h3>
+    <div id="ordersLoading" class="text-center py-8 text-on-surface-variant font-body-sm text-body-sm">Loading...</div>
     <div id="ordersEmpty" class="hidden bg-surface-container-low rounded-2xl p-8 text-center text-on-surface-variant">
       <span class="material-symbols-outlined text-4xl mb-2 block opacity-30">inbox</span>
-      <p class="font-body-sm text-body-sm">暂无订单记录</p>
-      <a href="products.html" class="inline-block mt-4 bg-primary text-on-primary px-6 py-2 rounded-none text-sm font-bold hover:opacity-80 transition-opacity">去逛逛</a>
+      <p class="font-body-sm text-body-sm">No orders yet</p>
+      <a href="products.html" class="inline-block mt-4 bg-primary text-on-primary px-6 py-2 rounded-none text-sm font-bold hover:opacity-80 transition-opacity">Shop Now</a>
     </div>
     <div id="ordersList" class="hidden space-y-4"></div>
   </div>
   <div id="tabContentWishlist" class="hidden">
-    <h3 class="font-headline-md text-on-surface mb-4">我的收藏</h3>
+    <h3 class="font-headline-md text-on-surface mb-4">My Wishlist</h3>
     <div id="wishlistGrid" class="grid grid-cols-2 gap-3"></div>
     <div id="wishlistEmpty" class="bg-surface-container-low rounded-2xl p-8 text-center text-on-surface-variant hidden">
       <span class="material-symbols-outlined text-4xl mb-2 block opacity-30">favorite</span>
-      <p class="font-body-sm text-body-sm">还没有收藏的商品</p>
-      <a href="products.html" class="inline-block mt-4 bg-primary text-on-primary px-6 py-2 rounded-none text-sm font-bold hover:opacity-80 transition-opacity">去逛逛</a>
+      <p class="font-body-sm text-body-sm">No saved products yet</p>
+      <a href="products.html" class="inline-block mt-4 bg-primary text-on-primary px-6 py-2 rounded-none text-sm font-bold hover:opacity-80 transition-opacity">Shop Now</a>
     </div>
   </div>
   <div id="tabContentPoints" class="hidden">
-    <h3 class="font-headline-md text-on-surface mb-4">积分明细</h3>
+    <h3 class="font-headline-md text-on-surface mb-4">Points History</h3>
     <div class="bg-surface-container-low rounded-2xl p-8 text-center text-on-surface-variant">
       <span class="material-symbols-outlined text-4xl mb-2 block opacity-30">star</span>
-      <p class="font-body-sm text-body-sm">暂无积分记录</p>
+      <p class="font-body-sm text-body-sm">No points history yet</p>
     </div>
   </div>
 </div>
@@ -413,7 +413,7 @@
             } else {
                 dashboard.classList.add('hidden');
                 clubIntro.classList.remove('hidden');
-                setStatus('注册后请查收邮件确认账号。');
+                setStatus(accountTx('After signing up, please check your email to confirm your account.', '注册后请查收邮件确认账号。'));
             }
         }
 
@@ -444,26 +444,36 @@
                   <img src="${p.image_url||''}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
                 </div>
                 <div class="p-3">
-                  <p class="font-label-md text-xs text-on-surface leading-tight mb-1">${p.name_zh||p.name}</p>
+                  <p class="font-label-md text-xs text-on-surface leading-tight mb-1">${window.cippyProductName ? window.cippyProductName(p) : (p.name || p.name_zh || '')}</p>
                   <p class="text-primary text-xs font-bold">MYR ${parseFloat(p.price_myr||p.price||0).toFixed(2)}</p>
                 </div>
               </a>`).join('');
         }
 
         const tierInfo = {
-            Classic: { label: 'Classic 会员 · 每消费 RM1 得 1 积分', multiplier: 1 },
-            Luxe:    { label: 'Luxe 会员 · 积分 1.5 倍加成',         multiplier: 1.5 },
-            Elite:   { label: 'Elite 会员 · 积分 2 倍加成',          multiplier: 2 },
+            Classic: { en: 'Classic Member · Earn 1 point per RM1 · 10 points = RM1', zh: 'Classic 会员 · 每消费 RM1 得 1 积分 · 10积分 = RM1', multiplier: 1 },
+            Luxe:    { en: 'Luxe Member · 1.5x points bonus', zh: 'Luxe 会员 · 积分 1.5 倍加成', multiplier: 1.5 },
+            Elite:   { en: 'Elite Member · 2x points bonus', zh: 'Elite 会员 · 积分 2 倍加成', multiplier: 2 },
         };
+        function accountTx(en, zh) { return window.getCippyLang?.() === 'zh' ? zh : en; }
+        let lastProfileData = null;
 
         async function loadProfile() {
             const { data, error } = await sb.from('profiles').select('points,total_spent,tier').single();
             if (error || !data) return;
+            lastProfileData = data;
+            renderProfile(data);
+        }
+
+        function renderProfile(data) {
             const pts = data.points || 0;
             const tier = data.tier || 'Classic';
             document.getElementById('dashPoints').textContent = `${pts} pts`;
-            document.getElementById('dashTierLabel').textContent = tierInfo[tier]?.label || tier;
+            const info = tierInfo[tier];
+            document.getElementById('dashTierLabel').textContent = info ? accountTx(info.en, info.zh) : tier;
         }
+
+        let lastOrdersData = null;
 
         async function loadOrders() {
             const loading = document.getElementById('ordersLoading');
@@ -480,22 +490,29 @@
                 empty.classList.remove('hidden');
                 return;
             }
+            lastOrdersData = data;
+            renderOrders(data);
+        }
 
+        function renderOrders(data) {
             const fmt = new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' });
             const statusMap = {
-                pending:         { label: '待付款', cls: 'bg-error-container text-on-error-container' },
-                paid:            { label: '已付款', cls: 'bg-secondary-container text-on-surface' },
-                processing:      { label: '处理中', cls: 'bg-primary-fixed text-on-surface' },
-                shipped:         { label: '已发货', cls: 'bg-tertiary-container text-on-tertiary-container' },
-                delivered:       { label: '已送达', cls: 'bg-tertiary-container text-on-tertiary-container' },
-                cancelled:       { label: '已取消', cls: 'bg-surface-container-high text-on-surface-variant' },
+                pending:         { en: 'Pending Payment', zh: '待付款', cls: 'bg-error-container text-on-error-container' },
+                paid:            { en: 'Paid', zh: '已付款', cls: 'bg-secondary-container text-on-surface' },
+                processing:      { en: 'Processing', zh: '处理中', cls: 'bg-primary-fixed text-on-surface' },
+                shipped:         { en: 'Shipped', zh: '已发货', cls: 'bg-tertiary-container text-on-tertiary-container' },
+                delivered:       { en: 'Delivered', zh: '已送达', cls: 'bg-tertiary-container text-on-tertiary-container' },
+                cancelled:       { en: 'Cancelled', zh: '已取消', cls: 'bg-surface-container-high text-on-surface-variant' },
             };
+            const list = document.getElementById('ordersList');
             list.classList.remove('hidden');
             list.innerHTML = data.map(order => {
                 const items = order.items || [];
                 const totals = order.totals || {};
-                const date = new Date(order.created_at).toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+                const isZh = window.getCippyLang?.() === 'zh';
+                const date = new Date(order.created_at).toLocaleDateString(isZh ? 'zh-CN' : 'en-MY', { year: 'numeric', month: 'long', day: 'numeric' });
                 const st = statusMap[order.status] || { label: order.status, cls: 'bg-surface-container text-on-surface-variant' };
+                const statusLabel = st.label || accountTx(st.en, st.zh);
                 return `
                 <a href="order.html?id=${order.id}" class="block bg-surface-container-low rounded-2xl overflow-hidden hover:shadow-md transition-shadow">
                     <div class="flex items-center justify-between px-5 py-4 border-b border-outline-variant">
@@ -504,7 +521,7 @@
                             <p class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">${date}</p>
                         </div>
                         <div class="flex items-center gap-2">
-                            <span class="px-3 py-1 ${st.cls} font-label-sm text-label-sm rounded-full">${st.label}</span>
+                            <span class="px-3 py-1 ${st.cls} font-label-sm text-label-sm rounded-full">${statusLabel}</span>
                             <span class="material-symbols-outlined text-on-surface-variant text-lg">chevron_right</span>
                         </div>
                     </div>
@@ -516,7 +533,7 @@
                             ).join('')}
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="font-body-sm text-body-sm text-on-surface-variant">${items.length} 件商品</p>
+                            <p class="font-body-sm text-body-sm text-on-surface-variant">${isZh ? `${items.length} 件商品` : `${items.length} item${items.length === 1 ? '' : 's'}`}</p>
                             <p class="font-label-md text-label-md text-on-surface">${fmt.format(totals.total || 0)}</p>
                         </div>
                     </div>
@@ -541,31 +558,39 @@
 
         createBtn.addEventListener('click', async () => {
             const { name, email, password } = getFields();
-            if (!email || password.length < 6) return setStatus('请输入邮箱和至少6位密码。', true);
+            if (!email || password.length < 6) return setStatus(accountTx('Please enter an email and a password with at least 6 characters.', '请输入邮箱和至少6位密码。'), true);
             const { error } = await sb.auth.signUp({ email, password, options: { data: { name } } });
             if (error) return setStatus(error.message, true);
-            setStatus('注册成功！请查收邮件确认账号后再登录。');
+            setStatus(accountTx('Sign up successful. Please check your email to confirm your account before logging in.', '注册成功！请查收邮件确认账号后再登录。'));
         });
 
         signInBtn.addEventListener('click', async () => {
             const { email, password } = getFields();
-            if (!email || !password) return setStatus('请输入邮箱和密码。', true);
+            if (!email || !password) return setStatus(accountTx('Please enter your email and password.', '请输入邮箱和密码。'), true);
             const { error } = await sb.auth.signInWithPassword({ email, password });
-            if (error) return setStatus('邮箱或密码错误。', true);
+            if (error) return setStatus(accountTx('Email or password is incorrect.', '邮箱或密码错误。'), true);
         });
 
         resendBtn.addEventListener('click', async () => {
             const { email } = getFields();
-            if (!email) return setStatus('请先输入邮箱地址。', true);
+            if (!email) return setStatus(accountTx('Please enter your email address first.', '请先输入邮箱地址。'), true);
             const { error } = await sb.auth.resend({ type: 'signup', email });
             if (error) return setStatus(error.message, true);
-            setStatus('验证邮件已重新发送，请查收。');
+            setStatus(accountTx('Verification email has been resent. Please check your inbox.', '验证邮件已重新发送，请查收。'));
         });
 
         signOutBtn.addEventListener('click', async () => {
           ['cippy_cart','cippy_last_order','cippy_pending_order','cippy_addresses'].forEach(k => localStorage.removeItem(k));
           await sb.auth.signOut();
         });
+
+        const prevAccountLangChange = window.onCippyLangChange;
+        window.onCippyLangChange = function(lang) {
+          if (prevAccountLangChange) prevAccountLangChange(lang);
+          loadWishlist();
+          if (lastProfileData) renderProfile(lastProfileData);
+          if (lastOrdersData) renderOrders(lastOrdersData);
+        };
 </script>
 <script>
         // Simple intersection observer for reveal animations

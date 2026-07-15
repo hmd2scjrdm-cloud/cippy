@@ -159,7 +159,7 @@
 </div>
 </div>
 </nav>
-<main class="pt-32 pb-xl px-6 md:px-margin-desktop max-w-[1440px] mx-auto">
+<main class="pt-32 pb-32 md:pb-xl px-6 md:px-margin-desktop max-w-[1440px] mx-auto">
 <!-- Product Hero Section -->
 <div class="flex flex-col md:grid md:grid-cols-12 gap-gutter lg:gap-xl">
 <!-- Left: Image Gallery -->
@@ -239,7 +239,7 @@
 </div>
 <!-- Add to Bag -->
 <div class="pt-lg space-y-4">
-<button onclick="addToBag()" class="w-full py-5 bg-primary text-on-primary rounded-none font-headline-md hover:opacity-80 active:scale-95 transition-all">Add to Bag</button>
+<button id="addToBagBtn" onclick="addToBag()" class="w-full py-5 bg-primary text-on-primary rounded-none font-headline-md hover:opacity-80 active:scale-95 transition-all">Add to Bag</button>
 <button id="wishlistBtn" onclick="toggleWishlist()" class="w-full py-4 border border-outline-variant text-on-surface rounded-none font-label-md flex items-center justify-center gap-2 hover:bg-surface-container-low transition-colors">
 <span id="wishlistIcon" class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">favorite</span><span id="wishlistLabel">Save to Wishlist</span>
 </button>
@@ -263,6 +263,20 @@
 </div>
 <!-- Shipping Info -->
 <div class="pt-lg space-y-3">
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+  <div class="p-3 bg-white border border-surface-container rounded-xl">
+    <p class="font-label-sm text-label-sm text-on-surface">1-3 Working Days Shipping</p>
+    <p class="text-[11px] text-on-surface-variant mt-1">Malaysia ready stock.</p>
+  </div>
+  <div class="p-3 bg-white border border-surface-container rounded-xl">
+    <p class="font-label-sm text-label-sm text-on-surface">7-Day Return / Exchange</p>
+    <p class="text-[11px] text-on-surface-variant mt-1">Subject to item condition.</p>
+  </div>
+  <div class="p-3 bg-white border border-surface-container rounded-xl">
+    <p class="font-label-sm text-label-sm text-on-surface">Unboxing Video Required</p>
+    <p class="text-[11px] text-on-surface-variant mt-1">For after-sales claims.</p>
+  </div>
+</div>
 <div class="flex items-center gap-3 p-4 bg-surface-container-low rounded-xl">
 <span class="material-symbols-outlined text-on-surface-variant">local_shipping</span>
 <div>
@@ -357,6 +371,15 @@
   </button>
 </section>
 </main>
+<div id="mobileStickyAtc" class="md:hidden fixed left-0 right-0 bottom-0 z-50 bg-background/95 backdrop-blur border-t border-outline-variant px-4 py-3 shadow-[0_-8px_24px_rgba(32,26,27,0.08)]">
+  <div class="flex items-center gap-3">
+    <div class="min-w-0 flex-1">
+      <p id="stickyProductName" class="font-label-md text-xs text-on-surface truncate">Loading…</p>
+      <p id="stickyProductPrice" class="font-label-md text-sm text-primary"></p>
+    </div>
+    <button id="stickyAddToBagBtn" onclick="addToBag()" class="bg-primary text-on-primary px-5 py-3 rounded-none font-label-md text-sm active:scale-95 transition-transform">Add to Bag</button>
+  </div>
+</div>
 <!-- Footer -->
 <footer class="w-full py-xl bg-surface-container-low">
 <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-6 md:px-margin-desktop w-full max-w-[1440px] mx-auto">
@@ -430,6 +453,18 @@ function switchMainImage(url) {
 let selectedVariant = null;
 let selectedPrice = null;
 let _productData = null;
+
+function updateStickyProductBar() {
+  if (!_productData) return;
+  const name = window.cippyProductName
+    ? window.cippyProductName(_productData)
+    : (window.getCippyLang?.() === 'zh' ? (_productData.name_zh || _productData.name || '') : (_productData.name || _productData.name_zh || ''));
+  const stickyName = document.getElementById('stickyProductName');
+  const stickyPrice = document.getElementById('stickyProductPrice');
+  const priceText = document.getElementById('productPrice')?.textContent || '';
+  if (stickyName) stickyName.textContent = name;
+  if (stickyPrice) stickyPrice.textContent = priceText;
+}
 
 function showToast(msg) {
   let t = document.getElementById('cippyToast');
@@ -511,6 +546,7 @@ function applyProductLang(lang) {
   document.getElementById('productName').textContent = displayName;
   document.getElementById('productDesc').textContent = p.description || '';
   document.title = `cippy | ${displayName || (lang === 'zh' ? '商品' : 'Product')}`;
+  updateStickyProductBar();
   // Re-collect so spec labels/values and color buttons get re-translated
   if (window.recollectCippyLang) window.recollectCippyLang();
 }
@@ -578,12 +614,14 @@ async function loadProduct() {
         priceNote.classList.add('hidden');
         selectedVariant = v;
         selectedPrice = parseFloat(v.price_myr);
+        updateStickyProductBar();
         if (v.image_url) switchMainImage(v.image_url);
       });
       variantBtns.appendChild(btn);
     });
   } else {
     priceEl.textContent = p.price_myr ? `RM ${parseFloat(p.price_myr).toFixed(2)}` : (p.price ? `RM ${parseFloat(p.price).toFixed(2)}` : '');
+    updateStickyProductBar();
   }
 
   // Colors & Sizes
