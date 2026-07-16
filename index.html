@@ -76,10 +76,9 @@
 <section class="relative w-full overflow-hidden bg-[#f8f0eb]">
 <div class="relative max-w-[1314px] mx-auto">
 <img class="block w-full h-auto" alt="Cippy Style petite-friendly Korean fashion Malaysia campaign banner" src="assets/cippy-home-petite-hero-bg.png"/>
-<div class="absolute left-[6%] top-[14%] w-[35%]">
-  <p class="font-label-sm text-[7px] leading-[10px] sm:text-[10px] md:text-[15px] lg:text-[18px] text-on-surface-variant uppercase tracking-[0.14em] md:tracking-[0.28em] mb-[2%]">Cippy Style · Petite Friendly</p>
-  <h1 class="font-headline-lg text-[15px] leading-[18px] sm:text-[26px] sm:leading-[32px] md:text-[42px] md:leading-[50px] lg:text-[54px] lg:leading-[64px] text-on-surface mb-[4%]">Petite-ready Korean fashion for Malaysian girls.</h1>
-  <p class="font-body-md text-[8px] leading-[12px] sm:text-[13px] sm:leading-[20px] md:text-[22px] md:leading-[32px] text-on-surface-variant max-w-md">Ready stock daily outfits and sets, curated for 150-160cm girls.</p>
+<div class="absolute left-[6%] top-[17%] w-[30%]">
+  <p class="font-label-sm text-[8px] leading-[12px] sm:text-[12px] md:text-[18px] lg:text-[24px] text-on-surface uppercase tracking-[0.22em] md:tracking-[0.34em]">Cippy Style</p>
+  <p class="font-label-sm text-[6px] sm:text-[9px] md:text-[12px] lg:text-[14px] text-on-surface-variant uppercase tracking-[0.18em] md:tracking-[0.26em] mt-1 md:mt-2">Petite Friendly · Malaysia</p>
 </div>
 <a class="absolute left-[4.2%] bottom-[5.3%] w-[21.8%] h-[7.6%] flex items-center justify-center rounded-full font-label-md text-[10px] sm:text-[14px] md:text-[22px] text-on-surface hover:opacity-75 transition-opacity" href="products.html?sort=new">Shop New In</a>
 </div>
@@ -413,10 +412,8 @@
 (function() {
   const key = 'cippy_promo_closed';
   const el = document.getElementById('memberPromo');
-  if (sessionStorage.getItem(key)) return; // already closed this session
-  setTimeout(() => {
-    el.style.transform = 'translateY(0)';
-  }, 2500);
+  if (!el || sessionStorage.getItem(key)) return;
+  sessionStorage.setItem(key, '1');
 })();
 function closePromo() {
   const el = document.getElementById('memberPromo');

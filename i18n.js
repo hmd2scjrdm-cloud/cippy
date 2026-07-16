@@ -494,6 +494,7 @@
   "Shop Now": "去逛逛",
   "Petite-ready Malaysian Korean fashion, in stock now.": "适合小个子的马来西亚韩系女装，现货发售。",
   "Cippy Style · Petite Friendly": "Cippy Style · 小个子友好",
+  "Petite Friendly · Malaysia": "小个子友好 · 马来西亚",
   "Petite-ready Korean fashion for Malaysian girls.": "适合马来西亚小个子的韩系女装。",
   "Ready stock daily outfits and sets, curated for 150-160cm girls.": "现货日常穿搭与套装单品，精选适合 150-160cm 女生。",
   "Petite Friendly 150-160cm": "小个子友好 150-160cm",
