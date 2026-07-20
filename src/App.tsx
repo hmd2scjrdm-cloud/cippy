@@ -2023,7 +2023,7 @@ export default function App() {
               {/* Center: CHAEWON Title Logo */}
               <div className="md:w-1/3 flex justify-center">
                 <img 
-                  src="/cippy-logo.png"
+                  src="https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/logo/cippylogo.svg.PNG"
                   alt="Cippy Logo"
                   onClick={() => {
                     setActiveTab('rtw');
@@ -3665,7 +3665,7 @@ export default function App() {
                       {/* Logo displayed beautifully */}
                       <div className="flex justify-center mb-6">
                         <img 
-                          src="/cippy-logo.png" 
+                          src="https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/logo/cippylogo.svg.PNG" 
                           alt="Cippy Logo" 
                           className="h-12 w-auto object-contain"
                           referrerPolicy="no-referrer"

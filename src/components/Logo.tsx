@@ -18,7 +18,7 @@ export default function Logo({ className = "", size = "md" }: LogoProps) {
   return (
     <div className={`flex flex-col items-center select-none ${className}`}>
       <img
-        src="/cippy-logo.png"
+        src="https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/logo/cippylogo.svg.PNG"
         alt="Cippy Malaysia"
         className={`${heightClass} w-auto object-contain transition-all duration-300`}
         referrerPolicy="no-referrer"
