@@ -3,7 +3,15 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
-      "source": "/((?!api/).*)",
+      "source": "/admin",
+      "destination": "/admin.html"
+    },
+    {
+      "source": "/admin-products",
+      "destination": "/admin-products.html"
+    },
+    {
+      "source": "/((?!api/|admin|admin-products).*)",
       "destination": "/index.html"
     }
   ],
@@ -13,4 +21,5 @@
     }
   }
 }
+
 

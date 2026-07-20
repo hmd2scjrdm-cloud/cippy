@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>cippy | 商品管理</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  @font-face { font-family: "JF Open Huninn"; src: url("assets/jf-openhuninn.ttf") format("truetype"); font-display: swap; }
+  body { font-family: "JF Open Huninn", sans-serif; background: #faf7f5; }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- Login screen -->
+<div id="loginScreen" class="hidden max-w-sm mx-auto mt-32 text-center px-8">
+  <img src="assets/cippy-logo.png" alt="cippy" class="h-16 mx-auto mb-8"/>
+  <p class="text-stone-400 text-sm mb-6">管理员登录</p>
+  <button id="loginBtn" class="w-full py-3 bg-[#C4928A] text-white font-bold rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-3">
+    <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20H24v8h11.3C33.6 33.1 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34 6.5 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 19.7-8 19.7-20 0-1.3-.1-2.7-.1-4z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.1 19 12 24 12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34 6.5 29.3 4 24 4 16.3 4 9.7 8.4 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.9 13.5-5l-6.2-5.2C29.5 35.6 26.9 36 24 36c-5.2 0-9.6-2.9-11.2-7.1l-6.5 5C9.9 39.8 16.5 44 24 44z"/><path fill="#1976D2" d="M43.6 20H24v8h11.3c-.8 2.3-2.3 4.2-4.3 5.6l6.2 5.2C41.2 35.4 44 30 44 24c0-1.3-.1-2.7-.4-4z"/></svg>
+    Google 登录
+  </button>
+</div>
+
+<!-- Main -->
+<div id="app" class="hidden">
+  <!-- Nav -->
+  <nav class="bg-white border-b border-stone-200 px-6 py-4 flex justify-between items-center">
+    <div class="flex items-center gap-6">
+      <img src="assets/cippy-logo.png" alt="cippy" class="h-10"/>
+      <span class="text-stone-300">|</span>
+      <a href="admin.html" class="text-sm text-stone-500 hover:text-stone-800">库存总览</a>
+      <a href="admin-products.html" class="text-sm font-bold text-[#C4928A]">商品管理</a>
+      <a href="generate.html" class="text-sm text-stone-500 hover:text-stone-800">AI 图生成</a>
+    </div>
+    <div class="flex items-center gap-4">
+      <span id="userEmail" class="text-xs text-stone-400"></span>
+      <button id="logoutBtn" class="text-xs text-stone-400 hover:text-stone-600">退出</button>
+    </div>
+  </nav>
+
+  <div class="max-w-6xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+    <!-- Add / Edit form -->
+    <div class="lg:col-span-1">
+      <div class="bg-white rounded-xl border border-stone-100 shadow-sm p-6 sticky top-6">
+        <h2 id="formTitle" class="font-bold text-stone-800 mb-5">添加商品</h2>
+        <form id="productForm" class="space-y-4">
+          <input type="hidden" id="editId"/>
+
+          <div>
+            <label class="text-xs text-stone-400 block mb-1">商品名称（英文）*</label>
+            <input id="fName" type="text" required placeholder="e.g. Ruffled Mini Skirt"
+              class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4928A]"/>
+          </div>
+          <div>
+            <label class="text-xs text-stone-400 block mb-1">商品名称（中文）</label>
+            <input id="fNameZh" type="text" placeholder="例：荷叶边短裙"
+              class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4928A]"/>
+          </div>
+          <div>
+            <label class="text-xs text-stone-400 block mb-1">分类</label>
+            <select id="fCategory" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4928A]">
+              <option value="">选择分类</option>
+              <option>上装</option>
+              <option>下装</option>
+              <option>连衣裙</option>
+              <option>外套</option>
+              <option>配饰</option>
+              <option>鞋履</option>
+              <option>包袋</option>
+            </select>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-xs text-stone-400 block mb-1">售价 (RM) *</label>
+              <input id="fPrice" type="number" step="0.01" min="0" required placeholder="0.00"
+                class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4928A]"/>
+            </div>
+            <div>
+              <label class="text-xs text-stone-400 block mb-1">成本 (RM) *</label>
+              <input id="fCost" type="number" step="0.01" min="0" required placeholder="0.00"
+                class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4928A]"/>
+            </div>
+          </div>
+
+          <!-- Live margin preview -->
+          <div id="marginPreview" class="hidden bg-stone-50 rounded-lg px-4 py-3 text-sm">
+            <span class="text-stone-400">毛利：</span>
+            <span id="previewGross" class="font-bold text-stone-700"></span>
+            <span class="text-stone-300 mx-2">·</span>
+            <span class="text-stone-400">毛利率：</span>
+            <span id="previewMargin" class="font-bold"></span>
+          </div>
+
+          <div>
+            <label class="text-xs text-stone-400 block mb-1">库存数量 *</label>
+            <input id="fStock" type="number" min="0" required placeholder="0"
+              class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4928A]"/>
+          </div>
+          <div>
+            <label class="text-xs text-stone-400 block mb-1">图片 URL</label>
+            <input id="fImageUrl" type="url" placeholder="https://..."
+              class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4928A]"/>
+          </div>
+          <div>
+            <label class="text-xs text-stone-400 block mb-1">描述</label>
+            <textarea id="fDescription" rows="2" placeholder="商品描述…"
+              class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4928A] resize-none"></textarea>
+          </div>
+
+          <div class="flex gap-3 pt-1">
+            <button type="submit"
+              class="flex-1 py-2.5 bg-[#C4928A] text-white font-bold rounded-lg hover:opacity-90 transition-opacity text-sm">
+              <span id="submitLabel">添加商品</span>
+            </button>
+            <button type="button" id="cancelEdit"
+              class="hidden px-4 py-2.5 border border-stone-200 text-stone-500 rounded-lg text-sm hover:bg-stone-50">
+              取消
+            </button>
+          </div>
+          <div id="formMsg" class="hidden text-xs text-center py-1 rounded-lg"></div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Product list -->
+    <div class="lg:col-span-2">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="font-bold text-stone-800">商品列表</h2>
+        <span id="productCount" class="text-sm text-stone-400"></span>
+      </div>
+      <div id="productList" class="space-y-3">
+        <div class="text-center py-12 text-stone-400">加载中…</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete confirm modal -->
+<div id="deleteModal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-6">
+  <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
+    <h3 class="font-bold text-stone-800 mb-2">确认删除？</h3>
+    <p id="deleteModalName" class="text-stone-500 text-sm mb-6"></p>
+    <div class="flex gap-3">
+      <button id="confirmDelete" class="flex-1 py-2.5 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600 text-sm">删除</button>
+      <button id="cancelDelete" class="flex-1 py-2.5 border border-stone-200 text-stone-500 rounded-lg text-sm hover:bg-stone-50">取消</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://ilzeziznxzaxxudzhdmu.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI';
+const ALLOWED_EMAILS = ['cippy.kl@gmail.com'];
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let deleteTargetId = null;
+
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  handleSession(session);
+  sb.auth.onAuthStateChange((_, session) => handleSession(session));
+}
+
+function handleSession(session) {
+  if (!session || !ALLOWED_EMAILS.includes(session.user.email)) {
+    document.getElementById('loginScreen').classList.remove('hidden');
+    document.getElementById('app').classList.add('hidden');
+    return;
+  }
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('userEmail').textContent = session.user.email;
+  loadProducts();
+}
+
+document.getElementById('loginBtn').addEventListener('click', () =>
+  sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } }));
+document.getElementById('logoutBtn').addEventListener('click', () => sb.auth.signOut());
+
+// Live margin preview
+['fPrice', 'fCost'].forEach(id => {
+  document.getElementById(id).addEventListener('input', updateMarginPreview);
+});
+
+function updateMarginPreview() {
+  const price = parseFloat(document.getElementById('fPrice').value) || 0;
+  const cost = parseFloat(document.getElementById('fCost').value) || 0;
+  const preview = document.getElementById('marginPreview');
+  if (!price && !cost) { preview.classList.add('hidden'); return; }
+  const gross = price - cost;
+  const margin = price > 0 ? (gross / price * 100) : 0;
+  const marginEl = document.getElementById('previewMargin');
+  marginEl.textContent = margin.toFixed(1) + '%';
+  marginEl.className = 'font-bold ' + (margin >= 50 ? 'text-green-600' : margin >= 30 ? 'text-amber-600' : 'text-red-500');
+  document.getElementById('previewGross').textContent = 'RM ' + gross.toFixed(2);
+  preview.classList.remove('hidden');
+}
+
+// Form submit
+document.getElementById('productForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const id = document.getElementById('editId').value;
+  const payload = {
+    name: document.getElementById('fName').value.trim(),
+    name_zh: document.getElementById('fNameZh').value.trim() || null,
+    category: document.getElementById('fCategory').value || null,
+    price: parseFloat(document.getElementById('fPrice').value),
+    cost: parseFloat(document.getElementById('fCost').value),
+    stock: parseInt(document.getElementById('fStock').value),
+    image_url: document.getElementById('fImageUrl').value.trim() || null,
+    description: document.getElementById('fDescription').value.trim() || null,
+  };
+
+  const msg = document.getElementById('formMsg');
+  msg.classList.remove('hidden');
+  msg.className = 'text-xs text-center py-1 rounded-lg bg-stone-100 text-stone-500';
+  msg.textContent = id ? '保存中…' : '添加中…';
+
+  const { error } = id
+    ? await sb.from('products').update(payload).eq('id', id)
+    : await sb.from('products').insert(payload);
+
+  if (error) {
+    msg.className = 'text-xs text-center py-1 rounded-lg bg-red-50 text-red-500';
+    msg.textContent = '失败：' + error.message;
+    return;
+  }
+
+  msg.className = 'text-xs text-center py-1 rounded-lg bg-green-50 text-green-600';
+  msg.textContent = id ? '✓ 已保存' : '✓ 已添加';
+  resetForm();
+  loadProducts();
+  setTimeout(() => msg.classList.add('hidden'), 2000);
+});
+
+function resetForm() {
+  document.getElementById('editId').value = '';
+  document.getElementById('productForm').reset();
+  document.getElementById('formTitle').textContent = '添加商品';
+  document.getElementById('submitLabel').textContent = '添加商品';
+  document.getElementById('cancelEdit').classList.add('hidden');
+  document.getElementById('marginPreview').classList.add('hidden');
+}
+
+document.getElementById('cancelEdit').addEventListener('click', resetForm);
+
+async function loadProducts() {
+  const { data, error } = await sb.from('products').select('*').order('created_at', { ascending: false });
+  if (error) return;
+
+  document.getElementById('productCount').textContent = `共 ${data.length} 件商品`;
+  const list = document.getElementById('productList');
+
+  if (!data.length) {
+    list.innerHTML = '<div class="text-center py-12 text-stone-400">还没有商品，从左边添加第一件吧</div>';
+    return;
+  }
+
+  list.innerHTML = data.map(p => {
+    const gross = p.price - p.cost;
+    const margin = p.price > 0 ? (gross / p.price * 100) : 0;
+    const marginColor = margin >= 50 ? 'text-green-600' : margin >= 30 ? 'text-amber-600' : 'text-red-500';
+    const stockColor = p.stock <= 3 ? 'text-red-500 font-bold' : p.stock <= 10 ? 'text-amber-600' : 'text-stone-600';
+    return `
+      <div class="bg-white rounded-xl border border-stone-100 shadow-sm p-4 flex gap-4 items-start">
+        ${p.image_url
+          ? `<img src="${p.image_url}" class="w-16 h-16 rounded-lg object-cover bg-stone-100 shrink-0"/>`
+          : `<div class="w-16 h-16 rounded-lg bg-stone-100 shrink-0 flex items-center justify-center text-stone-300 text-xs">无图</div>`}
+        <div class="flex-1 min-w-0">
+          <div class="flex justify-between items-start gap-2">
+            <div>
+              <p class="font-bold text-stone-800 truncate">${p.name}</p>
+              ${p.name_zh ? `<p class="text-xs text-stone-400">${p.name_zh}</p>` : ''}
+              ${p.category ? `<span class="inline-block mt-1 text-xs bg-stone-100 text-stone-500 px-2 py-0.5 rounded-full">${p.category}</span>` : ''}
+            </div>
+            <div class="flex gap-2 shrink-0">
+              <button onclick="editProduct('${p.id}')"
+                class="text-xs px-3 py-1.5 border border-stone-200 text-stone-500 rounded-lg hover:bg-stone-50">编辑</button>
+              <button onclick="promptDelete('${p.id}', '${p.name.replace(/'/g, "\\'")}')"
+                class="text-xs px-3 py-1.5 border border-red-200 text-red-400 rounded-lg hover:bg-red-50">删除</button>
+            </div>
+          </div>
+          <div class="mt-3 flex flex-wrap gap-4 text-sm">
+            <div><span class="text-stone-400 text-xs">售价</span><br/><span class="font-bold text-stone-700">RM ${Number(p.price).toFixed(2)}</span></div>
+            <div><span class="text-stone-400 text-xs">成本</span><br/><span class="text-stone-500">RM ${Number(p.cost).toFixed(2)}</span></div>
+            <div><span class="text-stone-400 text-xs">毛利率</span><br/><span class="font-bold ${marginColor}">${margin.toFixed(1)}%</span></div>
+            <div><span class="text-stone-400 text-xs">库存</span><br/><span class="${stockColor}">${p.stock} 件</span></div>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+async function editProduct(id) {
+  const { data } = await sb.from('products').select('*').eq('id', id).single();
+  if (!data) return;
+  document.getElementById('editId').value = data.id;
+  document.getElementById('fName').value = data.name;
+  document.getElementById('fNameZh').value = data.name_zh || '';
+  document.getElementById('fCategory').value = data.category || '';
+  document.getElementById('fPrice').value = data.price;
+  document.getElementById('fCost').value = data.cost;
+  document.getElementById('fStock').value = data.stock;
+  document.getElementById('fImageUrl').value = data.image_url || '';
+  document.getElementById('fDescription').value = data.description || '';
+  document.getElementById('formTitle').textContent = '编辑商品';
+  document.getElementById('submitLabel').textContent = '保存修改';
+  document.getElementById('cancelEdit').classList.remove('hidden');
+  updateMarginPreview();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function promptDelete(id, name) {
+  deleteTargetId = id;
+  document.getElementById('deleteModalName').textContent = `「${name}」将被永久删除`;
+  document.getElementById('deleteModal').classList.remove('hidden');
+}
+
+document.getElementById('cancelDelete').addEventListener('click', () => {
+  document.getElementById('deleteModal').classList.add('hidden');
+  deleteTargetId = null;
+});
+
+document.getElementById('confirmDelete').addEventListener('click', async () => {
+  if (!deleteTargetId) return;
+  await sb.from('products').delete().eq('id', deleteTargetId);
+  document.getElementById('deleteModal').classList.add('hidden');
+  deleteTargetId = null;
+  loadProducts();
+});
+
+init();
+</script>
+</body>
+</html>
