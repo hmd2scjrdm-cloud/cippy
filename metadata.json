@@ -1,0 +1,6 @@
+{
+  "name": "Cippy",
+  "description": "A high-end, Korean-style ready-to-wear clothing brand. Loose-fitting and lovely designs in sizes S and M, with a storybook aesthetic tailored for Malaysian Chinese.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
