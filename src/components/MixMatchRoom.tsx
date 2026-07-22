@@ -7,6 +7,7 @@ interface MixMatchRoomProps {
   onAddProductToCart: (product: Product, size: 'S' | 'M') => void;
   activeTheme?: any;
   activeArchetype?: any;
+  lang?: 'en' | 'zh';
 }
 
 const pinkFallback = {
@@ -40,7 +41,7 @@ const defaultArchetype = {
   fontBody: 'font-sans'
 };
 
-export default function MixMatchRoom({ onAddProductToCart, activeTheme: activeThemeProp, activeArchetype: activeArchetypeProp }: MixMatchRoomProps) {
+export default function MixMatchRoom({ onAddProductToCart, activeTheme: activeThemeProp, activeArchetype: activeArchetypeProp, lang = 'en' }: MixMatchRoomProps) {
   const activeTheme = activeThemeProp || pinkFallback;
   const activeArchetype = activeArchetypeProp || defaultArchetype;
   
@@ -94,12 +95,18 @@ export default function MixMatchRoom({ onAddProductToCart, activeTheme: activeTh
           </span>
         )}
         <h2 className={`text-3xl md:text-4xl ${activeArchetype.fontTitle} font-bold text-zinc-800 tracking-tight`}>
-          {isMinimal ? 'COORDINATES CLOSET' : 'Mix & Match Ready-to-Wear'}
+          {isMinimal
+            ? (lang === 'zh' ? '搭配衣橱' : 'COORDINATES CLOSET')
+            : (lang === 'zh' ? '成衣自由搭配' : 'Mix & Match Ready-to-Wear')}
         </h2>
         <p className={`text-sm ${activeArchetype.fontBody} text-zinc-400 mt-1 max-w-xl mx-auto`}>
-          {isMinimal 
-            ? 'Select and combine ready-to-wear tops and bottoms on our architectural virtual mannequin hanger.'
-            : 'Our loose-fitting ready-to-wear coordinates fit S & M flawlessly. Drag or tap to dress our magical boutique hanger!'}
+          {isMinimal
+            ? (lang === 'zh'
+              ? '在我们的虚拟人台衣架上，自由挑选并搭配上装与下装。'
+              : 'Select and combine ready-to-wear tops and bottoms on our architectural virtual mannequin hanger.')
+            : (lang === 'zh'
+              ? '我们的宽松成衣搭配完美适配 S 与 M 码。轻触为我们的梦幻精品衣架换上新装吧！'
+              : 'Our loose-fitting ready-to-wear coordinates fit S & M flawlessly. Drag or tap to dress our magical boutique hanger!')}
         </p>
       </div>
 
@@ -134,13 +141,17 @@ export default function MixMatchRoom({ onAddProductToCart, activeTheme: activeTh
                       : 'border-zinc-100 hover:border-zinc-300 bg-white'
                   }`}
                 >
-                  {/* Miniature icon */}
+                  {/* Miniature photo */}
                   <div className={`w-10 h-10 ${
                     isMinimal ? 'rounded-none border-zinc-200 bg-zinc-50' : 'rounded-lg border-[var(--theme-primary-soft)] bg-[var(--theme-scrollbar-bg)]'
-                  } flex items-center justify-center border shrink-0`}>
-                    <svg viewBox="0 0 100 100" fill="none" className={`w-6 h-6 ${activeTheme.primaryText}`}>
-                      <path d={top.svgPath} fill="currentColor" opacity="0.8" />
-                    </svg>
+                  } overflow-hidden border shrink-0`}>
+                    {top.imageUrl ? (
+                      <img src={top.imageUrl} alt={top.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    ) : (
+                      <svg viewBox="0 0 100 100" fill="none" className={`w-full h-full p-2 ${activeTheme.primaryText}`}>
+                        <path d={top.svgPath} fill="currentColor" opacity="0.8" />
+                      </svg>
+                    )}
                   </div>
                   <div>
                     <h4 className={`text-xs font-bold text-zinc-800 leading-tight ${activeArchetype.fontTitle}`}>
@@ -183,10 +194,14 @@ export default function MixMatchRoom({ onAddProductToCart, activeTheme: activeTh
                 >
                   <div className={`w-10 h-10 ${
                     isMinimal ? 'rounded-none border-zinc-200 bg-zinc-50' : 'rounded-lg border-[var(--theme-primary-soft)] bg-[var(--theme-scrollbar-bg)]'
-                  } flex items-center justify-center border shrink-0`}>
-                    <svg viewBox="0 0 100 100" fill="none" className={`w-6 h-6 ${activeTheme.primaryText}`}>
-                      <path d={bottom.svgPath} fill="currentColor" opacity="0.8" />
-                    </svg>
+                  } overflow-hidden border shrink-0`}>
+                    {bottom.imageUrl ? (
+                      <img src={bottom.imageUrl} alt={bottom.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    ) : (
+                      <svg viewBox="0 0 100 100" fill="none" className={`w-full h-full p-2 ${activeTheme.primaryText}`}>
+                        <path d={bottom.svgPath} fill="currentColor" opacity="0.8" />
+                      </svg>
+                    )}
                   </div>
                   <div>
                     <h4 className={`text-xs font-bold text-zinc-800 leading-tight ${activeArchetype.fontTitle}`}>
@@ -210,7 +225,7 @@ export default function MixMatchRoom({ onAddProductToCart, activeTheme: activeTh
               : 'bg-white/95 storybook-border-sm p-4 storybook-shadow rounded-2xl'
           } flex items-center justify-between gap-4`}>
             <span className={`text-xs text-zinc-600 ${activeArchetype.fontBody}`}>
-              Select Size for both:
+              {lang === 'zh' ? '选择尺码（两件通用）：' : 'Select Size for both:'}
             </span>
             <div className="flex gap-2">
               {(['S', 'M'] as const).map((sz) => (
@@ -266,26 +281,26 @@ export default function MixMatchRoom({ onAddProductToCart, activeTheme: activeTh
               <path d="M 15,22 L 50,15 L 85,22 Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
             </svg>
 
-            {/* Top garment overlay */}
-            <div className="relative z-20 transition-all duration-500 transform hover:scale-105" style={{ filter: 'drop-shadow(0 6px 10px rgba(0,0,0,0.06))' }}>
-              <svg viewBox="0 0 100 100" fill="none" className="w-48 h-48" style={{ color: selectedTop.color }}>
-                <path d={selectedTop.svgPath} fill="currentColor" />
-                {/* Extra detailed lines to make it look highly tailored */}
-                <path d="M 50,35 L 50,80" stroke="#000000" strokeWidth="1.2" strokeOpacity="0.08" />
-                {/* Ribbon decoration overlay on top */}
-                <path d="M 45,40 C 48,36 52,36 55,40" stroke={activeTheme.ribbonColor} strokeWidth="2.5" strokeLinecap="round" />
-              </svg>
+            {/* Top garment photo */}
+            <div className="relative z-20 w-40 h-52 rounded-2xl overflow-hidden ring-4 ring-white transition-all duration-500 transform hover:scale-105" style={{ filter: 'drop-shadow(0 6px 10px rgba(0,0,0,0.1))' }}>
+              {selectedTop.imageUrl ? (
+                <img src={selectedTop.imageUrl} alt={selectedTop.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+              ) : (
+                <svg viewBox="0 0 100 100" fill="none" className="w-full h-full" style={{ color: selectedTop.color }}>
+                  <path d={selectedTop.svgPath} fill="currentColor" />
+                </svg>
+              )}
             </div>
 
-            {/* Bottom garment overlay */}
-            <div className="relative z-10 -mt-16 transition-all duration-500 transform hover:scale-105" style={{ filter: 'drop-shadow(0 8px 12px rgba(0,0,0,0.08))' }}>
-              <svg viewBox="0 0 100 100" fill="none" className="w-48 h-48" style={{ color: selectedBottom.color }}>
-                <path d={selectedBottom.svgPath} fill="currentColor" />
-                {/* Pleat or shadow details */}
-                <path d="M 50,30 L 50,85" stroke="#000000" strokeWidth="1.5" strokeOpacity="0.06" />
-                <path d="M 38,35 L 34,80" stroke="#000000" strokeWidth="1" strokeOpacity="0.04" />
-                <path d="M 62,35 L 66,80" stroke="#000000" strokeWidth="1" strokeOpacity="0.04" />
-              </svg>
+            {/* Bottom garment photo */}
+            <div className="relative z-10 w-40 h-52 rounded-2xl overflow-hidden ring-4 ring-white -mt-6 transition-all duration-500 transform hover:scale-105" style={{ filter: 'drop-shadow(0 8px 12px rgba(0,0,0,0.12))' }}>
+              {selectedBottom.imageUrl ? (
+                <img src={selectedBottom.imageUrl} alt={selectedBottom.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+              ) : (
+                <svg viewBox="0 0 100 100" fill="none" className="w-full h-full" style={{ color: selectedBottom.color }}>
+                  <path d={selectedBottom.svgPath} fill="currentColor" />
+                </svg>
+              )}
             </div>
           </div>
 
@@ -293,13 +308,15 @@ export default function MixMatchRoom({ onAddProductToCart, activeTheme: activeTh
           {showHeartburst && (
             <div className="absolute inset-0 bg-white/80 flex flex-col items-center justify-center z-40 transition-all duration-300">
               <span className="text-4xl animate-bounce">🎀✨</span>
-              <span className={`text-sm ${activeArchetype.fontTitle} ${activeTheme.primaryText} font-bold mt-2`}>Ready-To-Wear Added!</span>
+              <span className={`text-sm ${activeArchetype.fontTitle} ${activeTheme.primaryText} font-bold mt-2`}>{lang === 'zh' ? '已加入购物袋！' : 'Ready-To-Wear Added!'}</span>
             </div>
           )}
 
           {/* Tiny label */}
           <span className="absolute bottom-3 text-[10px] font-mono tracking-widest text-zinc-400">
-            {isMinimal ? 'CAD_MODULE // ATELIER_V1' : 'CIPPY_BOUTIQUE_CLOSER'}
+            {isMinimal
+              ? (lang === 'zh' ? 'CAD_模块 // 高定_V1' : 'CAD_MODULE // ATELIER_V1')
+              : (lang === 'zh' ? 'CIPPY_精品衣橱' : 'CIPPY_BOUTIQUE_CLOSER')}
           </span>
         </div>
 
@@ -371,7 +388,7 @@ export default function MixMatchRoom({ onAddProductToCart, activeTheme: activeTh
                   RM {totalCost}
                 </span>
                 <span className="text-[10px] font-sans text-zinc-400 block">
-                  Size {selectedSize} · Free Delivery within Malaysia
+                  {lang === 'zh' ? `尺码 ${selectedSize} · 大马境内免运费` : `Size ${selectedSize} · Free Delivery within Malaysia`}
                 </span>
               </div>
             </div>
@@ -387,7 +404,7 @@ export default function MixMatchRoom({ onAddProductToCart, activeTheme: activeTh
                   : `${activeTheme.primaryBg} ${activeTheme.primaryHover} text-white font-sans font-semibold text-xs rounded-xl shadow-sm ${activeTheme.btnShadow}`
               }`}
             >
-              <ShoppingBag className="w-4 h-4" /> Add Ready-to-Wear Set <ArrowRight className="w-3.5 h-3.5" />
+              <ShoppingBag className="w-4 h-4" /> {lang === 'zh' ? '加入整套成衣' : 'Add Ready-to-Wear Set'} <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>

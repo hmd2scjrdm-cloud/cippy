@@ -304,7 +304,7 @@ export default function ShoppingBagDrawer({
                 )}
 
                 <span className="text-[11px] font-sans text-[#B96A73] font-bold tracking-wider uppercase block border-b border-pink-100 pb-1">
-                  1. Shipping Information · 配送信息
+                  {tx("1. Shipping Information", "1. 配送信息")}
                 </span>
 
                 <div className="space-y-1.5">
@@ -383,7 +383,7 @@ export default function ShoppingBagDrawer({
 
                 {/* Payment Selection Block */}
                 <span className="text-[11px] font-sans text-[#B96A73] font-bold tracking-wider uppercase block border-b border-pink-100 pt-3 pb-1">
-                  2. Secure Payment · 支付方式
+                  {tx("2. Secure Payment", "2. 支付方式")}
                 </span>
 
                 <div className="grid grid-cols-3 gap-2">
@@ -675,7 +675,7 @@ export default function ShoppingBagDrawer({
                   onClick={handlePlaceOrder}
                   className="w-full bg-[#B96A73] hover:bg-[#a55962] text-white font-sans font-semibold text-xs py-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-1.5 shadow-md cursor-pointer disabled:opacity-50"
                 >
-                  {isPlacing ? tx("Placing Order...", "正在提交订单...") : tx("Place Storybook Order · 确认订购", "Place Storybook Order · 确认订购")}
+                  {isPlacing ? tx("Placing Order...", "正在提交订单...") : tx("Place Storybook Order", "确认订购")}
                   <Sparkles className="w-3.5 h-3.5 text-white" />
                 </button>
               ) : (

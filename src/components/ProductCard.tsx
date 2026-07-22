@@ -261,7 +261,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         >
           <div className="flex items-center justify-between">
             <span className={`text-[10px] tracking-wider font-bold text-zinc-400 uppercase ${activeArchetype.fontBody}`}>
-              Quick Add / 快速加入
+              {lang === 'zh' ? '快速加入' : 'Quick Add'}
             </span>
             <div className="flex gap-1.5">
               {(['S', 'M'] as const).map((sz) => (
@@ -300,11 +300,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
           >
             {addedAnimation ? (
               <>
-                <Check className="w-3.5 h-3.5" /> Added! 包裹装好啦
+                <Check className="w-3.5 h-3.5" /> {lang === 'zh' ? '已加入！' : 'Added!'}
               </>
             ) : (
               <>
-                <ShoppingBag className="w-3 h-3" /> Add Size {selectedSize} · RM {product.price}
+                <ShoppingBag className="w-3 h-3" /> {lang === 'zh' ? `加入 ${selectedSize} 码 · RM ${product.price}` : `Add Size ${selectedSize} · RM ${product.price}`}
               </>
             )}
           </button>
@@ -334,13 +334,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
         {/* Short description */}
         <p className={`text-xs text-zinc-500 leading-relaxed text-justify line-clamp-2 ${activeArchetype.fontBody}`}>
-          {product.description}
+          {lang === 'zh' && product.cnDescription ? product.cnDescription : product.description}
         </p>
 
         {/* Interactive size and action buttons */}
         <div className={`space-y-2 pt-1 border-t ${isMinimal ? 'border-zinc-200' : 'border-[var(--theme-primary-soft)]/30'}`}>
           <div className="flex items-center justify-between text-xs font-sans">
-            <span className="text-zinc-400">Available S&M sizes:</span>
+            <span className="text-zinc-400">{lang === 'zh' ? '可选尺码 S&M：' : 'Available S&M sizes:'}</span>
             <div className="flex gap-1.5">
               {(['S', 'M'] as const).map((sz) => (
                 <button
@@ -396,7 +396,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               {/* Bullets details */}
               <div className={`border-t pt-2 space-y-1 ${isMinimal ? 'border-zinc-200' : 'border-[var(--theme-primary-soft)]/30'}`}>
                 <span className="text-[9px] font-mono tracking-widest text-zinc-400 block uppercase">
-                  Details / 成衣特征
+                  {lang === 'zh' ? '成衣特征' : 'Details'}
                 </span>
                 <ul className="list-disc list-inside text-[9px] text-zinc-500 space-y-0.5">
                   {product.cnDetails.slice(0, 3).map((det, idx) => (
@@ -424,11 +424,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
           >
             {addedAnimation ? (
               <>
-                <Check className="w-4 h-4" /> Added to Bag! 包裹装好啦
+                <Check className="w-4 h-4" /> {lang === 'zh' ? '已加入购物袋！' : 'Added to Bag!'}
               </>
             ) : (
               <>
-                <ShoppingBag className="w-3.5 h-3.5" /> Add Ready-to-Wear
+                <ShoppingBag className="w-3.5 h-3.5" /> {lang === 'zh' ? '加入购物袋' : 'Add Ready-to-Wear'}
               </>
             )}
           </button>

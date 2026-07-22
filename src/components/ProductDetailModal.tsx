@@ -143,7 +143,7 @@ export default function ProductDetailModal({
             <div>
               <strong>{tx("Cippy Studio Styling Note:", "Cippy 首尔美学穿搭建议：")}</strong>
               {" "}{tx(
-                "This loose silhouette is designed to layer elegantly. Pair S with high-waisted folds to maximize your vertical proportions.",
+                "This loose silhouette is cut to layer elegantly. Pair S with high-waisted folds to maximize your vertical proportions.",
                 "此款松弛感成衣专为黄金比例叠穿而生。S 码建议搭配高腰长裤或蛋糕短裙，极佳拉长下半身比例，干净清爽。"
               )}
             </div>
@@ -172,13 +172,10 @@ export default function ProductDetailModal({
             <div className="bg-[#FFF9FB] p-4 rounded-xl border border-pink-100/40 space-y-2">
               <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-[#B96A73] font-bold">
                 <BookOpen className="w-3.5 h-3.5" />
-                <span>{tx("Design Chronicles · 故事编织", "Design Chronicles · 故事编织")}</span>
+                <span>{tx("Style Chronicles", "故事编织")}</span>
               </div>
               <p className="text-xs text-zinc-600 font-serif italic leading-relaxed text-justify">
-                "{product.story}"
-              </p>
-              <p className="text-xs text-zinc-500 font-sans leading-relaxed text-justify border-t border-pink-50 pt-2">
-                {product.cnStory}
+                "{tx(product.story, product.cnStory)}"
               </p>
             </div>
 
@@ -208,7 +205,7 @@ export default function ProductDetailModal({
             <div className="bg-[#FFFDFC] rounded-xl p-4 border border-pink-100/50 space-y-3 shadow-xs">
               <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-800">
                 <Scale className="w-4 h-4 text-[#B96A73]" />
-                <span>{tx("Sizing Fairy Calculator · 尺码精灵助选", "Sizing Fairy Calculator · 尺码精灵助选")}</span>
+                <span>{tx("Sizing Fairy Calculator", "尺码精灵助选")}</span>
               </div>
               
               <form onSubmit={handleCalculateSize} className="flex gap-2.5">

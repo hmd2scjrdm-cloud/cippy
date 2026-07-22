@@ -589,8 +589,8 @@ export const POLICIES: PolicySection[] = [
       {
         titleZh: '商品版权',
         titleEn: 'Product copyright',
-        textZh: '所有商品设计版权归 Cippy Malaysia 所有，未经授权不得复制、仿制或销售。',
-        textEn: 'Product designs and selections belong to Cippy Malaysia where applicable and may not be copied or resold without permission.'
+        textZh: '本店商品文案、图文介绍及甄选搭配内容版权归 Cippy Malaysia 所有，未经授权不得复制、仿制或转售。',
+        textEn: 'Product descriptions, curated selections, and styling content on this site belong to Cippy Malaysia and may not be copied or resold without permission.'
       },
       {
         titleZh: '图片版权',

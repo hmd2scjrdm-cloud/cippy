@@ -17,7 +17,7 @@ export const storybookChapters: StoryChapter[] = [
     cnTitle: "第二章：即穿即美的日常魔法",
     subtitle: "Effortless styling for the modern dreamer",
     cnSubtitle: "无需费心搭配，穿上即是梦境主角",
-    content: "True luxury is effortless. Every Cippy piece is meticulously designed to be the main character of your daily look. No complicated styling required—simply wear, adjust the delicate premium details, and step out into your day with confidence and whimsical beauty.",
+    content: "True luxury is effortless. Every Cippy piece is meticulously curated to be the main character of your daily look. No complicated styling required—simply wear, adjust the delicate premium details, and step out into your day with confidence and whimsical beauty.",
     cnContent: "真正的奢华是毫不费力的。Cippy 的每一件 Ready-to-Wear（成衣）都经过精心雕琢，旨在成为你日常穿搭的绝对主角。无需繁复的搭配技巧——轻轻穿上，系好带子，便能自信走入童话般的日常。",
     illustrationType: "bow"
   },
@@ -36,8 +36,8 @@ export const storybookChapters: StoryChapter[] = [
     title: "Chapter IV: A Whimsical Match for Malaysia",
     cnTitle: "第四章：大马女孩的温婉日常",
     subtitle: "Breathable weaves tailored for year-round comfort",
-    cnSubtitle: "专为热带气温与冷气房设计的柔顺触感",
-    content: "Designed for Malaysian Chinese dreamers who transition from the tropical breeze of Kuala Lumpur to chilled cozy boutique spaces. Our ready-to-wear pieces use exceptionally lightweight, breathable cotton-linen and cloud-soft knits that keep you beautifully fresh and warm all at once.",
+    cnSubtitle: "专为热带气温与冷气房甄选的柔顺触感",
+    content: "Curated for Malaysian Chinese dreamers who transition from the tropical breeze of Kuala Lumpur to chilled cozy boutique spaces. Our ready-to-wear pieces use exceptionally lightweight, breathable cotton-linen and cloud-soft knits that keep you beautifully fresh and warm all at once.",
     cnContent: "为穿梭在大马明媚微风与舒适冷气房中的华裔女孩特别定制。我们精选极轻盈、会呼吸的棉麻面料与如云朵般轻软的针织衫，让你在吉隆坡的四季如夏里，随时拥有温和纯净的韩系氛围感。",
     illustrationType: "cloud"
   }
@@ -98,8 +98,8 @@ export const products: Product[] = [
     ],
     "description": "An effortlessly chic, premium ready-to-wear piece crafted from highly breathable fabric. Perfect for modern, everyday storytelling.",
     "cnDescription": "一款专为大马气候精选的高端透气成衣。裁剪松弛而优雅，细节精致，完美融入日常韩系氛围穿搭。",
-    "story": "A pristine high-waisted silhouette designed to elongate the legs. Its A-line drape floats gracefully, making it an essential chapter for your daily strolls.",
-    "cnStory": "专为修饰小个子比例设计的高腰 A 字裙摆。利落服帖的线条，走动时却带出轻盈波光，是日常衣橱里最百搭温婉的诗意篇章。",
+    "story": "A pristine high-waisted silhouette cut to elongate the legs. Its A-line drape floats gracefully, making it an essential chapter for your daily strolls.",
+    "cnStory": "专为修饰小个子比例甄选的高腰 A 字裙摆。利落服帖的线条，走动时却带出轻盈波光，是日常衣橱里最百搭温婉的诗意篇章。",
     "details": [
       "Fabric: 聚酯纤维",
       "Series: Cippy Essential",
@@ -236,7 +236,7 @@ export const products: Product[] = [
     ],
     "description": "An effortlessly chic, premium ready-to-wear piece crafted from highly breathable fabric. Perfect for modern, everyday storytelling.",
     "cnDescription": "一款专为大马气候精选的高端透气成衣。裁剪松弛而优雅，细节精致，完美融入日常韩系氛围穿搭。",
-    "story": "A classic high-drape design that elongates the figure beautifully. Fabricated with a soft-touch fluid drape that flows elegantly with every step you take.",
+    "story": "A classic high-drape silhouette that elongates the figure beautifully. Fabricated with a soft-touch fluid drape that flows elegantly with every step you take.",
     "cnStory": "拥有神仙垂感的高腰阔腿长裤。天丝麻质地走动时带有如水波般的流动感，瞬间拉长双腿比例，让大马的每一次通勤都充满松弛自信。",
     "details": [
       "Fabric: 粘胶纤维、聚酯纤维、氨纶",
@@ -378,7 +378,7 @@ export const products: Product[] = [
     "description": "An effortlessly chic, premium ready-to-wear piece crafted from highly breathable fabric. Perfect for modern, everyday storytelling.",
     "cnDescription": "一款专为大马气候精选的高端透气成衣。裁剪松弛而优雅，细节精致，完美融入日常韩系氛围穿搭。",
     "story": "An adorable Seoul-inspired top featuring gorgeous puff sleeves and a playful tie-front closure. Highly breathable for warm, bright days.",
-    "cnStory": "首尔设计团队力作，立体蓬松的泡泡袖搭配前幅温柔的小系带。修身显瘦，选用透气微凉感面料，在吉隆坡的骄阳下依然清爽优雅。",
+    "cnStory": "首尔严选力作，立体蓬松的泡泡袖搭配前幅温柔的小系带。修身显瘦，选用透气微凉感面料，在吉隆坡的骄阳下依然清爽优雅。",
     "details": [
       "Fabric: 聚酯纤维",
       "Series: Cippy Daily",
@@ -477,7 +477,7 @@ export const products: Product[] = [
     ],
     "description": "An effortlessly chic, premium ready-to-wear piece crafted from highly breathable fabric. Perfect for modern, everyday storytelling.",
     "cnDescription": "一款专为大马气候精选的高端透气成衣。裁剪松弛而优雅，细节精致，完美融入日常韩系氛围穿搭。",
-    "story": "An elegant lace halter silhouette in a deep, mysterious navy hue. Designed to float beautifully between day-lit galleries and evening garden parties.",
+    "story": "An elegant lace halter silhouette in a deep, mysterious navy hue. Cut to float beautifully between day-lit galleries and evening garden parties.",
     "cnStory": "一袭神秘高贵的海军蓝蕾丝挂脖裙。精致钩花蕾丝如海浪般层层倾泻，挂脖剪裁衬托出完美颈部曲线，是美术馆漫步与暮色晚宴的绝佳选择。",
     "details": [
       "Fabric: Premium blend",

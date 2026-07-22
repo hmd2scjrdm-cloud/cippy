@@ -268,6 +268,8 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<{ points: number; total_spent: number; tier: string } | null>(null);
   const [userOrders, setUserOrders] = useState<any[]>([]);
+  // Only the store owner's account may access the internal campaign broadcast tools (see admin.html ALLOWED_EMAILS)
+  const isAdminUser = currentUser?.email === 'cippy.kl@gmail.com';
 
   // Gmail & New Arrival Alerts States (Resend App)
   const [googleToken, setGoogleToken] = useState<string | null>(getGmailToken());
@@ -1116,9 +1118,9 @@ export default function App() {
         return { zh: '高弹力，软糯修身贴合', en: 'Highly elastic, cozy form-fitting stretch' };
       }
       if (p.name.toLowerCase().includes('elastic') || p.name.toLowerCase().includes('drawstring') || p.category === 'sets') {
-        return { zh: '中等弹力（后腰/抽绳设计，宽松舒适）', en: 'Moderate stretch (Elastic back / drawstring)' };
+        return { zh: '中等弹力（后腰/抽绳款式，宽松舒适）', en: 'Moderate stretch (Elastic back / drawstring)' };
       }
-      return { zh: '无弹/微弹（专为立体垂感剪裁而设计）', en: 'Non-stretch or micro-stretch (Designed for structured drape)' };
+      return { zh: '无弹/微弹（专为立体垂感剪裁打造）', en: 'Non-stretch or micro-stretch (Made for structured drape)' };
     }
     if (attr === 'lining') {
       if (p.lining) return { en: p.lining, zh: p.lining };
@@ -1133,9 +1135,9 @@ export default function App() {
   // Announcement Notice state
   const [announcementIndex, setAnnouncementIndex] = useState(0);
   const announcements = [
-    "✨ Live Supabase Cloud Sync: Real-time stock counting of Cippy products / 实时同步 Supabase 真实库存与价格",
-    "🇲🇾 DHL Fast Delivery: West Malaysia RM10 / East Malaysia RM15 / Singapore RM30 | 满配西马/东马/新加坡快捷寄送",
-    "🌿 Korean Oversized Fit curated beautifully for Malaysian tropical breezes / 专为大马温湿气温设计的轻盈松弛韩系版型"
+    { en: "✨ Live Supabase Cloud Sync: Real-time stock counting of Cippy products", zh: "✨ 实时同步 Supabase 真实库存与价格" },
+    { en: "🇲🇾 DHL Fast Delivery: West Malaysia RM10 / East Malaysia RM15 / Singapore RM30", zh: "🇲🇾 大马西马 RM10 / 东马 RM15 / 新加坡 RM30，DHL 快捷寄送" },
+    { en: "🌿 Korean Oversized Fit curated beautifully for Malaysian tropical breezes", zh: "🌿 专为大马温湿气温甄选的轻盈松弛韩系版型" }
   ];
 
   // Supabase Authentication Operations
@@ -1145,7 +1147,7 @@ export default function App() {
     setIsAuthLoading(true);
 
     if (!supabase) {
-      setAuthStatus({ message: 'Supabase client is not initialized', isError: true });
+      setAuthStatus({ message: lang === 'zh' ? '系统初始化失败，请稍后再试。' : 'Supabase client is not initialized', isError: true });
       setIsAuthLoading(false);
       return;
     }
@@ -1185,7 +1187,7 @@ export default function App() {
       }
     } catch (err: any) {
       console.error("Authentication error caught:", err);
-      let errMsg = 'An error occurred during authentication';
+      let errMsg = lang === 'zh' ? '登录验证过程中发生错误' : 'An error occurred during authentication';
       
       if (err) {
         const errStr = String(err);
@@ -1489,8 +1491,8 @@ export default function App() {
   const [selectedArrivalProduct, setSelectedArrivalProduct] = useState<Product | null>(dbProducts[0]);
   const [composerSubject, setComposerSubject] = useState('🌸 Cippy New Arrival Alert: {product_name} is live! 🌸');
   const [selectedTemplateStyle, setSelectedTemplateStyle] = useState<'rose' | 'coffee' | 'midnight'>('rose');
-  const [composerMessageZH, setComposerMessageZH] = useState('亲爱的闺蜜，Cippy 的设计师手稿成衣新品 {product_name} 正式发布啦！这次的新品融合了我们最具标志性的剪裁美学，无论是蕾丝花边、棉麻垂感，还是精美蝴蝶结，都能为您带来绝妙的温润质感。欢迎点击下方链接查看新品详情与一键下单。');
-  const [composerMessage, setComposerMessage] = useState('Dearest Fairytale Friend, Cippy’s boutique ready-to-wear masterpiece {product_name} has officially landed! This item features our signature loose fit silhouette, delicate romantic ribbons, and premium organic cotton-linen textures. Discover the design story and shop now via the link below.');
+  const [composerMessageZH, setComposerMessageZH] = useState('亲爱的闺蜜，Cippy 严选甄选的成衣新品 {product_name} 正式发布啦！这次的新品融合了我们最具标志性的剪裁美学，无论是蕾丝花边、棉麻垂感，还是精美蝴蝶结，都能为您带来绝妙的温润质感。欢迎点击下方链接查看新品详情与一键下单。');
+  const [composerMessage, setComposerMessage] = useState('Dearest Fairytale Friend, Cippy’s boutique ready-to-wear masterpiece {product_name} has officially landed! This item features our signature loose fit silhouette, delicate romantic ribbons, and premium organic cotton-linen textures. Discover the style story and shop now via the link below.');
   const [selectedRecipientEmails, setSelectedRecipientEmails] = useState<string[]>(['christinechong235@gmail.com', 'pearly.yap@cippy.my', 'weini.lim@gmail.com']);
   const [customNewSubscriberEmail, setCustomNewSubscriberEmail] = useState('');
   const [isSendingGmail, setIsSendingGmail] = useState(false);
@@ -1564,7 +1566,11 @@ export default function App() {
     }, 800);
 
     // Show custom toast notification
-    setToastMessage(`✨ "${product.name}" (${size}) added to your Storybook Bag!`);
+    setToastMessage(
+      lang === 'zh'
+        ? `✨ "${product.cnName}" (${size}) 已加入您的童话购物袋！`
+        : `✨ "${product.name}" (${size}) added to your Storybook Bag!`
+    );
     setTimeout(() => {
       setToastMessage(null);
     }, 3000);
@@ -1616,7 +1622,7 @@ export default function App() {
     setFortuneMessage(randomFortune);
     localStorage.setItem('cippy_current_fortune', JSON.stringify(randomFortune));
 
-    const bonusPoints = 20;
+    const bonusPoints = 5;
     const nextPoints = (userProfile?.points || 0) + bonusPoints;
 
     // Update in React State
@@ -1771,15 +1777,7 @@ export default function App() {
               Notice
             </span>
             <div className="animate-fade-in truncate transition-all duration-300 max-w-[200px] md:max-w-md text-center">
-              {lang === 'zh' ? (
-                announcements[announcementIndex] === "🌸 Soft Launch: Free Premium Gift Box Wrapping for orders above RM150"
-                  ? "🌸 新品发布首发特惠：单笔订单满 RM150 即可免费升级豪华定制礼盒包装"
-                  : announcements[announcementIndex] === "🚚 Standard Malaysia Shipping: RM6 flat rate. Dispatching daily from KL"
-                  ? "🚚 马来西亚全境标准邮费 RM6，精选每日吉隆坡直发，预计2-4日送达"
-                  : "✨ Cippy 会员计划已上线：消费可得返现积分，累计积分可永久解锁黄金/白金VIP折扣"
-              ) : (
-                announcements[announcementIndex]
-              )}
+              {lang === 'zh' ? announcements[announcementIndex].zh : announcements[announcementIndex].en}
             </div>
           </div>
           
@@ -2005,7 +2003,7 @@ export default function App() {
                     activeTab === 'rtw' ? 'text-[#3F2B2B] border-b-2 border-[#3F2B2B] pb-1' : 'text-zinc-500 hover:text-[#3F2B2B] pb-1 border-b-2 border-transparent'
                   }`}
                 >
-                  COLLECTION
+                  {lang === 'zh' ? '成衣目录' : 'COLLECTION'}
                 </button>
                 <button
                   onClick={() => {
@@ -2016,7 +2014,7 @@ export default function App() {
                     activeTab === 'journal' ? 'text-[#3F2B2B] border-b-2 border-[#3F2B2B] pb-1' : 'text-zinc-500 hover:text-[#3F2B2B] pb-1 border-b-2 border-transparent'
                   }`}
                 >
-                  THE NARRATIVE
+                  {lang === 'zh' ? '品牌故事' : 'THE NARRATIVE'}
                 </button>
               </div>
 
@@ -2045,19 +2043,21 @@ export default function App() {
                     activeTab === 'atelier' ? 'text-[#3F2B2B] border-b-2 border-[#3F2B2B] pb-1' : 'text-zinc-500 hover:text-[#3F2B2B] pb-1 border-b-2 border-transparent'
                   }`}
                 >
-                  ARCHIVE
+                  {lang === 'zh' ? '工坊' : 'ARCHIVE'}
                 </button>
-                <button
-                  onClick={() => {
-                    setActiveTab('alerts');
-                    document.getElementById('nabi-studio-app-card')?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                  className={`text-[11px] tracking-[0.2em] font-bold font-sans transition-all duration-300 cursor-pointer ${
-                    activeTab === 'alerts' ? 'text-[#3F2B2B] border-b-2 border-[#3F2B2B] pb-1' : 'text-zinc-500 hover:text-[#3F2B2B] pb-1 border-b-2 border-transparent'
-                  }`}
-                >
-                  {lang === 'zh' ? '推送群发' : 'ALERTS'}
-                </button>
+                {isAdminUser && (
+                  <button
+                    onClick={() => {
+                      setActiveTab('alerts');
+                      document.getElementById('nabi-studio-app-card')?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className={`text-[11px] tracking-[0.2em] font-bold font-sans transition-all duration-300 cursor-pointer ${
+                      activeTab === 'alerts' ? 'text-[#3F2B2B] border-b-2 border-[#3F2B2B] pb-1' : 'text-zinc-500 hover:text-[#3F2B2B] pb-1 border-b-2 border-transparent'
+                    }`}
+                  >
+                    {lang === 'zh' ? '推送群发' : 'ALERTS'}
+                  </button>
+                )}
                 <button
                   onClick={() => {
                     setActiveTab('account');
@@ -2077,7 +2077,7 @@ export default function App() {
                       : 'text-zinc-500 hover:text-[#3F2B2B]'
                   }`}
                 >
-                  CART ({totalCartCount})
+                  {lang === 'zh' ? `购物袋 (${totalCartCount})` : `CART (${totalCartCount})`}
                 </button>
               </div>
             </div>
@@ -2234,7 +2234,7 @@ export default function App() {
                         Presence.
                       </h2>
                       <p className="text-xs sm:text-[13px] text-zinc-500 font-sans leading-relaxed max-w-sm">
-                        An exploration of structural soft drapery. Crafted from high-density linen and combed cotton, designed to float beautifully between the skin and the environment.
+                        An exploration of structural soft drapery. Crafted from high-density linen and combed cotton, cut to float beautifully between the skin and the environment.
                       </p>
                     </div>
 
@@ -2570,7 +2570,7 @@ export default function App() {
                           "The Softness of Being"
                         </h2>
                         <p className="text-xs md:text-[13px] text-zinc-500 font-sans leading-relaxed max-w-sm">
-                          Designed for the humid Malaysian afternoons. Our loose-fit silhouettes allow for breathability without compromising on high-end Korean aesthetics.
+                          Curated for the humid Malaysian afternoons. Our loose-fit silhouettes allow for breathability without compromising on high-end Korean aesthetics.
                         </p>
                       </div>
                     </div>
@@ -2649,7 +2649,7 @@ export default function App() {
                   <div className="lg:col-span-7 p-6 md:p-8 lg:p-10 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-[#FBEBF0] space-y-8">
                     <div className="space-y-4">
                       <span className="text-[10px] uppercase font-mono text-zinc-400 font-semibold tracking-[0.25em] block">
-                        CHAPTER 01 — THE LOOSE SILHOUETTE
+                        {lang === 'zh' ? '第一章 — 宽松轮廓美学' : 'CHAPTER 01 — THE LOOSE SILHOUETTE'}
                       </span>
                       
                       {/* Large custom image container with model photo matching mockup exactly */}
@@ -2679,10 +2679,12 @@ export default function App() {
                     {/* Lower narrative block: The Story of Ready-to-Wear */}
                     <div className="bg-[#FFFDFD] border border-[#FBEBF0] rounded-2xl p-6 space-y-3">
                       <h3 className="text-2xl md:text-3xl font-serif text-[#3F2B2B] leading-tight font-semibold">
-                        The Story of Ready-to-Wear
+                        {lang === 'zh' ? '成衣的故事' : 'The Story of Ready-to-Wear'}
                       </h3>
                       <p className="text-xs md:text-[13px] text-zinc-500 font-sans leading-relaxed italic">
-                        Inspired by the soft winds of Seoul, reimagined for the Malaysian climate. A collection focused on minimal sophistication, comfort, and premium drapes designed to flow effortlessly with your everyday movements.
+                        {lang === 'zh'
+                          ? '灵感源自首尔的柔风，为马来西亚的气候重新演绎。这一系列专注于极简优雅、舒适自在，以及能随您每日行动轻盈流动的高级垂坠感。'
+                          : 'Inspired by the soft winds of Seoul, reimagined for the Malaysian climate. A collection focused on minimal sophistication, comfort, and premium drapes cut to flow effortlessly with your everyday movements.'}
                       </p>
                     </div>
                   </div>
@@ -2693,13 +2695,15 @@ export default function App() {
                     {/* Fit Profile block */}
                     <div className="space-y-4">
                       <span className="text-xs font-bold text-[#B96A73] tracking-[0.25em] font-sans uppercase block">
-                        FIT PROFILE
+                        {lang === 'zh' ? '版型解析' : 'FIT PROFILE'}
                       </span>
                       <h2 className="font-serif text-3xl md:text-4xl font-semibold italic text-[#3F2B2B] tracking-tight leading-tight">
-                        "The Gentle Over-Size"
+                        {lang === 'zh' ? '「温柔大廓形」' : '"The Gentle Over-Size"'}
                       </h2>
                       <p className="text-xs md:text-[13px] text-zinc-500 font-sans leading-relaxed">
-                        Discarding the rigid structures of the past. Our new design philosophy centers on the space between the body and the fabric. Designed exclusively in S and M to preserve the intended artistic drape.
+                        {lang === 'zh'
+                          ? '摒弃过往的刻板结构。我们的甄选理念聚焦于身体与面料之间的空间感，只提供 S 与 M 码，只为保留最初那份艺术垂坠感。'
+                          : 'Discarding the rigid structures of the past. Our curation philosophy centers on the space between the body and the fabric. Offered exclusively in S and M to preserve the intended artistic drape.'}
                       </p>
 
                       {/* Action buttons matching mockup styling */}
@@ -2710,7 +2714,7 @@ export default function App() {
                           }}
                           className="bg-[#3F2B2B] hover:bg-[#2F1F1F] text-white px-8 py-3 rounded-lg font-sans tracking-[0.2em] text-[11px] font-bold uppercase transition-all duration-300 cursor-pointer shadow-sm"
                         >
-                          SHOP NOW
+                          {lang === 'zh' ? '立即选购' : 'SHOP NOW'}
                         </button>
                         <button
                           onClick={() => {
@@ -2719,7 +2723,7 @@ export default function App() {
                           }}
                           className="bg-white hover:bg-zinc-50 text-[#3F2B2B] border border-[#3F2B2B]/40 px-8 py-3 rounded-lg font-sans tracking-[0.2em] text-[11px] font-bold uppercase transition-all duration-300 cursor-pointer"
                         >
-                          LOOKBOOK
+                          {lang === 'zh' ? '穿搭画册' : 'LOOKBOOK'}
                         </button>
                       </div>
                     </div>
@@ -2730,7 +2734,7 @@ export default function App() {
                     {/* Preview product teasers */}
                     <div className="space-y-3">
                       <span className="text-[10px] tracking-[0.2em] font-mono text-zinc-400 font-bold uppercase block">
-                        HOT RELEASE PREVIEW
+                        {lang === 'zh' ? '新品热预览' : 'HOT RELEASE PREVIEW'}
                       </span>
                       <div className="grid grid-cols-2 gap-4">
                         {/* Blush Drape Coat */}
@@ -2812,7 +2816,7 @@ export default function App() {
                           Sophistication
                         </h2>
                         <p className="text-xs text-zinc-500 leading-relaxed text-justify">
-                          Designed for the tropical humidity of Malaysia, our Korean-inspired loose-fit collection balances airy volumes with structured elegance.
+                          Curated for the tropical humidity of Malaysia, our Korean-inspired loose-fit collection balances airy volumes with structured elegance.
                         </p>
                       </div>
                       <span className="text-6xl font-serif font-semibold text-[#EBC4C8]/60 select-none">
@@ -3035,13 +3039,15 @@ export default function App() {
                   <div className="space-y-2 relative z-10 text-center md:text-left">
                     <div className="flex items-center justify-center md:justify-start gap-1 text-[#D89CA2]">
                       <Star className="w-4 h-4 fill-[#FBEBF0]" />
-                      <span className="text-xs font-mono tracking-widest font-semibold uppercase">SIZING_FAIRY_NOTIFY</span>
+                      <span className="text-xs font-mono tracking-widest font-semibold uppercase">{lang === 'zh' ? '尺码小仙女提醒' : 'SIZING FAIRY NOTICE'}</span>
                     </div>
                     <h3 className="text-lg md:text-xl font-serif text-zinc-800 tracking-tight">
-                      Unsure between Small (S) and Medium (M)?
+                      {lang === 'zh' ? '拿不定主意选 S 还是 M？' : 'Unsure between Small (S) and Medium (M)?'}
                     </h3>
                     <p className="text-xs text-zinc-500 font-sans max-w-xl">
-                      Because Korean clothes are designed naturally loose-fitting, our sizing fairy uses weight, height, and shoulder ratios to recommend the absolute most stunning look for you. Let's calculate!
+                      {lang === 'zh'
+                        ? '因为韩系成衣天生版型宽松，我们的尺码小仙女会根据您的体重、身高与肩宽比例，为您推荐最显瘦好看的尺码。快来测算吧！'
+                        : "Because Korean clothes are cut naturally loose-fitting, our sizing fairy uses weight, height, and shoulder ratios to recommend the absolute most stunning look for you. Let's calculate!"}
                     </p>
                   </div>
 
@@ -3068,10 +3074,12 @@ export default function App() {
                   Nabi Atelier Salon
                 </span>
                 <h2 className="text-2xl md:text-3xl font-serif text-zinc-800 tracking-tight">
-                  Atelier Fitting & Dressing Room
+                  {lang === 'zh' ? '试衣工坊' : 'Atelier Fitting & Dressing Room'}
                 </h2>
                 <p className="text-xs text-zinc-400">
-                  Virtually try on loose-fit combinations or calculate your ideal silhouette proportions.
+                  {lang === 'zh'
+                    ? '虚拟试穿宽松成衣搭配，或计算您的理想身形比例。'
+                    : 'Virtually try on loose-fit combinations or calculate your ideal silhouette proportions.'}
                 </p>
               </div>
 
@@ -3082,7 +3090,7 @@ export default function App() {
                     atelierSubTab === 'sizing' ? 'border-[#B96A73] text-[#B96A73]' : 'border-transparent text-zinc-400 hover:text-zinc-600'
                   }`}
                 >
-                  Sizing Fairy Calculator
+                  {lang === 'zh' ? '尺码精灵计算器' : 'Sizing Fairy Calculator'}
                 </button>
                 <button
                   onClick={() => setAtelierSubTab('mirror')}
@@ -3090,17 +3098,17 @@ export default function App() {
                     atelierSubTab === 'mirror' ? 'border-[#B96A73] text-[#B96A73]' : 'border-transparent text-zinc-400 hover:text-zinc-600'
                   }`}
                 >
-                  Virtual Dressing Room
+                  {lang === 'zh' ? '虚拟试衣间' : 'Virtual Dressing Room'}
                 </button>
               </div>
 
               {atelierSubTab === 'sizing' ? (
                 <div className="animate-fade-in max-w-4xl mx-auto">
-                  <SizingHelper activeTheme={activeTheme} activeArchetype={activeArchetype} />
+                  <SizingHelper activeTheme={activeTheme} activeArchetype={activeArchetype} lang={lang} />
                 </div>
               ) : (
                 <div className="animate-fade-in">
-                  <MixMatchRoom onAddProductToCart={handleAddProductToCart} activeTheme={activeTheme} activeArchetype={activeArchetype} />
+                  <MixMatchRoom onAddProductToCart={handleAddProductToCart} activeTheme={activeTheme} activeArchetype={activeArchetype} lang={lang} />
                 </div>
               )}
             </div>
@@ -3114,13 +3122,15 @@ export default function App() {
                   Our Anthology
                 </span>
                 <h2 className="text-2xl md:text-3xl font-serif text-zinc-800 tracking-tight">
-                  The Journal Chronicles
+                  {lang === 'zh' ? '品牌纪事' : 'The Journal Chronicles'}
                 </h2>
                 <p className="text-xs text-zinc-400">
-                  Read the fairytale origins and design diaries behind Nabi Studio's ready-to-wear garments.
+                  {lang === 'zh'
+                    ? '阅读 Nabi Studio 成衣背后的童话起源与穿搭日记。'
+                    : "Read the fairytale origins and styling diaries behind Nabi Studio's ready-to-wear garments."}
                 </p>
               </div>
-              <StoryChapters activeTheme={activeTheme} activeArchetype={activeArchetype} />
+              <StoryChapters activeTheme={activeTheme} activeArchetype={activeArchetype} lang={lang} />
             </div>
           )}
 
@@ -3552,7 +3562,7 @@ export default function App() {
                             className="inline-flex items-center gap-2 bg-[#B96A73] hover:bg-[#a15a62] text-white text-xs px-5 py-2.5 rounded-full font-bold shadow-md transition-all duration-200"
                           >
                             <Mail className="w-4 h-4" />
-                            <span>WhatsApp Customer Support (+601120861073)</span>
+                            <span>{lang === 'zh' ? 'WhatsApp 客服 (+601120861073)' : 'WhatsApp Customer Support (+601120861073)'}</span>
                           </a>
                         </div>
                       </div>
@@ -3645,7 +3655,7 @@ export default function App() {
                               setToastMessage(lang === 'zh' ? '✨ 激活邮件已重新发送！' : '✨ Activation email resent successfully!');
                               setTimeout(() => setToastMessage(null), 2500);
                             } catch (err: any) {
-                              setToastMessage(err.message || 'Resend failed');
+                              setToastMessage(err.message || (lang === 'zh' ? '重新发送失败' : 'Resend failed'));
                               setTimeout(() => setToastMessage(null), 2500);
                             } finally {
                               setIsAuthLoading(false);
@@ -3707,7 +3717,9 @@ export default function App() {
                       {/* Header Title */}
                       <div className="text-center space-y-1">
                         <span className="font-serif italic text-xs text-[#D89CA2]">
-                          {authMode === 'signin' ? 'Welcome back, dreamer' : 'Begin your storybook journey'}
+                          {authMode === 'signin'
+                            ? (lang === 'zh' ? '欢迎回来，亲爱的' : 'Welcome back, dreamer')
+                            : (lang === 'zh' ? '开启您的童话之旅' : 'Begin your storybook journey')}
                         </span>
                         <h3 className="text-xl font-serif text-zinc-800 tracking-tight">
                           {authMode === 'signin'
@@ -4026,7 +4038,7 @@ export default function App() {
                           {lang === 'zh' ? '每日童话签到 & 占卜 / Daily Sign-In' : 'Daily Fairytale Sign-In'}
                         </h4>
                         <p className="text-xs text-zinc-400 font-sans">
-                          {lang === 'zh' ? '每日登录进行签到即可免费领取 20 积分，并抽取您的今日童话签文。' : 'Claim 20 loyalty points daily and reveal your magic fairytale fortune card.'}
+                          {lang === 'zh' ? '每日登录进行签到即可免费领取 5 积分，并抽取您的今日童话签文。' : 'Claim 5 loyalty points daily and reveal your magic fairytale fortune card.'}
                         </p>
                       </div>
 
@@ -4039,7 +4051,7 @@ export default function App() {
                             </div>
                             <div className="space-y-0.5">
                               <p className="text-xs font-bold text-zinc-700">{lang === 'zh' ? '今日签到完成 🌸' : 'Checked In For Today!'}</p>
-                              <p className="text-[10px] text-zinc-400">{lang === 'zh' ? '您今天已成功领取了 20 会员积分' : 'You have earned +20 points today.'}</p>
+                              <p className="text-[10px] text-zinc-400">{lang === 'zh' ? '您今天已成功领取了 5 会员积分' : 'You have earned +5 points today.'}</p>
                             </div>
                           </div>
                         ) : (
@@ -4051,7 +4063,7 @@ export default function App() {
                             <Sparkles className="w-6 h-6 text-yellow-200 animate-spin" />
                             <div className="text-center">
                               <span className="block text-xs font-bold tracking-widest uppercase">{lang === 'zh' ? '每日签到领积分' : 'DAILY SIGN-IN'}</span>
-                              <span className="block text-[9px] text-[#FFD2D6] font-normal font-sans mt-0.5">{lang === 'zh' ? 'Claim 20 Fairy Points & Fortune' : 'Claim 20 Fairy Points & Fortune'}</span>
+                              <span className="block text-[9px] text-[#FFD2D6] font-normal font-sans mt-0.5">{lang === 'zh' ? '领取 5 积分与今日签文' : 'Claim 5 Fairy Points & Fortune'}</span>
                             </div>
                           </button>
                         )}
@@ -4249,7 +4261,8 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Gmail New Arrival Alerts & Broadcaster Hub */}
+                  {/* Gmail New Arrival Alerts & Broadcaster Hub — admin only */}
+                  {isAdminUser && (
                   <div className="bg-white border border-[#FBEBF0] rounded-3xl p-6 md:p-8 space-y-8 shadow-xs">
                     <div className="border-b pb-4 border-zinc-100">
                       <div className="flex items-center justify-between">
@@ -4283,7 +4296,7 @@ export default function App() {
                               {lang === 'zh' ? '订购新品上市提醒邮件' : 'Subscribe to Fairytale Alerts'}
                             </h5>
                             <p className="text-[11px] text-zinc-500 leading-relaxed font-sans">
-                              {lang === 'zh' ? '开启后，每当 Cippy 设计室发布全新高级剪裁成衣时，您的 Gmail 邮箱将会第一时间收到带有设计师手稿和穿搭故事的精美 HTML 邮件！' : 'Be the absolute first to receive custom layout catalogs, story chapter cards, and purchase links whenever a new Cippy item lands.'}
+                              {lang === 'zh' ? '开启后，每当 Cippy 上新全新高级剪裁成衣时，您的 Gmail 邮箱将会第一时间收到带有严选甄选手记和穿搭故事的精美 HTML 邮件！' : 'Be the absolute first to receive custom layout catalogs, story chapter cards, and purchase links whenever a new Cippy item lands.'}
                             </p>
                           </div>
 
@@ -4385,7 +4398,7 @@ export default function App() {
                           {/* Select Dress / Product */}
                           <div className="space-y-1.5">
                             <label className="block text-[10px] font-mono font-bold text-zinc-400 uppercase">
-                              {lang === 'zh' ? '选择要推荐的新品成衣 / Select New Garment' : 'Feature Product Design'}
+                              {lang === 'zh' ? '选择要推荐的新品成衣 / Select New Garment' : 'Feature New Arrival'}
                             </label>
                             <select
                               disabled={!googleEmail}
@@ -4631,6 +4644,7 @@ export default function App() {
                       </div>
                     </div>
                   </div>
+                  )}
 
                   {/* Monthly Spending Trends Section */}
                   <div className="bg-white border border-[#FBEBF0] rounded-3xl p-6 md:p-8 space-y-6">
@@ -4958,7 +4972,7 @@ export default function App() {
 
                               {/* Items Breakdown list */}
                               <div className="space-y-2">
-                                <span className="text-[9px] font-mono tracking-widest text-zinc-400 uppercase block font-bold">ITEMS ORDERED</span>
+                                <span className="text-[9px] font-mono tracking-widest text-zinc-400 uppercase block font-bold">{lang === 'zh' ? '订购商品' : 'ITEMS ORDERED'}</span>
                                 <div className="space-y-3">
                                   {itemsArray.map((item: any, idx: number) => {
                                     const resolvedProduct = dbProducts.find(p => p.id === String(item.id || item.product?.id));
@@ -5020,7 +5034,7 @@ export default function App() {
             </div>
           )}
 
-          {activeTab === 'alerts' && (
+          {activeTab === 'alerts' && isAdminUser && (
             <div className="space-y-8 animate-fade-in-up">
               {/* Header Banner */}
               <div className="bg-gradient-to-r from-[#FFF0F2] via-white to-[#FBEBF0] border border-[#FBEBF0] rounded-3xl p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-xs relative overflow-hidden">
@@ -5035,7 +5049,7 @@ export default function App() {
                   </h3>
                   <p className="text-xs text-zinc-500 font-sans leading-relaxed">
                     {lang === 'zh' 
-                      ? '通过 Google Workspace Gmail API 极速将带有高定设计稿、故事章节、穿搭细节和一键购买链接的精美 HTML 新品速递广播给您的小红书/大马 VIP 闺蜜。' 
+                      ? '通过 Google Workspace Gmail API 极速将带有严选甄选图、故事章节、穿搭细节和一键购买链接的精美 HTML 新品速递广播给您的小红书/大马 VIP 闺蜜。'
                       : 'Connect your Gmail secure credentials to broadcast, customize, or instantly resend bespoke apparel-launch HTML catalogs directly to active VIP dreamers.'}
                   </p>
                 </div>
@@ -5085,7 +5099,7 @@ export default function App() {
                   <div className="flex items-center gap-2 border-b pb-3 border-zinc-100">
                     <Mail className="w-4 h-4 text-[#B96A73]" />
                     <h4 className="font-serif text-sm font-bold text-zinc-800">
-                      {lang === 'zh' ? '新品推广设计器 / Campaign Composer' : 'Fairytale Campaign Designer'}
+                      {lang === 'zh' ? '新品推广策划器 / Campaign Composer' : 'Fairytale Campaign Composer'}
                     </h4>
                   </div>
 
@@ -5162,7 +5176,7 @@ export default function App() {
                     {/* Custom Story/Message Textarea */}
                     <div className="space-y-1.5">
                       <label className="block text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-widest">
-                        {lang === 'zh' ? '写给闺蜜的温润日常穿搭故事 / Custom Design Narrative' : 'Showcase Narrative / Design Story'}
+                        {lang === 'zh' ? '写给闺蜜的温润日常穿搭故事 / Custom Style Narrative' : 'Showcase Narrative / Style Story'}
                       </label>
                       {lang === 'zh' ? (
                         <textarea
@@ -5524,10 +5538,12 @@ export default function App() {
               <div className="w-10 h-10 rounded-full bg-[#FFF0F2] flex items-center justify-center text-[#B96A73] mx-auto md:mx-0">
                 <Sparkles className="w-5 h-5" />
               </div>
-              <h3 className="font-serif font-bold text-zinc-800 text-sm">1. High-End Korean Tailoring</h3>
+              <h3 className="font-serif font-bold text-zinc-800 text-sm">{lang === 'zh' ? '1. 高端韩系剪裁' : '1. High-End Korean Tailoring'}</h3>
               <h4 className="text-[11px] font-serif text-[#D89CA2] font-semibold leading-none mt-0.5">高端成衣版型与垂感</h4>
               <p className="text-xs text-zinc-500 leading-relaxed font-sans text-justify md:text-left">
-                Every garment is created as a ready-to-wear masterpiece with precise drop-shoulder calculations and drapes, ensuring that S & M sizes always produce a flattering, slim, yet comfortable Korean drape.
+                {lang === 'zh'
+                  ? '每一件成衣都经过精准的落肩计算与垂坠设计，确保 S 与 M 码始终呈现显瘦又舒适的韩系垂感。'
+                  : 'Every garment is created as a ready-to-wear masterpiece with precise drop-shoulder calculations and drapes, ensuring that S & M sizes always produce a flattering, slim, yet comfortable Korean drape.'}
               </p>
             </div>
 
@@ -5535,10 +5551,12 @@ export default function App() {
               <div className="w-10 h-10 rounded-full bg-[#FFF0F2] flex items-center justify-center text-[#B96A73] mx-auto md:mx-0">
                 <Heart className="w-5 h-5 fill-[#FFF0F2]" />
               </div>
-              <h3 className="font-serif font-bold text-zinc-800 text-sm">2. Delicate Editorial Touch</h3>
+              <h3 className="font-serif font-bold text-zinc-800 text-sm">{lang === 'zh' ? '2. 精致细节巧思' : '2. Delicate Editorial Touch'}</h3>
               <h4 className="text-[11px] font-serif text-[#D89CA2] font-semibold leading-none mt-0.5">温润浪漫的视觉治愈</h4>
               <p className="text-xs text-zinc-500 leading-relaxed font-sans text-justify md:text-left">
-                From the brand bow ribbon to the soft ruffles and organic pockets, our clothes are infused with cute fairytale motifs that bring playfulness and cozy romance into your daily urban walks.
+                {lang === 'zh'
+                  ? '从品牌标志性蝴蝶结到柔软的荷叶边与设计口袋，每件衣裳都融入了童话般的精致巧思，为您的日常街头漫步注入俏皮浪漫的温度。'
+                  : 'From the brand bow ribbon to the soft ruffles and organic pockets, our clothes are infused with cute fairytale motifs that bring playfulness and cozy romance into your daily urban walks.'}
               </p>
             </div>
 
@@ -5546,10 +5564,12 @@ export default function App() {
               <div className="w-10 h-10 rounded-full bg-[#FFF0F2] flex items-center justify-center text-[#B96A73] mx-auto md:mx-0">
                 <ShoppingBag className="w-5 h-5" />
               </div>
-              <h3 className="font-serif font-bold text-zinc-800 text-sm">3. Localised Malaysian Service</h3>
+              <h3 className="font-serif font-bold text-zinc-800 text-sm">{lang === 'zh' ? '3. 大马本地化服务' : '3. Localised Malaysian Service'}</h3>
               <h4 className="text-[11px] font-serif text-[#D89CA2] font-semibold leading-none mt-0.5">专为大马华裔女孩贴心打造</h4>
               <p className="text-xs text-zinc-500 leading-relaxed font-sans text-justify md:text-left">
-                We understand Malaysia's climate and lifestyle. Our cotton-linen blends are extremely breathable for sunny streets, yet comfortable for air-conditioned cafés, with prompt localized RM pricing and delivery.
+                {lang === 'zh'
+                  ? '我们深知大马的气候与生活方式。棉麻混纺面料在艳阳街头透气清凉，在冷气咖啡馆里也舒适宜人，配合本地化 RM 定价与快捷配送。'
+                  : "We understand Malaysia's climate and lifestyle. Our cotton-linen blends are extremely breathable for sunny streets, yet comfortable for air-conditioned cafés, with prompt localized RM pricing and delivery."}
               </p>
             </div>
 
@@ -5638,7 +5658,7 @@ export default function App() {
                   onClick={() => { setActiveTab('journal'); document.getElementById('nabi-studio-app-card')?.scrollIntoView({ behavior: 'smooth' }); }} 
                   className="hover:text-[#B96A73] cursor-pointer"
                 >
-                  Design Chronicles
+                  Style Chronicles
                 </button>
                 <span>·</span>
                 <button 
@@ -5651,7 +5671,7 @@ export default function App() {
 
               <div className="max-w-md mx-auto space-y-1.5 text-[11px] font-sans">
                 <p>
-                  Designed with tender care for Malaysian Chinese dreamers. Inspired by Korean loose fit aesthetics.
+                  Curated with tender care for Malaysian Chinese dreamers. Inspired by Korean loose fit aesthetics.
                 </p>
                 <p className="text-zinc-400 font-medium">
                   © 2026 CIPPY STUDIO. All Rights Reserved. Crafted with love and fairytale threads.

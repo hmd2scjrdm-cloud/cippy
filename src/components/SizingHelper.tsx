@@ -5,6 +5,7 @@ import { Sparkles, HelpCircle, Ruler, Scale } from 'lucide-react';
 interface SizingHelperProps {
   activeTheme?: any;
   activeArchetype?: any;
+  lang?: 'en' | 'zh';
 }
 
 const pinkFallback = {
@@ -38,7 +39,7 @@ const defaultArchetype = {
   fontBody: 'font-sans'
 };
 
-export default function SizingHelper({ activeTheme: activeThemeProp, activeArchetype: activeArchetypeProp }: SizingHelperProps) {
+export default function SizingHelper({ activeTheme: activeThemeProp, activeArchetype: activeArchetypeProp, lang = 'en' }: SizingHelperProps) {
   const activeTheme = activeThemeProp || pinkFallback;
   const activeArchetype = activeArchetypeProp || defaultArchetype;
 
@@ -95,10 +96,14 @@ export default function SizingHelper({ activeTheme: activeThemeProp, activeArche
           </span>
         )}
         <h2 className={`text-3xl ${activeArchetype.fontTitle} font-bold text-zinc-800 tracking-tight`}>
-          {isMinimal ? 'PROPORTION CALCULATOR' : 'Find Your Perfect Loose Fit'}
+          {isMinimal
+            ? (lang === 'zh' ? '比例计算器' : 'PROPORTION CALCULATOR')
+            : (lang === 'zh' ? '找到你的完美宽松尺码' : 'Find Your Perfect Loose Fit')}
         </h2>
         <p className={`text-sm ${activeArchetype.fontBody} text-zinc-400 mt-1 max-w-lg mx-auto`}>
-          We focus exclusively on S & M sizes to ensure the ultimate elegant drape. Tell the fairy your metrics!
+          {lang === 'zh'
+            ? '我们只专注于 S 与 M 两个尺码，确保呈现最优雅的垂坠感。告诉尺码精灵您的身形数据吧！'
+            : 'We focus exclusively on S & M sizes to ensure the ultimate elegant drape. Tell the fairy your metrics!'}
         </p>
       </div>
 
@@ -215,9 +220,17 @@ export default function SizingHelper({ activeTheme: activeThemeProp, activeArche
           }`}>
             <HelpCircle className={`w-4 h-4 shrink-0 mt-0.5 ${activeTheme.accentText}`} />
             <p className={`text-[11px] text-zinc-500 leading-relaxed ${activeArchetype.fontBody}`}>
-              <strong>S & M Specifics:</strong> Because our Korean ready-to-wear is designed naturally loose and oversized, standard parameters don't apply. We ensure perfect drop-shoulder lines so you always look slim and graceful.
-              <br />
-              <span className={`italic ${activeTheme.accentText}`}>提示：韩系宽松版型容错率极高，主要通过落肩和胸放呈现慵懒感，无需担心围度束缚。</span>
+              {lang === 'zh' ? (
+                <>
+                  <strong>S 与 M 码说明：</strong>因为我们的韩系成衣天生版型宽松、偏大廓形，标准尺码参数并不完全适用。我们通过精准的落肩线条设计，确保您始终呈现纤瘦优雅的比例。
+                  <br />
+                  <span className={`italic ${activeTheme.accentText}`}>提示：韩系宽松版型容错率极高，主要通过落肩和胸放呈现慵懒感，无需担心围度束缚。</span>
+                </>
+              ) : (
+                <>
+                  <strong>S & M Specifics:</strong> Because our Korean ready-to-wear is cut naturally loose and oversized, standard parameters don't apply. We ensure perfect drop-shoulder lines so you always look slim and graceful.
+                </>
+              )}
             </p>
           </div>
         </div>
@@ -237,11 +250,11 @@ export default function SizingHelper({ activeTheme: activeThemeProp, activeArche
           
           <div className="space-y-4 relative z-10">
             <span className="text-xs font-mono tracking-widest text-zinc-400 uppercase">
-              RECOM_SIZE_ENG
+              {lang === 'zh' ? 'AI 智能推荐' : 'AI SIZE MATCH'}
             </span>
-            
+
             <div className="space-y-1">
-              <span className="text-zinc-500 text-xs font-sans block">Your Recommended Size</span>
+              <span className="text-zinc-500 text-xs font-sans block">{lang === 'zh' ? '您的推荐尺码' : 'Your Recommended Size'}</span>
               <span className={`text-zinc-500 text-xs ${activeArchetype.fontTitle} italic block`}>仙子推荐尺码</span>
               
               {/* Huge animated size badge */}
@@ -270,7 +283,7 @@ export default function SizingHelper({ activeTheme: activeThemeProp, activeArche
           <div className={`mt-6 pt-4 border-t relative z-10 flex items-center justify-center gap-1.5 text-[11px] text-zinc-400 font-sans ${
             isMinimal ? 'border-zinc-200' : 'border-[var(--theme-primary-soft)]/20'
           }`}>
-            <Scale className={`w-3.5 h-3.5 ${activeTheme.accentText}`} /> Suitable for weights 40kg - 72kg beautifully.
+            <Scale className={`w-3.5 h-3.5 ${activeTheme.accentText}`} /> {lang === 'zh' ? '适合体重 40kg - 72kg 的您，穿出优雅比例。' : 'Suitable for weights 40kg - 72kg beautifully.'}
           </div>
         </div>
 

@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Sparkles, BookOpen } from 'lucide-react';
 interface StoryChaptersProps {
   activeTheme?: any;
   activeArchetype?: any;
+  lang?: 'en' | 'zh';
 }
 
 const pinkFallback = {
@@ -38,7 +39,7 @@ const defaultArchetype = {
   fontBody: 'font-sans'
 };
 
-export default function StoryChapters({ activeTheme: activeThemeProp, activeArchetype: activeArchetypeProp }: StoryChaptersProps) {
+export default function StoryChapters({ activeTheme: activeThemeProp, activeArchetype: activeArchetypeProp, lang = 'en' }: StoryChaptersProps) {
   const activeTheme = activeThemeProp || pinkFallback;
   const activeArchetype = activeArchetypeProp || defaultArchetype;
 
@@ -166,10 +167,14 @@ export default function StoryChapters({ activeTheme: activeThemeProp, activeArch
           </span>
         )}
         <h2 className={`text-3xl md:text-4xl ${activeArchetype.fontTitle} font-bold text-zinc-800 tracking-tight`}>
-          {isMinimal ? 'DESIGN CHRONOLOGY' : 'Chapters of Cippy'}
+          {isMinimal
+            ? (lang === 'zh' ? '风格纪事' : 'STYLE CHRONOLOGY')
+            : (lang === 'zh' ? 'Cippy 的篇章' : 'Chapters of Cippy')}
         </h2>
         <p className={`text-sm ${activeArchetype.fontBody} text-zinc-400 mt-1`}>
-          Turn the pages to explore our storybook aesthetic and tailoring secrets
+          {lang === 'zh'
+            ? '翻开每一页，探索我们的绘本美学与剪裁秘密'
+            : 'Turn the pages to explore our storybook aesthetic and tailoring secrets'}
         </p>
       </div>
 
@@ -225,7 +230,7 @@ export default function StoryChapters({ activeTheme: activeThemeProp, activeArch
             {/* Title / Chapter Label */}
             <div className="space-y-1">
               <span className={`text-xs ${activeArchetype.fontTitle} italic ${activeTheme.accentText} font-medium block`}>
-                Chapter {currentChapter.id} of {totalChapters}
+                {lang === 'zh' ? `第 ${currentChapter.id} 章 · 共 ${totalChapters} 章` : `Chapter ${currentChapter.id} of ${totalChapters}`}
               </span>
               <h3 className={`text-xl md:text-2xl ${activeArchetype.fontTitle} font-bold text-zinc-800 tracking-tight leading-snug`}>
                 {currentChapter.title}
@@ -280,7 +285,7 @@ export default function StoryChapters({ activeTheme: activeThemeProp, activeArch
                   : `${activeTheme.primaryText} ${activeTheme.softBgHover} font-medium`
               }`}
             >
-              <ChevronLeft className="w-4 h-4" /> Prev Page
+              <ChevronLeft className="w-4 h-4" /> {lang === 'zh' ? '上一页' : 'Prev Page'}
             </button>
 
             {/* Micro star icon decoration - Only for non-minimal */}
@@ -302,7 +307,7 @@ export default function StoryChapters({ activeTheme: activeThemeProp, activeArch
                   : `${activeTheme.primaryText} ${activeTheme.softBgHover} font-medium`
               }`}
             >
-              Next Page <ChevronRight className="w-4 h-4" />
+              {lang === 'zh' ? '下一页' : 'Next Page'} <ChevronRight className="w-4 h-4" />
             </button>
           </div>
 
