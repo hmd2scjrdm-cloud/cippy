@@ -251,8 +251,8 @@ export default async function handler(req, res) {
     customer_email: user?.email || customer.email || undefined,
     line_items,
     metadata: { orderId, customerName: String(customer.name || "").slice(0, 500) },
-    success_url: `${origin}/thankyou.html?order=${orderId}&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${origin}/cart.html`,
+    success_url: `${origin}/?checkout=success&order=${orderId}&session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${origin}/?checkout=cancelled`,
   });
 
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY;

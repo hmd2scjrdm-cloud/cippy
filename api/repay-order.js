@@ -76,8 +76,8 @@ export default async function handler(req, res) {
     mode: "payment",
     customer_email: user.email,
     line_items,
-    success_url: `${origin}/thankyou.html?order=${order.order_id}&session_id={CHECKOUT_SESSION_ID}&repay=1`,
-    cancel_url: `${origin}/order.html?id=${orderId}`,
+    success_url: `${origin}/?checkout=success&order=${order.order_id}&session_id={CHECKOUT_SESSION_ID}&repay=1`,
+    cancel_url: `${origin}/?checkout=cancelled`,
   });
 
   return res.status(200).json({ url: session.url });

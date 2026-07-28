@@ -4,3 +4,4 @@ node_modules
 cippy-site-ready.zip
 .DS_Store
 .env*
+!.env.example
