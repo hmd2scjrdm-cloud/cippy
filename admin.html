@@ -1099,9 +1099,18 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
   };
 
   const editId = document.getElementById('editId').value;
-  const { error } = editId
-    ? await sb.from('products').update(payload).eq('id', editId)
-    : await sb.from('products').insert(payload);
+  const doSave = () => editId
+    ? sb.from('products').update(payload).eq('id', editId)
+    : sb.from('products').insert(payload);
+
+  let { error } = await doSave();
+  // "TypeError: Load failed" / "Failed to fetch" are network-layer errors (request never
+  // reached the server) — most often a transient blip, so retry once before bothering the user.
+  if (error && /load failed|failed to fetch|networkerror/i.test(error.message || '')) {
+    btn.textContent = '网络波动，重试中…';
+    await new Promise(r => setTimeout(r, 1200));
+    ({ error } = await doSave());
+  }
 
   if (error) alert('保存失败：' + error.message);
   else { closeModal(); loadProducts(); }

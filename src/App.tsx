@@ -1535,10 +1535,11 @@ export default function App() {
       return salesB - salesA;
     }
     // newest (Default): Sweet/Summer series first, then original index order
+    const RIBBED_TEE_ID = 'e59bbfe1-abfa-439f-b433-88eb20d9d011';
     const isNewA = a.series === "Cippy Sweet" || a.series === "Cippy Summer";
     const isNewB = b.series === "Cippy Sweet" || b.series === "Cippy Summer";
-    const scoreA = (isNewA ? 1000 : 0) + products.findIndex(orig => orig.id === a.id);
-    const scoreB = (isNewB ? 1000 : 0) + products.findIndex(orig => orig.id === b.id);
+    const scoreA = (a.id === RIBBED_TEE_ID ? 100000 : 0) + (isNewA ? 1000 : 0) + products.findIndex(orig => orig.id === a.id);
+    const scoreB = (b.id === RIBBED_TEE_ID ? 100000 : 0) + (isNewB ? 1000 : 0) + products.findIndex(orig => orig.id === b.id);
     return scoreB - scoreA;
   });
 
@@ -2749,44 +2750,52 @@ export default function App() {
                       </span>
                       <div className="grid grid-cols-2 gap-4">
                         {/* Ribbed Crewneck Tee */}
-                        <div
-                          onClick={() => {
-                            const p = dbProducts.find(p => p.id === 'e59bbfe1-abfa-439f-b433-88eb20d9d011');
-                            if (p) setSelectedProduct(p);
-                          }}
-                          className="group relative bg-[#FFF0F2]/40 border border-[#FBEBF0] rounded-2xl p-4 flex flex-col justify-between h-[160px] overflow-hidden hover:bg-[#FFF0F2]/60 transition-all duration-300 cursor-pointer"
-                        >
-                          <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-[#B96A73]" />
-                          <div className="w-full h-1/2 bg-[#FFF0F2]/70 rounded-lg flex items-center justify-center">
-                            <span className="font-serif italic text-[#B96A73] text-lg font-semibold">{lang === 'zh' ? '圆领T' : 'Tee'}</span>
-                          </div>
-                          <div className="space-y-0.5 pt-1">
-                            <h4 className="text-[10px] sm:text-[11px] font-sans font-bold text-zinc-700 tracking-wider uppercase group-hover:text-[#B96A73] transition-colors line-clamp-1">
-                              {lang === 'zh' ? '版型超正圆领T' : 'RIBBED CREWNECK TEE'}
-                            </h4>
-                            <span className="text-[10px] font-mono text-[#B96A73] font-semibold">RM 15</span>
-                          </div>
-                        </div>
+                        {(() => {
+                          const p = dbProducts.find(p => p.id === 'e59bbfe1-abfa-439f-b433-88eb20d9d011');
+                          return (
+                            <div
+                              onClick={() => { if (p) setSelectedProduct(p); }}
+                              className="group relative bg-[#FFF0F2]/40 border border-[#FBEBF0] rounded-2xl p-4 flex flex-col justify-between h-[160px] overflow-hidden hover:bg-[#FFF0F2]/60 transition-all duration-300 cursor-pointer"
+                            >
+                              <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-[#B96A73] z-10" />
+                              <div className="w-full h-1/2 rounded-lg overflow-hidden bg-[#FFF0F2]/70">
+                                {p?.imageUrl && (
+                                  <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                )}
+                              </div>
+                              <div className="space-y-0.5 pt-1">
+                                <h4 className="text-[10px] sm:text-[11px] font-sans font-bold text-zinc-700 tracking-wider uppercase group-hover:text-[#B96A73] transition-colors line-clamp-1">
+                                  {lang === 'zh' ? '版型超正圆领T' : 'RIBBED CREWNECK TEE'}
+                                </h4>
+                                <span className="text-[10px] font-mono text-[#B96A73] font-semibold">RM 15</span>
+                              </div>
+                            </div>
+                          );
+                        })()}
 
                         {/* Drawstring Casual Shorts */}
-                        <div
-                          onClick={() => {
-                            const p = dbProducts.find(p => p.id === 'bef1b190-bd86-4e1f-b3c4-c2ce24c79bca');
-                            if (p) setSelectedProduct(p);
-                          }}
-                          className="group relative bg-[#FFF0F2]/40 border border-[#FBEBF0] rounded-2xl p-4 flex flex-col justify-between h-[160px] overflow-hidden hover:bg-[#FFF0F2]/60 transition-all duration-300 cursor-pointer"
-                        >
-                          <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-[#B96A73]" />
-                          <div className="w-full h-1/2 bg-[#FFF0F2]/70 rounded-lg flex items-center justify-center">
-                            <span className="font-serif italic text-[#B96A73] text-lg font-semibold">{lang === 'zh' ? '短裤' : 'Shorts'}</span>
-                          </div>
-                          <div className="space-y-0.5 pt-1">
-                            <h4 className="text-[10px] sm:text-[11px] font-sans font-bold text-zinc-700 tracking-wider uppercase group-hover:text-[#B96A73] transition-colors line-clamp-1">
-                              {lang === 'zh' ? '日常必备抽绳休闲短裤' : 'DRAWSTRING CASUAL SHORTS'}
-                            </h4>
-                            <span className="text-[10px] font-mono text-[#B96A73] font-semibold">RM 36</span>
-                          </div>
-                        </div>
+                        {(() => {
+                          const p = dbProducts.find(p => p.id === 'bef1b190-bd86-4e1f-b3c4-c2ce24c79bca');
+                          return (
+                            <div
+                              onClick={() => { if (p) setSelectedProduct(p); }}
+                              className="group relative bg-[#FFF0F2]/40 border border-[#FBEBF0] rounded-2xl p-4 flex flex-col justify-between h-[160px] overflow-hidden hover:bg-[#FFF0F2]/60 transition-all duration-300 cursor-pointer"
+                            >
+                              <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-[#B96A73] z-10" />
+                              <div className="w-full h-1/2 rounded-lg overflow-hidden bg-[#FFF0F2]/70">
+                                {p?.imageUrl && (
+                                  <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                )}
+                              </div>
+                              <div className="space-y-0.5 pt-1">
+                                <h4 className="text-[10px] sm:text-[11px] font-sans font-bold text-zinc-700 tracking-wider uppercase group-hover:text-[#B96A73] transition-colors line-clamp-1">
+                                  {lang === 'zh' ? '日常必备抽绳休闲短裤' : 'DRAWSTRING CASUAL SHORTS'}
+                                </h4>
+                                <span className="text-[10px] font-mono text-[#B96A73] font-semibold">RM 36</span>
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </div>
                     </div>
 

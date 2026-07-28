@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Product } from '../types';
-import { ShoppingBag, BookOpen, Star, Sparkles, Check, ChevronDown, ChevronUp, GitCompare, Heart } from 'lucide-react';
+import { ShoppingBag, Star, Sparkles, Check, GitCompare, Heart } from 'lucide-react';
 import { motion } from 'motion/react';
 
 interface ProductCardProps {
@@ -78,12 +78,20 @@ const ProductCard: React.FC<ProductCardProps> = ({
   };
   
   // This product is Freesize/M-only in practice, regardless of what the sizes data says
+  const isColorProduct = product.sku === '011' || product.id === 'e59bbfe1-abfa-439f-b433-88eb20d9d011';
   const availableSizes = product.id === 'e59bbfe1-abfa-439f-b433-88eb20d9d011' ? (['M'] as const) : normalizeSizes(product.sizes);
   const [selectedSize, setSelectedSize] = useState<'S' | 'M' | null>(availableSizes.length === 1 ? availableSizes[0] : null);
-  const [showStory, setShowStory] = useState(false);
+  const [selectedColor, setSelectedColor] = useState<'White' | 'Pink' | 'Black' | null>(null);
   const [addedAnimation, setAddedAnimation] = useState(false);
   const [isPulsing, setIsPulsing] = useState(false);
   const [sizeRequiredHint, setSizeRequiredHint] = useState(false);
+  const [colorRequiredHint, setColorRequiredHint] = useState(false);
+
+  const colorSwatches: { id: 'White' | 'Pink' | 'Black'; nameEn: string; nameZh: string; hex: string; border: string }[] = [
+    { id: 'White', nameEn: 'White', nameZh: '白色', hex: '#FFFFFF', border: 'border-zinc-300' },
+    { id: 'Pink', nameEn: 'Pink', nameZh: '粉色', hex: '#FBCFE8', border: 'border-transparent' },
+    { id: 'Black', nameEn: 'Black', nameZh: '黑色', hex: '#18181B', border: 'border-transparent' },
+  ];
 
   // Pulse when item is added to wishlist
   React.useEffect(() => {
@@ -100,7 +108,23 @@ const ProductCard: React.FC<ProductCardProps> = ({
       setTimeout(() => setSizeRequiredHint(false), 1200);
       return;
     }
-    onAddProductToCart(product, selectedSize);
+    if (isColorProduct && !selectedColor) {
+      setColorRequiredHint(true);
+      setTimeout(() => setColorRequiredHint(false), 1200);
+      return;
+    }
+    let finalProduct = product;
+    if (isColorProduct && selectedColor) {
+      const colorNameMap = { White: { en: 'White', zh: '白色' }, Pink: { en: 'Pink', zh: '粉色' }, Black: { en: 'Black', zh: '黑色' } };
+      const col = colorNameMap[selectedColor];
+      finalProduct = {
+        ...product,
+        id: `${product.id}-${selectedColor.toLowerCase()}`,
+        name: `${product.name} - ${col.en}`,
+        cnName: `${product.cnName} - ${col.zh}`
+      };
+    }
+    onAddProductToCart(finalProduct, selectedSize);
     setAddedAnimation(true);
     setTimeout(() => {
       setAddedAnimation(false);
@@ -300,6 +324,33 @@ const ProductCard: React.FC<ProductCardProps> = ({
             </div>
           </div>
 
+          {isColorProduct && (
+            <div className="flex items-center justify-between">
+              <span className={`text-[10px] tracking-wider font-bold text-zinc-400 uppercase ${activeArchetype.fontBody}`}>
+                {lang === 'zh' ? '颜色' : 'Color'}
+              </span>
+              <div className="flex gap-1.5">
+                {colorSwatches.map((col) => (
+                  <button
+                    key={col.id}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedColor(col.id);
+                    }}
+                    title={lang === 'zh' ? col.nameZh : col.nameEn}
+                    className={`relative w-6 h-6 rounded-full border transition-all cursor-pointer ${col.border} flex items-center justify-center`}
+                    style={{ backgroundColor: col.hex }}
+                  >
+                    {selectedColor === col.id && (
+                      <Check className={`w-3.5 h-3.5 ${col.id === 'White' ? 'text-zinc-800' : 'text-white'}`} />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -310,7 +361,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             } ${
               addedAnimation
                 ? 'bg-emerald-500 text-white shadow-emerald-100'
-                : sizeRequiredHint
+                : sizeRequiredHint || colorRequiredHint
                 ? 'bg-red-400 text-white'
                 : isMinimal
                 ? 'bg-zinc-900 hover:bg-zinc-800 text-white'
@@ -323,12 +374,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
               </>
             ) : sizeRequiredHint ? (
               <>{lang === 'zh' ? '请先选择尺码' : 'Please select a size'}</>
-            ) : selectedSize ? (
+            ) : colorRequiredHint ? (
+              <>{lang === 'zh' ? '请先选择颜色' : 'Please select a color'}</>
+            ) : selectedSize && (!isColorProduct || selectedColor) ? (
               <>
                 <ShoppingBag className="w-3 h-3" /> {lang === 'zh' ? `加入 ${selectedSize} 码 · RM ${product.price}` : `Add Size ${selectedSize} · RM ${product.price}`}
               </>
             ) : (
-              <>{lang === 'zh' ? `选择尺码 · RM ${product.price}` : `Select Size · RM ${product.price}`}</>
+              <>{lang === 'zh' ? `选择尺码/颜色 · RM ${product.price}` : `Select Options · RM ${product.price}`}</>
             )}
           </button>
         </div>
@@ -388,48 +441,25 @@ const ProductCard: React.FC<ProductCardProps> = ({
               ))}
             </div>
           </div>
-        </div>
 
-        {/* Storybook / Design Legend expansion */}
-        <div className={`border-t ${isMinimal ? 'border-zinc-100' : 'border-[var(--theme-primary-soft)]/20'} pt-2`}>
-          <button
-            onClick={() => setShowStory(!showStory)}
-            className={`flex items-center justify-between w-full text-left text-[11px] ${activeTheme.accentText} hover:${activeTheme.primaryText} font-medium transition-colors cursor-pointer ${activeArchetype.fontBody}`}
-          >
-            <span className="flex items-center gap-1">
-              <BookOpen className="w-3.5 h-3.5" /> 
-              {isMinimal ? 'Design Spec Log // 设色初见' : isVintage ? 'Atelier Storybook Anthology // 精灵溯源' : 'Read Storybook Legend · 童话起源'}
-            </span>
-            {showStory ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-          </button>
-
-          {showStory && (
-            <div className={`mt-2 p-3 space-y-2 animate-gentle-bounce ${
-              isMinimal 
-                ? 'bg-zinc-50 border border-zinc-200 rounded-none' 
-                : isVintage 
-                ? 'bg-[#FDFBF7] border border-amber-900/10 rounded-sm' 
-                : 'rounded-xl border border-[var(--theme-primary-soft)]/50'
-            }`} style={!isMinimal && !isVintage ? { backgroundColor: 'var(--theme-scrollbar-bg)' } : undefined}>
-              <p className={`text-[11px] italic text-zinc-600 leading-relaxed text-justify ${activeArchetype.fontTitle}`}>
-                "{product.story}"
-              </p>
-              <p className={`text-[10px] text-zinc-500 leading-relaxed text-justify border-t pt-1.5 ${
-                isMinimal ? 'border-zinc-200' : 'border-[var(--theme-primary-soft)]/30'
-              }`}>
-                {product.cnStory}
-              </p>
-              
-              {/* Bullets details */}
-              <div className={`border-t pt-2 space-y-1 ${isMinimal ? 'border-zinc-200' : 'border-[var(--theme-primary-soft)]/30'}`}>
-                <span className="text-[9px] font-mono tracking-widest text-zinc-400 block uppercase">
-                  {lang === 'zh' ? '成衣特征' : 'Details'}
-                </span>
-                <ul className="list-disc list-inside text-[9px] text-zinc-500 space-y-0.5">
-                  {product.cnDetails.slice(0, 3).map((det, idx) => (
-                    <li key={idx} className="truncate">{det}</li>
-                  ))}
-                </ul>
+          {isColorProduct && (
+            <div className="flex items-center justify-between text-xs font-sans">
+              <span className="text-zinc-400">{lang === 'zh' ? '选择颜色：' : 'Choose color:'}</span>
+              <div className="flex gap-1.5">
+                {colorSwatches.map((col) => (
+                  <button
+                    key={col.id}
+                    type="button"
+                    onClick={() => setSelectedColor(col.id)}
+                    title={lang === 'zh' ? col.nameZh : col.nameEn}
+                    className={`relative w-6 h-6 rounded-full border transition-all cursor-pointer ${col.border} flex items-center justify-center`}
+                    style={{ backgroundColor: col.hex }}
+                  >
+                    {selectedColor === col.id && (
+                      <Check className={`w-3.5 h-3.5 ${col.id === 'White' ? 'text-zinc-800' : 'text-white'}`} />
+                    )}
+                  </button>
+                ))}
               </div>
             </div>
           )}
@@ -444,7 +474,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             } ${
               addedAnimation
                 ? 'bg-emerald-500 text-white shadow-emerald-100'
-                : sizeRequiredHint
+                : sizeRequiredHint || colorRequiredHint
                 ? 'bg-red-400 text-white'
                 : isMinimal
                 ? 'bg-zinc-900 hover:bg-zinc-800 text-white'
@@ -457,6 +487,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
               </>
             ) : sizeRequiredHint ? (
               <>{lang === 'zh' ? '请先选择尺码' : 'Please select a size'}</>
+            ) : colorRequiredHint ? (
+              <>{lang === 'zh' ? '请先选择颜色' : 'Please select a color'}</>
             ) : (
               <>
                 <ShoppingBag className="w-3.5 h-3.5" /> {lang === 'zh' ? '加入购物袋' : 'Add Ready-to-Wear'}
