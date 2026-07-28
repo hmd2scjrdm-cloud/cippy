@@ -43,6 +43,7 @@ export interface StoryChapter {
   content: string;
   cnContent: string;
   illustrationType: 'bow' | 'dress' | 'cloud' | 'stars';
+  image?: string;
 }
 
 export interface SizeRecommendation {

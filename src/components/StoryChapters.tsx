@@ -199,14 +199,22 @@ export default function StoryChapters({ activeTheme: activeThemeProp, activeArch
         }`} />
 
         {/* Left Page: The illustration & visual atmosphere */}
-        <div className={`flex-1 flex flex-col justify-center items-center p-4 relative ${
-          isMinimal 
-            ? 'bg-zinc-50 rounded-none border border-zinc-100' 
-            : isVintage 
-            ? 'bg-[#FAF6F0] rounded-sm border border-amber-900/5' 
+        <div className={`flex-1 flex flex-col justify-center items-center p-4 relative overflow-hidden ${
+          isMinimal
+            ? 'bg-zinc-50 rounded-none border border-zinc-100'
+            : isVintage
+            ? 'bg-[#FAF6F0] rounded-sm border border-amber-900/5'
             : 'bg-[#FFFDFC] rounded-2xl border border-pink-50/50'
         }`}>
-          {renderIllustration(currentChapter.illustrationType)}
+          {currentChapter.image ? (
+            <img
+              src={currentChapter.image}
+              alt={currentChapter.title}
+              className={`absolute inset-0 w-full h-full object-cover ${isMinimal ? '' : isVintage ? 'rounded-sm' : 'rounded-2xl'}`}
+            />
+          ) : (
+            renderIllustration(currentChapter.illustrationType)
+          )}
 
           {/* Page Number indicator left */}
           <span className="absolute bottom-2 left-4 text-[10px] font-mono text-zinc-400 uppercase tracking-widest">

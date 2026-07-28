@@ -9,7 +9,8 @@ export const storybookChapters: StoryChapter[] = [
     cnSubtitle: "自由舒展的剪裁与不费力优雅",
     content: "At Cippy, we believe that garments should never confine you. Our loose-fitting philosophy is a love letter to the relaxed Korean aesthetic—tailored with premium drapes that flow with your body, creating a fairytale silhouette that is both high-end and deeply comforting.",
     cnContent: "在 Cippy，我们深信衣物不该是拘束。我们的‘韩系宽松美学’是一首献给随性生活的抒情诗——选用高端垂坠面料，随着身体的律动起伏，营造出既高级又温暖舒适的童话廓形。",
-    illustrationType: "dress"
+    illustrationType: "dress",
+    image: "/assets/journal/chapter-1.png"
   },
   {
     id: 2,
@@ -19,26 +20,28 @@ export const storybookChapters: StoryChapter[] = [
     cnSubtitle: "无需费心搭配，穿上即是梦境主角",
     content: "True luxury is effortless. Every Cippy piece is meticulously curated to be the main character of your daily look. No complicated styling required—simply wear, adjust the delicate premium details, and step out into your day with confidence and whimsical beauty.",
     cnContent: "真正的奢华是毫不费力的。Cippy 的每一件 Ready-to-Wear（成衣）都经过精心雕琢，旨在成为你日常穿搭的绝对主角。无需繁复的搭配技巧——轻轻穿上，系好带子，便能自信走入童话般的日常。",
-    illustrationType: "bow"
+    illustrationType: "bow",
+    image: "/assets/journal/chapter-2.jpeg"
   },
   {
     id: 3,
-    title: "Chapter III: The S & M Size Secret Garden",
-    cnTitle: "第三章：小码与中码的秘密花园",
-    subtitle: "Crafting the perfect drape for elegant shapes",
-    cnSubtitle: "专为精细身形研发的‘大廓形’体验",
-    content: "We focus exclusively on Small and Medium sizing to ensure our drapes are perfectly balanced. By concentrating on these sizes, our patterns are calibrated to look beautifully oversized without overwhelming your frame, creating a soft, elegant proportion.",
-    cnContent: "我们专注于 S 与 M 两个尺码，只为将‘宽松廓形’比例调校到极致。这并非限制，而是专属于对精致度有极高追求的女孩。精确的落肩、微调的下摆，让每一件大廓形衣物在身上优雅垂坠，绝不显得臃肿臃塞。",
-    illustrationType: "stars"
+    title: "Chapter III: The S & M Fit Philosophy",
+    cnTitle: "第三章：专属于 S 与 M 的合身哲学",
+    subtitle: "REFINED PROPORTIONS FOR A BEAUTIFUL EVERYDAY FIT",
+    cnSubtitle: "为日常穿着反复调整的细腻比例",
+    content: "We focus on S and M sizing so every silhouette can be adjusted with greater attention to proportion. From the neckline and waist placement to the overall length and drape, each detail is considered to create a flattering fit that feels comfortable, feminine and easy to wear.",
+    cnContent: "我们专注于 S 与 M 两个尺码，让每一件衣服的比例都能获得更细致的调整。从领口、腰线到衣长与垂坠度，我们反复琢磨每一个细节，让衣服自然贴合身形，穿起来舒适、显比例，同时保留 Cippy 独有的温柔感。",
+    illustrationType: "stars",
+    image: "/assets/journal/chapter-3.jpg"
   },
   {
     id: 4,
-    title: "Chapter IV: A Whimsical Match for Malaysia",
-    cnTitle: "第四章：大马女孩的温婉日常",
+    title: "Chapter IV: Made for Malaysian Days",
+    cnTitle: "第四章：为马来西亚日常而选",
     subtitle: "Breathable weaves tailored for year-round comfort",
     cnSubtitle: "专为热带气温与冷气房甄选的柔顺触感",
-    content: "Curated for Malaysian Chinese dreamers who transition from the tropical breeze of Kuala Lumpur to chilled cozy boutique spaces. Our ready-to-wear pieces use exceptionally lightweight, breathable cotton-linen and cloud-soft knits that keep you beautifully fresh and warm all at once.",
-    cnContent: "为穿梭在大马明媚微风与舒适冷气房中的华裔女孩特别定制。我们精选极轻盈、会呼吸的棉麻面料与如云朵般轻软的针织衫，让你在吉隆坡的四季如夏里，随时拥有温和纯净的韩系氛围感。",
+    content: "Curated for life in Malaysia—from sunny afternoons and café dates to cool classrooms and air-conditioned spaces. Cippy pieces are selected to feel light, comfortable and easy to layer, so you can look lovely without dressing too formally.",
+    cnContent: "为马来西亚的日常生活而精选——从炎热午后、咖啡店约会，到冷气充足的教室与商场。Cippy 重视轻盈、舒适与容易叠穿，让你既可以穿去打卡，也能自然融入上课、逛街和普通生活，不必穿得过分隆重。",
     illustrationType: "cloud"
   }
 ];

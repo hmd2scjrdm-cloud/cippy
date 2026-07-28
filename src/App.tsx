@@ -806,18 +806,7 @@ export default function App() {
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const [isSignUpComplete, setIsSignUpComplete] = useState(false);
 
-  // Member Daily Sign-In & Rewards States
-  const [lastCheckInDate, setLastCheckInDate] = useState<string | null>(() => {
-    return localStorage.getItem('cippy_last_checkin_date');
-  });
-  const [fortuneMessage, setFortuneMessage] = useState<{ en: string; zh: string } | null>(() => {
-    try {
-      const saved = localStorage.getItem('cippy_current_fortune');
-      return saved ? JSON.parse(saved) : null;
-    } catch {
-      return null;
-    }
-  });
+  // Member Rewards States
   const [unlockedCoupons, setUnlockedCoupons] = useState<string[]>(() => {
     try {
       return JSON.parse(localStorage.getItem('cippy_unlocked_coupons') || '[]');
@@ -1199,9 +1188,15 @@ export default function App() {
                              errStr === '{}';
 
         if (isFetchError) {
+          // Dev note: this usually means the Supabase `profiles` table is missing a column
+          // (full_name / avatar_url / email / username) that the new-user sync trigger expects.
+          // Fix via Supabase SQL Editor: ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS <col> text;
+          console.error(
+            'Signup failed: Supabase profiles-sync trigger likely errored (missing column on public.profiles — full_name/avatar_url/email/username). Add the missing column(s) in the Supabase SQL Editor.'
+          );
           errMsg = lang === 'zh'
-            ? '❌ 注册失败 (Database error saving new user)\n\n【原因】您的 Supabase 后台有一个触发器 (trigger)，试图在您注册新账号时自动将新用户信息同步到 `profiles` 表，但由于您的 `profiles` 表缺少 `full_name` 或 `avatar_url` 等字段，导致同步插入失败并返回了 500 服务器错误。\n\n【解决办法】请登录您的 Supabase Dashboard 控制台，打开 SQL Editor 运行以下 SQL 语句来添加缺失的字段，然后刷新此页面重新进行注册即可：\n\nALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS full_name text;\nALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS avatar_url text;\nALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS email text;\nALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS username text;'
-            : '❌ Registration failed: Database sync error (Database error saving new user).\n\n【Reason】A trigger on your Supabase `auth.users` table automatically tries to copy newly registered users into the public `profiles` table, but it fails with a 500 server error because your `profiles` table is missing some columns (like `full_name` or `avatar_url`).\n\n【Solution】Please log in to your Supabase Dashboard, open the SQL Editor, run the following SQL statements to add the missing columns, then refresh this page and try registering again:\n\nALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS full_name text;\nALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS avatar_url text;\nALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS email text;\nALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS username text;';
+            ? '❌ 注册暂时遇到问题，请稍后再试，或联系客服协助处理。'
+            : '❌ Registration is temporarily unavailable. Please try again shortly or contact support.';
         } else {
           if (typeof err === 'string') {
             errMsg = err;
@@ -1574,82 +1569,6 @@ export default function App() {
     setTimeout(() => {
       setToastMessage(null);
     }, 3000);
-  };
-
-  const handleDailyCheckIn = async () => {
-    if (!currentUser) {
-      setToastMessage(lang === 'zh' ? '🌸 请先登录会员账号再进行签到。' : '🌸 Please log in to your account first.');
-      setTimeout(() => setToastMessage(null), 3000);
-      return;
-    }
-
-    const todayStr = new Date().toISOString().split('T')[0];
-    if (lastCheckInDate === todayStr) {
-      setToastMessage(lang === 'zh' ? '🌸 今天您已经签到过了哦，明天再来吧~' : '🌸 You have already checked in today. See you tomorrow!');
-      setTimeout(() => setToastMessage(null), 3000);
-      return;
-    }
-
-    // Unveil fairytale fortune
-    const fortunes = [
-      {
-        en: "✨ 'A simple dress can make a grey day feel like a Waltz in the woods.'",
-        zh: "✨ “一件简单的衣裳，能让灰暗的日子宛如林中圆舞曲般翩翩起舞。”"
-      },
-      {
-        en: "🌸 'Let the soft threads of today sew a dream of delight for your tomorrow.'",
-        zh: "🌸 “让今日的绵绵细线，缝合织就你明日的欢愉梦境。”"
-      },
-      {
-        en: "🌟 'True elegance is being as beautifully kind on the inside as on the outside.'",
-        zh: "🌟 “真正的优雅，是内外皆散发着如一的温柔与善良。”"
-      },
-      {
-        en: "🍵 'May your day be filled with warm tea, soft tulle, and quiet moments of wonder.'",
-        zh: "🍵 “愿你的日子温茶溢香、薄纱似水，满是静谧安详的微光奇迹。”"
-      },
-      {
-        en: "👑 'You are the author of your own fairytale; dress beautifully for your chapters.'",
-        zh: "👑 “你正是自己童话篇章的执笔人，请身着华彩，优雅谱写每一页。”"
-      },
-      {
-        en: "🧚 'Like a butterfly breaking from its cocoon, trust your own time to blossom.'",
-        zh: "🧚 “正如破茧而出的仙气之蝶，请相信自己绽放的绚烂时刻。”"
-      }
-    ];
-
-    const randomFortune = fortunes[Math.floor(Math.random() * fortunes.length)];
-    setFortuneMessage(randomFortune);
-    localStorage.setItem('cippy_current_fortune', JSON.stringify(randomFortune));
-
-    const bonusPoints = 5;
-    const nextPoints = (userProfile?.points || 0) + bonusPoints;
-
-    // Update in React State
-    if (userProfile) {
-      setUserProfile(prev => prev ? { ...prev, points: nextPoints } : { points: bonusPoints, total_spent: 0, tier: 'Classic' });
-    } else {
-      setUserProfile({ points: bonusPoints, total_spent: 0, tier: 'Classic' });
-    }
-
-    // Save check-in date
-    localStorage.setItem('cippy_last_checkin_date', todayStr);
-    setLastCheckInDate(todayStr);
-
-    // Update in Supabase
-    if (supabase) {
-      try {
-        await supabase
-          .from('profiles')
-          .update({ points: nextPoints })
-          .eq('id', currentUser.id);
-      } catch (err) {
-        console.error("Failed to update points in Supabase:", err);
-      }
-    }
-
-    setToastMessage(lang === 'zh' ? `✨ 签到成功！获得 +${bonusPoints} 积分 🌸` : `✨ Signed in successfully! +${bonusPoints} Points 🌸`);
-    setTimeout(() => setToastMessage(null), 3500);
   };
 
   const handleRedeemReward = async (pointsRequired: number, couponCode: string, successMessageZH: string, successMessageEN: string) => {
@@ -3126,8 +3045,8 @@ export default function App() {
                 </h2>
                 <p className="text-xs text-zinc-400">
                   {lang === 'zh'
-                    ? '阅读 Nabi Studio 成衣背后的童话起源与穿搭日记。'
-                    : "Read the fairytale origins and styling diaries behind Nabi Studio's ready-to-wear garments."}
+                    ? '阅读 Cippy 成衣背后的童话起源与穿搭日记。'
+                    : "Read the fairytale origins and styling diaries behind Cippy's ready-to-wear garments."}
                 </p>
               </div>
               <StoryChapters activeTheme={activeTheme} activeArchetype={activeArchetype} lang={lang} />
@@ -3949,7 +3868,7 @@ export default function App() {
                   </div>
 
                   {/* VIP Membership Card & Daily Check-In Grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+                  <div className="grid grid-cols-1 gap-6 sm:gap-8 max-w-xl mx-auto w-full">
                     {/* VIP Card: Cippy Atelier Fairy Pass */}
                     <div className="bg-white border border-[#FBEBF0] rounded-3xl p-6 md:p-8 flex flex-col justify-between space-y-6 shadow-xs">
                       <div className="space-y-1">
@@ -4027,67 +3946,6 @@ export default function App() {
                           <span className="font-semibold text-purple-600">{lang === 'zh' ? 'Platinum (最高级):' : 'Platinum (Highest):'}</span>
                           <span>{lang === 'zh' ? '享全店成衣永久 9.0 折特权' : 'Lifetime 10% Off discount'}</span>
                         </div>
-                      </div>
-                    </div>
-
-                    {/* Daily Check-In Widget */}
-                    <div className="bg-white border border-[#FBEBF0] rounded-3xl p-6 md:p-8 flex flex-col justify-between space-y-6 shadow-xs">
-                      <div className="space-y-1">
-                        <h4 className="font-serif text-lg font-bold text-zinc-800 flex items-center gap-2">
-                          <Calendar className="w-5 h-5 text-[#B96A73]" />
-                          {lang === 'zh' ? '每日童话签到 & 占卜 / Daily Sign-In' : 'Daily Fairytale Sign-In'}
-                        </h4>
-                        <p className="text-xs text-zinc-400 font-sans">
-                          {lang === 'zh' ? '每日登录进行签到即可免费领取 5 积分，并抽取您的今日童话签文。' : 'Claim 5 loyalty points daily and reveal your magic fairytale fortune card.'}
-                        </p>
-                      </div>
-
-                      {/* Sign-In Interactive Button */}
-                      <div className="flex flex-col items-center justify-center p-5 bg-[#FFFDFC]/80 border border-[#FBEBF0]/70 rounded-2xl space-y-4 shadow-2xs relative overflow-hidden text-center min-h-[160px]">
-                        {lastCheckInDate === new Date().toISOString().split('T')[0] ? (
-                          <div className="space-y-3 animate-fade-in">
-                            <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600 mx-auto border border-emerald-100 shadow-2xs">
-                              <CheckCircle2 className="w-6 h-6 animate-bounce" />
-                            </div>
-                            <div className="space-y-0.5">
-                              <p className="text-xs font-bold text-zinc-700">{lang === 'zh' ? '今日签到完成 🌸' : 'Checked In For Today!'}</p>
-                              <p className="text-[10px] text-zinc-400">{lang === 'zh' ? '您今天已成功领取了 5 会员积分' : 'You have earned +5 points today.'}</p>
-                            </div>
-                          </div>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={handleDailyCheckIn}
-                            className="group relative flex flex-col items-center gap-2.5 bg-gradient-to-r from-[#B96A73] to-[#A85B64] hover:from-[#A85B64] hover:to-[#B96A73] text-white font-bold p-6 rounded-2xl transition-all duration-300 w-full max-w-xs shadow-md hover:shadow-lg cursor-pointer transform hover:-translate-y-0.5"
-                          >
-                            <Sparkles className="w-6 h-6 text-yellow-200 animate-spin" />
-                            <div className="text-center">
-                              <span className="block text-xs font-bold tracking-widest uppercase">{lang === 'zh' ? '每日签到领积分' : 'DAILY SIGN-IN'}</span>
-                              <span className="block text-[9px] text-[#FFD2D6] font-normal font-sans mt-0.5">{lang === 'zh' ? '领取 5 积分与今日签文' : 'Claim 5 Fairy Points & Fortune'}</span>
-                            </div>
-                          </button>
-                        )}
-                      </div>
-
-                      {/* Fairytale Fortune Scroll/Card */}
-                      <div className="relative border border-amber-200/50 bg-[#FFFDF9]/95 rounded-2xl p-4 md:p-5 text-center shadow-2xs min-h-[100px] flex flex-col justify-center items-center">
-                        <div className="absolute top-2 left-3 text-[9px] font-mono tracking-widest text-amber-700/60 font-bold uppercase">
-                          {lang === 'zh' ? '✨ 今日占卜签文' : '✨ DAILY FORTUNE'}
-                        </div>
-                        {fortuneMessage ? (
-                          <div className="space-y-1.5 py-2 animate-fade-in">
-                            <p className="font-serif italic text-zinc-700 text-xs leading-relaxed max-w-sm">
-                              {lang === 'zh' ? fortuneMessage.zh : fortuneMessage.en}
-                            </p>
-                            <span className="text-[9px] text-amber-700/60 font-serif tracking-widest block uppercase">
-                              &bull; Cippy Wishing Well &bull;
-                            </span>
-                          </div>
-                        ) : (
-                          <div className="text-zinc-400 font-serif italic text-[11px] py-4">
-                            {lang === 'zh' ? '🌸 请点击上方签到按钮，测测您的今日好运～' : '🌸 Click Sign-In above to draw your fairytale fortune card...'}
-                          </div>
-                        )}
                       </div>
                     </div>
                   </div>
