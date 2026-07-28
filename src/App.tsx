@@ -4925,7 +4925,7 @@ export default function App() {
                                 <span className="text-[9px] font-mono tracking-widest text-zinc-400 uppercase block font-bold">{lang === 'zh' ? '订购商品' : 'ITEMS ORDERED'}</span>
                                 <div className="space-y-3">
                                   {itemsArray.map((item: any, idx: number) => {
-                                    const resolvedProduct = dbProducts.find(p => p.id === String(item.id || item.product?.id));
+                                    const resolvedProduct = dbProducts.find(p => p.id === String(item.id || item.product?.id).split('-')[0] || p.id === String(item.id || item.product?.id));
                                     const productName = resolvedProduct ? (lang === 'zh' ? resolvedProduct.cnName : resolvedProduct.name) : (item.name || item.product?.name || 'Cippy Wear');
                                     const productPrice = resolvedProduct ? resolvedProduct.price : (item.price_myr || item.product?.price || 0);
                                     const productImg = resolvedProduct?.imageUrl || item.product?.imageUrl || item.product?.image_url;
@@ -5593,9 +5593,9 @@ export default function App() {
                 &copy; 2026 CIPPY ATELIER. ALL RIGHTS RESERVED.
               </div>
               <div className="md:w-1/3 flex justify-center gap-6 tracking-widest text-zinc-500">
-                <a href="#instagram" className="hover:text-[#3F2B2B] transition-colors">INSTAGRAM</a>
-                <a href="#facebook" className="hover:text-[#3F2B2B] transition-colors">FACEBOOK</a>
-                <a href="#pinterest" className="hover:text-[#3F2B2B] transition-colors">PINTEREST</a>
+                <a href="https://wa.me/601120861073" target="_blank" rel="noreferrer" className="hover:text-[#3F2B2B] transition-colors">
+                  {lang === 'zh' ? '客服 WHATSAPP' : 'WHATSAPP SUPPORT'}
+                </a>
               </div>
               <div className="md:w-1/3 text-center md:text-right tracking-wider text-zinc-500 uppercase">
                 MADE IN SEOUL &middot; 蔚蓝之境
