@@ -2045,6 +2045,17 @@ export default function App() {
                 >
                   {lang === 'zh' ? '工坊' : 'ARCHIVE'}
                 </button>
+                <button
+                  onClick={() => {
+                    setActiveTab('policies');
+                    document.getElementById('nabi-studio-app-card')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className={`text-[11px] tracking-[0.2em] font-bold font-sans transition-all duration-300 cursor-pointer ${
+                    activeTab === 'policies' ? 'text-[#3F2B2B] border-b-2 border-[#3F2B2B] pb-1' : 'text-zinc-500 hover:text-[#3F2B2B] pb-1 border-b-2 border-transparent'
+                  }`}
+                >
+                  {lang === 'zh' ? '政策条款' : 'T&C'}
+                </button>
                 {isAdminUser && (
                   <button
                     onClick={() => {
