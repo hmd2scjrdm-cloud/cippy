@@ -107,7 +107,6 @@ export default async function handler(req, res) {
       totals: { subtotal: verifiedSubtotal, shipping, total: verifiedTotal },
       status: "pending_payment",
       payment_method: "duitnow",
-      gift_note: giftNote || null,
     }),
   });
   if (!saveRes.ok) {
