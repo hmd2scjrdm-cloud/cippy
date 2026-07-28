@@ -22,6 +22,8 @@ export default function ProductDetailModal({
   onToggleWishlist
 }: ProductDetailModalProps) {
   const [selectedSize, setSelectedSize] = useState<'S' | 'M'>('S');
+  const [selectedColor, setSelectedColor] = useState<'White' | 'Pink' | 'Black'>('White');
+  const isColorProduct = product.sku === '011' || product.id === 'e59bbfe1-abfa-439f-b433-88eb20d9d011';
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [addedToCart, setAddedToCart] = useState(false);
   
@@ -44,7 +46,22 @@ export default function ProductDetailModal({
   ].filter(Boolean) as string[];
 
   const handleAddToCart = () => {
-    onAddProductToCart(product, selectedSize);
+    let finalProduct = product;
+    if (isColorProduct) {
+      const colorNameMap = {
+        White: { en: 'White', zh: '白色' },
+        Pink: { en: 'Pink', zh: '粉色' },
+        Black: { en: 'Black', zh: '黑色' }
+      };
+      const col = colorNameMap[selectedColor];
+      finalProduct = {
+        ...product,
+        id: `${product.id}-${selectedColor.toLowerCase()}`,
+        name: `${product.name} - ${col.en}`,
+        cnName: `${product.cnName} - ${col.zh}`
+      };
+    }
+    onAddProductToCart(finalProduct, selectedSize);
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2000);
   };
@@ -248,6 +265,33 @@ export default function ProductDetailModal({
                 </div>
               )}
             </div>
+
+            {/* Colors selector (if applicable) */}
+            {isColorProduct && (
+              <div className="flex items-center justify-between text-xs font-sans pt-2 border-t border-pink-100/30">
+                <span className="text-zinc-500 font-medium">{tx("Choose Color / 颜色:", "选择颜色:")}</span>
+                <div className="flex gap-2.5">
+                  {[
+                    { id: 'White', nameEn: 'White', nameZh: '白色', hex: '#FFFFFF', border: 'border-zinc-300' },
+                    { id: 'Pink', nameEn: 'Pink', nameZh: '粉色', hex: '#FBCFE8', border: 'border-transparent' },
+                    { id: 'Black', nameEn: 'Black', nameZh: '黑色', hex: '#18181B', border: 'border-transparent' }
+                  ].map((col) => (
+                    <button
+                      key={col.id}
+                      type="button"
+                      onClick={() => setSelectedColor(col.id as any)}
+                      className={`relative w-6 h-6 rounded-full border transition-all cursor-pointer ${col.border} flex items-center justify-center`}
+                      style={{ backgroundColor: col.hex }}
+                      title={tx(col.nameEn, col.nameZh)}
+                    >
+                      {selectedColor === col.id && (
+                        <Check className={`w-3.5 h-3.5 ${col.id === 'White' ? 'text-zinc-800' : 'text-white'}`} />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Sizes selector */}
             <div className="flex items-center justify-between text-xs font-sans pt-2">

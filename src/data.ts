@@ -48,17 +48,17 @@ export const storybookChapters: StoryChapter[] = [
 
 export const products: Product[] = [
   {
-    "id": "waist-fit-ribbed-tee-011-white",
-    "name": "Flattering Silhouette | Waist-Fit Crewneck Ribbed Tee - White",
-    "cnName": "版型超正圆领T｜修身收腰螺纹短袖 - 白色",
+    "id": "e59bbfe1-abfa-439f-b433-88eb20d9d011",
+    "name": "Flattering Silhouette | Waist-Fit Crewneck Ribbed Tee",
+    "cnName": "版型超正圆领T｜修身收腰螺纹短袖",
     "category": "tops",
     "price": 15,
     "sizes": [
       "S",
       "M"
     ],
-    "description": "A super flattering waist-fit crewneck ribbed tee in White. Crafted from lightweight, breathable ribbed fabric. Freesize, suitable for 45-50kg.",
-    "cnDescription": "版型超级正的圆领T！白色。螺纹面料，清爽透气。特别添加修身收腰设计。Freesize 均码，适合体重 45-50kg。",
+    "description": "A super flattering waist-fit crewneck ribbed tee. Crafted from lightweight, breathable ribbed fabric. Freesize, suitable for 45-50kg. Available in White, Pink, Black.",
+    "cnDescription": "版型超级正的圆领T！螺纹面料，清爽透气。特别添加修身收腰设计。Freesize 均码（适合体重 45-50kg 可穿）。拥有白色、粉色、黑色三种经典颜色选择，每个颜色各 2 件。",
     "story": "A timeless, waist-contouring basic featuring a clean ribbed knit. Soft to the touch and incredibly breathable, it effortlessly updates your daily fairytale look.",
     "cnStory": "修身利落的剪裁搭配温柔亲肤的螺纹面料，单穿即可营造法式轻慵懒氛围。精致的收腰设计，给简单的日常多了一分浪漫细节。",
     "details": [
@@ -80,91 +80,7 @@ export const products: Product[] = [
     "detailImages": [],
     "images": [],
     "inStock": true,
-    "stock": 2,
-    "series": "Cippy Basic",
-    "fabric": "螺纹面料",
-    "clothingType": "短袖上衣、T恤",
-    "lining": "无内衬",
-    "stretch": "高弹力",
-    "transparency": "微透 (Slight)",
-    "care": "冷水轻柔手洗 / 悬挂晾干"
-  },
-  {
-    "id": "waist-fit-ribbed-tee-011-pink",
-    "name": "Flattering Silhouette | Waist-Fit Crewneck Ribbed Tee - Pink",
-    "cnName": "版型超正圆领T｜修身收腰螺纹短袖 - 粉色",
-    "category": "tops",
-    "price": 15,
-    "sizes": [
-      "S",
-      "M"
-    ],
-    "description": "A super flattering waist-fit crewneck ribbed tee in Pink. Crafted from lightweight, breathable ribbed fabric. Freesize, suitable for 45-50kg.",
-    "cnDescription": "版型超级正的圆领T！粉色。螺纹面料，清爽透气。特别添加修身收腰设计。Freesize 均码，适合体重 45-50kg。",
-    "story": "A timeless, waist-contouring basic featuring a clean ribbed knit. Soft to the touch and incredibly breathable, it effortlessly updates your daily fairytale look.",
-    "cnStory": "修身利落的剪裁搭配温柔亲肤的螺纹面料，单穿即可营造法式轻慵懒氛围。精致的收腰设计，给简单的日常多了一分浪漫细节。",
-    "details": [
-      "Fabric: Premium elastic ribbed cotton blend / 螺纹棉混纺",
-      "Series: Cippy Basic",
-      "Fit: Flattering waist-contouring slim silhouette",
-      "Care: Gentle hand wash or machine wash under 30°C"
-    ],
-    "cnDetails": [
-      "面料材质：高端轻薄螺纹棉混纺",
-      "系列归属：Cippy Basic",
-      "版型剪裁：修身收腰版型，视觉上非常显腰细",
-      "洗涤建议：建议放入洗衣袋轻柔机洗或手洗，避免暴力拉扯"
-    ],
-    "color": "#FAF4F6",
-    "bgGradient": "from-[#FCF5F7] to-[#F5E6EB]",
-    "svgPath": "M 15,35 L 85,35 L 80,80 L 20,80 Z",
-    "imageUrl": "/images/product_ribbed_tee_011.jpg",
-    "detailImages": [],
-    "images": [],
-    "inStock": true,
-    "stock": 2,
-    "series": "Cippy Basic",
-    "fabric": "螺纹面料",
-    "clothingType": "短袖上衣、T恤",
-    "lining": "无内衬",
-    "stretch": "高弹力",
-    "transparency": "微透 (Slight)",
-    "care": "冷水轻柔手洗 / 悬挂晾干"
-  },
-  {
-    "id": "waist-fit-ribbed-tee-011-black",
-    "name": "Flattering Silhouette | Waist-Fit Crewneck Ribbed Tee - Black",
-    "cnName": "版型超正圆领T｜修身收腰螺纹短袖 - 黑色",
-    "category": "tops",
-    "price": 15,
-    "sizes": [
-      "S",
-      "M"
-    ],
-    "description": "A super flattering waist-fit crewneck ribbed tee in Black. Crafted from lightweight, breathable ribbed fabric. Freesize, suitable for 45-50kg.",
-    "cnDescription": "版型超级正的圆领T！黑色。螺纹面料，清爽透气。特别添加修身收腰设计。Freesize 均码，适合体重 45-50kg。",
-    "story": "A timeless, waist-contouring basic featuring a clean ribbed knit. Soft to the touch and incredibly breathable, it effortlessly updates your daily fairytale look.",
-    "cnStory": "修身利落的剪裁搭配温柔亲肤的螺纹面料，单穿即可营造法式轻慵懒氛围。精致的收腰设计，给简单的日常多了一分浪漫细节。",
-    "details": [
-      "Fabric: Premium elastic ribbed cotton blend / 螺纹棉混纺",
-      "Series: Cippy Basic",
-      "Fit: Flattering waist-contouring slim silhouette",
-      "Care: Gentle hand wash or machine wash under 30°C"
-    ],
-    "cnDetails": [
-      "面料材质：高端轻薄螺纹棉混纺",
-      "系列归属：Cippy Basic",
-      "版型剪裁：修身收腰版型，视觉上非常显腰细",
-      "洗涤建议：建议放入洗衣袋轻柔机洗或手洗，避免暴力拉扯"
-    ],
-    "color": "#FAF4F6",
-    "bgGradient": "from-[#FCF5F7] to-[#F5E6EB]",
-    "svgPath": "M 15,35 L 85,35 L 80,80 L 20,80 Z",
-    "imageUrl": "/images/product_ribbed_tee_011.jpg",
-    "detailImages": [],
-    "images": [],
-    "inStock": true,
-    "stock": 2,
+    "stock": 6,
     "series": "Cippy Basic",
     "fabric": "螺纹面料",
     "clothingType": "短袖上衣、T恤",
