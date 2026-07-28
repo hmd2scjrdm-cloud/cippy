@@ -47,8 +47,17 @@ const defaultArchetype = {
   fontBody: 'font-sans'
 };
 
-const ProductCard: React.FC<ProductCardProps> = ({ 
-  product, 
+// product.sizes may be plain strings (['S','M']) or, for color-variant products,
+// objects like {size, color, stock} used for per-color inventory — normalize to labels.
+function normalizeSizes(sizes: unknown): ('S' | 'M')[] {
+  if (!Array.isArray(sizes) || sizes.length === 0) return ['S', 'M'];
+  const labels = sizes.map((s: any) => (typeof s === 'string' ? s : s?.size)).filter(Boolean);
+  const unique = Array.from(new Set(labels)) as ('S' | 'M')[];
+  return unique.length > 0 ? unique : ['S', 'M'];
+}
+
+const ProductCard: React.FC<ProductCardProps> = ({
+  product,
   onAddProductToCart, 
   onViewProduct,
   activeTheme: activeThemeProp,
@@ -68,10 +77,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
     }
   };
   
-  const [selectedSize, setSelectedSize] = useState<'S' | 'M'>('S');
+  // This product is Freesize/M-only in practice, regardless of what the sizes data says
+  const availableSizes = product.id === 'e59bbfe1-abfa-439f-b433-88eb20d9d011' ? (['M'] as const) : normalizeSizes(product.sizes);
+  const [selectedSize, setSelectedSize] = useState<'S' | 'M' | null>(availableSizes.length === 1 ? availableSizes[0] : null);
   const [showStory, setShowStory] = useState(false);
   const [addedAnimation, setAddedAnimation] = useState(false);
   const [isPulsing, setIsPulsing] = useState(false);
+  const [sizeRequiredHint, setSizeRequiredHint] = useState(false);
 
   // Pulse when item is added to wishlist
   React.useEffect(() => {
@@ -83,6 +95,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
   }, [isWishlisted]);
 
   const handleAdd = () => {
+    if (!selectedSize) {
+      setSizeRequiredHint(true);
+      setTimeout(() => setSizeRequiredHint(false), 1200);
+      return;
+    }
     onAddProductToCart(product, selectedSize);
     setAddedAnimation(true);
     setTimeout(() => {
@@ -264,7 +281,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               {lang === 'zh' ? '快速加入' : 'Quick Add'}
             </span>
             <div className="flex gap-1.5">
-              {(['S', 'M'] as const).map((sz) => (
+              {availableSizes.map((sz) => (
                 <button
                   key={sz}
                   onClick={(e) => {
@@ -282,7 +299,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               ))}
             </div>
           </div>
-          
+
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -293,6 +310,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
             } ${
               addedAnimation
                 ? 'bg-emerald-500 text-white shadow-emerald-100'
+                : sizeRequiredHint
+                ? 'bg-red-400 text-white'
                 : isMinimal
                 ? 'bg-zinc-900 hover:bg-zinc-800 text-white'
                 : `${activeTheme.primaryBg} ${activeTheme.primaryHover} text-white hover:shadow-md ${activeTheme.btnShadow}`
@@ -302,10 +321,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
               <>
                 <Check className="w-3.5 h-3.5" /> {lang === 'zh' ? '已加入！' : 'Added!'}
               </>
-            ) : (
+            ) : sizeRequiredHint ? (
+              <>{lang === 'zh' ? '请先选择尺码' : 'Please select a size'}</>
+            ) : selectedSize ? (
               <>
                 <ShoppingBag className="w-3 h-3" /> {lang === 'zh' ? `加入 ${selectedSize} 码 · RM ${product.price}` : `Add Size ${selectedSize} · RM ${product.price}`}
               </>
+            ) : (
+              <>{lang === 'zh' ? `选择尺码 · RM ${product.price}` : `Select Size · RM ${product.price}`}</>
             )}
           </button>
         </div>
@@ -340,9 +363,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
         {/* Interactive size and action buttons */}
         <div className={`space-y-2 pt-1 border-t ${isMinimal ? 'border-zinc-200' : 'border-[var(--theme-primary-soft)]/30'}`}>
           <div className="flex items-center justify-between text-xs font-sans">
-            <span className="text-zinc-400">{lang === 'zh' ? '可选尺码 S&M：' : 'Available S&M sizes:'}</span>
+            <span className="text-zinc-400">
+              {availableSizes.length === 1
+                ? (lang === 'zh' ? `仅 ${availableSizes[0]} 码：` : `${availableSizes[0]} size only:`)
+                : (lang === 'zh' ? '可选尺码 S&M：' : 'Available S&M sizes:')}
+            </span>
             <div className="flex gap-1.5">
-              {(['S', 'M'] as const).map((sz) => (
+              {availableSizes.map((sz) => (
                 <button
                   key={sz}
                   onClick={() => setSelectedSize(sz)}
@@ -417,6 +444,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
             } ${
               addedAnimation
                 ? 'bg-emerald-500 text-white shadow-emerald-100'
+                : sizeRequiredHint
+                ? 'bg-red-400 text-white'
                 : isMinimal
                 ? 'bg-zinc-900 hover:bg-zinc-800 text-white'
                 : `${activeTheme.primaryBg} ${activeTheme.primaryHover} text-white hover:shadow-md ${activeTheme.btnShadow}`
@@ -426,6 +455,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
               <>
                 <Check className="w-4 h-4" /> {lang === 'zh' ? '已加入购物袋！' : 'Added to Bag!'}
               </>
+            ) : sizeRequiredHint ? (
+              <>{lang === 'zh' ? '请先选择尺码' : 'Please select a size'}</>
             ) : (
               <>
                 <ShoppingBag className="w-3.5 h-3.5" /> {lang === 'zh' ? '加入购物袋' : 'Add Ready-to-Wear'}

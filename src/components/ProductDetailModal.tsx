@@ -12,6 +12,15 @@ interface ProductDetailModalProps {
   onToggleWishlist: (product: Product) => void;
 }
 
+// product.sizes may be plain strings (['S','M']) or, for color-variant products,
+// objects like {size, color, stock} used for per-color inventory — normalize to labels.
+function normalizeSizes(sizes: unknown): ('S' | 'M')[] {
+  if (!Array.isArray(sizes) || sizes.length === 0) return ['S', 'M'];
+  const labels = sizes.map((s: any) => (typeof s === 'string' ? s : s?.size)).filter(Boolean);
+  const unique = Array.from(new Set(labels)) as ('S' | 'M')[];
+  return unique.length > 0 ? unique : ['S', 'M'];
+}
+
 export default function ProductDetailModal({
   product,
   isOpen,
@@ -21,11 +30,14 @@ export default function ProductDetailModal({
   isWishlisted,
   onToggleWishlist
 }: ProductDetailModalProps) {
-  const [selectedSize, setSelectedSize] = useState<'S' | 'M'>('S');
-  const [selectedColor, setSelectedColor] = useState<'White' | 'Pink' | 'Black'>('White');
+  // This product is Freesize/M-only in practice, regardless of what the sizes data says
+  const availableSizes = product.id === 'e59bbfe1-abfa-439f-b433-88eb20d9d011' ? (['M'] as const) : normalizeSizes(product.sizes);
+  const [selectedSize, setSelectedSize] = useState<'S' | 'M' | null>(availableSizes.length === 1 ? availableSizes[0] : null);
+  const [selectedColor, setSelectedColor] = useState<'White' | 'Pink' | 'Black' | null>(null);
   const isColorProduct = product.sku === '011' || product.id === 'e59bbfe1-abfa-439f-b433-88eb20d9d011';
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [addedToCart, setAddedToCart] = useState(false);
+  const [selectionRequiredHint, setSelectionRequiredHint] = useState<string | null>(null);
   
   // Sizing Fairy Calculator State
   const [height, setHeight] = useState<string>("");
@@ -46,8 +58,18 @@ export default function ProductDetailModal({
   ].filter(Boolean) as string[];
 
   const handleAddToCart = () => {
+    if (!selectedSize) {
+      setSelectionRequiredHint(tx('Please select a size', '请先选择尺码'));
+      setTimeout(() => setSelectionRequiredHint(null), 1500);
+      return;
+    }
+    if (isColorProduct && !selectedColor) {
+      setSelectionRequiredHint(tx('Please select a color', '请先选择颜色'));
+      setTimeout(() => setSelectionRequiredHint(null), 1500);
+      return;
+    }
     let finalProduct = product;
-    if (isColorProduct) {
+    if (isColorProduct && selectedColor) {
       const colorNameMap = {
         White: { en: 'White', zh: '白色' },
         Pink: { en: 'Pink', zh: '粉色' },
@@ -297,7 +319,7 @@ export default function ProductDetailModal({
             <div className="flex items-center justify-between text-xs font-sans pt-2">
               <span className="text-zinc-500 font-medium">{tx("Choose your drape size / 尺码:", "选择尺码:")}</span>
               <div className="flex gap-2">
-                {(['S', 'M'] as const).map((sz) => (
+                {availableSizes.map((sz) => (
                   <button
                     key={sz}
                     onClick={() => setSelectedSize(sz)}
@@ -321,6 +343,8 @@ export default function ProductDetailModal({
               className={`flex-1 py-3 text-xs font-bold font-sans transition-all duration-300 flex items-center justify-center gap-2 rounded-xl shadow-xs cursor-pointer ${
                 addedToCart
                   ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-100'
+                  : selectionRequiredHint
+                  ? 'bg-red-400 text-white'
                   : 'bg-[#B96A73] hover:bg-[#a55962] text-white hover:shadow-md'
               }`}
             >
@@ -328,9 +352,15 @@ export default function ProductDetailModal({
                 <>
                   <Check className="w-4 h-4" /> {tx("Added to bag!", "包裹已打结装箱！")}
                 </>
-              ) : (
+              ) : selectionRequiredHint ? (
+                <>{selectionRequiredHint}</>
+              ) : selectedSize ? (
                 <>
                   <ShoppingBag className="w-4 h-4" /> {tx(`Add Ready-to-Wear (${selectedSize})`, `加入购物车 (${selectedSize})`)}
+                </>
+              ) : (
+                <>
+                  <ShoppingBag className="w-4 h-4" /> {tx("Select Options to Continue", "请选择尺码/颜色")}
                 </>
               )}
             </button>

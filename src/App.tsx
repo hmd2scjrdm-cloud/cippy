@@ -2748,43 +2748,43 @@ export default function App() {
                         {lang === 'zh' ? '新品热预览' : 'HOT RELEASE PREVIEW'}
                       </span>
                       <div className="grid grid-cols-2 gap-4">
-                        {/* Blush Drape Coat */}
-                        <div 
+                        {/* Ribbed Crewneck Tee */}
+                        <div
                           onClick={() => {
-                            setSelectedCategory('outerwear');
-                            document.getElementById('garments-section')?.scrollIntoView({ behavior: 'smooth' });
+                            const p = dbProducts.find(p => p.id === 'e59bbfe1-abfa-439f-b433-88eb20d9d011');
+                            if (p) setSelectedProduct(p);
                           }}
                           className="group relative bg-[#FFF0F2]/40 border border-[#FBEBF0] rounded-2xl p-4 flex flex-col justify-between h-[160px] overflow-hidden hover:bg-[#FFF0F2]/60 transition-all duration-300 cursor-pointer"
                         >
                           <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-[#B96A73]" />
                           <div className="w-full h-1/2 bg-[#FFF0F2]/70 rounded-lg flex items-center justify-center">
-                            <span className="font-serif italic text-[#B96A73] text-lg font-semibold">Coat</span>
+                            <span className="font-serif italic text-[#B96A73] text-lg font-semibold">{lang === 'zh' ? '圆领T' : 'Tee'}</span>
                           </div>
                           <div className="space-y-0.5 pt-1">
                             <h4 className="text-[10px] sm:text-[11px] font-sans font-bold text-zinc-700 tracking-wider uppercase group-hover:text-[#B96A73] transition-colors line-clamp-1">
-                              BLUSH DRAPE COAT
+                              {lang === 'zh' ? '版型超正圆领T' : 'RIBBED CREWNECK TEE'}
                             </h4>
-                            <span className="text-[10px] font-mono text-[#B96A73] font-semibold">RM 249</span>
+                            <span className="text-[10px] font-mono text-[#B96A73] font-semibold">RM 15</span>
                           </div>
                         </div>
 
-                        {/* Silk Loose Trouser */}
-                        <div 
+                        {/* Drawstring Casual Shorts */}
+                        <div
                           onClick={() => {
-                            setSelectedCategory('bottoms');
-                            document.getElementById('garments-section')?.scrollIntoView({ behavior: 'smooth' });
+                            const p = dbProducts.find(p => p.id === 'bef1b190-bd86-4e1f-b3c4-c2ce24c79bca');
+                            if (p) setSelectedProduct(p);
                           }}
                           className="group relative bg-[#FFF0F2]/40 border border-[#FBEBF0] rounded-2xl p-4 flex flex-col justify-between h-[160px] overflow-hidden hover:bg-[#FFF0F2]/60 transition-all duration-300 cursor-pointer"
                         >
                           <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-[#B96A73]" />
                           <div className="w-full h-1/2 bg-[#FFF0F2]/70 rounded-lg flex items-center justify-center">
-                            <span className="font-serif italic text-[#B96A73] text-lg font-semibold">Pants</span>
+                            <span className="font-serif italic text-[#B96A73] text-lg font-semibold">{lang === 'zh' ? '短裤' : 'Shorts'}</span>
                           </div>
                           <div className="space-y-0.5 pt-1">
                             <h4 className="text-[10px] sm:text-[11px] font-sans font-bold text-zinc-700 tracking-wider uppercase group-hover:text-[#B96A73] transition-colors line-clamp-1">
-                              SILK LOOSE TROUSER
+                              {lang === 'zh' ? '日常必备抽绳休闲短裤' : 'DRAWSTRING CASUAL SHORTS'}
                             </h4>
-                            <span className="text-[10px] font-mono text-[#B96A73] font-semibold">RM 189</span>
+                            <span className="text-[10px] font-mono text-[#B96A73] font-semibold">RM 36</span>
                           </div>
                         </div>
                       </div>

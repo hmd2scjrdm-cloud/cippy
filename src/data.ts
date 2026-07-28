@@ -54,7 +54,6 @@ export const products: Product[] = [
     "category": "tops",
     "price": 15,
     "sizes": [
-      "S",
       "M"
     ],
     "description": "A super flattering waist-fit crewneck ribbed tee. Crafted from lightweight, breathable ribbed fabric. Freesize, suitable for 45-50kg. Available in White, Pink, Black.",
