@@ -1299,7 +1299,9 @@ export default function App() {
                       (p.category || "").toLowerCase() === 'outerwear' ? 'outerwear' :
                       (p.category || "").toLowerCase() === 'set' || (p.category || "").toLowerCase() === 'sets' ? 'sets' : 'dresses',
             price: Number(p.price_myr || p.price || 0),
+            sku: p.sku || undefined,
             sizes: Array.isArray(p.sizes) ? p.sizes : ['S', 'M'],
+            color_images: p.color_images && typeof p.color_images === 'object' ? p.color_images : undefined,
             description: p.description || "",
             cnDescription: p.description_zh || p.description || "",
             story: p.story || "",

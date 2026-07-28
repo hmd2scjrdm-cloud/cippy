@@ -12,13 +12,28 @@ interface ProductDetailModalProps {
   onToggleWishlist: (product: Product) => void;
 }
 
-// product.sizes may be plain strings (['S','M']) or, for color-variant products,
-// objects like {size, color, stock} used for per-color inventory — normalize to labels.
-function normalizeSizes(sizes: unknown): ('S' | 'M')[] {
+// product.sizes may be plain strings (['S','M']) or, for color-variant products set up in the
+// admin product manager, per-color/size stock entries like {size, color, stock}.
+function isColorSizeEntry(sizes: unknown): sizes is { size: string; color: string; stock?: number }[] {
+  return Array.isArray(sizes) && sizes.length > 0 && typeof sizes[0] === 'object' && sizes[0] !== null && 'color' in (sizes[0] as object);
+}
+
+// Unique color names configured for this product in the admin panel (empty if none = no color choice needed)
+function getColorOptions(sizes: unknown): string[] {
+  if (!isColorSizeEntry(sizes)) return [];
+  return Array.from(new Set(sizes.map(s => s.color).filter(Boolean)));
+}
+
+// Sizes available for the given color (or all sizes if no color selected yet / not a color product)
+function getSizesForColor(sizes: unknown, color: string | null): ('S' | 'M')[] {
   if (!Array.isArray(sizes) || sizes.length === 0) return ['S', 'M'];
-  const labels = sizes.map((s: any) => (typeof s === 'string' ? s : s?.size)).filter(Boolean);
-  const unique = Array.from(new Set(labels)) as ('S' | 'M')[];
-  return unique.length > 0 ? unique : ['S', 'M'];
+  if (!isColorSizeEntry(sizes)) {
+    const labels = Array.from(new Set(sizes.filter((s: any) => typeof s === 'string'))) as ('S' | 'M')[];
+    return labels.length > 0 ? labels : ['S', 'M'];
+  }
+  const filtered = color ? sizes.filter(s => s.color === color) : sizes;
+  const labels = Array.from(new Set(filtered.map(s => s.size).filter(Boolean))) as ('S' | 'M')[];
+  return labels.length > 0 ? labels : ['S', 'M'];
 }
 
 export default function ProductDetailModal({
@@ -30,15 +45,25 @@ export default function ProductDetailModal({
   isWishlisted,
   onToggleWishlist
 }: ProductDetailModalProps) {
-  // This product is Freesize/M-only in practice, regardless of what the sizes data says
-  const availableSizes = product.id === 'e59bbfe1-abfa-439f-b433-88eb20d9d011' ? (['M'] as const) : normalizeSizes(product.sizes);
+  const colorOptions = getColorOptions(product.sizes);
+  const isColorProduct = colorOptions.length > 0;
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const availableSizes = getSizesForColor(product.sizes, selectedColor);
   const [selectedSize, setSelectedSize] = useState<'S' | 'M' | null>(availableSizes.length === 1 ? availableSizes[0] : null);
-  const [selectedColor, setSelectedColor] = useState<'White' | 'Pink' | 'Black' | null>(null);
-  const isColorProduct = product.sku === '011' || product.id === 'e59bbfe1-abfa-439f-b433-88eb20d9d011';
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [addedToCart, setAddedToCart] = useState(false);
   const [selectionRequiredHint, setSelectionRequiredHint] = useState<string | null>(null);
-  
+
+  // Auto-pick the size when a color leaves only one option; clear it if it's no longer valid
+  React.useEffect(() => {
+    if (availableSizes.length === 1) {
+      setSelectedSize(availableSizes[0]);
+    } else if (selectedSize && !availableSizes.includes(selectedSize)) {
+      setSelectedSize(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedColor]);
+
   // Sizing Fairy Calculator State
   const [height, setHeight] = useState<string>("");
   const [weight, setWeight] = useState<string>("");
@@ -70,17 +95,13 @@ export default function ProductDetailModal({
     }
     let finalProduct = product;
     if (isColorProduct && selectedColor) {
-      const colorNameMap = {
-        White: { en: 'White', zh: '白色' },
-        Pink: { en: 'Pink', zh: '粉色' },
-        Black: { en: 'Black', zh: '黑色' }
-      };
-      const col = colorNameMap[selectedColor];
+      const slug = selectedColor.toLowerCase().replace(/\s+/g, '-');
       finalProduct = {
         ...product,
-        id: `${product.id}-${selectedColor.toLowerCase()}`,
-        name: `${product.name} - ${col.en}`,
-        cnName: `${product.cnName} - ${col.zh}`
+        id: `${product.id}-${slug}`,
+        name: `${product.name} - ${selectedColor}`,
+        cnName: `${product.cnName} - ${selectedColor}`,
+        imageUrl: product.color_images?.[selectedColor] || product.imageUrl,
       };
     }
     onAddProductToCart(finalProduct, selectedSize);
@@ -290,27 +311,34 @@ export default function ProductDetailModal({
 
             {/* Colors selector (if applicable) */}
             {isColorProduct && (
-              <div className="flex items-center justify-between text-xs font-sans pt-2 border-t border-pink-100/30">
-                <span className="text-zinc-500 font-medium">{tx("Choose Color / 颜色:", "选择颜色:")}</span>
-                <div className="flex gap-2.5">
-                  {[
-                    { id: 'White', nameEn: 'White', nameZh: '白色', hex: '#FFFFFF', border: 'border-zinc-300' },
-                    { id: 'Pink', nameEn: 'Pink', nameZh: '粉色', hex: '#FBCFE8', border: 'border-transparent' },
-                    { id: 'Black', nameEn: 'Black', nameZh: '黑色', hex: '#18181B', border: 'border-transparent' }
-                  ].map((col) => (
-                    <button
-                      key={col.id}
-                      type="button"
-                      onClick={() => setSelectedColor(col.id as any)}
-                      className={`relative w-6 h-6 rounded-full border transition-all cursor-pointer ${col.border} flex items-center justify-center`}
-                      style={{ backgroundColor: col.hex }}
-                      title={tx(col.nameEn, col.nameZh)}
-                    >
-                      {selectedColor === col.id && (
-                        <Check className={`w-3.5 h-3.5 ${col.id === 'White' ? 'text-zinc-800' : 'text-white'}`} />
-                      )}
-                    </button>
-                  ))}
+              <div className="flex items-center justify-between text-xs font-sans pt-2 border-t border-pink-100/30 gap-2">
+                <span className="text-zinc-500 font-medium shrink-0">{tx("Choose Color / 颜色:", "选择颜色:")}</span>
+                <div className="flex gap-2 flex-wrap justify-end">
+                  {colorOptions.map((col) => {
+                    const swatchImg = product.color_images?.[col];
+                    return (
+                      <button
+                        key={col}
+                        type="button"
+                        onClick={() => setSelectedColor(col)}
+                        title={col}
+                        className={`relative rounded-full border-2 transition-all cursor-pointer overflow-hidden flex items-center justify-center ${
+                          selectedColor === col ? 'border-[#B96A73]' : 'border-zinc-200'
+                        } ${swatchImg ? 'w-7 h-7' : 'px-2.5 h-7 text-[10px] font-semibold whitespace-nowrap ' + (selectedColor === col ? 'text-[#B96A73] bg-[#FFF0F2]' : 'text-zinc-600')}`}
+                      >
+                        {swatchImg ? (
+                          <>
+                            <img src={swatchImg} alt={col} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                            {selectedColor === col && (
+                              <span className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                <Check className="w-3.5 h-3.5 text-white" />
+                              </span>
+                            )}
+                          </>
+                        ) : col}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}

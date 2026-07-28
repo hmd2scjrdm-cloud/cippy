@@ -5,7 +5,9 @@ export interface Product {
   cnName: string;
   category: string;
   price: number; // In RM (Malaysian Ringgit)
-  sizes: string[];
+  // Plain size labels, or per-color/size stock entries set up in the admin product manager
+  sizes: string[] | { size: string; color: string; stock?: number }[];
+  color_images?: Record<string, string>; // Optional: color name -> photo URL, set in the admin product manager
   description: string;
   cnDescription: string;
   story: string; // The "storybook" fairytale style description
