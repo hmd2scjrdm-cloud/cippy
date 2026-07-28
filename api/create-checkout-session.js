@@ -189,7 +189,7 @@ export default async function handler(req, res) {
 
   // Sequential order number starting from 100010
   const countRes = await fetch(`${SUPABASE_URL}/rest/v1/orders?select=id`, {
-    headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${token}`, Prefer: 'count=exact', Range: '0-0' },
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${token || SUPABASE_ANON_KEY}`, Prefer: 'count=exact', Range: '0-0' },
   });
   const contentRange = countRes.headers.get('content-range') || '0/0';
   const totalOrders = parseInt(contentRange.split('/')[1] || '0', 10);
@@ -199,7 +199,7 @@ export default async function handler(req, res) {
   const productIds = [...new Set(items.map(i => i.product_id || i.id).filter(Boolean))];
   const priceRes = await fetch(
     `${SUPABASE_URL}/rest/v1/products?id=in.(${productIds.join(',')})&select=id,price_myr,name_zh,name,image_url`,
-    { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${token}` } }
+    { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${token || SUPABASE_ANON_KEY}` } }
   );
   const dbProducts = priceRes.ok ? await priceRes.json() : [];
   const priceMap = Object.fromEntries(dbProducts.map(p => [p.id, p]));
