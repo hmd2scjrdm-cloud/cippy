@@ -4996,6 +4996,7 @@ export default function App() {
                 refreshProfileAndOrders();
               }}
               onBack={() => setActiveTab('rtw')}
+              onViewPolicies={() => setActiveTab('policies')}
               returnState={checkoutReturnState}
               isConfirmingReturn={isConfirmingReturn}
               onDismissReturnState={() => {
