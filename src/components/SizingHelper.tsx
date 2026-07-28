@@ -155,7 +155,7 @@ export default function SizingHelper({ activeTheme: activeThemeProp, activeArche
             <input
               type="range"
               min="38"
-              max="75"
+              max="72"
               value={weight}
               onChange={(e) => setWeight(Number(e.target.value))}
               className={`w-full h-1.5 rounded-lg appearance-none cursor-pointer ${
@@ -165,7 +165,7 @@ export default function SizingHelper({ activeTheme: activeThemeProp, activeArche
             <div className="flex justify-between text-[10px] text-zinc-400 font-mono">
               <span>38 kg</span>
               <span>55 kg</span>
-              <span>75 kg</span>
+              <span>72 kg</span>
             </div>
           </div>
 
