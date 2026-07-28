@@ -8,6 +8,7 @@ import SizingHelper from './components/SizingHelper';
 import MixMatchRoom from './components/MixMatchRoom';
 import ProductCard from './components/ProductCard';
 import ShoppingBagDrawer from './components/ShoppingBag';
+import CheckoutPage from './components/CheckoutPage';
 import ProductDetailModal from './components/ProductDetailModal';
 import { supabase } from './lib/supabase';
 import { signInWithGoogleGmail, sendGmailMessage, logoutGmail, getGmailToken, getGmailEmail } from './lib/gmailService';
@@ -246,7 +247,7 @@ export default function App() {
   } : baseTheme;
 
   // Navigation tab states
-  const [activeTab, setActiveTab] = useState<'rtw' | 'atelier' | 'journal' | 'policies' | 'account' | 'alerts'>('rtw');
+  const [activeTab, setActiveTab] = useState<'rtw' | 'atelier' | 'journal' | 'policies' | 'account' | 'alerts' | 'checkout'>('rtw');
   const [atelierSubTab, setAtelierSubTab] = useState<'sizing' | 'mirror'>('sizing');
   const [selectedPolicyId, setSelectedPolicyId] = useState<string>('shopping');
   const [faqOpenIndex, setFaqOpenIndex] = useState<number | null>(null);
@@ -828,6 +829,7 @@ export default function App() {
 
   // Cart state
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [giftBoxTopup, setGiftBoxTopup] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCartAnimating, setIsCartAnimating] = useState(false);
   
@@ -1629,7 +1631,75 @@ export default function App() {
     setCartItems([]);
   };
 
+  const refreshProfileAndOrders = async () => {
+    if (!supabase || !currentUser) return;
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('points, total_spent, tier')
+        .eq('id', currentUser.id)
+        .single();
+      if (profile) setUserProfile(profile);
+
+      const { data: orders } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false });
+      if (orders) setUserOrders(orders);
+    } catch (err) {
+      console.error("Refresh profile & orders failed:", err);
+    }
+  };
+
   const totalCartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+
+  // Handle return from Stripe Checkout redirect (?checkout=success|cancelled&order=...&session_id=...)
+  const [checkoutReturnState, setCheckoutReturnState] = useState<{ status: 'success' | 'cancelled'; orderId?: string } | null>(null);
+  const [isConfirmingReturn, setIsConfirmingReturn] = useState(false);
+
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const checkout = params.get('checkout');
+    if (!checkout) return;
+
+    setActiveTab('checkout');
+    const cleanUrl = () => window.history.replaceState({}, '', window.location.pathname);
+
+    if (checkout === 'cancelled') {
+      setCheckoutReturnState({ status: 'cancelled' });
+      cleanUrl();
+      return;
+    }
+
+    if (checkout === 'success') {
+      const orderId = params.get('order') || undefined;
+      const sessionId = params.get('session_id') || undefined;
+      setIsConfirmingReturn(true);
+      (async () => {
+        try {
+          const { data } = await supabase.auth.getSession();
+          const token = data.session?.access_token;
+          if (token && orderId) {
+            await fetch('/api/confirm-order', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+              body: JSON.stringify({ orderId, sessionId }),
+            });
+          }
+          setCartItems([]);
+          await refreshProfileAndOrders();
+        } catch (err) {
+          console.error('Order confirmation failed:', err);
+        } finally {
+          setCheckoutReturnState({ status: 'success', orderId });
+          setIsConfirmingReturn(false);
+          cleanUrl();
+        }
+      })();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div 
@@ -4892,6 +4962,27 @@ export default function App() {
             </div>
           )}
 
+          {activeTab === 'checkout' && (
+            <CheckoutPage
+              cartItems={cartItems}
+              giftBoxTopup={giftBoxTopup}
+              lang={lang}
+              currentUser={currentUser}
+              onOrderComplete={() => {
+                setCartItems([]);
+                setGiftBoxTopup(false);
+                refreshProfileAndOrders();
+              }}
+              onBack={() => setActiveTab('rtw')}
+              returnState={checkoutReturnState}
+              isConfirmingReturn={isConfirmingReturn}
+              onDismissReturnState={() => {
+                setCheckoutReturnState(null);
+                setActiveTab('rtw');
+              }}
+            />
+          )}
+
           {activeTab === 'alerts' && isAdminUser && (
             <div className="space-y-8 animate-fade-in-up">
               {/* Header Banner */}
@@ -5551,25 +5642,13 @@ export default function App() {
         lang={lang}
         currentUser={currentUser}
         userProfile={userProfile}
-        onRefreshProfileAndOrders={async () => {
-          if (!supabase || !currentUser) return;
-          try {
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('points, total_spent, tier')
-              .eq('id', currentUser.id)
-              .single();
-            if (profile) setUserProfile(profile);
-
-            const { data: orders } = await supabase
-              .from('orders')
-              .select('*')
-              .eq('user_id', currentUser.id)
-              .order('created_at', { ascending: false });
-            if (orders) setUserOrders(orders);
-          } catch (err) {
-            console.error("Refresh profile & orders failed:", err);
-          }
+        onRefreshProfileAndOrders={refreshProfileAndOrders}
+        giftBoxTopup={giftBoxTopup}
+        onToggleGiftBoxTopup={setGiftBoxTopup}
+        onProceedToCheckout={() => {
+          setIsCartOpen(false);
+          setActiveTab('checkout');
+          document.getElementById('nabi-studio-app-card')?.scrollIntoView({ behavior: 'smooth' });
         }}
       />
 
