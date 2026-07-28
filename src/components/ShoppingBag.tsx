@@ -57,12 +57,19 @@ export default function ShoppingBagDrawer({
   const [placedOrderNumber, setPlacedOrderNumber] = useState("");
   const [isPlacing, setIsPlacing] = useState(false);
 
+  // Auto fill details if user logged in
+  React.useEffect(() => {
+    if (currentUser) {
+      if (!fullName) setFullName(currentUser.user_metadata?.name || "");
+    }
+  }, [currentUser]);
+
   if (!isOpen) return null;
 
   const totalItemCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const subtotal = cartItems.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
   const giftBoxFee = giftBoxTopup ? 10 : 0;
-  
+
   // Free shipping threshold at RM 150 (as in legacy cart.html)
   const shippingThreshold = 150;
   const isFreeShipping = subtotal >= shippingThreshold;
@@ -71,13 +78,6 @@ export default function ShoppingBagDrawer({
   const gapToFreeShipping = shippingThreshold - subtotal;
 
   const tx = (en: string, zh: string) => (lang === 'zh' ? zh : en);
-
-  // Auto fill details if user logged in
-  React.useEffect(() => {
-    if (currentUser) {
-      if (!fullName) setFullName(currentUser.user_metadata?.name || "");
-    }
-  }, [currentUser]);
 
   const handleReceiptUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
