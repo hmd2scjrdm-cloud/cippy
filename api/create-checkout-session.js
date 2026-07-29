@@ -209,9 +209,12 @@ export default async function handler(req, res) {
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-  // Sequential order number starting from 100010
+  // Sequential order number starting from 10010. Must use the service role key here — anon/user
+  // tokens can't see other customers' orders under RLS, so the count silently came back as 0 and
+  // every single order was getting the same number ("10010").
+  const orderCountKey = process.env.SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY;
   const countRes = await fetch(`${SUPABASE_URL}/rest/v1/orders?select=id`, {
-    headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${token || SUPABASE_ANON_KEY}`, Prefer: 'count=exact', Range: '0-0' },
+    headers: { apikey: orderCountKey, Authorization: `Bearer ${orderCountKey}`, Prefer: 'count=exact', Range: '0-0' },
   });
   const contentRange = countRes.headers.get('content-range') || '0/0';
   const totalOrders = parseInt(contentRange.split('/')[1] || '0', 10);

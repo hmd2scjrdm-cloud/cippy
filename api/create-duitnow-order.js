@@ -85,14 +85,16 @@ export default async function handler(req, res) {
   const verifiedSubtotal = items.reduce((s, i) => s + i._verified_price * Number(i.qty || 1), 0);
   const verifiedTotal = verifiedSubtotal + shipping;
 
-  // Sequential order ID
+  // Sequential order ID. Must count with the service role key — the anon key can't see
+  // other customers' orders under RLS, so the count always came back as 0 and every
+  // order was getting the same number ("10010").
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY;
   const countRes = await fetch(`${SUPABASE_URL}/rest/v1/orders?select=id`, {
-    headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, Prefer: "count=exact", Range: "0-0" },
+    headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}`, Prefer: "count=exact", Range: "0-0" },
   });
   const contentRange = countRes.headers.get("content-range") || "0/0";
   const totalOrders = parseInt(contentRange.split("/")[1] || "0", 10);
   const orderId = String(10010 + totalOrders);
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY;
 
   // Save order to Supabase (service role key bypasses RLS)
   const saveRes = await sbFetch("orders", {
