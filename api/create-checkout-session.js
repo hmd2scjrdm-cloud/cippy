@@ -9,6 +9,28 @@ function clean(v, fallback = "") {
   return String(v ?? fallback).replace(/[<>]/g, "").trim();
 }
 
+function publicOrigin(req) {
+  const raw = String(req.headers.origin || process.env.APP_URL || "https://cippy.vercel.app").trim();
+  try {
+    const url = new URL(raw);
+    if (url.protocol === "https:" || url.hostname === "localhost" || url.hostname === "127.0.0.1") {
+      return url.origin;
+    }
+  } catch {}
+  return "https://cippy.vercel.app";
+}
+
+function stripeImageUrl(value, origin) {
+  const raw = String(value || "").trim();
+  if (!raw) return undefined;
+  try {
+    const url = new URL(raw, origin);
+    return url.protocol === "https:" ? url.href : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 async function getVerifiedUser(req) {
   const token = (req.headers.authorization || "").replace("Bearer ", "");
   if (!token) return null;
@@ -224,18 +246,22 @@ export default async function handler(req, res) {
   // Rebuild totals from verified prices
   const verifiedTotals = { ...totals, subtotal: verifiedSubtotal, total: verifiedTotal };
 
-  const line_items = items.map(item => ({
-    price_data: {
-      currency: "myr",
-      product_data: {
-        name: String(item.name_zh || item.name || "Item"),
-        description: [item.size, item.color, item.variant].filter(Boolean).join(" / ") || undefined,
-        images: item.image_url ? [item.image_url] : undefined,
+  const origin = publicOrigin(req);
+  const line_items = items.map(item => {
+    const imageUrl = stripeImageUrl(item.image_url || priceMap[item.product_id || item.id]?.image_url, origin);
+    return {
+      price_data: {
+        currency: "myr",
+        product_data: {
+          name: String(item.name_zh || item.name || "Item"),
+          description: [item.size, item.color, item.variant].filter(Boolean).join(" / ") || undefined,
+          ...(imageUrl ? { images: [imageUrl] } : {}),
+        },
+        unit_amount: Math.round(item._verified_price * 100),
       },
-      unit_amount: Math.round(item._verified_price * 100),
-    },
-    quantity: Number(item.qty || 1),
-  }));
+      quantity: Number(item.qty || 1),
+    };
+  });
 
   if (shipping > 0) {
     line_items.push({
@@ -244,7 +270,6 @@ export default async function handler(req, res) {
     });
   }
 
-  const origin = req.headers.origin || "https://cippy.vercel.app";
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ["card"],
     mode: "payment",
@@ -286,7 +311,7 @@ export default async function handler(req, res) {
       const html = buildEmailHtml({ orderId, customer, items, totals, pointsEarned: 0 });
       await transporter.sendMail({
         from: `Cippy <${process.env.GMAIL_USER}>`,
-        to: user.email,
+        to: user?.email || customer.email,
         bcc: process.env.ORDER_NOTIFY_EMAIL || process.env.GMAIL_USER,
         subject: `Cippy 订单确认 ${orderId}`,
         html,

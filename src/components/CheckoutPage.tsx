@@ -233,8 +233,11 @@ export default function CheckoutPage({
         headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify(buildRequestBody()),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || tx('Could not start Stripe checkout', '无法启动 Stripe 结账'));
+      const contentType = res.headers.get('content-type') || '';
+      const data = contentType.includes('application/json') ? await res.json() : { error: await res.text() };
+      if (!res.ok) {
+        throw new Error(data.error || tx('Could not start Stripe checkout. Please choose DuitNow or try again later.', '无法启动信用卡结账，请先使用 DuitNow 或稍后再试。'));
+      }
       const url = typeof data.url === 'string' ? data.url.trim() : '';
       if (!/^https:\/\//.test(url)) {
         throw new Error(tx('Stripe did not return a valid checkout link. Please try again.', 'Stripe 未返回有效的结账链接，请重试。'));
