@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { products, mixMatchTops, mixMatchBottoms } from './data';
 import { POLICIES, FAQS } from './data/policies';
 import { CartItem, Product, StoryChapter } from './types';
@@ -6032,6 +6033,7 @@ export default function App() {
         </div>
       )}
 
+    <Analytics />
     </div>
   );
 }
