@@ -1683,10 +1683,12 @@ export default function App() {
         try {
           const { data } = await supabase.auth.getSession();
           const token = data.session?.access_token;
-          if (token && orderId) {
+          // Confirm regardless of login — guests still need their order marked paid,
+          // they just won't earn member points (confirm-order.js handles that split).
+          if (orderId) {
             await fetch('/api/confirm-order', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+              headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
               body: JSON.stringify({ orderId, sessionId }),
             });
           }

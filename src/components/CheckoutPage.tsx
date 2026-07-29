@@ -75,6 +75,7 @@ export default function CheckoutPage({
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('manual');
   const [isPlacing, setIsPlacing] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [stripeRedirectUrl, setStripeRedirectUrl] = useState<string | null>(null);
   const [manualOrderPlaced, setManualOrderPlaced] = useState<{ orderId: string; total: number } | null>(null);
 
   const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>(loadSavedAddresses);
@@ -223,6 +224,7 @@ export default function CheckoutPage({
   const handleStripeSubmit = async () => {
     if (!validateForm()) return;
     setErrorMsg(null);
+    setStripeRedirectUrl(null);
     setIsPlacing(true);
     try {
       const token = await getAuthToken();
@@ -233,8 +235,19 @@ export default function CheckoutPage({
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || tx('Could not start Stripe checkout', '无法启动 Stripe 结账'));
+      const url = typeof data.url === 'string' ? data.url.trim() : '';
+      if (!/^https:\/\//.test(url)) {
+        throw new Error(tx('Stripe did not return a valid checkout link. Please try again.', 'Stripe 未返回有效的结账链接，请重试。'));
+      }
       maybeSaveAddress();
-      window.location.href = data.url;
+      // Some browsers (notably Safari) can throw on this assignment for reasons unrelated to
+      // the URL's actual validity — fall back to a manual link instead of leaving the user stuck.
+      try {
+        window.location.href = url;
+      } catch {
+        setStripeRedirectUrl(url);
+        setIsPlacing(false);
+      }
     } catch (e: any) {
       setErrorMsg(e.message || tx('Something went wrong, please try again.', '出了点问题，请重试。'));
       setIsPlacing(false);
@@ -511,6 +524,15 @@ export default function CheckoutPage({
 
           {errorMsg && (
             <div className="p-3 bg-red-50 border border-red-100 rounded-xl text-xs text-red-600">{errorMsg}</div>
+          )}
+
+          {stripeRedirectUrl && (
+            <a
+              href={stripeRedirectUrl}
+              className="block text-center p-3 bg-[#FFF0F2] border border-pink-200 rounded-xl text-xs font-bold text-[#B96A73] hover:bg-[#FFE4E8] transition-colors"
+            >
+              {tx('Your order is ready — tap here to continue to Stripe payment', '订单已就绪 — 点击这里前往 Stripe 完成付款')}
+            </a>
           )}
 
           <button

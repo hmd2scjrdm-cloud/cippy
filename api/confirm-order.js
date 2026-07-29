@@ -37,38 +37,6 @@ async function sbUpsert(path, body, token) {
   });
 }
 
-async function deductInventory(items, serviceKey) {
-  if (!serviceKey) return; // skip if no service role key configured
-  for (const item of items) {
-    const pid = item.product_id || item.id;
-    if (!pid) continue;
-    const qty = Number(item.qty || 1);
-
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/products?id=eq.${pid}&select=stock,sizes`, {
-      headers: headers(serviceKey),
-    });
-    if (!r.ok) continue;
-    const [prod] = await r.json();
-    if (!prod) continue;
-
-    const newStock = Math.max(0, Number(prod.stock || 0) - qty);
-
-    // Deduct from color×size matrix
-    const newSizes = (prod.sizes || []).map(s => {
-      if (s.color === item.color && s.size === item.size) {
-        return { ...s, stock: Math.max(0, Number(s.stock || 0) - qty) };
-      }
-      return s;
-    });
-
-    await fetch(`${SUPABASE_URL}/rest/v1/products?id=eq.${pid}`, {
-      method: "PATCH",
-      headers: { ...headers(serviceKey), Prefer: "return=minimal" },
-      body: JSON.stringify({ stock: newStock, sizes: newSizes }),
-    });
-  }
-}
-
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -81,10 +49,11 @@ export default async function handler(req, res) {
   const { orderId, sessionId } = req.body || {};
   if (!orderId) return res.status(400).json({ error: "Missing orderId" });
 
-  const user = await getVerifiedUser(token);
-  if (!user) return res.status(401).json({ error: "未登录" });
+  // Guests have no token — that's fine, we still confirm the order and mark it paid,
+  // we just skip the member-only points step below.
+  const user = token ? await getVerifiedUser(token) : null;
 
-  const orders = await sbGet(`orders?order_id=eq.${orderId}&select=*`, token);
+  const orders = await sbGet(`orders?order_id=eq.${orderId}&select=*`, SUPABASE_ANON_KEY);
   const order = orders?.[0];
   if (!order) return res.status(404).json({ error: "找不到订单" });
 
@@ -112,23 +81,24 @@ export default async function handler(req, res) {
     return res.status(402).json({ error: "支付未完成" });
   }
 
-  // Mark order paid
+  // Mark order paid. Inventory is NOT deducted here — create-checkout-session.js already
+  // reserved/deducted it when the order was first created, so doing it again here would
+  // double-deduct every paid Stripe order.
   await sbPatch(`orders?order_id=eq.${orderId}`, { status: "paid" }, SUPABASE_ANON_KEY);
 
-  // Deduct inventory (uses service role key to bypass RLS on products table)
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  try { await deductInventory(order.items || [], serviceKey); } catch (e) { console.error("Inventory deduct error:", e.message); }
-
-  // Award points
-  const orderTotal = Number(order.totals?.total || 0);
-  const profiles = await sbGet(`profiles?id=eq.${user.id}&select=points,total_spent,tier`, token);
-  const profile = profiles?.[0] || { points: 0, total_spent: 0, tier: "Classic" };
-  const newTotalSpent = Number(profile.total_spent || 0) + orderTotal;
-  const tier = newTotalSpent >= 2000 ? "Elite" : newTotalSpent >= 800 ? "Luxe" : "Classic";
-  const multiplier = tier === "Elite" ? 2 : tier === "Luxe" ? 1.5 : 1;
-  const pointsEarned = Math.floor(orderTotal * multiplier);
-  const newPoints = Number(profile.points || 0) + pointsEarned;
-  await sbUpsert("profiles", { id: user.id, points: newPoints, total_spent: newTotalSpent, tier }, token);
+  // Award points — members only, guests have no profile to credit
+  let pointsEarned = 0, newPoints = 0, tier = null;
+  if (user) {
+    const orderTotal = Number(order.totals?.total || 0);
+    const profiles = await sbGet(`profiles?id=eq.${user.id}&select=points,total_spent,tier`, token);
+    const profile = profiles?.[0] || { points: 0, total_spent: 0, tier: "Classic" };
+    const newTotalSpent = Number(profile.total_spent || 0) + orderTotal;
+    tier = newTotalSpent >= 2000 ? "Elite" : newTotalSpent >= 800 ? "Luxe" : "Classic";
+    const multiplier = tier === "Elite" ? 2 : tier === "Luxe" ? 1.5 : 1;
+    pointsEarned = Math.floor(orderTotal * multiplier);
+    newPoints = Number(profile.points || 0) + pointsEarned;
+    await sbUpsert("profiles", { id: user.id, points: newPoints, total_spent: newTotalSpent, tier }, token);
+  }
 
   return res.status(200).json({ ok: true, pointsEarned, newPoints, tier });
 }
