@@ -144,8 +144,10 @@ export default function CheckoutPage({
 
   const buildItemsPayload = () => {
     const items: any[] = cartItems.map(item => ({
-      product_id: item.product.id,
-      id: item.product.id,
+      // Color variants get a suffixed cart-line id (e.g. "...-白色上衣") so each color is a
+      // separate line — product_id must stay the real DB id or price verification fails.
+      product_id: item.product.baseProductId || item.product.id,
+      id: item.product.baseProductId || item.product.id,
       name: item.product.name,
       name_zh: item.product.cnName,
       qty: item.quantity,

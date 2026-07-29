@@ -1,5 +1,8 @@
 export interface Product {
   id: string;
+  // When a color variant is added to cart, `id` gets a color suffix so each color is a
+  // distinct cart line — baseProductId keeps the real DB id so checkout can still verify it.
+  baseProductId?: string;
   sku?: string;
   name: string;
   cnName: string;

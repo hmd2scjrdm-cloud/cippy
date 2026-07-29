@@ -99,6 +99,7 @@ export default function ProductDetailModal({
       finalProduct = {
         ...product,
         id: `${product.id}-${slug}`,
+        baseProductId: product.baseProductId || product.id,
         name: `${product.name} - ${selectedColor}`,
         cnName: `${product.cnName} - ${selectedColor}`,
         imageUrl: product.color_images?.[selectedColor] || product.imageUrl,
