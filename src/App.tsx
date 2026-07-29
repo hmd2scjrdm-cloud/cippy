@@ -1289,7 +1289,9 @@ export default function App() {
         }
 
         if (data && data.length > 0) {
-          const mapped: Product[] = data.map((p: any) => ({
+          // Admin's "上架中" toggle sets in_stock=false to delist a product — hide those from customers.
+          const listed = data.filter((p: any) => p.in_stock !== false);
+          const mapped: Product[] = listed.map((p: any) => ({
             id: String(p.id),
             name: p.name || "",
             cnName: p.name_zh || p.name || "",
