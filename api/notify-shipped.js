@@ -28,7 +28,7 @@ export default async function handler(req, res) {
   const admin = await getVerifiedUser(token);
   if (!admin || admin.email !== ADMIN_EMAIL) return res.status(403).json({ error: "无权限" });
 
-  const { id, trackingNumber } = req.body || {};
+  const { id, trackingNumber, photoUrl } = req.body || {};
   if (!id || !trackingNumber) return res.status(400).json({ error: "Missing id or trackingNumber" });
 
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY;
@@ -77,6 +77,7 @@ export default async function handler(req, res) {
               <p style="margin:0;font-size:18px;font-weight:700;color:#111827;font-family:monospace;letter-spacing:0.03em;">${tracking}</p>
             </div>
             <p style="margin:0 0 16px;font-size:13px;color:#6b7280;line-height:1.6;">您可以前往 <a href="https://spx.com.my" style="color:#C4928A;">spx.com.my</a> 官网，输入以上运单号查询实时物流状态。<br/>You can track your parcel in real time at <a href="https://spx.com.my" style="color:#C4928A;">spx.com.my</a> using the tracking number above.</p>
+            ${photoUrl ? `<p style="margin:0 0 8px;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#C4928A;font-weight:600;">打包实拍 / Packing Photo</p><img src="${clean(photoUrl)}" width="100%" style="border-radius:10px;display:block;margin-bottom:16px;max-height:320px;object-fit:cover;" alt="Packing photo"/>` : ""}
             <div style="border-top:1px solid #f3f4f6;margin:20px 0;"></div>
             <p style="margin:0 0 4px;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#9ca3af;font-weight:500;">寄送至 / Delivering to</p>
             <p style="margin:0 0 4px;font-size:14px;font-weight:600;color:#111827;">${clean(customer.name)}</p>

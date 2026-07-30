@@ -148,6 +148,12 @@
       onkeydown="if(event.key==='Enter')confirmShipping()"
       class="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#C4928A]"/>
     <p class="text-xs text-stone-400">保存后将自动发送发货邮件通知顾客（运单号可留空，之后再补填）</p>
+    <div>
+      <label class="block text-xs font-semibold text-stone-500 mb-1.5">出货照片（选填，会附在发货邮件里）</label>
+      <input id="shipmentPhotoInput" type="file" accept="image/*" onchange="previewShipmentPhoto(event)"
+        class="w-full text-xs text-stone-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-stone-100 file:text-stone-600 file:text-xs file:font-semibold hover:file:bg-stone-200"/>
+      <img id="shipmentPhotoPreview" class="hidden mt-2 rounded-xl max-h-32 w-full object-cover border border-stone-100"/>
+    </div>
     <div class="flex gap-3">
       <button onclick="closeTrackingModal()" class="flex-1 py-2.5 border border-stone-200 rounded-xl text-sm text-stone-500 hover:bg-stone-50">取消</button>
       <button id="confirmShipBtn" onclick="confirmShipping()" class="flex-1 py-2.5 bg-[#C4928A] text-white rounded-xl text-sm font-semibold hover:opacity-90">确认发货</button>
@@ -555,9 +561,16 @@ function renderOrders() {
             </div>
             ${o.status === 'shipped' || o.tracking_number ? `
             <div class="min-w-[140px]">
-              <p class="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-2">运单号</p>
+              <p class="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-2">运单号 · SPX Express</p>
               <p id="tracking_${o.id}" class="text-sm font-mono text-stone-700">${o.tracking_number || '—'}</p>
               <button onclick="event.stopPropagation();editTracking('${o.id}')" class="mt-2 text-xs text-[#C4928A] border border-[#C4928A] px-2 py-1 rounded hover:bg-[#fdf0ed]">修改运单号</button>
+            </div>` : ''}
+            ${c.shipment_photo_url ? `
+            <div class="min-w-[100px]">
+              <p class="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-2">出货照片</p>
+              <a href="${c.shipment_photo_url}" target="_blank" onclick="event.stopPropagation()">
+                <img src="${c.shipment_photo_url}" class="w-20 h-20 object-cover rounded-lg border border-stone-100 hover:opacity-80"/>
+              </a>
             </div>` : ''}
           </div>
         </td>
@@ -596,6 +609,7 @@ async function updateOrderStatus(id, status, selectEl) {
     const o = allOrders.find(x => x.id === id);
     document.getElementById('trackingInput').value = o?.tracking_number || '';
     document.getElementById('trackingOrderId').textContent = o?.order_id || '';
+    resetShipmentPhotoPicker();
     document.getElementById('trackingModal').classList.remove('hidden');
     document.getElementById('trackingInput').focus();
     return;
@@ -620,6 +634,46 @@ function updateBadge(id, status) {
 
 let pendingShipId = null;
 let pendingShipSelect = null;
+let pendingShipmentPhotoFile = null;
+
+function resetShipmentPhotoPicker() {
+  pendingShipmentPhotoFile = null;
+  const input = document.getElementById('shipmentPhotoInput');
+  const preview = document.getElementById('shipmentPhotoPreview');
+  if (input) input.value = '';
+  if (preview) { preview.src = ''; preview.classList.add('hidden'); }
+}
+
+function previewShipmentPhoto(event) {
+  const file = event.target.files?.[0];
+  if (!file) { pendingShipmentPhotoFile = null; return; }
+  pendingShipmentPhotoFile = file;
+  const preview = document.getElementById('shipmentPhotoPreview');
+  preview.src = URL.createObjectURL(file);
+  preview.classList.remove('hidden');
+}
+window.previewShipmentPhoto = previewShipmentPhoto;
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).split(',')[1] || '');
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadShipmentPhoto(token) {
+  const fileBase64 = await fileToBase64(pendingShipmentPhotoFile);
+  const r = await fetch('/api/upload-shipment-photo', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ fileBase64, fileName: pendingShipmentPhotoFile.name, contentType: pendingShipmentPhotoFile.type }),
+  });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || '照片上传失败');
+  return j.url;
+}
 
 async function confirmShipping() {
   const tracking = document.getElementById('trackingInput').value.trim();
@@ -629,16 +683,37 @@ async function confirmShipping() {
   const btn = document.getElementById('confirmShipBtn');
   btn.textContent = '保存中…'; btn.disabled = true;
 
+  const { data: { session } } = await sb.auth.getSession();
+  const token = session?.access_token || '';
+
+  let photoUrl = null;
+  if (pendingShipmentPhotoFile) {
+    btn.textContent = '上传照片中…';
+    try {
+      photoUrl = await uploadShipmentPhoto(token);
+    } catch (e) {
+      btn.textContent = '确认发货'; btn.disabled = false;
+      alert('照片上传失败，请重试：' + e.message);
+      return;
+    }
+  }
+
   const fromDropdown = !!pendingShipSelect;
+  const o = allOrders.find(x => x.id === id);
   const update = fromDropdown
     ? { status: 'shipped', tracking_number: tracking }
     : { tracking_number: tracking };
+  if (photoUrl) update.customer = { ...(o?.customer || {}), shipment_photo_url: photoUrl };
 
+  btn.textContent = '保存中…';
   const { error } = await sb.from('orders').update(update).eq('id', id);
   if (error) { btn.textContent = '确认发货'; btn.disabled = false; alert('保存失败：' + error.message); return; }
 
-  const o = allOrders.find(x => x.id === id);
-  if (o) { if (fromDropdown) o.status = 'shipped'; o.tracking_number = tracking; }
+  if (o) {
+    if (fromDropdown) o.status = 'shipped';
+    o.tracking_number = tracking;
+    if (photoUrl) o.customer = { ...(o.customer || {}), shipment_photo_url: photoUrl };
+  }
 
   if (fromDropdown) updateBadge(id, 'shipped');
   const trackEl = document.getElementById('tracking_' + id);
@@ -647,11 +722,10 @@ async function confirmShipping() {
   if (tracking) {
     btn.textContent = '发送邮件中…';
     try {
-      const { data: { session } } = await sb.auth.getSession();
       const r = await fetch('/api/notify-shipped', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
-        body: JSON.stringify({ id, trackingNumber: tracking }),
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ id, trackingNumber: tracking, photoUrl }),
       });
       if (!r.ok) { const j = await r.json().catch(() => ({})); alert('运单号已保存，但邮件发送失败：' + (j.error || r.status)); }
     } catch (e) {
@@ -661,6 +735,7 @@ async function confirmShipping() {
 
   btn.textContent = '确认发货'; btn.disabled = false;
   closeTrackingModal();
+  renderOrders();
 }
 window.confirmShipping = confirmShipping;
 
@@ -670,6 +745,7 @@ function closeTrackingModal() {
     const o = allOrders.find(x => x.id === pendingShipId);
     pendingShipSelect.value = o?.status || 'shipped';
   }
+  resetShipmentPhotoPicker();
   pendingShipId = null;
   pendingShipSelect = null;
 }
@@ -681,6 +757,7 @@ function editTracking(id) {
   pendingShipSelect = null;
   document.getElementById('trackingInput').value = o?.tracking_number || '';
   document.getElementById('trackingOrderId').textContent = o?.order_id || '';
+  resetShipmentPhotoPicker();
   document.getElementById('trackingModal').classList.remove('hidden');
   document.getElementById('trackingInput').focus();
 }
