@@ -14,12 +14,7 @@
       "source": "/((?!api/|admin|admin-products).*)",
       "destination": "/index.html"
     }
-  ],
-  "functions": {
-    "api/generate-showcase.js": {
-      "maxDuration": 60
-    }
-  }
+  ]
 }
 
 
