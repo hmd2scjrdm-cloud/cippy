@@ -541,6 +541,7 @@ export default function CheckoutPage({
           <button
             onClick={paymentMethod === 'manual' ? handleManualSubmit : handleStripeSubmit}
             disabled={isPlacing || isUploadingProof}
+            data-track-conversion="place_order"
             className="w-full bg-[#B96A73] hover:bg-[#a55962] text-white font-semibold text-sm py-3.5 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-md cursor-pointer disabled:opacity-50"
           >
             {isPlacing ? tx('Processing...', '处理中...') : tx('Place Order', '确认订购')}
