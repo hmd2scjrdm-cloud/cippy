@@ -104,8 +104,8 @@ export const POLICIES: PolicySection[] = [
       {
         titleZh: 'Courier 公司',
         titleEn: 'Courier',
-        textZh: '本店使用 DHL Express 配送，确保快速安全到达。',
-        textEn: 'We use DHL Express for delivery where available.'
+        textZh: '本店使用 SPX Express 配送，确保快速安全到达。',
+        textEn: 'We use SPX Express for delivery where available.'
       },
       {
         titleZh: '运费计算',

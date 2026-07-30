@@ -140,14 +140,14 @@
     <div class="flex items-center justify-between">
       <div>
         <p class="font-bold text-stone-800">填写运单号</p>
-        <p class="text-xs text-stone-400 mt-0.5">订单 <span id="trackingOrderId"></span></p>
+        <p class="text-xs text-stone-400 mt-0.5">订单 <span id="trackingOrderId"></span> · 快递公司：SPX Express</p>
       </div>
       <button onclick="closeTrackingModal()" class="text-stone-300 hover:text-stone-500 text-2xl leading-none">&times;</button>
     </div>
-    <input id="trackingInput" type="text" placeholder="例：MY123456789"
+    <input id="trackingInput" type="text" placeholder="例：SPXMY000000000"
       onkeydown="if(event.key==='Enter')confirmShipping()"
       class="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#C4928A]"/>
-    <p class="text-xs text-stone-400">运单号可留空，之后在订单详情中补填</p>
+    <p class="text-xs text-stone-400">保存后将自动发送发货邮件通知顾客（运单号可留空，之后再补填）</p>
     <div class="flex gap-3">
       <button onclick="closeTrackingModal()" class="flex-1 py-2.5 border border-stone-200 rounded-xl text-sm text-stone-500 hover:bg-stone-50">取消</button>
       <button id="confirmShipBtn" onclick="confirmShipping()" class="flex-1 py-2.5 bg-[#C4928A] text-white rounded-xl text-sm font-semibold hover:opacity-90">确认发货</button>
@@ -635,8 +635,7 @@ async function confirmShipping() {
     : { tracking_number: tracking };
 
   const { error } = await sb.from('orders').update(update).eq('id', id);
-  btn.textContent = '确认发货'; btn.disabled = false;
-  if (error) { alert('保存失败：' + error.message); return; }
+  if (error) { btn.textContent = '确认发货'; btn.disabled = false; alert('保存失败：' + error.message); return; }
 
   const o = allOrders.find(x => x.id === id);
   if (o) { if (fromDropdown) o.status = 'shipped'; o.tracking_number = tracking; }
@@ -645,6 +644,22 @@ async function confirmShipping() {
   const trackEl = document.getElementById('tracking_' + id);
   if (trackEl) trackEl.textContent = tracking || '—';
 
+  if (tracking) {
+    btn.textContent = '发送邮件中…';
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      const r = await fetch('/api/notify-shipped', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
+        body: JSON.stringify({ id, trackingNumber: tracking }),
+      });
+      if (!r.ok) { const j = await r.json().catch(() => ({})); alert('运单号已保存，但邮件发送失败：' + (j.error || r.status)); }
+    } catch (e) {
+      alert('运单号已保存，但邮件发送失败：' + e.message);
+    }
+  }
+
+  btn.textContent = '确认发货'; btn.disabled = false;
   closeTrackingModal();
 }
 window.confirmShipping = confirmShipping;
