@@ -1128,7 +1128,7 @@ export default function App() {
   const [announcementIndex, setAnnouncementIndex] = useState(0);
   const announcements = [
     { en: "✨ Live Supabase Cloud Sync: Real-time stock counting of Cippy products", zh: "✨ 实时同步 Supabase 真实库存与价格" },
-    { en: "🇲🇾 DHL Fast Delivery: West Malaysia RM10 / East Malaysia RM15 / Singapore RM30", zh: "🇲🇾 大马西马 RM10 / 东马 RM15 / 新加坡 RM30，DHL 快捷寄送" },
+    { en: "🇲🇾 SPX Express Fast Delivery: West Malaysia RM10 / East Malaysia RM15 / Singapore RM30", zh: "🇲🇾 大马西马 RM10 / 东马 RM15 / 新加坡 RM30，SPX Express 快捷寄送" },
     { en: "🌿 Korean Oversized Fit curated beautifully for Malaysian tropical breezes", zh: "🌿 专为大马温湿气温甄选的轻盈松弛韩系版型" }
   ];
 
@@ -3894,7 +3894,7 @@ export default function App() {
                         <ul className="list-disc pl-4 space-y-1">
                           <li>{lang === 'zh' ? '下单自动积分：每消费 RM1 累积 1 积分，返现立等可用' : 'Earn 1 Loyalty Point for every RM1 spent on ready-to-wear.'}</li>
                           <li>{lang === 'zh' ? '等级成长：积分越高享永久折扣越丰厚（最高白金卡永久9折）' : 'Level up to Gold or Platinum for lifetime automated cashbacks.'}</li>
-                          <li>{lang === 'zh' ? '订单云存储：随时登录追踪物流、发货包裹与开箱记录' : 'Access order timelines, DHL tracking codes, and packaging choices.'}</li>
+                          <li>{lang === 'zh' ? '订单云存储：随时登录追踪物流、发货包裹与开箱记录' : 'Access order timelines, SPX Express tracking codes, and packaging choices.'}</li>
                         </ul>
                       </div>
                     </>
@@ -4206,7 +4206,7 @@ export default function App() {
                         <div className="space-y-1">
                           <span className="text-[9px] tracking-wider font-mono bg-purple-50 text-purple-700 px-1.5 py-0.5 rounded-sm uppercase font-bold">Free shipping</span>
                           <h5 className="text-xs font-bold text-zinc-800 mt-1">{lang === 'zh' ? '全马免运费无限折抵券' : 'Free Shipping Direct Pass'}</h5>
-                          <p className="text-[11px] text-zinc-400 leading-relaxed font-sans">{lang === 'zh' ? '支持西马/东马/新加坡，直接免除整笔包裹快递邮费' : 'Waiver of flat DHL postage fees for Malaysian deliveries.'}</p>
+                          <p className="text-[11px] text-zinc-400 leading-relaxed font-sans">{lang === 'zh' ? '支持西马/东马/新加坡，直接免除整笔包裹快递邮费' : 'Waiver of flat SPX Express postage fees for Malaysian deliveries.'}</p>
                         </div>
                         <div className="flex items-center justify-between pt-1 border-t border-zinc-50">
                           <span className="text-xs font-serif font-bold text-purple-700">200 pts</span>
@@ -4768,7 +4768,7 @@ export default function App() {
                                     </span>
                                   ) : statusStr === 'shipped' || statusStr === 'dispatched' ? (
                                     <span className="inline-flex items-center gap-1 text-[10px] font-bold tracking-widest bg-indigo-50 text-indigo-600 border border-indigo-100 px-2.5 py-0.5 rounded-full uppercase">
-                                      {lang === 'zh' ? '包裹已寄出 (Shipped)' : 'Shipped via DHL'}
+                                      {lang === 'zh' ? '包裹已寄出 (Shipped)' : 'Shipped via SPX Express'}
                                     </span>
                                   ) : (
                                     <span className="inline-flex items-center gap-1 text-[10px] font-bold tracking-widest bg-emerald-50 text-emerald-600 border border-emerald-100 px-2.5 py-0.5 rounded-full uppercase">
@@ -4785,7 +4785,7 @@ export default function App() {
                                     <Truck className="w-3.5 h-3.5 text-[#B96A73] animate-bounce" />
                                     {lang === 'zh' ? '实时物流状态追踪 / Delivery Progress' : 'Live Delivery Tracking Timeline'}
                                   </span>
-                                  {/* Simulate DHL Progress controller for user testing */}
+                                  {/* Simulate SPX Express Progress controller for user testing */}
                                   <div className="flex items-center gap-1.5 bg-pink-50/50 border border-pink-100/55 rounded-lg px-2 py-1">
                                     <span className="text-[9px] font-medium text-pink-500 font-mono">
                                       {lang === 'zh' ? '测试物流模拟:' : 'Test Sim:'}
@@ -4797,7 +4797,7 @@ export default function App() {
                                     >
                                       <option value="pending">{lang === 'zh' ? '1. 已下单' : '1. Placed'}</option>
                                       <option value="processing">{lang === 'zh' ? '2. 配货包装' : '2. Packing'}</option>
-                                      <option value="shipped">{lang === 'zh' ? '3. 已寄出 DHL' : '3. Shipped'}</option>
+                                      <option value="shipped">{lang === 'zh' ? '3. 已寄出 SPX' : '3. Shipped'}</option>
                                       <option value="delivered">{lang === 'zh' ? '4. 已签收' : '4. Delivered'}</option>
                                     </select>
                                   </div>
@@ -4842,10 +4842,10 @@ export default function App() {
                                       },
                                       {
                                         id: 2,
-                                        titleEN: "Shipped via DHL",
-                                        titleZH: "已寄出 DHL",
-                                        descEN: "DHL live tracking is active",
-                                        descZH: "交付 DHL Express 运输",
+                                        titleEN: "Shipped via SPX Express",
+                                        titleZH: "已寄出 SPX",
+                                        descEN: "SPX Express live tracking is active",
+                                        descZH: "交付 SPX Express 运输",
                                         icon: Truck
                                       },
                                       {
@@ -4922,10 +4922,10 @@ export default function App() {
                                                (lang === 'zh' ? `预计 · ${dateStr}` : `Est · ${dateStr}`)}
                                             </span>
 
-                                            {/* Live Mock DHL Tracking Number details */}
+                                            {/* Real SPX Express tracking number, filled in by admin when the order ships */}
                                             {step.id === 2 && isCompleted && (
                                               <span className="text-[8px] font-mono bg-zinc-100 border border-zinc-200/50 px-1 py-0.5 rounded-sm text-zinc-500 block w-fit md:mx-auto mt-0.5 select-all">
-                                                DHL: <strong className="text-zinc-700 font-bold">CPY-{ord.id.substring(0, 8).toUpperCase()}</strong>
+                                                SPX: <strong className="text-zinc-700 font-bold">{(ord as any).tracking_number || (lang === 'zh' ? '待补填' : 'pending')}</strong>
                                               </span>
                                             )}
                                           </div>
