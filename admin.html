@@ -217,7 +217,7 @@
       <p class="font-bold text-stone-800">手动添加订单</p>
       <button onclick="closeAddOrderModal()" class="text-stone-300 hover:text-stone-500 text-2xl leading-none">&times;</button>
     </div>
-    <p class="text-xs text-stone-400 -mt-2">用于线下 / WhatsApp / 现金等非网站下单的订单，会计入订单列表与库存扣减不会自动进行，请自行到商品管理调整库存。</p>
+    <p class="text-xs text-stone-400 -mt-2">用于线下 / WhatsApp / 现金等非网站下单的订单，提交后会自动扣减对应商品库存（选了颜色/尺码的会精确扣该变体的库存）。</p>
 
     <div class="grid grid-cols-2 gap-3">
       <div class="col-span-2">
@@ -669,21 +669,31 @@ function closeAddOrderModal() {
 }
 window.closeAddOrderModal = closeAddOrderModal;
 
+function isVariantSizes(sizes) {
+  return Array.isArray(sizes) && sizes.length > 0 && typeof sizes[0] === 'object' && sizes[0] !== null && 'color' in sizes[0];
+}
+
 function addOrderItemRow() {
   const id = ++aoItemRowId;
   const options = ['<option value="">— 自定义商品名 —</option>']
     .concat(allProducts.map(p => `<option value="${p.id}" data-price="${p.price_myr || 0}" data-name="${(p.name_zh || p.name || '').replace(/"/g, '&quot;')}">${p.name_zh || p.name}</option>`));
   const row = document.createElement('div');
   row.id = `aoRow_${id}`;
-  row.className = 'flex gap-2 items-start';
+  row.className = 'space-y-1.5';
   row.innerHTML = `
-    <select onchange="onAoProductPick(${id}, this)" class="flex-1 min-w-0 border border-stone-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:border-[#C4928A]">
-      ${options.join('')}
-    </select>
-    <input id="aoRowName_${id}" type="text" placeholder="商品名称" oninput="recalcAddOrderTotals()" class="flex-1 min-w-0 border border-stone-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:border-[#C4928A]"/>
-    <input id="aoRowQty_${id}" type="number" min="1" value="1" oninput="recalcAddOrderTotals()" class="w-14 border border-stone-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:border-[#C4928A]" title="数量"/>
-    <input id="aoRowPrice_${id}" type="number" min="0" step="0.01" value="0" oninput="recalcAddOrderTotals()" class="w-20 border border-stone-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:border-[#C4928A]" title="单价 RM"/>
-    <button onclick="removeOrderItemRow(${id})" class="text-stone-300 hover:text-red-500 px-1.5 py-2 text-sm">&times;</button>
+    <div class="flex gap-2 items-start">
+      <select onchange="onAoProductPick(${id}, this)" class="flex-1 min-w-0 border border-stone-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:border-[#C4928A]">
+        ${options.join('')}
+      </select>
+      <input id="aoRowName_${id}" type="text" placeholder="商品名称" oninput="recalcAddOrderTotals()" class="flex-1 min-w-0 border border-stone-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:border-[#C4928A]"/>
+      <input id="aoRowQty_${id}" type="number" min="1" value="1" oninput="recalcAddOrderTotals()" class="w-14 border border-stone-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:border-[#C4928A]" title="数量"/>
+      <input id="aoRowPrice_${id}" type="number" min="0" step="0.01" value="0" oninput="recalcAddOrderTotals()" class="w-20 border border-stone-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:border-[#C4928A]" title="单价 RM"/>
+      <button onclick="removeOrderItemRow(${id})" class="text-stone-300 hover:text-red-500 px-1.5 py-2 text-sm">&times;</button>
+    </div>
+    <div id="aoRowVariant_${id}" class="hidden flex gap-2 pl-1">
+      <select id="aoRowColor_${id}" onchange="onAoColorPick(${id})" class="flex-1 min-w-0 border border-stone-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-[#C4928A]"></select>
+      <select id="aoRowSize_${id}" class="flex-1 min-w-0 border border-stone-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-[#C4928A]"></select>
+    </div>
   `;
   document.getElementById('aoItemsList').appendChild(row);
   recalcAddOrderTotals();
@@ -692,13 +702,37 @@ window.addOrderItemRow = addOrderItemRow;
 
 function onAoProductPick(id, selectEl) {
   const opt = selectEl.selectedOptions[0];
+  const variantWrap = document.getElementById(`aoRowVariant_${id}`);
   if (opt && opt.value) {
     document.getElementById(`aoRowName_${id}`).value = opt.dataset.name || '';
     document.getElementById(`aoRowPrice_${id}`).value = opt.dataset.price || '0';
+    const product = allProducts.find(p => String(p.id) === opt.value);
+    if (product && isVariantSizes(product.sizes)) {
+      const colors = [...new Set(product.sizes.map(s => s.color).filter(Boolean))];
+      const colorSel = document.getElementById(`aoRowColor_${id}`);
+      colorSel.innerHTML = colors.map(c => `<option value="${c}">${c}</option>`).join('');
+      variantWrap.classList.remove('hidden');
+      onAoColorPick(id);
+    } else {
+      variantWrap.classList.add('hidden');
+    }
+  } else {
+    variantWrap.classList.add('hidden');
   }
   recalcAddOrderTotals();
 }
 window.onAoProductPick = onAoProductPick;
+
+function onAoColorPick(id) {
+  const select = document.getElementById(`aoRow_${id}`).querySelector('select');
+  const opt = select.selectedOptions[0];
+  const product = allProducts.find(p => String(p.id) === opt.value);
+  if (!product) return;
+  const color = document.getElementById(`aoRowColor_${id}`).value;
+  const sizes = product.sizes.filter(s => s.color === color).map(s => s.size).filter(Boolean);
+  document.getElementById(`aoRowSize_${id}`).innerHTML = sizes.map(s => `<option value="${s}">${s}</option>`).join('');
+}
+window.onAoColorPick = onAoColorPick;
 
 function removeOrderItemRow(id) {
   const row = document.getElementById(`aoRow_${id}`);
@@ -715,14 +749,36 @@ function collectAoItems() {
     const select = row.querySelector('select');
     const opt = select.selectedOptions[0];
     const productId = opt && opt.value ? opt.value : null;
+    const variantVisible = !document.getElementById(`aoRowVariant_${id}`).classList.contains('hidden');
     return {
       product_id: productId,
       name_zh: document.getElementById(`aoRowName_${id}`).value.trim(),
       name: document.getElementById(`aoRowName_${id}`).value.trim(),
       qty: Math.max(1, parseInt(document.getElementById(`aoRowQty_${id}`).value, 10) || 1),
       price_myr: Math.max(0, parseFloat(document.getElementById(`aoRowPrice_${id}`).value) || 0),
+      color: variantVisible ? document.getElementById(`aoRowColor_${id}`).value : undefined,
+      size: variantVisible ? document.getElementById(`aoRowSize_${id}`).value : undefined,
     };
   }).filter(i => i.name_zh);
+}
+
+async function deductInventoryForOrder(items) {
+  for (const item of items) {
+    if (!item.product_id) continue;
+    const { data: rows, error } = await sb.from('products').select('stock,sizes').eq('id', item.product_id).limit(1);
+    if (error || !rows || !rows[0]) continue;
+    const prod = rows[0];
+    const newStock = Math.max(0, (prod.stock || 0) - item.qty);
+    let newSizes = prod.sizes;
+    if (isVariantSizes(prod.sizes)) {
+      newSizes = prod.sizes.map(s =>
+        s.color === item.color && s.size === item.size
+          ? { ...s, stock: Math.max(0, (s.stock || 0) - item.qty) }
+          : s
+      );
+    }
+    await sb.from('products').update({ stock: newStock, in_stock: newStock > 0, sizes: newSizes }).eq('id', item.product_id);
+  }
 }
 
 function recalcAddOrderTotals() {
@@ -773,10 +829,21 @@ async function submitAddOrder() {
 
   const { data, error } = await sb.from('orders').insert(payload).select();
 
+  if (error) {
+    btn.textContent = '创建订单'; btn.disabled = false;
+    errEl.textContent = '创建失败：' + error.message; errEl.classList.remove('hidden');
+    return;
+  }
+
+  btn.textContent = '扣减库存中…';
+  try {
+    await deductInventoryForOrder(items);
+  } catch (e) {
+    console.error('Inventory deduction failed:', e);
+  }
+  loadProducts();
+
   btn.textContent = '创建订单'; btn.disabled = false;
-
-  if (error) { errEl.textContent = '创建失败：' + error.message; errEl.classList.remove('hidden'); return; }
-
   if (data && data[0]) allOrders.unshift(data[0]);
   closeAddOrderModal();
   renderOrders();
