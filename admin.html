@@ -83,6 +83,7 @@
         <button onclick="setStatusFilter('delivered')" data-status="delivered" class="status-filter-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-stone-100 text-stone-500">已送达</button>
       </div>
       <button onclick="loadAdminOrders()" class="text-xs text-stone-400 hover:text-stone-600 whitespace-nowrap">↻ 刷新</button>
+      <button onclick="openAddOrderModal()" class="bg-[#C4928A] text-white px-3 py-2 rounded-lg text-xs font-bold hover:opacity-90 whitespace-nowrap">+ 添加订单</button>
     </div>
 
     <div class="bg-white rounded-xl border border-stone-100 overflow-hidden">
@@ -205,6 +206,84 @@
     <div class="flex gap-3">
       <button onclick="closeTrackingModal()" class="flex-1 py-2.5 border border-stone-200 rounded-xl text-sm text-stone-500 hover:bg-stone-50">取消</button>
       <button id="confirmShipBtn" onclick="confirmShipping()" class="flex-1 py-2.5 bg-[#C4928A] text-white rounded-xl text-sm font-semibold hover:opacity-90">确认发货</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Order Modal -->
+<div id="addOrderModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background:rgba(0,0,0,0.4)">
+  <div class="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 space-y-4">
+    <div class="flex items-center justify-between">
+      <p class="font-bold text-stone-800">手动添加订单</p>
+      <button onclick="closeAddOrderModal()" class="text-stone-300 hover:text-stone-500 text-2xl leading-none">&times;</button>
+    </div>
+    <p class="text-xs text-stone-400 -mt-2">用于线下 / WhatsApp / 现金等非网站下单的订单，会计入订单列表与库存扣减不会自动进行，请自行到商品管理调整库存。</p>
+
+    <div class="grid grid-cols-2 gap-3">
+      <div class="col-span-2">
+        <label class="block text-xs font-semibold text-stone-500 mb-1">顾客姓名 *</label>
+        <input id="aoName" type="text" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4928A]"/>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-stone-500 mb-1">电话</label>
+        <input id="aoPhone" type="text" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4928A]"/>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-stone-500 mb-1">邮箱</label>
+        <input id="aoEmail" type="email" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4928A]"/>
+      </div>
+      <div class="col-span-2">
+        <label class="block text-xs font-semibold text-stone-500 mb-1">收货地址</label>
+        <textarea id="aoAddress" rows="2" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4928A]"></textarea>
+      </div>
+    </div>
+
+    <div>
+      <div class="flex items-center justify-between mb-2">
+        <label class="block text-xs font-semibold text-stone-500">商品明细</label>
+        <button onclick="addOrderItemRow()" class="text-xs text-[#C4928A] font-semibold hover:underline">+ 添加商品行</button>
+      </div>
+      <div id="aoItemsList" class="space-y-2"></div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3 bg-stone-50 rounded-xl p-3">
+      <div>
+        <label class="block text-xs font-semibold text-stone-500 mb-1">运费 (RM)</label>
+        <input id="aoShipping" type="number" min="0" step="0.01" value="0" oninput="recalcAddOrderTotals()" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4928A]"/>
+      </div>
+      <div class="text-right">
+        <p class="text-xs text-stone-400">合计</p>
+        <p id="aoTotalDisplay" class="text-lg font-bold text-stone-800">RM 0.00</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label class="block text-xs font-semibold text-stone-500 mb-1">支付方式</label>
+        <select id="aoPaymentMethod" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4928A]">
+          <option value="manual">银行转账 / DuitNow</option>
+          <option value="cash">现金</option>
+          <option value="stripe">Stripe 卡</option>
+          <option value="other">其他</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-stone-500 mb-1">订单状态</label>
+        <select id="aoStatus" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4928A]">
+          <option value="paid">已付款</option>
+          <option value="pending">待付款</option>
+          <option value="processing">处理中</option>
+          <option value="shipped">已发货</option>
+          <option value="delivered">已送达</option>
+        </select>
+      </div>
+    </div>
+
+    <p id="aoError" class="hidden text-xs text-red-500"></p>
+
+    <div class="flex gap-3">
+      <button onclick="closeAddOrderModal()" class="flex-1 py-2.5 border border-stone-200 rounded-xl text-sm text-stone-500 hover:bg-stone-50">取消</button>
+      <button id="aoSubmitBtn" onclick="submitAddOrder()" class="flex-1 py-2.5 bg-[#C4928A] text-white rounded-xl text-sm font-semibold hover:opacity-90">创建订单</button>
     </div>
   </div>
 </div>
@@ -548,6 +627,7 @@ async function loadAnalytics() {
 window.loadAnalytics = loadAnalytics;
 
 let allOrders = [];
+let allProducts = [];
 let activeStatusFilter = '';
 let openDetailId = null;
 
@@ -565,6 +645,143 @@ async function loadAdminOrders() {
   renderOrders();
 }
 window.loadAdminOrders = loadAdminOrders;
+
+let aoItemRowId = 0;
+
+function openAddOrderModal() {
+  document.getElementById('aoName').value = '';
+  document.getElementById('aoPhone').value = '';
+  document.getElementById('aoEmail').value = '';
+  document.getElementById('aoAddress').value = '';
+  document.getElementById('aoShipping').value = '0';
+  document.getElementById('aoPaymentMethod').value = 'manual';
+  document.getElementById('aoStatus').value = 'paid';
+  document.getElementById('aoError').classList.add('hidden');
+  document.getElementById('aoItemsList').innerHTML = '';
+  aoItemRowId = 0;
+  addOrderItemRow();
+  document.getElementById('addOrderModal').classList.remove('hidden');
+}
+window.openAddOrderModal = openAddOrderModal;
+
+function closeAddOrderModal() {
+  document.getElementById('addOrderModal').classList.add('hidden');
+}
+window.closeAddOrderModal = closeAddOrderModal;
+
+function addOrderItemRow() {
+  const id = ++aoItemRowId;
+  const options = ['<option value="">— 自定义商品名 —</option>']
+    .concat(allProducts.map(p => `<option value="${p.id}" data-price="${p.price_myr || 0}" data-name="${(p.name_zh || p.name || '').replace(/"/g, '&quot;')}">${p.name_zh || p.name}</option>`));
+  const row = document.createElement('div');
+  row.id = `aoRow_${id}`;
+  row.className = 'flex gap-2 items-start';
+  row.innerHTML = `
+    <select onchange="onAoProductPick(${id}, this)" class="flex-1 min-w-0 border border-stone-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:border-[#C4928A]">
+      ${options.join('')}
+    </select>
+    <input id="aoRowName_${id}" type="text" placeholder="商品名称" oninput="recalcAddOrderTotals()" class="flex-1 min-w-0 border border-stone-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:border-[#C4928A]"/>
+    <input id="aoRowQty_${id}" type="number" min="1" value="1" oninput="recalcAddOrderTotals()" class="w-14 border border-stone-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:border-[#C4928A]" title="数量"/>
+    <input id="aoRowPrice_${id}" type="number" min="0" step="0.01" value="0" oninput="recalcAddOrderTotals()" class="w-20 border border-stone-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:border-[#C4928A]" title="单价 RM"/>
+    <button onclick="removeOrderItemRow(${id})" class="text-stone-300 hover:text-red-500 px-1.5 py-2 text-sm">&times;</button>
+  `;
+  document.getElementById('aoItemsList').appendChild(row);
+  recalcAddOrderTotals();
+}
+window.addOrderItemRow = addOrderItemRow;
+
+function onAoProductPick(id, selectEl) {
+  const opt = selectEl.selectedOptions[0];
+  if (opt && opt.value) {
+    document.getElementById(`aoRowName_${id}`).value = opt.dataset.name || '';
+    document.getElementById(`aoRowPrice_${id}`).value = opt.dataset.price || '0';
+  }
+  recalcAddOrderTotals();
+}
+window.onAoProductPick = onAoProductPick;
+
+function removeOrderItemRow(id) {
+  const row = document.getElementById(`aoRow_${id}`);
+  if (row) row.remove();
+  if (!document.getElementById('aoItemsList').children.length) addOrderItemRow();
+  recalcAddOrderTotals();
+}
+window.removeOrderItemRow = removeOrderItemRow;
+
+function collectAoItems() {
+  const rows = [...document.getElementById('aoItemsList').children];
+  return rows.map(row => {
+    const id = row.id.replace('aoRow_', '');
+    const select = row.querySelector('select');
+    const opt = select.selectedOptions[0];
+    const productId = opt && opt.value ? opt.value : null;
+    return {
+      product_id: productId,
+      name_zh: document.getElementById(`aoRowName_${id}`).value.trim(),
+      name: document.getElementById(`aoRowName_${id}`).value.trim(),
+      qty: Math.max(1, parseInt(document.getElementById(`aoRowQty_${id}`).value, 10) || 1),
+      price_myr: Math.max(0, parseFloat(document.getElementById(`aoRowPrice_${id}`).value) || 0),
+    };
+  }).filter(i => i.name_zh);
+}
+
+function recalcAddOrderTotals() {
+  const items = collectAoItems();
+  const subtotal = items.reduce((s, i) => s + i.price_myr * i.qty, 0);
+  const shipping = Math.max(0, parseFloat(document.getElementById('aoShipping').value) || 0);
+  document.getElementById('aoTotalDisplay').textContent = `RM ${(subtotal + shipping).toFixed(2)}`;
+}
+window.recalcAddOrderTotals = recalcAddOrderTotals;
+
+function nextOrderId() {
+  const nums = allOrders.map(o => parseInt(o.order_id, 10)).filter(n => !isNaN(n));
+  const max = nums.length ? Math.max(...nums) : 10009;
+  return String(max + 1);
+}
+
+async function submitAddOrder() {
+  const errEl = document.getElementById('aoError');
+  errEl.classList.add('hidden');
+
+  const name = document.getElementById('aoName').value.trim();
+  if (!name) { errEl.textContent = '请填写顾客姓名'; errEl.classList.remove('hidden'); return; }
+
+  const items = collectAoItems();
+  if (!items.length) { errEl.textContent = '请至少添加一件商品'; errEl.classList.remove('hidden'); return; }
+
+  const shipping = Math.max(0, parseFloat(document.getElementById('aoShipping').value) || 0);
+  const subtotal = items.reduce((s, i) => s + i.price_myr * i.qty, 0);
+  const total = subtotal + shipping;
+
+  const payload = {
+    order_id: nextOrderId(),
+    customer: {
+      name,
+      phone: document.getElementById('aoPhone').value.trim(),
+      email: document.getElementById('aoEmail').value.trim(),
+      address: document.getElementById('aoAddress').value.trim(),
+    },
+    guest_email: document.getElementById('aoEmail').value.trim() || null,
+    items,
+    totals: { subtotal, shipping, total },
+    status: document.getElementById('aoStatus').value,
+    payment_method: document.getElementById('aoPaymentMethod').value,
+  };
+
+  const btn = document.getElementById('aoSubmitBtn');
+  btn.textContent = '创建中…'; btn.disabled = true;
+
+  const { data, error } = await sb.from('orders').insert(payload).select();
+
+  btn.textContent = '创建订单'; btn.disabled = false;
+
+  if (error) { errEl.textContent = '创建失败：' + error.message; errEl.classList.remove('hidden'); return; }
+
+  if (data && data[0]) allOrders.unshift(data[0]);
+  closeAddOrderModal();
+  renderOrders();
+}
+window.submitAddOrder = submitAddOrder;
 
 function setStatusFilter(status) {
   activeStatusFilter = status;
@@ -881,6 +1098,7 @@ window.saveTracking = saveTracking;
 async function loadProducts() {
   const { data, error } = await sb.from('products').select('*').order('created_at', { ascending: false });
   if (error) { console.error(error); return; }
+  allProducts = data;
 
   document.getElementById('statTotal').textContent = data.length;
   document.getElementById('statInStock').textContent = data.filter(p => p.in_stock).length;
