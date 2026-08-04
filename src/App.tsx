@@ -1125,13 +1125,6 @@ export default function App() {
     return { zh: '-', en: '-' };
   };
   
-  // Announcement Notice state
-  const [announcementIndex, setAnnouncementIndex] = useState(0);
-  const announcements = [
-    { en: "✨ Live Supabase Cloud Sync: Real-time stock counting of Cippy products", zh: "✨ 实时同步 Supabase 真实库存与价格" },
-    { en: "🇲🇾 SPX Express Fast Delivery: West Malaysia RM10 / East Malaysia RM15 / Singapore RM30", zh: "🇲🇾 大马西马 RM10 / 东马 RM15 / 新加坡 RM30，SPX Express 快捷寄送" },
-    { en: "🌿 Korean Oversized Fit curated beautifully for Malaysian tropical breezes", zh: "🌿 专为大马温湿气温甄选的轻盈松弛韩系版型" }
-  ];
 
   // Supabase Authentication Operations
   const handleAuthSubmit = async (e: React.FormEvent) => {
@@ -1267,13 +1260,6 @@ export default function App() {
       console.error("Failed to update status in Supabase:", err);
     }
   };
-
-  React.useEffect(() => {
-    const timer = setInterval(() => {
-      setAnnouncementIndex((prev) => (prev + 1) % announcements.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, []);
 
   // Effect 1: Load Dynamic Products from Supabase
   React.useEffect(() => {
@@ -1769,16 +1755,6 @@ export default function App() {
             </button>
           </div>
 
-          {/* Center Side: Announcement Ticker */}
-          <div className="flex-1 flex justify-center items-center gap-2 overflow-hidden h-4 my-1 sm:my-0">
-            <span className="shrink-0 font-bold uppercase tracking-widest text-[9px] px-1.5 py-0.2 rounded-xs bg-white/60 text-current select-none">
-              Notice
-            </span>
-            <div className="animate-fade-in truncate transition-all duration-300 max-w-[200px] md:max-w-md text-center">
-              {lang === 'zh' ? announcements[announcementIndex].zh : announcements[announcementIndex].en}
-            </div>
-          </div>
-          
           {/* Right Side: Account state portal */}
           <div className="flex items-center gap-3 shrink-0">
             {currentUser ? (
@@ -1807,22 +1783,6 @@ export default function App() {
                 <span>{lang === 'zh' ? '会员登录 / 注册' : 'Member Portal'}</span>
               </button>
             )}
-            
-            <span className="text-zinc-300 font-light select-none">|</span>
-            <div className="flex items-center gap-1">
-              <button 
-                onClick={() => setAnnouncementIndex((prev) => (prev - 1 + announcements.length) % announcements.length)}
-                className="hover:opacity-80 transition-opacity cursor-pointer font-bold px-1"
-              >
-                ←
-              </button>
-              <button 
-                onClick={() => setAnnouncementIndex((prev) => (prev + 1) % announcements.length)}
-                className="hover:opacity-80 transition-opacity cursor-pointer font-bold px-1"
-              >
-                →
-              </button>
-            </div>
           </div>
         </div>
 
