@@ -11,6 +11,7 @@ import ProductCard from './components/ProductCard';
 import ShoppingBagDrawer from './components/ShoppingBag';
 import CheckoutPage from './components/CheckoutPage';
 import ProductDetailModal from './components/ProductDetailModal';
+import { Bilingual } from './components/Bilingual';
 import { supabase } from './lib/supabase';
 import { signInWithGoogleGmail, sendGmailMessage, logoutGmail, getGmailToken, getGmailEmail } from './lib/gmailService';
 import { ShoppingBag, Star, Sparkles, BookOpen, Heart, ArrowRight, CheckCircle2, ChevronRight, Globe, Compass, RefreshCw, User, Lock, Mail, CreditCard, ClipboardList, LogOut, Truck, Package, Clock, Check, Search, X, TrendingUp, ChevronDown, GitCompare, Award, Calendar, Copy, Send, Bell, ShieldAlert, Trash2, Plus, Users, Activity } from 'lucide-react';
@@ -257,7 +258,7 @@ export default function App() {
   // Language & Translation State
   const [lang, setLang] = useState<'en' | 'zh'>(() => {
     const saved = localStorage.getItem('cippy_lang');
-    return (saved === 'zh' || saved === 'en') ? saved : 'zh'; // Default to zh as requested for GenZ Malaysia client base
+    return (saved === 'zh' || saved === 'en') ? saved : 'en'; // English-first per brand repositioning
   });
 
   const toggleLanguage = () => {
@@ -2000,7 +2001,7 @@ export default function App() {
                     activeTab === 'rtw' ? 'text-[#3F2B2B] border-b-2 border-[#3F2B2B] pb-1' : 'text-zinc-500 hover:text-[#3F2B2B] pb-1 border-b-2 border-transparent'
                   }`}
                 >
-                  {lang === 'zh' ? '成衣目录' : 'COLLECTION'}
+                  <Bilingual en="COLLECTION" zh="成衣目录" enClassName="block" zhClassName="block text-[8px] tracking-normal font-normal" />
                 </button>
                 <button
                   onClick={() => {
@@ -2011,7 +2012,7 @@ export default function App() {
                   }}
                   className="text-[11px] tracking-[0.2em] font-bold font-sans transition-all duration-300 cursor-pointer text-zinc-500 hover:text-[#3F2B2B] pb-1 border-b-2 border-transparent"
                 >
-                  {lang === 'zh' ? '浏览商品' : 'SHOP NOW'}
+                  <Bilingual en="SHOP NOW" zh="浏览商品" enClassName="block" zhClassName="block text-[8px] tracking-normal font-normal" />
                 </button>
                 <button
                   onClick={() => {
@@ -2022,7 +2023,7 @@ export default function App() {
                     activeTab === 'journal' ? 'text-[#3F2B2B] border-b-2 border-[#3F2B2B] pb-1' : 'text-zinc-500 hover:text-[#3F2B2B] pb-1 border-b-2 border-transparent'
                   }`}
                 >
-                  {lang === 'zh' ? '品牌故事' : 'THE NARRATIVE'}
+                  <Bilingual en="THE NARRATIVE" zh="品牌故事" enClassName="block" zhClassName="block text-[8px] tracking-normal font-normal" />
                 </button>
               </div>
 
@@ -2051,7 +2052,7 @@ export default function App() {
                     activeTab === 'atelier' ? 'text-[#3F2B2B] border-b-2 border-[#3F2B2B] pb-1' : 'text-zinc-500 hover:text-[#3F2B2B] pb-1 border-b-2 border-transparent'
                   }`}
                 >
-                  {lang === 'zh' ? '工坊' : 'ARCHIVE'}
+                  <Bilingual en="ARCHIVE" zh="工坊" enClassName="block" zhClassName="block text-[8px] tracking-normal font-normal" />
                 </button>
                 <button
                   onClick={() => {
@@ -2062,7 +2063,7 @@ export default function App() {
                     activeTab === 'policies' ? 'text-[#3F2B2B] border-b-2 border-[#3F2B2B] pb-1' : 'text-zinc-500 hover:text-[#3F2B2B] pb-1 border-b-2 border-transparent'
                   }`}
                 >
-                  {lang === 'zh' ? '政策条款' : 'T&C'}
+                  <Bilingual en="T&C" zh="政策条款" enClassName="block" zhClassName="block text-[8px] tracking-normal font-normal" />
                 </button>
                 {isAdminUser && (
                   <button
@@ -2074,7 +2075,7 @@ export default function App() {
                       activeTab === 'alerts' ? 'text-[#3F2B2B] border-b-2 border-[#3F2B2B] pb-1' : 'text-zinc-500 hover:text-[#3F2B2B] pb-1 border-b-2 border-transparent'
                     }`}
                   >
-                    {lang === 'zh' ? '推送群发' : 'ALERTS'}
+                    <Bilingual en="ALERTS" zh="推送群发" enClassName="block" zhClassName="block text-[8px] tracking-normal font-normal" />
                   </button>
                 )}
                 <button
@@ -2086,17 +2087,17 @@ export default function App() {
                     activeTab === 'account' ? 'text-[#3F2B2B] border-b-2 border-[#3F2B2B] pb-1' : 'text-zinc-500 hover:text-[#3F2B2B] pb-1 border-b-2 border-transparent'
                   }`}
                 >
-                  {lang === 'zh' ? '会员中心' : 'MEMBER'}
+                  <Bilingual en="MEMBER" zh="会员中心" enClassName="block" zhClassName="block text-[8px] tracking-normal font-normal" />
                 </button>
                 <button
                   onClick={() => setIsCartOpen(true)}
                   className={`text-[11px] tracking-[0.2em] font-bold font-sans transition-all duration-300 cursor-pointer uppercase ${
-                    isCartAnimating 
-                      ? 'animate-cart-shake text-[#3F2B2B]' 
+                    isCartAnimating
+                      ? 'animate-cart-shake text-[#3F2B2B]'
                       : 'text-zinc-500 hover:text-[#3F2B2B]'
                   }`}
                 >
-                  {lang === 'zh' ? `购物袋 (${totalCartCount})` : `CART (${totalCartCount})`}
+                  <Bilingual en={`CART (${totalCartCount})`} zh={`购物袋 (${totalCartCount})`} enClassName="block" zhClassName="block text-[8px] tracking-normal font-normal normal-case" />
                 </button>
               </div>
             </div>
