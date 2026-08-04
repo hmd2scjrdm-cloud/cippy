@@ -2696,15 +2696,16 @@ export default function App() {
                       </div>
                     </div>
 
-                    {/* Lower narrative block: The Story of Ready-to-Wear */}
-                    <div className="bg-[#FFFDFD] border border-[#FBEBF0] rounded-2xl p-6 space-y-3">
+                    {/* Lower narrative block: brand positioning — A Storybook Wardrobe */}
+                    <div className="bg-[#FFFDFD] border border-[#FBEBF0] rounded-2xl p-6 space-y-2">
                       <h3 className="text-2xl md:text-3xl font-serif text-[#3F2B2B] leading-tight font-semibold">
-                        {lang === 'zh' ? '成衣的故事' : 'The Story of Ready-to-Wear'}
+                        A Storybook Wardrobe
                       </h3>
-                      <p className="text-xs md:text-[13px] text-zinc-500 font-sans leading-relaxed italic">
+                      <span className="text-xs font-serif text-[#B96A73] font-medium block">故事衣橱</span>
+                      <p className="text-xs md:text-[13px] text-zinc-500 font-sans leading-relaxed italic pt-1">
                         {lang === 'zh'
-                          ? '灵感源自首尔的柔风，为马来西亚的气候重新演绎。这一系列专注于极简优雅、舒适自在，以及能随您每日行动轻盈流动的高级垂坠感。'
-                          : 'Inspired by the soft winds of Seoul, reimagined for the Malaysian climate. A collection focused on minimal sophistication, comfort, and premium drapes cut to flow effortlessly with your everyday movements.'}
+                          ? '那些你会一穿再穿的日常。'
+                          : "Pieces you'll reach for, again and again."}
                       </p>
                     </div>
                   </div>
@@ -2722,8 +2723,8 @@ export default function App() {
                       </h2>
                       <p className="text-xs md:text-[13px] text-zinc-500 font-sans leading-relaxed">
                         {lang === 'zh'
-                          ? '摒弃过往的刻板结构。我们的甄选理念聚焦于身体与面料之间的空间感，只提供 S 与 M 码，只为保留最初那份艺术垂坠感。'
-                          : 'Discarding the rigid structures of the past. Our curation philosophy centers on the space between the body and the fabric. Offered exclusively in S and M to preserve the intended artistic drape.'}
+                          ? '不设限的版型。留白的空间感。只做 S 与 M。'
+                          : 'No rigid structures. Just space to move. S & M only.'}
                       </p>
 
                       {/* Action buttons matching mockup styling */}
@@ -2932,7 +2933,7 @@ export default function App() {
                       Our Ready-to-Wear Catalogue
                     </h2>
                     <p className="text-xs text-zinc-400 font-sans mt-0.5">
-                      Hand-crafted Korean style ready-to-wear tailored in comfortable S & M sizes.
+                      Made for Malaysia. Lightweight. Breathable. Everyday.
                     </p>
                   </div>
 
@@ -3074,8 +3075,8 @@ export default function App() {
                     </h3>
                     <p className="text-xs text-zinc-500 font-sans max-w-xl">
                       {lang === 'zh'
-                        ? '因为韩系成衣天生版型宽松，我们的尺码小仙女会根据您的体重、身高与肩宽比例，为您推荐最显瘦好看的尺码。快来测算吧！'
-                        : "Because Korean clothes are cut naturally loose-fitting, our sizing fairy uses weight, height, and shoulder ratios to recommend the absolute most stunning look for you. Let's calculate!"}
+                        ? '宽松版型，一测就懂。'
+                        : 'Loose-fit sizing, made simple.'}
                     </p>
                   </div>
 
