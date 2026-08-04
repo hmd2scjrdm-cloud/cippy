@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Product } from '../types';
 import { X, ShoppingBag, Heart, Check, Sparkles, Scale, BookOpen, AlertCircle } from 'lucide-react';
+import { getPriceTier } from '../lib/priceTier';
 
 interface ProductDetailModalProps {
   product: Product;
@@ -216,17 +217,20 @@ export default function ProductDetailModal({
           <div className="space-y-5">
             {/* Title Block */}
             <div className="space-y-1.5 border-b border-pink-100/50 pb-4">
-              <h1 className="text-xl sm:text-2xl font-serif font-bold text-zinc-800 leading-snug tracking-tight">
-                {tx(product.name, product.cnName)}
-              </h1>
-              <div className="flex items-center justify-between">
-                <span className="font-serif text-xs font-semibold text-[#B96A73]">
-                  {tx(product.cnName, product.name)}
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#B96A73]">
+                  {getPriceTier(product.price).emoji} {getPriceTier(product.price).en}
                 </span>
-                <span className="font-mono text-lg font-bold text-[#B96A73]">
+                <span className="font-mono text-xs text-zinc-400">
                   RM {product.price}.00
                 </span>
               </div>
+              <h1 className="text-xl sm:text-2xl font-serif font-bold text-zinc-800 leading-snug tracking-tight">
+                {product.name}
+              </h1>
+              <span className="font-serif text-xs font-semibold text-[#B96A73] block">
+                {product.cnName}
+              </span>
             </div>
 
             {/* Design Chronicles (Fairytale Story) */}

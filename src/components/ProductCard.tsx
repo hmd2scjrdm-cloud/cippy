@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Product } from '../types';
 import { ShoppingBag, Star, Sparkles, Check, GitCompare, Heart } from 'lucide-react';
 import { motion } from 'motion/react';
+import { getPriceTier } from '../lib/priceTier';
 
 interface ProductCardProps {
   product: Product;
@@ -421,20 +422,23 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
       {/* Details Section */}
       <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
-        
-        {/* Title, Chinese subtitle and Price */}
+
+        {/* Tier eyebrow, Title, Chinese subtitle and Price */}
         <div className="space-y-1">
-          <div className="flex justify-between items-start gap-2">
-            <h3 
-              onClick={handleCardClick}
-              className={`cursor-pointer ${activeArchetype.fontTitle} font-bold text-zinc-800 text-sm md:text-base leading-snug tracking-tight group-hover:${activeTheme.primaryText} transition-colors duration-200`}
-            >
-              {product.name}
-            </h3>
-            <span className={`font-mono text-base font-bold ${activeTheme.primaryText} shrink-0`}>
+          <div className="flex items-center justify-between gap-2">
+            <span className={`text-[9px] font-bold uppercase tracking-[0.12em] ${activeTheme.accentText}`}>
+              {getPriceTier(product.price).emoji} {getPriceTier(product.price).en}
+            </span>
+            <span className="font-mono text-xs text-zinc-400 shrink-0">
               RM {product.price}
             </span>
           </div>
+          <h3
+            onClick={handleCardClick}
+            className={`cursor-pointer ${activeArchetype.fontTitle} font-bold text-zinc-800 text-sm md:text-base leading-snug tracking-tight group-hover:${activeTheme.primaryText} transition-colors duration-200`}
+          >
+            {product.name}
+          </h3>
           <h4 className={`${activeArchetype.fontTitle} text-xs ${activeTheme.accentText} font-medium leading-none`}>
             {product.cnName}
           </h4>
