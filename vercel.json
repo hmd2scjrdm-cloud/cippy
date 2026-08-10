@@ -12,7 +12,7 @@
     },
     {
       "source": "/((?!api/|admin|admin-products).*)",
-      "destination": "/index.html"
+      "destination": "/maintenance.html"
     }
   ]
 }
