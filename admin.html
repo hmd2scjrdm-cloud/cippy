@@ -1051,6 +1051,22 @@ function fileToBase64(file) {
   });
 }
 
+// Product photos go to Cloudflare R2 (zero egress fees) instead of Supabase
+// Storage, which has a limited egress quota that customer browsing burns
+// through fast on a live catalog.
+async function uploadImageToR2(blob, filename) {
+  const fileBase64 = await fileToBase64(blob);
+  const { data: { session } } = await sb.auth.getSession();
+  const r = await fetch('/api/upload-image', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
+    body: JSON.stringify({ fileBase64, fileName: filename, contentType: blob.type || 'image/jpeg' }),
+  });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || '上传失败');
+  return j.url;
+}
+
 async function uploadShipmentPhoto(token) {
   const fileBase64 = await fileToBase64(pendingShipmentPhotoFile);
   const r = await fetch('/api/upload-shipment-photo', {
@@ -1429,10 +1445,13 @@ document.getElementById('fImageFile').addEventListener('change', async (e) => {
   });
 
   status.textContent = '上传中…';
-  const path = `${Date.now()}.jpg`;
-  const { error } = await sb.storage.from('product-images').upload(path, compressed, { upsert: true, contentType: 'image/jpeg' });
-  if (error) { status.textContent = '上传失败：' + error.message; return; }
-  const { data: { publicUrl } } = sb.storage.from('product-images').getPublicUrl(path);
+  let publicUrl;
+  try {
+    publicUrl = await uploadImageToR2(compressed, `${Date.now()}.jpg`);
+  } catch (err) {
+    status.textContent = '上传失败：' + err.message;
+    return;
+  }
   document.getElementById('fImageUrl').value = publicUrl;
   document.getElementById('imagePreview').src = publicUrl;
   document.getElementById('imagePreviewWrap').classList.remove('hidden');
@@ -1658,10 +1677,11 @@ document.getElementById('fDetailImgs').addEventListener('change', async (e) => {
       img.src = url;
     });
     const filename = `detail_${Date.now()}_${i}.jpg`;
-    const { data, error } = await sb.storage.from('product-images').upload(filename, compressed, { contentType: 'image/jpeg', upsert: true });
-    if (!error) {
-      const { data: pub } = sb.storage.from('product-images').getPublicUrl(filename);
-      currentDetailImages.push(pub.publicUrl);
+    try {
+      const url = await uploadImageToR2(compressed, filename);
+      currentDetailImages.push(url);
+    } catch (err) {
+      console.error('Detail image upload failed:', err);
     }
     status.textContent = `上传中 ${i + 1}/${files.length}…`;
   }
@@ -1723,9 +1743,12 @@ async function compressAndUpload(file, prefix) {
     img.src = url;
   });
   const filename = `${prefix}_${Date.now()}.jpg`;
-  const { error } = await sb.storage.from('product-images').upload(filename, compressed, { contentType: 'image/jpeg', upsert: true });
-  if (error) return null;
-  return sb.storage.from('product-images').getPublicUrl(filename).data.publicUrl;
+  try {
+    return await uploadImageToR2(compressed, filename);
+  } catch (err) {
+    console.error('Image upload failed:', err);
+    return null;
+  }
 }
 
 document.getElementById('fExtraImgs').addEventListener('change', async (e) => {
