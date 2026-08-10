@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="icon" type="image/png" href="/assets/cippy-logo-new.png" />
+<title>Cippy 临时发货通知工具</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: #FAF4F6;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    padding: 40px 16px;
+  }
+  .card {
+    max-width: 420px;
+    margin: 0 auto;
+    background: #FFFBFD;
+    border: 1px solid #FBEBF0;
+    border-radius: 20px;
+    padding: 32px;
+  }
+  h1 { font-size: 16px; color: #3F2B2B; margin: 0 0 4px; }
+  p.note { font-size: 12px; color: #A89A9D; margin: 0 0 24px; line-height: 1.6; }
+  label { display: block; font-size: 12px; font-weight: 600; color: #6B5F5F; margin: 16px 0 6px; }
+  input {
+    width: 100%;
+    border: 1px solid #FBEBF0;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+    outline: none;
+  }
+  input:focus { border-color: #C4928A; }
+  button {
+    width: 100%;
+    margin-top: 24px;
+    background: #B96A73;
+    color: white;
+    border: none;
+    border-radius: 999px;
+    padding: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  #status { margin-top: 14px; font-size: 12px; text-align: center; }
+  #status.ok { color: #16a34a; }
+  #status.err { color: #dc2626; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>临时发货通知邮件</h1>
+    <p class="note">Supabase 恢复前的应急工具，不查数据库，直接发邮件。信息要自己核对准确，系统不会验证订单是否真实存在。</p>
+
+    <label>访问密码</label>
+    <input id="secret" type="password" placeholder="只有你知道的那串密码" />
+
+    <label>顾客邮箱</label>
+    <input id="email" type="email" placeholder="customer@example.com" />
+
+    <label>顾客姓名（选填）</label>
+    <input id="name" type="text" placeholder="Christine" />
+
+    <label>订单号</label>
+    <input id="orderId" type="text" placeholder="10012" />
+
+    <label>SPX 运单号</label>
+    <input id="tracking" type="text" placeholder="SPXMY0012345678" />
+
+    <label>打包照片链接（选填）</label>
+    <input id="photo" type="text" placeholder="https://..." />
+
+    <button id="btn" onclick="send()">发送邮件</button>
+    <div id="status"></div>
+  </div>
+
+<script>
+async function send() {
+  const btn = document.getElementById('btn');
+  const statusEl = document.getElementById('status');
+  statusEl.textContent = '';
+  statusEl.className = '';
+
+  const body = {
+    secret: document.getElementById('secret').value.trim(),
+    email: document.getElementById('email').value.trim(),
+    customerName: document.getElementById('name').value.trim(),
+    orderId: document.getElementById('orderId').value.trim(),
+    trackingNumber: document.getElementById('tracking').value.trim(),
+    photoUrl: document.getElementById('photo').value.trim(),
+  };
+
+  if (!body.secret || !body.email || !body.orderId || !body.trackingNumber) {
+    statusEl.textContent = '密码、邮箱、订单号、运单号都要填';
+    statusEl.className = 'err';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '发送中…';
+
+  try {
+    const r = await fetch('/api/manual-notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const j = await r.json().catch(() => ({}));
+    if (r.ok) {
+      statusEl.textContent = '✓ 邮件已发送';
+      statusEl.className = 'ok';
+    } else {
+      statusEl.textContent = '失败：' + (j.error || r.status);
+      statusEl.className = 'err';
+    }
+  } catch (e) {
+    statusEl.textContent = '失败：' + e.message;
+    statusEl.className = 'err';
+  }
+
+  btn.disabled = false;
+  btn.textContent = '发送邮件';
+}
+</script>
+</body>
+</html>
