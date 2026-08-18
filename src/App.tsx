@@ -398,7 +398,7 @@ export default function App() {
     const prodDesc = lang === 'zh' ? (product.cnDescription || product.description) : product.description;
     const prodStory = lang === 'zh' ? (product.cnStory || product.story) : product.story;
     const prodPrice = product.price;
-    const prodImg = product.imageUrl || "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/product-image/005.png";
+    const prodImg = product.imageUrl || "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/005.png";
 
     // Colors based on template style
     let primaryColor = "#B96A73"; // Pink
@@ -1986,7 +1986,7 @@ export default function App() {
               {/* Center: CHAEWON Title Logo */}
               <div className="md:w-1/3 flex justify-center">
                 <img 
-                  src="https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/logo/cippylogo.svg.PNG"
+                  src="https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/logo/cippylogo.svg.PNG"
                   alt="Cippy Logo"
                   onClick={() => {
                     setActiveTab('rtw');
@@ -2250,7 +2250,7 @@ export default function App() {
                       >
                         <div className="w-full sm:w-1/3 bg-white border border-[#E4E8DF] h-32 rounded-none relative overflow-hidden flex items-center justify-center">
                           <img 
-                            src="https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/product-image/004.png"
+                            src="https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/004.png"
                             alt="Sage Blouse"
                             className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
                             referrerPolicy="no-referrer"
@@ -2280,7 +2280,7 @@ export default function App() {
                       >
                         <div className="w-full sm:w-1/3 bg-white border border-[#E4E8DF] h-32 rounded-none relative overflow-hidden flex items-center justify-center">
                           <img 
-                            src="https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/product-image/007.png"
+                            src="https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/007.png"
                             alt="Structure Pants"
                             className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
                             referrerPolicy="no-referrer"
@@ -2310,7 +2310,7 @@ export default function App() {
                       >
                         <div className="w-full sm:w-1/3 bg-white border border-[#E4E8DF] h-32 rounded-none relative overflow-hidden flex items-center justify-center">
                           <img 
-                            src="https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/product-image/003.png"
+                            src="https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/003.png"
                             alt="Cocoon Dress"
                             className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
                             referrerPolicy="no-referrer"
@@ -2389,7 +2389,7 @@ export default function App() {
                       >
                         <div className="relative bg-[#FFF0F2]/50 border border-[#FCE3E6] rounded-2xl overflow-hidden h-[240px] shadow-2xs transition-all duration-300 group-hover:bg-[#FFF0F2]/75 group-hover:scale-[1.01] flex items-center justify-center">
                           <img 
-                            src="https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/product-image/005.png"
+                            src="https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/005.png"
                             alt="Campus Diary Set"
                             className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
                             referrerPolicy="no-referrer"
@@ -2416,7 +2416,7 @@ export default function App() {
                       >
                         <div className="relative bg-[#FFF0F2]/50 border border-[#FCE3E6] rounded-2xl overflow-hidden h-[240px] shadow-2xs transition-all duration-300 group-hover:bg-[#FFF0F2]/75 group-hover:scale-[1.01] flex items-center justify-center">
                           <img 
-                            src="https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/product-image/001.png"
+                            src="https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/001.png"
                             alt="Matcha Jacquard Dress"
                             className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
                             referrerPolicy="no-referrer"
@@ -2443,7 +2443,7 @@ export default function App() {
                       >
                         <div className="relative bg-[#FFF0F2]/50 border border-[#FCE3E6] rounded-2xl overflow-hidden h-[240px] shadow-2xs transition-all duration-300 group-hover:bg-[#FFF0F2]/75 group-hover:scale-[1.01] flex items-center justify-center">
                           <img 
-                            src="https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/product-image/004.png"
+                            src="https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/004.png"
                             alt="Seoul Street Puff Sleeve"
                             className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
                             referrerPolicy="no-referrer"
@@ -2470,7 +2470,7 @@ export default function App() {
                       >
                         <div className="relative bg-[#FFF0F2]/50 border border-[#FCE3E6] rounded-2xl overflow-hidden h-[240px] shadow-2xs transition-all duration-300 group-hover:bg-[#FFF0F2]/75 group-hover:scale-[1.01] flex items-center justify-center">
                           <img 
-                            src="https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/product-image/003.png"
+                            src="https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/003.png"
                             alt="Paris Girl Polka Set"
                             className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
                             referrerPolicy="no-referrer"
@@ -2500,7 +2500,7 @@ export default function App() {
                       {/* Floating Bestseller Badge */}
                       <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5 bg-rose-50 border border-rose-200/60 rounded-full pl-1.5 pr-2.5 py-0.5 shadow-xs">
                         <img 
-                          src="https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/product-image/001.png"
+                          src="https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/001.png"
                           alt="Bestseller"
                           className="w-5 h-5 rounded-full object-cover border border-rose-200"
                           referrerPolicy="no-referrer"
@@ -2631,7 +2631,7 @@ export default function App() {
                       {/* Large custom image container with model photo matching mockup exactly */}
                       <div className="relative bg-[#FFF0F2]/70 rounded-2xl h-[400px] w-full flex items-center justify-center overflow-hidden border border-[#FCE3E6] group">
                         <img 
-                          src="https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/model-ootd/0013.jpeg"
+                          src="https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/model-ootd/0013.jpeg"
                           alt="Chaewon Campaign"
                           className="absolute inset-0 h-full w-full object-cover group-hover:scale-[1.03] transition-transform duration-[6000ms] ease-out"
                           referrerPolicy="no-referrer"
@@ -2751,7 +2751,7 @@ export default function App() {
                       {/* Huge Arched Frame matching screenshot with real model image */}
                       <div className="relative rounded-t-full h-[380px] w-full flex flex-col justify-center items-center overflow-hidden border border-[#FBE3E6]/60 shadow-xs group">
                         <img 
-                          src="https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/model-ootd/0019.jpeg"
+                          src="https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/model-ootd/0019.jpeg"
                           alt="Nabi Spring"
                           className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-[6000ms] ease-out"
                           referrerPolicy="no-referrer"
@@ -3633,7 +3633,7 @@ export default function App() {
                       {/* Logo displayed beautifully */}
                       <div className="flex justify-center mb-6">
                         <img 
-                          src="https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/logo/cippylogo.svg.PNG" 
+                          src="https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/logo/cippylogo.svg.PNG" 
                           alt="Cippy Logo" 
                           className="h-12 w-auto object-contain"
                           referrerPolicy="no-referrer"

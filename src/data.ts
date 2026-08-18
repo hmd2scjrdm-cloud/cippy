@@ -117,7 +117,7 @@ export const products: Product[] = [
     "color": "#1E3A8A",
     "bgGradient": "from-[#F0F4FC] to-[#DCE4F5]",
     "svgPath": "M 20,35 L 80,35 L 85,65 L 70,65 L 68,80 L 32,80 L 30,65 L 15,65 Z",
-    "imageUrl": "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/product-image/005.png",
+    "imageUrl": "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/005.png",
     "detailImages": [],
     "images": [],
     "inStock": true,
@@ -159,10 +159,10 @@ export const products: Product[] = [
     "color": "#C4928A",
     "bgGradient": "from-[#FFF5F7] to-[#FFE3EB]",
     "svgPath": "M 20,35 L 80,35 L 85,65 L 70,65 L 68,80 L 32,80 L 30,65 L 15,65 Z",
-    "imageUrl": "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/product-image/011.png",
+    "imageUrl": "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/011.png",
     "detailImages": [
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/product-image/010.png",
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/product-image/009.png"
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/010.png",
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/009.png"
     ],
     "images": [],
     "inStock": true,
@@ -204,9 +204,9 @@ export const products: Product[] = [
     "color": "#C4928A",
     "bgGradient": "from-[#FFF5F7] to-[#FFE3EB]",
     "svgPath": "M 20,35 L 80,35 L 85,65 L 70,65 L 68,80 L 32,80 L 30,65 L 15,65 Z",
-    "imageUrl": "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/product-image/006.png",
+    "imageUrl": "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/006.png",
     "detailImages": [
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/product-image/013.png"
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/013.png"
     ],
     "images": [],
     "inStock": true,
@@ -248,15 +248,15 @@ export const products: Product[] = [
     "color": "#F3F4F6",
     "bgGradient": "from-[#FAF9F6] to-[#F3F2EC]",
     "svgPath": "M 20,40 C 25,25 75,25 80,40 L 75,55 L 90,85 L 10,85 L 25,55 Z",
-    "imageUrl": "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/product-image/003.png",
+    "imageUrl": "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/003.png",
     "detailImages": [
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/details_pic/003details/1.png",
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/details_pic/003details/2.png",
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/details_pic/003details/4.png"
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/details_pic/003details/1.png",
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/details_pic/003details/2.png",
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/details_pic/003details/4.png"
     ],
     "images": [
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/model-ootd/0005.png",
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/model-ootd/0013.jpeg"
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/model-ootd/0005.png",
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/model-ootd/0013.jpeg"
     ],
     "inStock": true,
     "stock": 1,
@@ -297,10 +297,10 @@ export const products: Product[] = [
     "color": "#C4928A",
     "bgGradient": "from-[#FFF5F7] to-[#FFE3EB]",
     "svgPath": "M 20,35 L 80,35 L 85,65 L 70,65 L 68,80 L 32,80 L 30,65 L 15,65 Z",
-    "imageUrl": "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/product-image/007.png",
+    "imageUrl": "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/007.png",
     "detailImages": [
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/product-image/014.png",
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/product-image/015.png"
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/014.png",
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/015.png"
     ],
     "images": [],
     "inStock": true,
@@ -342,11 +342,11 @@ export const products: Product[] = [
     "color": "#6B7280",
     "bgGradient": "from-[#F3F4F6] to-[#E5E7EB]",
     "svgPath": "M 15,35 L 85,35 L 80,80 L 20,80 Z",
-    "imageUrl": "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/product-image/002.png",
+    "imageUrl": "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/002.png",
     "detailImages": [],
     "images": [
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/model-ootd/0014.jpg",
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/model-ootd/0015.jpeg"
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/model-ootd/0014.jpg",
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/model-ootd/0015.jpeg"
     ],
     "inStock": true,
     "stock": 1,
@@ -387,17 +387,17 @@ export const products: Product[] = [
     "color": "#5D6B54",
     "bgGradient": "from-[#F4F6F2] to-[#E4E8DF]",
     "svgPath": "M 20,40 C 25,25 75,25 80,40 L 75,55 L 90,85 L 10,85 L 25,55 Z",
-    "imageUrl": "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/product-image/001.png",
+    "imageUrl": "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/001.png",
     "detailImages": [
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/details_pic/001details/1.png",
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/details_pic/001details/2.png",
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/details_pic/001details/4.png"
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/details_pic/001details/1.png",
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/details_pic/001details/2.png",
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/details_pic/001details/4.png"
     ],
     "images": [
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/model-ootd/0019.jpeg",
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/model-ootd/0021.jpeg",
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/model-ootd/0022.jpeg",
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/model-ootd/0014.jpeg"
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/model-ootd/0019.jpeg",
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/model-ootd/0021.jpeg",
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/model-ootd/0022.jpeg",
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/model-ootd/0014.jpeg"
     ],
     "inStock": true,
     "stock": 1,
@@ -438,22 +438,22 @@ export const products: Product[] = [
     "color": "#C4928A",
     "bgGradient": "from-[#FFF5F7] to-[#FFE3EB]",
     "svgPath": "M 20,35 L 80,35 L 85,65 L 70,65 L 68,80 L 32,80 L 30,65 L 15,65 Z",
-    "imageUrl": "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/product-image/004.png",
+    "imageUrl": "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/004.png",
     "detailImages": [
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/details_pic/004details/1.png",
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/details_pic/004details/2.png",
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/details_pic/004details/3.png",
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/details_pic/004details/4.png",
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/details_pic/004details/5.png",
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/product-image/008.png",
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/product-image/012.png"
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/details_pic/004details/1.png",
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/details_pic/004details/2.png",
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/details_pic/004details/3.png",
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/details_pic/004details/4.png",
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/details_pic/004details/5.png",
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/008.png",
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/012.png"
     ],
     "images": [
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/model-ootd/0001.jpg",
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/model-ootd/0004.png",
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/model-ootd/0003.png",
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/model-ootd/0002.png",
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/model-ootd/0012.jpeg"
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/model-ootd/0001.jpg",
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/model-ootd/0004.png",
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/model-ootd/0003.png",
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/model-ootd/0002.png",
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/model-ootd/0012.jpeg"
     ],
     "inStock": true,
     "stock": 1,
@@ -493,10 +493,10 @@ export const products: Product[] = [
     "color": "#C4928A",
     "bgGradient": "from-[#FFF5F7] to-[#FFE3EB]",
     "svgPath": "M 20,35 L 80,35 L 85,65 L 70,65 L 68,80 L 32,80 L 30,65 L 15,65 Z",
-    "imageUrl": "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/product-image/016.png",
+    "imageUrl": "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/016.png",
     "detailImages": [],
     "images": [
-      "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/model-ootd/0023.jpeg"
+      "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/model-ootd/0023.jpeg"
     ],
     "inStock": true,
     "stock": 0,
@@ -538,7 +538,7 @@ export const products: Product[] = [
     "color": "#1E3A8A",
     "bgGradient": "from-[#F0F4FC] to-[#DCE4F5]",
     "svgPath": "M 20,35 L 80,35 L 85,65 L 70,65 L 68,80 L 32,80 L 30,65 L 15,65 Z",
-    "imageUrl": "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/product-image/017.png",
+    "imageUrl": "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/017.png",
     "detailImages": [],
     "images": [],
     "inStock": true,
@@ -574,7 +574,7 @@ export const mixMatchTops: MixMatchItem[] = [
     color: "#F4F6F2",
     svgPath: "M 20,35 L 80,35 L 85,65 L 70,65 L 68,80 L 32,80 L 30,65 L 15,65 Z",
     productId: "90d8f406-18e1-499d-8e16-3797b3e49bb7",
-    imageUrl: "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/product-image/004.png"
+    imageUrl: "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/004.png"
   },
   {
     id: "top-grey-knit",
@@ -584,7 +584,7 @@ export const mixMatchTops: MixMatchItem[] = [
     color: "#6B7280",
     svgPath: "M 15,35 L 85,35 L 80,80 L 20,80 Z",
     productId: "e3791f4a-949d-41eb-8e45-d091708ba5b2",
-    imageUrl: "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/product-image/002.png"
+    imageUrl: "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/002.png"
   }
 ];
 
@@ -598,7 +598,7 @@ export const mixMatchBottoms: MixMatchItem[] = [
     color: "#C4928A",
     svgPath: "M 32,30 L 68,30 L 80,85 L 20,85 Z",
     productId: "573351cc-0215-4fb2-b1f5-c6c6908b481f",
-    imageUrl: "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/product-image/011.png"
+    imageUrl: "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/011.png"
   },
   {
     id: "bottom-drawstring-shorts",
@@ -608,7 +608,7 @@ export const mixMatchBottoms: MixMatchItem[] = [
     color: "#78350F",
     svgPath: "M 30,30 L 70,30 L 75,85 L 53,85 L 50,55 L 47,85 L 25,85 Z",
     productId: "bef1b190-bd86-4e1f-b3c4-c2ce24c79bca",
-    imageUrl: "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/product-image/006.png"
+    imageUrl: "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/006.png"
   },
   {
     id: "bottom-wide-pants",
@@ -618,7 +618,7 @@ export const mixMatchBottoms: MixMatchItem[] = [
     color: "#1E3A8A",
     svgPath: "M 30,30 L 70,30 L 75,85 L 53,85 L 50,55 L 47,85 L 25,85 Z",
     productId: "e26470ef-5ffc-48de-aad4-1521e6b5a32d",
-    imageUrl: "https://ilzeziznxzaxxudzhdmu.supabase.co/storage/v1/object/public/product-image/007.png"
+    imageUrl: "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/007.png"
   }
 ];
 
