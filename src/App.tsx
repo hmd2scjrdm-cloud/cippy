@@ -2631,8 +2631,8 @@ export default function App() {
                       
                       {/* Large custom image container with model photo matching mockup exactly */}
                       <div className="relative bg-[#FFF0F2]/70 rounded-2xl h-[400px] w-full flex items-center justify-center overflow-hidden border border-[#FCE3E6] group">
-                        <img 
-                          src="https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/model-ootd/0013.jpeg"
+                        <img
+                          src="https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/WhatsApp%20Image%202026-08-20%20at%2019.39.28.jpeg"
                           alt="Chaewon Campaign"
                           className="absolute inset-0 h-full w-full object-cover group-hover:scale-[1.03] transition-transform duration-[6000ms] ease-out"
                           referrerPolicy="no-referrer"
