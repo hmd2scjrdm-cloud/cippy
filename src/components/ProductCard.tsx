@@ -166,14 +166,15 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const isNewArrival = !isSoldOut && !isLowStock && (product.series === "Cippy Sweet" || product.series === "Cippy Summer");
 
   if (isSoldOut) {
-    badgeText = 'Sold Out';
-    badgeCnText = '已售罄';
+    // Out of stock still sells — as preorder — rather than blocking the purchase.
+    badgeText = 'Preorder';
+    badgeCnText = '预购';
     if (isMinimal) {
-      badgeStyle = 'bg-zinc-100 text-zinc-400 border-zinc-200 uppercase font-mono tracking-wider text-[9px] px-2 py-0.5 rounded-none';
+      badgeStyle = 'bg-violet-50 text-violet-700 border-violet-200 uppercase font-mono tracking-wider text-[9px] px-2 py-0.5 rounded-none';
     } else if (isVintage) {
-      badgeStyle = 'bg-stone-100/95 text-stone-500/80 border-stone-200 font-serif italic text-[10px] px-2 py-0.5 rounded-sm';
+      badgeStyle = 'bg-violet-50/95 text-violet-800/90 border-violet-900/15 font-serif italic text-[10px] px-2 py-0.5 rounded-sm';
     } else {
-      badgeStyle = 'bg-zinc-100/95 text-zinc-400 border-zinc-200/50 font-sans font-semibold text-[10px] px-2.5 py-0.5 rounded-full';
+      badgeStyle = 'bg-violet-50/95 text-violet-600 border-violet-100 font-sans font-semibold text-[10px] px-2.5 py-0.5 rounded-full';
     }
   } else if (isLowStock) {
     badgeText = product.stock === 1 ? 'Only 1 Left' : 'Low Stock';
