@@ -47,6 +47,8 @@ export default function SizingHelper({ activeTheme: activeThemeProp, activeArche
   const [weight, setWeight] = useState<number>(50);
   const [shoulder, setShoulder] = useState<number>(37);
   const [chest, setChest] = useState<number>(84);
+  const [waist, setWaist] = useState<number>(66);
+  const [hip, setHip] = useState<number>(90);
 
   const isMinimal = activeArchetype.id === 'minimalist';
   const isVintage = activeArchetype.id === 'vintage';
@@ -57,18 +59,18 @@ export default function SizingHelper({ activeTheme: activeThemeProp, activeArche
     let fitDescription = "";
     let cnFitDescription = "";
 
-    if (h >= 164 || w >= 56 || s >= 39 || c >= 88) {
+    if (h >= 164 || w >= 56 || s >= 39 || c >= 88 || waist >= 70 || hip >= 94) {
       rec = 'M';
     } else {
       rec = 'S';
     }
 
     if (rec === 'S') {
-      fitDescription = `We recommend size S for your measurements. On your frame, our loose-fitting garments will drape beautifully with a perfect oversized feel—relaxed shoulders, a comfortable chest room, and a lovely flowing hemline that won't overwhelm your height.`;
-      cnFitDescription = `针对您的身形，我们强烈推荐【S码（小码）】。在您的身材比例上，我们的宽松版型能够呈现出完美的韩系慵懒度——恰到好处的落肩幅度、舒适优雅的胸围放量，以及灵动飘逸的裙摆，绝不会压低身高，尽显娇美温婉。`;
+      fitDescription = `Based on the measurements entered, S is the closer starting point. Please still compare the garment's bust, waist, hip and length before ordering.`;
+      cnFitDescription = `根据您输入的数据，S 码是较接近的起点。下单前仍需对照商品的胸围、腰围、臀围与衣长。`;
     } else {
-      fitDescription = `We recommend size M for your measurements. This will ensure the drop-shoulder seams sit perfectly and the sleeve/hem lengths are calibrated to give you that authentic premium loose silhouette without feeling tight or too short.`;
-      cnFitDescription = `针对您的身形，我们推荐选择【M码（中码）】。这能保证宽松衣物的落肩车线垂落在最理想的臂侧，袖长与裙摆长度也经过精确调校，为您完美还原高档韩系大廓形的松弛气场，自在轻盈。`;
+      fitDescription = `Based on the measurements entered, M is the closer starting point. Fit varies by garment, so compare its actual measurements before ordering.`;
+      cnFitDescription = `根据您输入的数据，M 码是较接近的起点。不同商品版型会有差异，下单前请对照实际尺寸。`;
     }
 
     return {
@@ -102,8 +104,8 @@ export default function SizingHelper({ activeTheme: activeThemeProp, activeArche
         </h2>
         <p className={`text-sm ${activeArchetype.fontBody} text-zinc-400 mt-1 max-w-lg mx-auto`}>
           {lang === 'zh'
-            ? '我们只专注于 S 与 M 两个尺码，确保呈现最优雅的垂坠感。告诉尺码精灵您的身形数据吧！'
-            : 'We focus exclusively on S & M sizes to ensure the ultimate elegant drape. Tell the fairy your metrics!'}
+            ? '输入身形数据取得一般尺码建议。结果不能代替每件商品的实际尺寸。'
+            : 'Enter your measurements for a general size guide. Always compare the garment measurements before ordering.'}
         </p>
       </div>
 
@@ -155,7 +157,7 @@ export default function SizingHelper({ activeTheme: activeThemeProp, activeArche
             <input
               type="range"
               min="38"
-              max="72"
+              max="90"
               value={weight}
               onChange={(e) => setWeight(Number(e.target.value))}
               className={`w-full h-1.5 rounded-lg appearance-none cursor-pointer ${
@@ -165,7 +167,7 @@ export default function SizingHelper({ activeTheme: activeThemeProp, activeArche
             <div className="flex justify-between text-[10px] text-zinc-400 font-mono">
               <span>38 kg</span>
               <span>55 kg</span>
-              <span>72 kg</span>
+              <span>90 kg</span>
             </div>
           </div>
 
@@ -210,6 +212,19 @@ export default function SizingHelper({ activeTheme: activeThemeProp, activeArche
             </div>
           </div>
 
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="block text-xs font-sans text-zinc-500">{lang === 'zh' ? '腰围 (cm)' : 'Waist (cm)'}</label>
+              <input type="number" min="55" max="120" value={waist} onChange={(e) => setWaist(Math.max(55, Math.min(120, Number(e.target.value))))}
+                className="w-full text-sm font-sans px-3 py-2 text-zinc-700 focus:outline-none focus:border-zinc-500 border border-pink-100 rounded-xl bg-pink-50/20" />
+            </div>
+            <div className="space-y-2">
+              <label className="block text-xs font-sans text-zinc-500">{lang === 'zh' ? '臀围 (cm)' : 'Hip (cm)'}</label>
+              <input type="number" min="70" max="140" value={hip} onChange={(e) => setHip(Math.max(70, Math.min(140, Number(e.target.value))))}
+                className="w-full text-sm font-sans px-3 py-2 text-zinc-700 focus:outline-none focus:border-zinc-500 border border-pink-100 rounded-xl bg-pink-50/20" />
+            </div>
+          </div>
+
           {/* Explanation on S-M specification */}
           <div className={`p-3 border flex items-start gap-2.5 ${
             isMinimal 
@@ -222,13 +237,13 @@ export default function SizingHelper({ activeTheme: activeThemeProp, activeArche
             <p className={`text-[11px] text-zinc-500 leading-relaxed ${activeArchetype.fontBody}`}>
               {lang === 'zh' ? (
                 <>
-                  <strong>S 与 M 码说明：</strong>因为我们的韩系成衣天生版型宽松、偏大廓形，标准尺码参数并不完全适用。我们通过精准的落肩线条设计，确保您始终呈现纤瘦优雅的比例。
+                  <strong>S 与 M 码说明：</strong>目前多数商品提供 S 与 M，部分商品另有 XS 或均码。每款版型不同，请以商品页实际尺码为准。
                   <br />
-                  <span className={`italic ${activeTheme.accentText}`}>提示：韩系宽松版型容错率极高，主要通过落肩和胸放呈现慵懒感，无需担心围度束缚。</span>
+                  <span className={`italic ${activeTheme.accentText}`}>如果您的围度接近尺码上限，请先联系 WhatsApp 客服确认，不建议只凭身高体重下单。</span>
                 </>
               ) : (
                 <>
-                  <strong>S & M Specifics:</strong> Because our Korean ready-to-wear is cut naturally loose and oversized, standard parameters don't apply. We ensure perfect drop-shoulder lines so you always look slim and graceful.
+                  <strong>Current size range:</strong> Most pieces are available in S and M, while selected items offer XS or free size. Check each product's actual options and measurements.
                 </>
               )}
             </p>
@@ -283,7 +298,7 @@ export default function SizingHelper({ activeTheme: activeThemeProp, activeArche
           <div className={`mt-6 pt-4 border-t relative z-10 flex items-center justify-center gap-1.5 text-[11px] text-zinc-400 font-sans ${
             isMinimal ? 'border-zinc-200' : 'border-[var(--theme-primary-soft)]/20'
           }`}>
-            <Scale className={`w-3.5 h-3.5 ${activeTheme.accentText}`} /> {lang === 'zh' ? '适合体重 40kg - 72kg 的您，穿出优雅比例。' : 'Suitable for weights 40kg - 72kg beautifully.'}
+            <Scale className={`w-3.5 h-3.5 ${activeTheme.accentText}`} /> {lang === 'zh' ? '一般建议，不保证合身；请以商品实测尺寸为准。' : 'General guidance only; fit is not guaranteed. Use the garment measurements.'}
           </div>
         </div>
 

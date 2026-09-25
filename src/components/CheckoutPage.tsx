@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { CartItem } from '../types';
 import { supabase } from '../lib/supabase';
-import { Landmark, CreditCard, ShieldCheck, Sparkles, Upload, ArrowLeft, CheckCircle2, XCircle, BookUser, X } from 'lucide-react';
+import { Landmark, CreditCard, ShieldCheck, Sparkles, ArrowLeft, CheckCircle2, XCircle, BookUser, X } from 'lucide-react';
 
 interface CheckoutPageProps {
   cartItems: CartItem[];
@@ -88,7 +88,8 @@ export default function CheckoutPage({
   const subtotal = cartItems.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
   const shippingThreshold = 150;
   const isFreeShipping = subtotal >= shippingThreshold;
-  const shippingCost = isFreeShipping ? 0 : 10;
+  const isEastMalaysia = ['Sabah', 'Sarawak', 'Labuan'].includes(state);
+  const shippingCost = isFreeShipping ? 0 : (isEastMalaysia ? 15 : 10);
   const giftBoxFee = giftBoxTopup ? 10 : 0;
   const grandTotal = subtotal + shippingCost + giftBoxFee;
 
@@ -179,6 +180,19 @@ export default function CheckoutPage({
     }
     if (!currentUser && !email) {
       setErrorMsg(tx("Please enter your email for guest checkout.", "访客结账需要填写邮箱地址。"));
+      return false;
+    }
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setErrorMsg(tx("Please enter a valid email address.", "请输入有效的邮箱地址。"));
+      return false;
+    }
+    const normalizedPhone = phone.replace(/[\s-]/g, '');
+    if (!/^(?:\+?60|0)1\d{8,9}$/.test(normalizedPhone)) {
+      setErrorMsg(tx("Please enter a valid Malaysian mobile number, for example 012-3456789.", "请输入有效的马来西亚手机号码，例如 012-3456789。"));
+      return false;
+    }
+    if (!/^\d{5}$/.test(postalCode.trim())) {
+      setErrorMsg(tx("Malaysian postcodes must contain 5 digits.", "马来西亚邮政编码应为 5 位数字。"));
       return false;
     }
     return true;
@@ -391,6 +405,12 @@ export default function CheckoutPage({
         <h1 className="text-2xl font-serif font-bold text-zinc-800">{tx('Secure Checkout', '安全结账')}</h1>
       </div>
 
+      <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] text-zinc-600">
+        <div className="rounded-xl border border-pink-100 bg-white px-3 py-2.5">{tx('Ready stock: dispatch in 1-3 working days', '现货：1–3 个工作日内发货')}</div>
+        <div className="rounded-xl border border-pink-100 bg-white px-3 py-2.5">{tx('West MY RM10 · East MY RM15 · Free from RM150', '西马 RM10 · 东马 RM15 · 满 RM150 免邮')}</div>
+        <div className="rounded-xl border border-pink-100 bg-white px-3 py-2.5">{tx('Card via Stripe or DuitNow QR', 'Stripe 信用卡或 DuitNow QR')}</div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-7 space-y-6">
           {/* Shipping form */}
@@ -424,40 +444,40 @@ export default function CheckoutPage({
             {!currentUser && (
               <div className="space-y-1.5 text-xs">
                 <label className="block text-zinc-500 font-medium">{tx('Email *', '邮箱 *')}</label>
-                <input type="email" required value={email} onChange={e => setEmail(e.target.value)}
+                <input id="checkout-email" name="email" autoComplete="email" type="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="name@example.com"
                   className="w-full text-sm bg-pink-50/10 border border-pink-100 rounded-xl px-3 py-2.5 text-zinc-700 focus:outline-none focus:border-pink-300" />
               </div>
             )}
 
             <div className="space-y-1.5 text-xs">
               <label className="block text-zinc-500 font-medium">{tx('Full Name *', '收件人姓名 *')}</label>
-              <input type="text" required value={fullName} onChange={e => setFullName(e.target.value)}
+              <input id="checkout-name" name="name" autoComplete="name" type="text" required value={fullName} onChange={e => setFullName(e.target.value)} placeholder={tx('Full name', '收件人姓名')}
                 className="w-full text-sm bg-pink-50/10 border border-pink-100 rounded-xl px-3 py-2.5 text-zinc-700 focus:outline-none focus:border-pink-300" />
             </div>
 
             <div className="space-y-1.5 text-xs">
               <label className="block text-zinc-500 font-medium">{tx('Phone Number *', '联系电话 *')}</label>
-              <input type="tel" required value={phone} onChange={e => setPhone(e.target.value)}
+              <input id="checkout-phone" name="tel" autoComplete="tel" type="tel" required value={phone} onChange={e => setPhone(e.target.value)} placeholder="012-3456789" inputMode="tel"
                 className="w-full text-sm bg-pink-50/10 border border-pink-100 rounded-xl px-3 py-2.5 text-zinc-700 focus:outline-none focus:border-pink-300" />
             </div>
 
             <div className="space-y-1.5 text-xs">
               <label className="block text-zinc-500 font-medium">{tx('Delivery Address *', '收件详细地址 *')}</label>
-              <textarea required rows={2} value={address} onChange={e => setAddress(e.target.value)}
+              <textarea id="checkout-address" name="street-address" autoComplete="street-address" required rows={2} value={address} onChange={e => setAddress(e.target.value)} placeholder={tx('Unit, street, area and city', '门牌、街道、地区与城市')}
                 className="w-full text-sm bg-pink-50/10 border border-pink-100 rounded-xl px-3 py-2 text-zinc-700 focus:outline-none focus:border-pink-300 resize-none" />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5 text-xs">
                 <label className="block text-zinc-500 font-medium">{tx('State *', '收件州属 *')}</label>
-                <select value={state} onChange={e => setState(e.target.value)}
+                <select id="checkout-state" name="address-level1" autoComplete="address-level1" value={state} onChange={e => setState(e.target.value)}
                   className="w-full text-sm bg-pink-50/10 border border-pink-100 rounded-xl px-3 py-2.5 text-zinc-700 focus:outline-none focus:border-pink-300">
                   {MALAYSIAN_STATES.map(st => <option key={st} value={st}>{st}</option>)}
                 </select>
               </div>
               <div className="space-y-1.5 text-xs">
                 <label className="block text-zinc-500 font-medium">{tx('Postcode *', '邮政编码 *')}</label>
-                <input type="text" required value={postalCode} onChange={e => setPostalCode(e.target.value)}
+                <input id="checkout-postcode" name="postal-code" autoComplete="postal-code" inputMode="numeric" maxLength={5} type="text" required value={postalCode} onChange={e => setPostalCode(e.target.value.replace(/\D/g, '').slice(0, 5))} placeholder="50000"
                   className="w-full text-sm bg-pink-50/10 border border-pink-100 rounded-xl px-3 py-2.5 text-zinc-700 focus:outline-none focus:border-pink-300" />
               </div>
             </div>
@@ -479,12 +499,12 @@ export default function CheckoutPage({
               <button type="button" onClick={() => setPaymentMethod('manual')}
                 className={`p-3 rounded-xl border flex flex-col items-center gap-1.5 cursor-pointer transition-all ${paymentMethod === 'manual' ? 'border-[#B96A73] bg-[#FFF0F2] text-[#B96A73]' : 'border-zinc-200 text-zinc-400 hover:text-zinc-600'}`}>
                 <Landmark className="w-4 h-4" />
-                <span className="text-[10px] font-semibold">{tx('Manual Payment', '人工付款')}</span>
+                <span className="text-[10px] font-semibold">{tx('DuitNow QR', 'DuitNow QR')}</span>
               </button>
               <button type="button" onClick={() => setPaymentMethod('stripe')}
                 className={`p-3 rounded-xl border flex flex-col items-center gap-1.5 cursor-pointer transition-all ${paymentMethod === 'stripe' ? 'border-[#B96A73] bg-[#FFF0F2] text-[#B96A73]' : 'border-zinc-200 text-zinc-400 hover:text-zinc-600'}`}>
                 <CreditCard className="w-4 h-4" />
-                <span className="text-[10px] font-semibold">{tx('Card (Stripe)', '信用卡 (Stripe)')}</span>
+                <span className="text-[10px] font-semibold">{tx('Debit / Credit Card', '银行卡 / 信用卡')}</span>
               </button>
             </div>
 
@@ -518,11 +538,15 @@ export default function CheckoutPage({
             )}
 
             {paymentMethod === 'stripe' && (
-              <div className="p-4 bg-pink-50/10 border border-pink-100 rounded-xl text-xs text-zinc-600 leading-relaxed flex items-start gap-2">
-                <Upload className="w-3.5 h-3.5 mt-0.5 shrink-0" />
-                <p>{tx("You'll be redirected to Stripe's secure checkout page to enter your card details.", '您将被跳转至 Stripe 安全结账页面填写卡片信息。')}</p>
+              <div className="rounded-xl border border-emerald-100 bg-emerald-50/40 p-3 text-[11px] leading-relaxed text-zinc-600">
+                {tx('You will be redirected to Stripe’s secure checkout to enter your Visa or Mastercard details. Cippy does not store your card number.', '您将跳转至 Stripe 安全付款页面输入 Visa 或 Mastercard 资料。Cippy 不会储存您的银行卡号码。')}
               </div>
             )}
+
+            <p className="text-[10px] leading-relaxed text-zinc-400">
+              {tx('FPX and TNG eWallet are not currently available. Please use DuitNow QR or card payment.', '目前暂不支持 FPX 与 TNG eWallet，请使用 DuitNow QR 或银行卡付款。')}
+            </p>
+
           </div>
 
           {errorMsg && (

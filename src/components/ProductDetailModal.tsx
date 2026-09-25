@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Product } from '../types';
-import { X, ShoppingBag, Heart, Check, Sparkles, Scale, BookOpen, AlertCircle } from 'lucide-react';
+import { X, ShoppingBag, Heart, Check, Sparkles, Scale, BookOpen, AlertCircle, Truck, RefreshCw } from 'lucide-react';
 import { getPriceTier } from '../lib/priceTier';
 
 interface ProductDetailModalProps {
@@ -35,6 +35,16 @@ function getSizesForColor(sizes: unknown, color: string | null): ('S' | 'M')[] {
   const filtered = color ? sizes.filter(s => s.color === color) : sizes;
   const labels = Array.from(new Set(filtered.map(s => s.size).filter(Boolean))) as ('S' | 'M')[];
   return labels.length > 0 ? labels : ['S', 'M'];
+}
+
+function colorLabel(color: string, lang: 'en' | 'zh'): string {
+  if (lang === 'zh') return color;
+  const map: Record<string, string> = {
+    '白色': 'White', '黑色': 'Black', '粉色': 'Pink', '灰色': 'Grey',
+    '白色裙子': 'White', '粉色裙子': 'Pink', '黑色短裤': 'Black', '灰色短裤': 'Grey',
+    '白色上衣': 'White', '棕色上衣': 'Brown', '图片色': 'As shown'
+  };
+  return map[color] || color;
 }
 
 export default function ProductDetailModal({
@@ -101,7 +111,7 @@ export default function ProductDetailModal({
         ...product,
         id: `${product.id}-${slug}`,
         baseProductId: product.baseProductId || product.id,
-        name: `${product.name} - ${selectedColor}`,
+        name: `${product.name} - ${colorLabel(selectedColor, 'en')}`,
         cnName: `${product.cnName} - ${selectedColor}`,
         imageUrl: product.color_images?.[selectedColor] || product.imageUrl,
       };
@@ -125,12 +135,12 @@ export default function ProductDetailModal({
 
     if (h > 163 || w > 52) {
       recommendedSize = 'M';
-      fitEn = "The Medium size will give you that beautiful, airy Korean loose fit. Sizing Fairy notes excellent drop-shoulder draping with absolute comfort.";
-      fitZh = "仙子推荐 M 码。高挑或丰满身形穿上能呈现极其松弛、干净的落肩线条，兼顾舒适垂顺感与温柔气质。";
+      fitEn = "M is the closer starting point based on height and weight. Please compare the garment measurements before ordering.";
+      fitZh = "根据身高与体重，M 码是较接近的起点。下单前请继续对照商品实测尺寸。";
     } else {
       recommendedSize = 'S';
-      fitEn = "The Small size is calibrated for a perfect petite Korean silhouette. Sizing Fairy notes elegant body proportions without overwhelming your delicate frame.";
-      fitZh = "仙子推荐 S 码。专为精致小个子研发的版型，比例更显纤长，让‘宽松大廓形’完美贴合身形而不累赘。";
+      fitEn = "S is the closer starting point based on height and weight. Please compare the garment measurements before ordering.";
+      fitZh = "根据身高与体重，S 码是较接近的起点。下单前请继续对照商品实测尺寸。";
     }
 
     setCalcResult({
@@ -153,6 +163,7 @@ export default function ProductDetailModal({
         {/* Close Button */}
         <button
           onClick={onClose}
+          aria-label={tx('Close product details', '关闭商品详情')}
           className="absolute top-4 right-4 z-20 p-2 rounded-full bg-white/85 hover:bg-white border border-pink-100 text-zinc-500 hover:text-zinc-800 transition-colors shadow-xs"
         >
           <X className="w-5 h-5" />
@@ -192,7 +203,7 @@ export default function ProductDetailModal({
                       activeImageIndex === idx ? 'border-[#B96A73] scale-95' : 'border-transparent opacity-70 hover:opacity-100'
                     }`}
                   >
-                    <img src={img} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    <img src={img} alt={`${tx(product.name, product.cnName)} ${idx + 1}`} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                   </button>
                 ))}
               </div>
@@ -226,11 +237,12 @@ export default function ProductDetailModal({
                 </span>
               </div>
               <h1 className="text-xl sm:text-2xl font-serif font-bold text-zinc-800 leading-snug tracking-tight">
-                {product.name}
+                {tx(product.name, product.cnName)}
               </h1>
-              <span className="font-serif text-xs font-semibold text-[#B96A73] block">
-                {product.cnName}
-              </span>
+              <span className="font-serif text-xs font-semibold text-[#B96A73] block">{product.series || 'Cippy'}</span>
+              <p className="pt-2 text-xs leading-relaxed text-zinc-600">
+                {tx(product.description, product.cnDescription)}
+              </p>
             </div>
 
             {/* Design Chronicles (Fairytale Story) */}
@@ -252,19 +264,62 @@ export default function ProductDetailModal({
               </div>
               <div>
                 <span className="text-zinc-400 font-mono">{tx("FIT / 版型:", "版型:")}</span>
-                <strong className="text-zinc-700 ml-1">{tx("Korean Loose Fit", "韩系落肩宽松")}</strong>
+                <strong className="text-zinc-700 ml-1">{product.clothingType || tx("See product photos", "请参考商品图片")}</strong>
               </div>
               <div>
                 <span className="text-zinc-400 font-mono">{tx("CARE / 洗涤:", "洗涤:")}</span>
-                <strong className="text-zinc-700 ml-1">{tx("Hand Wash Cold", "冷水轻柔手洗")}</strong>
+                <strong className="text-zinc-700 ml-1">{product.care || tx("Cold gentle wash", "冷水轻柔洗涤")}</strong>
               </div>
               <div>
                 <span className="text-zinc-400 font-mono">{tx("STOCK / 状态:", "状态:")}</span>
                 <strong className={`ml-1 ${(product.stock || 0) > 0 ? 'text-emerald-600' : 'text-zinc-400'}`}>
-                  {(product.stock || 0) > 0 ? tx("In Stock (S, M)", "少量现货") : tx("Pre-order", "预定款")}
+                  {(product.stock || 0) > 0
+                    ? tx(`In stock (${availableSizes.join(', ')})`, `现货 (${availableSizes.join('、')})`)
+                    : tx("Pre-order", "预购款")}
                 </strong>
               </div>
+              <div>
+                <span className="text-zinc-400 font-mono">{tx("LINING / 内衬:", "内衬:")}</span>
+                <strong className="text-zinc-700 ml-1">{product.lining || tx("Not specified", "资料待确认")}</strong>
+              </div>
+              <div>
+                <span className="text-zinc-400 font-mono">{tx("STRETCH / 弹性:", "弹性:")}</span>
+                <strong className="text-zinc-700 ml-1">{product.stretch || tx("Not specified", "资料待确认")}</strong>
+              </div>
+              <div>
+                <span className="text-zinc-400 font-mono">{tx("SHEERNESS / 透肤:", "透肤程度:")}</span>
+                <strong className="text-zinc-700 ml-1">{product.transparency || tx("Not specified", "资料待确认")}</strong>
+              </div>
             </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-zinc-600">
+              <div className="flex items-start gap-2 rounded-lg border border-pink-100 bg-white p-3">
+                <Truck className="mt-0.5 h-4 w-4 shrink-0 text-[#B96A73]" />
+                <span>{tx('Ready stock dispatches in 1-3 working days. West MY RM10, East MY RM15; free shipping from RM150.', '现货付款后 1–3 个工作日发货。西马 RM10、东马 RM15；满 RM150 全马免邮。')}</span>
+              </div>
+              <div className="flex items-start gap-2 rounded-lg border border-pink-100 bg-white p-3">
+                <RefreshCw className="mt-0.5 h-4 w-4 shrink-0 text-[#B96A73]" />
+                <span>{tx('Check measurements before ordering. Return or exchange requests follow our 7-day policy and require an unboxing video.', '下单前请核对尺寸。退换申请须符合 7 天政策，并保留完整开箱视频。')}</span>
+              </div>
+            </div>
+
+            <details className="rounded-xl border border-pink-100 bg-white px-4 py-3 text-[11px] text-zinc-600">
+              <summary className="cursor-pointer font-semibold text-zinc-800">
+                {tx('Full product and fit notes', '完整商品与版型资料')}
+              </summary>
+              <ul className="mt-3 list-disc space-y-1.5 pl-4 leading-relaxed">
+                {(lang === 'zh' ? product.cnDetails : product.details).map((detail, index) => <li key={index}>{detail}</li>)}
+                <li>
+                  {tx(
+                    'Model measurements and exact garment measurements are not recorded for this item yet. Please ask WhatsApp support before ordering if length or fit is important to you.',
+                    '此商品暂未录入模特数据与完整实测尺寸。如果您在意衣长、裤长或围度，请在下单前向 WhatsApp 客服确认。'
+                  )}
+                </li>
+              </ul>
+              <a href="https://wa.me/601120861073" target="_blank" rel="noreferrer" className="mt-3 inline-flex font-semibold text-[#B96A73] underline">
+                {tx('Ask about sizing on WhatsApp', '通过 WhatsApp 询问尺码')}
+              </a>
+            </details>
 
             {/* Interactive Sizing Fairy Calculator */}
             <div className="bg-[#FFFDFC] rounded-xl p-4 border border-pink-100/50 space-y-3 shadow-xs">
@@ -310,6 +365,9 @@ export default function ProductDetailModal({
                     </span>
                   </div>
                   <p>{tx(calcResult.fitEn, calcResult.fitZh)}</p>
+                  <p className="text-zinc-400">
+                    {tx('General guide only. Please compare the garment measurements or ask WhatsApp support before ordering.', '此结果仅供一般参考。下单前请对照商品尺寸，或联系 WhatsApp 客服确认。')}
+                  </p>
                 </div>
               )}
             </div>
@@ -326,7 +384,7 @@ export default function ProductDetailModal({
                         key={col}
                         type="button"
                         onClick={() => setSelectedColor(col)}
-                        title={col}
+                        title={colorLabel(col, lang)}
                         className={`relative rounded-full border-2 transition-all cursor-pointer overflow-hidden flex items-center justify-center ${
                           selectedColor === col ? 'border-[#B96A73]' : 'border-zinc-200'
                         } ${swatchImg ? 'w-7 h-7' : 'px-2.5 h-7 text-[10px] font-semibold whitespace-nowrap ' + (selectedColor === col ? 'text-[#B96A73] bg-[#FFF0F2]' : 'text-zinc-600')}`}
@@ -340,7 +398,7 @@ export default function ProductDetailModal({
                               </span>
                             )}
                           </>
-                        ) : col}
+                        ) : colorLabel(col, lang)}
                       </button>
                     );
                   })}

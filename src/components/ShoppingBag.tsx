@@ -51,11 +51,11 @@ export default function ShoppingBagDrawer({
         onClick={onClose}
       />
 
-      <div className="absolute inset-y-0 right-0 max-w-full flex pl-10">
+      <div className="absolute inset-y-0 right-0 max-w-full flex pl-0 sm:pl-10">
         <div className="w-screen max-w-md bg-[#FFFDFC] shadow-2xl flex flex-col border-l border-pink-100">
 
           {/* Drawer Header */}
-          <div className="px-6 py-5 border-b border-pink-100 flex items-center justify-between bg-pink-50/40">
+          <div className="px-4 sm:px-6 py-5 border-b border-pink-100 flex items-center justify-between bg-pink-50/40">
             <div className="flex items-center gap-2">
               <ShoppingBag className="w-5 h-5 text-[#B96A73]" />
               <h2 className="text-lg font-serif font-semibold text-zinc-800">
@@ -71,7 +71,7 @@ export default function ShoppingBagDrawer({
           </div>
 
           {/* Drawer Body */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
 
             {cartItems.length === 0 ? (
               /* Empty state */
@@ -98,8 +98,8 @@ export default function ShoppingBagDrawer({
                   <div className="flex justify-between text-[11px] font-sans">
                     <span className="text-zinc-600 font-medium">
                       {isFreeShipping
-                        ? tx("🎉 Free shipping unlocked in Malaysia!", "🎉 恭喜！西马/东马/新加坡包邮已解锁！")
-                        : tx(`RM ${gapToFreeShipping.toFixed(2)} more to unlock FREE shipping!`, `还差 RM ${gapToFreeShipping.toFixed(2)} 即可享受西马/东马/新加坡包邮！`)}
+                        ? tx("Free shipping unlocked across Malaysia!", "已享全马免邮！")
+                        : tx(`RM ${gapToFreeShipping.toFixed(2)} more to unlock free shipping across Malaysia.`, `还差 RM ${gapToFreeShipping.toFixed(2)} 即可享全马免邮。`)}
                     </span>
                     <span className="font-mono text-[#B96A73] font-bold">
                       RM {subtotal} / {shippingThreshold}
@@ -209,7 +209,7 @@ export default function ShoppingBagDrawer({
 
           {/* Drawer Footer (Only when not empty) */}
           {cartItems.length > 0 && (
-            <div className="p-6 border-t border-pink-100 bg-[#FFFDFC] space-y-4 shadow-inner">
+            <div className="p-4 sm:p-6 border-t border-pink-100 bg-[#FFFDFC] space-y-4 shadow-inner">
 
               {/* Cost calculation */}
               <div className="space-y-1.5 text-xs">
@@ -233,6 +233,13 @@ export default function ShoppingBagDrawer({
                   <span className="font-serif font-semibold text-zinc-800">{tx("Total Charged / 实付总额:", "实付总额:")}</span>
                   <span className="font-mono text-xl font-bold text-[#B96A73]">RM {grandTotal}.00</span>
                 </div>
+              </div>
+
+              <div className="rounded-lg border border-pink-100 bg-pink-50/30 px-3 py-2 text-[10px] leading-relaxed text-zinc-500">
+                {tx(
+                  'Shipping shown here uses the West Malaysia rate. Sabah, Sarawak and Labuan update to RM15 after you select your state. Ready stock dispatches in 1-3 working days.',
+                  '此处先按西马 RM10 显示；结账选择 Sabah、Sarawak 或 Labuan 后会自动更新为 RM15。现货于付款后 1–3 个工作日内发货。'
+                )}
               </div>
 
               {/* Action buttons */}

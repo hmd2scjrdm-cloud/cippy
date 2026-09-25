@@ -221,7 +221,7 @@ export default async function handler(req, res) {
   const orderId = String(10010 + totalOrders);
 
   // Fetch real prices from DB — never trust frontend price
-  const productIds = [...new Set(items.map(i => i.product_id || i.id).filter(Boolean))];
+  const productIds = [...new Set(items.filter(i => !i._is_discount).map(i => i.product_id || i.id).filter(Boolean))];
   const priceRes = await fetch(
     `${SUPABASE_URL}/rest/v1/products?id=in.(${productIds.join(',')})&select=id,price_myr,name_zh,name,image_url`,
     { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${token || SUPABASE_ANON_KEY}` } }
@@ -231,23 +231,31 @@ export default async function handler(req, res) {
 
   // Validate every item has a known product with a real price
   for (const item of items) {
-    if (item._is_discount) { item._verified_price = item.price_myr || 0; continue; }
+    const qty = Number(item.qty || 1);
+    if (!Number.isInteger(qty) || qty < 1 || qty > 10) return res.status(400).json({ error: "Invalid item quantity" });
+    item.qty = qty;
+    if (item._is_discount) {
+      if (item.name !== "Luxury Gift Wrapping") return res.status(400).json({ error: "Invalid cart add-on" });
+      item._verified_price = 10;
+      item.qty = 1;
+      continue;
+    }
     const pid = item.product_id || item.id;
     if (!pid || !priceMap[pid]) return res.status(400).json({ error: `商品不存在：${item.name_zh || pid}` });
     const dbPrice = Number(priceMap[pid].price_myr || 0);
     if (dbPrice <= 0) return res.status(400).json({ error: `商品价格异常：${item.name_zh}` });
-    // Use variant price if applicable (variants can have different prices)
-    const variantPrice = item.variant_price_myr ? Number(item.variant_price_myr) : null;
-    item._verified_price = variantPrice && variantPrice > 0 ? variantPrice : dbPrice;
+    item._verified_price = dbPrice;
   }
 
-  const shipping = Number(totals.shipping || 0);
+  const merchandiseSubtotal = items.filter(i => !i._is_discount).reduce((s, i) => s + i._verified_price * i.qty, 0);
+  const eastMalaysia = /\b(Sabah|Sarawak|Labuan)\b/i.test(String(customer.address || ""));
+  const shipping = merchandiseSubtotal >= 150 ? 0 : (eastMalaysia ? 15 : 10);
   const verifiedSubtotal = items.reduce((s, i) => s + i._verified_price * Number(i.qty || 1), 0);
   const verifiedTotal = verifiedSubtotal + shipping;
   const orderTotal = verifiedTotal;
 
   // Rebuild totals from verified prices
-  const verifiedTotals = { ...totals, subtotal: verifiedSubtotal, total: verifiedTotal };
+  const verifiedTotals = { ...totals, subtotal: verifiedSubtotal, shipping, total: verifiedTotal };
 
   const origin = publicOrigin(req);
   const line_items = items.map(item => {

@@ -72,6 +72,16 @@ function getSizesForColor(sizes: unknown, color: string | null): ('S' | 'M')[] {
   return labels.length > 0 ? labels : ['S', 'M'];
 }
 
+function colorLabel(color: string, lang: string): string {
+  if (lang === 'zh') return color;
+  const map: Record<string, string> = {
+    '白色': 'White', '黑色': 'Black', '粉色': 'Pink', '灰色': 'Grey',
+    '白色裙子': 'White', '粉色裙子': 'Pink', '黑色短裤': 'Black', '灰色短裤': 'Grey',
+    '白色上衣': 'White', '棕色上衣': 'Brown', '图片色': 'As shown'
+  };
+  return map[color] || color;
+}
+
 const ProductCard: React.FC<ProductCardProps> = ({
   product,
   onAddProductToCart, 
@@ -141,7 +151,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         ...product,
         id: `${product.id}-${slug}`,
         baseProductId: product.baseProductId || product.id,
-        name: `${product.name} - ${selectedColor}`,
+        name: `${product.name} - ${colorLabel(selectedColor, 'en')}`,
         cnName: `${product.cnName} - ${selectedColor}`,
         imageUrl: product.color_images?.[selectedColor] || product.imageUrl,
       };
@@ -315,7 +325,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
             ? 'border-amber-900/20 font-serif text-amber-900/80 italic rounded-md' 
             : 'border-[var(--theme-primary-soft)]/60 font-mono text-zinc-500 rounded-full'
         }`}>
-          {product.category}
+          {lang === 'zh'
+            ? ({ dresses: '连衣裙', sets: '套装', tops: '上装', bottoms: '下装', outerwear: '外套' } as Record<string, string>)[product.category] || product.category
+            : product.category}
         </span>
 
         {/* 'Quick Add' Button Overlay (Slides up on hover) */}
@@ -363,7 +375,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                         e.stopPropagation();
                         setSelectedColor(col);
                       }}
-                      title={col}
+                      title={colorLabel(col, lang)}
                       className={`relative rounded-full border-2 transition-all cursor-pointer overflow-hidden flex items-center justify-center ${
                         selectedColor === col ? 'border-[#B96A73]' : 'border-zinc-200'
                       } ${swatchImg ? 'w-6 h-6' : 'px-2 h-6 text-[9px] font-semibold whitespace-nowrap ' + (selectedColor === col ? 'text-[#B96A73] bg-[#FFF0F2]' : 'text-zinc-600')}`}
@@ -377,7 +389,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                             </span>
                           )}
                         </>
-                      ) : col}
+                      ) : colorLabel(col, lang)}
                     </button>
                   );
                 })}
@@ -423,8 +435,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
       {/* Details Section */}
       <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
-
-        {/* Tier eyebrow, Title, Chinese subtitle and Price */}
+        {/* Price tier, localized title and price */}
         <div className="space-y-1">
           <div className="flex items-center justify-between gap-2">
             <span className={`text-[9px] font-bold uppercase tracking-[0.12em] ${activeTheme.accentText}`}>
@@ -438,11 +449,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
             onClick={handleCardClick}
             className={`cursor-pointer ${activeArchetype.fontTitle} font-bold text-zinc-800 text-sm md:text-base leading-snug tracking-tight group-hover:${activeTheme.primaryText} transition-colors duration-200`}
           >
-            {product.name}
+            {lang === 'zh' ? product.cnName : product.name}
           </h3>
-          <h4 className={`${activeArchetype.fontTitle} text-xs ${activeTheme.accentText} font-medium leading-none`}>
-            {product.cnName}
-          </h4>
         </div>
 
         {/* Short description */}
@@ -456,7 +464,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             <span className="text-zinc-400">
               {availableSizes.length === 1
                 ? (lang === 'zh' ? `仅 ${availableSizes[0]} 码：` : `${availableSizes[0]} size only:`)
-                : (lang === 'zh' ? '可选尺码 S&M：' : 'Available S&M sizes:')}
+                : (lang === 'zh' ? `可选尺码 ${availableSizes.join('、')}：` : `Available sizes: ${availableSizes.join(', ')}`)}
             </span>
             <div className="flex gap-1.5">
               {availableSizes.map((sz) => (
@@ -490,7 +498,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                       key={col}
                       type="button"
                       onClick={() => setSelectedColor(col)}
-                      title={col}
+                      title={colorLabel(col, lang)}
                       className={`relative rounded-full border-2 transition-all cursor-pointer overflow-hidden flex items-center justify-center ${
                         selectedColor === col ? 'border-[#B96A73]' : 'border-zinc-200'
                       } ${swatchImg ? 'w-6 h-6' : 'px-2 h-6 text-[9px] font-semibold whitespace-nowrap ' + (selectedColor === col ? 'text-[#B96A73] bg-[#FFF0F2]' : 'text-zinc-600')}`}
@@ -504,7 +512,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                             </span>
                           )}
                         </>
-                      ) : col}
+                      ) : colorLabel(col, lang)}
                     </button>
                   );
                 })}

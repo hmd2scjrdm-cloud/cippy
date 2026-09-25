@@ -118,6 +118,24 @@ const getEmailHTML = (product: Product, brandConcept: string, siteUrl: string) =
   `;
 };
 
+const inferProductCategory = (product: any): string => {
+  const raw = String(product.category || '').toLowerCase();
+  const searchable = `${product.name || ''} ${product.name_zh || ''} ${product.clothing_type || ''}`.toLowerCase();
+
+  if (/set|套装|两件套|\+/.test(searchable)) return 'sets';
+  if (/skirt|shorts?|pants?|trousers?|bottom|半身裙|短裙|短裤|长裤|裤/.test(searchable)) return 'bottoms';
+  if (/cardigan|outerwear|jacket|开衫|外套/.test(searchable)) return 'outerwear';
+  if (/tee|t-shirt|tank|top|camisole|shirt|blouse|背心|上衣|短袖|衬衫|抹胸/.test(searchable)) return 'tops';
+  if (/dress|gown|连衣裙|挂脖裙/.test(searchable)) return 'dresses';
+
+  if (raw === 'dress' || raw === 'dresses') return 'dresses';
+  if (raw === 'top' || raw === 'tops') return 'tops';
+  if (raw === 'bottom' || raw === 'bottoms') return 'bottoms';
+  if (raw === 'outerwear') return 'outerwear';
+  if (raw === 'set' || raw === 'sets') return 'sets';
+  return 'tops';
+};
+
 export default function App() {
   // Dynamic visual atmosphere theme configurations
   const themePresets = {
@@ -1283,22 +1301,18 @@ export default function App() {
             id: String(p.id),
             name: p.name || "",
             cnName: p.name_zh || p.name || "",
-            category: (p.category || "").toLowerCase() === 'dress' || (p.category || "").toLowerCase() === 'dresses' ? 'dresses' : 
-                      (p.category || "").toLowerCase() === 'top' || (p.category || "").toLowerCase() === 'tops' ? 'tops' :
-                      (p.category || "").toLowerCase() === 'bottom' || (p.category || "").toLowerCase() === 'bottoms' ? 'bottoms' :
-                      (p.category || "").toLowerCase() === 'outerwear' ? 'outerwear' :
-                      (p.category || "").toLowerCase() === 'set' || (p.category || "").toLowerCase() === 'sets' ? 'sets' : 'dresses',
+            category: inferProductCategory(p),
             price: Number(p.price_myr || p.price || 0),
             stock: Number(p.stock || 0),
             sku: p.sku || undefined,
             sizes: Array.isArray(p.sizes) ? p.sizes : ['S', 'M'],
             color_images: p.color_images && typeof p.color_images === 'object' ? p.color_images : undefined,
             description: p.description || "",
-            cnDescription: p.description_zh || p.description || "",
+            cnDescription: p.description_zh || "商品详情请参考图片与下方的面料、尺码和洗涤资料。如需更多实拍或尺寸协助，请联系 WhatsApp 客服。",
             story: p.story || "",
-            cnStory: p.story_zh || p.story || "",
+            cnStory: p.story_zh || "为马来西亚日常精选的韩系单品，兼顾轻盈穿着感与日常搭配。",
             details: Array.isArray(p.details) ? p.details : [],
-            cnDetails: Array.isArray(p.details_zh) ? p.details_zh : (Array.isArray(p.details) ? p.details : []),
+            cnDetails: Array.isArray(p.details_zh) ? p.details_zh : [],
             color: p.color || '#B96A73',
             bgGradient: p.bgGradient || 'from-pink-50 to-pink-100',
             imageUrl: p.image_url || '',
@@ -1695,14 +1709,14 @@ export default function App() {
 
   return (
     <div 
-      className="min-h-screen bg-[#FAF4F6] text-zinc-800 font-sans selection:bg-[#FFF5F7] selection:text-[#B96A73] flex flex-col items-center justify-center p-2 sm:p-4 md:p-8"
+      className="min-h-screen w-full min-w-0 overflow-x-hidden bg-[#FAF4F6] text-zinc-800 font-sans selection:bg-[#FFF5F7] selection:text-[#B96A73] flex flex-col items-center justify-center p-0 sm:p-4 md:p-8"
       style={{ ...activeTheme.customProperties } as React.CSSProperties}
     >
       {/* Pristine rounded card container matching high-end mockup design */}
-      <div id="nabi-studio-app-card" className="w-full max-w-7xl bg-[#FFFBFD] rounded-[32px] shadow-2xl border border-[#FBEBF0] overflow-hidden flex flex-col min-h-[90vh]">
+      <div id="nabi-studio-app-card" className="w-full min-w-0 max-w-7xl bg-[#FFFBFD] rounded-none sm:rounded-[24px] md:rounded-[32px] shadow-none sm:shadow-2xl border-x-0 sm:border border-[#FBEBF0] overflow-hidden flex flex-col min-h-screen sm:min-h-[90vh]">
         
         {/* Animated Announcement Ticker Row */}
-        <div className="w-full bg-[#FFF0F2] text-[#B96A73] border-b border-[#FBEBF0] py-2.5 px-4 md:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] font-medium font-sans transition-all duration-500"
+        <div className="w-full min-w-0 bg-[#FFF0F2] text-[#B96A73] border-b border-[#FBEBF0] py-2.5 px-3 md:px-8 flex items-center justify-between gap-2 text-[11px] font-medium font-sans transition-all duration-500"
           style={{
             backgroundColor: isYunseo ? '#F4F6F2' : isHwayoon ? '#FFF5F6' : isHanyu ? '#FFF5F7' : isChaewon ? '#FFF5F7' : '#FFF0F2',
             color: isYunseo ? '#5D6B54' : isHwayoon ? '#C88E93' : isHanyu ? '#D31558' : isChaewon ? '#3F2B2B' : '#B96A73',
@@ -1710,7 +1724,7 @@ export default function App() {
           }}
         >
           {/* Left Side: Language Switcher & Saves */}
-          <div className="flex items-center gap-4 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0">
             <div className="flex items-center gap-1.5">
               <Globe className="w-3.5 h-3.5 opacity-70" />
               <div className="flex items-center bg-white/50 border border-current/10 rounded-full p-0.5 text-[9px] font-sans">
@@ -1736,7 +1750,7 @@ export default function App() {
                 </button>
               </div>
             </div>
-            <span className="text-zinc-300 font-light select-none">|</span>
+            <span className="hidden sm:inline text-zinc-300 font-light select-none">|</span>
             <button
               onClick={() => {
                 setActiveTab('rtw');
@@ -1745,7 +1759,7 @@ export default function App() {
                 setToastMessage(lang === 'zh' ? `💖 已显示您的所有收藏项目` : `💖 Showing your saved fairytale items`);
                 setTimeout(() => setToastMessage(null), 3000);
               }}
-              className="flex items-center gap-1 hover:opacity-80 transition-opacity cursor-pointer font-semibold"
+              className="hidden sm:flex items-center gap-1 hover:opacity-80 transition-opacity cursor-pointer font-semibold"
             >
               <Heart className={`w-3.5 h-3.5 text-rose-500 fill-rose-500`} />
               <span>{lang === 'zh' ? `我的收藏 (${wishlist.length})` : `Saves (${wishlist.length})`}</span>
@@ -1753,7 +1767,7 @@ export default function App() {
           </div>
 
           {/* Right Side: Account state portal */}
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center justify-end gap-2 sm:gap-3 min-w-0">
             {currentUser ? (
               <button
                 onClick={() => {
@@ -1777,16 +1791,16 @@ export default function App() {
                 className="flex items-center gap-1 hover:opacity-80 transition-opacity cursor-pointer font-bold"
               >
                 <User className="w-3.5 h-3.5" />
-                <span>{lang === 'zh' ? '会员登录 / 注册' : 'Member Portal'}</span>
+                <span className="hidden sm:inline">{lang === 'zh' ? '会员登录 / 注册' : 'Member Portal'}</span>
               </button>
             )}
           </div>
         </div>
 
         {/* Main Header / Navigation */}
-        <header className="px-4 md:px-10 py-6 bg-white/90 border-b border-[#FBEBF0] backdrop-blur-md">
+        <header className="px-3 sm:px-4 md:px-10 py-4 sm:py-6 bg-white/90 border-b border-[#FBEBF0] backdrop-blur-md overflow-hidden">
           {isYunseo ? (
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-3 sm:gap-4 min-w-0">
               {/* Left: ESTABLISHED 2026 */}
               <div className="md:w-1/3 text-center md:text-left">
                 <span className="text-[11px] tracking-[0.25em] font-sans font-bold text-[#5D6B54]/70 uppercase">
@@ -1866,7 +1880,7 @@ export default function App() {
               </div>
             </div>
           ) : isHwayoon ? (
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
               {/* Left: KUALA LUMPUR · SEOUL */}
               <div className="md:w-1/3 text-center md:text-left">
                 <span className="text-[11px] tracking-[0.25em] font-sans font-bold text-zinc-400 uppercase">
@@ -1946,9 +1960,9 @@ export default function App() {
               </div>
             </div>
           ) : isChaewon ? (
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
               {/* Left navigation links: COLLECTION, THE NARRATIVE */}
-              <div className="md:w-1/3 flex items-center justify-center md:justify-start gap-6 md:gap-8">
+              <div className="order-2 lg:order-1 w-full lg:w-1/3 flex flex-wrap items-center justify-center lg:justify-start gap-x-4 gap-y-2 lg:gap-8 min-w-0">
                 <button
                   onClick={() => {
                     setActiveTab('rtw');
@@ -1985,7 +1999,7 @@ export default function App() {
               </div>
 
               {/* Center: CHAEWON Title Logo */}
-              <div className="md:w-1/3 flex justify-center">
+              <div className="order-1 lg:order-2 lg:w-1/3 flex justify-center">
                 <img 
                   src="https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/logo/cippylogo.svg.PNG"
                   alt="Cippy Logo"
@@ -1999,7 +2013,7 @@ export default function App() {
               </div>
 
               {/* Right navigation links: ARCHIVE, MEMBER, ALERTS, CART */}
-              <div className="md:w-1/3 flex items-center justify-center md:justify-end gap-6 md:gap-8">
+              <div className="order-3 lg:order-3 w-full lg:w-1/3 flex flex-wrap items-center justify-center lg:justify-end gap-x-4 gap-y-2 lg:gap-8 min-w-0">
                 <button
                   onClick={() => {
                     setActiveTab('atelier');
@@ -2190,7 +2204,7 @@ export default function App() {
         </header>
  
         {/* Main Viewport Content inside the frame */}
-        <main id="main-viewport" className="flex-1 p-4 sm:p-6 md:p-10 transition-all duration-300">
+        <main id="main-viewport" className="flex-1 min-w-0 w-full p-3 sm:p-6 md:p-10 transition-all duration-300">
           
           {/* RTW Edition Tab */}
           {activeTab === 'rtw' && (
@@ -2644,7 +2658,7 @@ export default function App() {
                         
                         {/* White Stylized Text in Bottom Left */}
                         <div className="absolute bottom-6 left-6 text-white font-serif text-5xl font-bold tracking-widest select-none opacity-95 drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)]">
-                          新上市
+                          {lang === 'zh' ? '新品现货' : 'NEW IN'}
                         </div>
                         
                         <div className="absolute top-6 right-6 bg-white/90 backdrop-blur-xs text-[#3F2B2B] font-sans font-bold text-[9px] tracking-[0.25em] px-2.5 py-1 uppercase rounded-sm">
@@ -2680,8 +2694,8 @@ export default function App() {
                       </h2>
                       <p className="text-xs md:text-[13px] text-zinc-500 font-sans leading-relaxed">
                         {lang === 'zh'
-                          ? '不设限的版型。留白的空间感。只做 S 与 M。'
-                          : 'No rigid structures. Just space to move. S & M only.'}
+                          ? '以小个子友好比例与舒适活动空间为重点。每件商品都会显示实际可选尺码；下单前请对照实测尺寸，拿不准可直接咨询客服。'
+                          : 'Petite-friendly proportions with comfortable room to move. Available sizes are shown on each product; compare the garment measurements or ask us before ordering.'}
                       </p>
 
                       {/* Action buttons matching mockup styling */}
@@ -2860,10 +2874,12 @@ export default function App() {
                 <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 border-b border-[#FBEBF0] pb-6">
                   <div>
                     <h2 className="text-2xl md:text-3xl font-serif text-zinc-800 tracking-tight">
-                      Our Ready-to-Wear Catalogue
+                      {lang === 'zh' ? '成衣目录' : 'Our Ready-to-Wear Catalogue'}
                     </h2>
                     <p className="text-xs text-zinc-400 font-sans mt-0.5">
-                      Made for Malaysia. Lightweight. Breathable. Everyday.
+                      {lang === 'zh'
+                        ? '为马来西亚日常精选的韩系成衣。每件商品页均显示实际可选尺码。'
+                        : 'Korean-inspired ready-to-wear curated for Malaysian days. Available sizes are shown on each product.'}
                     </p>
                   </div>
 
@@ -2889,8 +2905,7 @@ export default function App() {
                               : `text-zinc-500 hover:text-[#B96A73] hover:bg-[#FFF0F2]/30 border border-transparent`
                           }`}
                         >
-                          <span>{cat.label}</span>
-                          <span className="text-[9px] block font-serif opacity-70 font-normal">{cat.cnLabel}</span>
+                          <span>{lang === 'zh' ? cat.cnLabel : cat.label}</span>
                         </button>
                       ))}
                     </div>
@@ -3005,8 +3020,8 @@ export default function App() {
                     </h3>
                     <p className="text-xs text-zinc-500 font-sans max-w-xl">
                       {lang === 'zh'
-                        ? '宽松版型，一测就懂。'
-                        : 'Loose-fit sizing, made simple.'}
+                        ? '输入身高、体重与围度，取得一般尺码建议。结果仅供参考，下单前仍请核对商品实测尺寸。'
+                        : 'Enter your height, weight and measurements for a general size guide. Check the garment measurements before ordering.'}
                     </p>
                   </div>
 
@@ -5459,11 +5474,11 @@ export default function App() {
                 <Sparkles className="w-5 h-5" />
               </div>
               <h3 className="font-serif font-bold text-zinc-800 text-sm">{lang === 'zh' ? '1. 高端韩系剪裁' : '1. High-End Korean Tailoring'}</h3>
-              <h4 className="text-[11px] font-serif text-[#D89CA2] font-semibold leading-none mt-0.5">高端成衣版型与垂感</h4>
+              <h4 className="text-[11px] font-serif text-[#D89CA2] font-semibold leading-none mt-0.5">{lang === 'zh' ? '高端成衣版型与垂感' : 'Considered shape and drape'}</h4>
               <p className="text-xs text-zinc-500 leading-relaxed font-sans text-justify md:text-left">
                 {lang === 'zh'
-                  ? '每一件成衣都经过精准的落肩计算与垂坠设计，确保 S 与 M 码始终呈现显瘦又舒适的韩系垂感。'
-                  : 'Every garment is created as a ready-to-wear masterpiece with precise drop-shoulder calculations and drapes, ensuring that S & M sizes always produce a flattering, slim, yet comfortable Korean drape.'}
+                  ? '我们重视领口、腰线、衣长与垂坠比例。每件商品的实际可选尺码均以商品页为准。'
+                  : 'We consider neckline, waist placement, length and drape. Available sizes vary and are shown on each product page.'}
               </p>
             </div>
 
@@ -5472,7 +5487,7 @@ export default function App() {
                 <Heart className="w-5 h-5 fill-[#FFF0F2]" />
               </div>
               <h3 className="font-serif font-bold text-zinc-800 text-sm">{lang === 'zh' ? '2. 精致细节巧思' : '2. Delicate Editorial Touch'}</h3>
-              <h4 className="text-[11px] font-serif text-[#D89CA2] font-semibold leading-none mt-0.5">温润浪漫的视觉治愈</h4>
+              <h4 className="text-[11px] font-serif text-[#D89CA2] font-semibold leading-none mt-0.5">{lang === 'zh' ? '温润浪漫的视觉治愈' : 'Soft, romantic details'}</h4>
               <p className="text-xs text-zinc-500 leading-relaxed font-sans text-justify md:text-left">
                 {lang === 'zh'
                   ? '从品牌标志性蝴蝶结到柔软的荷叶边与设计口袋，每件衣裳都融入了童话般的精致巧思，为您的日常街头漫步注入俏皮浪漫的温度。'
@@ -5485,7 +5500,7 @@ export default function App() {
                 <ShoppingBag className="w-5 h-5" />
               </div>
               <h3 className="font-serif font-bold text-zinc-800 text-sm">{lang === 'zh' ? '3. 大马本地化服务' : '3. Localised Malaysian Service'}</h3>
-              <h4 className="text-[11px] font-serif text-[#D89CA2] font-semibold leading-none mt-0.5">专为大马华裔女孩贴心打造</h4>
+              <h4 className="text-[11px] font-serif text-[#D89CA2] font-semibold leading-none mt-0.5">{lang === 'zh' ? '为马来西亚女生的日常而选' : 'Curated for everyday Malaysia'}</h4>
               <p className="text-xs text-zinc-500 leading-relaxed font-sans text-justify md:text-left">
                 {lang === 'zh'
                   ? '我们深知大马的气候与生活方式。棉麻混纺面料在艳阳街头透气清凉，在冷气咖啡馆里也舒适宜人，配合本地化 RM 定价与快捷配送。'
@@ -5547,7 +5562,7 @@ export default function App() {
                 </a>
               </div>
               <div className="md:w-1/3 text-center md:text-right tracking-wider text-zinc-500 uppercase">
-                MADE IN SEOUL &middot; 蔚蓝之境
+                {lang === 'zh' ? '吉隆坡精选 · 为马来西亚日常而选' : 'CURATED IN KL · FOR MALAYSIAN DAYS'}
               </div>
             </div>
           ) : (
