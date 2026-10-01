@@ -245,16 +245,19 @@ export default function ProductDetailModal({
               </p>
             </div>
 
-            {/* Design Chronicles (Fairytale Story) */}
-            <div className="bg-[#FFF9FB] p-4 rounded-xl border border-pink-100/40 space-y-2">
-              <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-[#B96A73] font-bold">
-                <BookOpen className="w-3.5 h-3.5" />
-                <span>{tx("Style Chronicles", "故事编织")}</span>
+            {/* Design Chronicles (Fairytale Story) — only when there's real copy, an empty
+                block with quote marks and nothing between them reads as broken, not minimal */}
+            {(product.story || product.cnStory) && (
+              <div className="bg-[#FFF9FB] p-4 rounded-xl border border-pink-100/40 space-y-2">
+                <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-[#B96A73] font-bold">
+                  <BookOpen className="w-3.5 h-3.5" />
+                  <span>{tx("Style Chronicles", "故事编织")}</span>
+                </div>
+                <p className="text-xs text-zinc-600 font-serif italic leading-relaxed text-justify">
+                  "{tx(product.story, product.cnStory)}"
+                </p>
               </div>
-              <p className="text-xs text-zinc-600 font-serif italic leading-relaxed text-justify">
-                "{tx(product.story, product.cnStory)}"
-              </p>
-            </div>
+            )}
 
             {/* Specification Checklist */}
             <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-[11px] text-zinc-600 font-sans border-b border-pink-100/30 pb-4">
@@ -295,7 +298,7 @@ export default function ProductDetailModal({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-zinc-600">
               <div className="flex items-start gap-2 rounded-lg border border-pink-100 bg-white p-3">
                 <Truck className="mt-0.5 h-4 w-4 shrink-0 text-[#B96A73]" />
-                <span>{tx('Ready stock dispatches in 1-3 working days. West MY RM10, East MY RM15; free shipping from RM150.', '现货付款后 1–3 个工作日发货。西马 RM10、东马 RM15；满 RM150 全马免邮。')}</span>
+                <span>{tx('Ready stock dispatches in 1-3 working days. West MY RM10, East MY RM15; free shipping from RM50.', '现货付款后 1–3 个工作日发货。西马 RM10、东马 RM15；满 RM50 全马免邮。')}</span>
               </div>
               <div className="flex items-start gap-2 rounded-lg border border-pink-100 bg-white p-3">
                 <RefreshCw className="mt-0.5 h-4 w-4 shrink-0 text-[#B96A73]" />

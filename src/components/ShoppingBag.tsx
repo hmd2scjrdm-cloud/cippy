@@ -33,8 +33,9 @@ export default function ShoppingBagDrawer({
 
   const subtotal = cartItems.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
 
-  // Free shipping threshold at RM 150 (as in legacy cart.html)
-  const shippingThreshold = 150;
+  // Lowered from RM150 — that threshold was out of reach for single-item orders
+  // (small budget-conscious buyers never saw a realistic path to free shipping).
+  const shippingThreshold = 50;
   const isFreeShipping = subtotal >= shippingThreshold;
   const shippingCost = isFreeShipping ? 0 : 10;
   const giftBoxFee = giftBoxTopup ? 10 : 0;

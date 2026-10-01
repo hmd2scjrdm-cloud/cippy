@@ -249,7 +249,9 @@ export default async function handler(req, res) {
 
   const merchandiseSubtotal = items.filter(i => !i._is_discount).reduce((s, i) => s + i._verified_price * i.qty, 0);
   const eastMalaysia = /\b(Sabah|Sarawak|Labuan)\b/i.test(String(customer.address || ""));
-  const shipping = merchandiseSubtotal >= 150 ? 0 : (eastMalaysia ? 15 : 10);
+  // Free-shipping threshold lowered from RM150 to RM50 — keep in sync with
+  // ShoppingBag.tsx / CheckoutPage.tsx and create-duitnow-order.js.
+  const shipping = merchandiseSubtotal >= 50 ? 0 : (eastMalaysia ? 15 : 10);
   const verifiedSubtotal = items.reduce((s, i) => s + i._verified_price * Number(i.qty || 1), 0);
   const verifiedTotal = verifiedSubtotal + shipping;
   const orderTotal = verifiedTotal;
