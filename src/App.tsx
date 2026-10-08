@@ -5560,6 +5560,12 @@ export default function App() {
                 <a href="https://wa.me/601120861073" target="_blank" rel="noreferrer" className="hover:text-[#3F2B2B] transition-colors">
                   {lang === 'zh' ? '客服 WHATSAPP' : 'WHATSAPP SUPPORT'}
                 </a>
+                <button
+                  onClick={() => { setActiveTab('policies'); document.getElementById('nabi-studio-app-card')?.scrollIntoView({ behavior: 'smooth' }); }}
+                  className="hover:text-[#3F2B2B] transition-colors cursor-pointer tracking-widest"
+                >
+                  {lang === 'zh' ? '政策与常见问题' : 'POLICIES & FAQ'}
+                </button>
               </div>
               <div className="md:w-1/3 text-center md:text-right tracking-wider text-zinc-500 uppercase">
                 {lang === 'zh' ? '吉隆坡精选 · 为马来西亚日常而选' : 'CURATED IN KL · FOR MALAYSIAN DAYS'}

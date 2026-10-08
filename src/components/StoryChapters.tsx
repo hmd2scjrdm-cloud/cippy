@@ -218,7 +218,7 @@ export default function StoryChapters({ activeTheme: activeThemeProp, activeArch
 
           {/* Page Number indicator left */}
           <span className="absolute bottom-2 left-4 text-[10px] font-mono text-zinc-400 uppercase tracking-widest">
-            CI_DIARY_PAGE_{(currentPageIdx * 2) + 1}
+            {(currentPageIdx * 2) + 1}
           </span>
           <span className={`absolute bottom-2 right-4 text-[10px] ${activeArchetype.fontBody} ${activeTheme.accentText}`}>
             Daily & Lovely
@@ -321,7 +321,7 @@ export default function StoryChapters({ activeTheme: activeThemeProp, activeArch
 
           {/* Page Number indicator right */}
           <span className="absolute bottom-2 right-4 text-[10px] font-mono text-zinc-400 uppercase tracking-widest">
-            CI_DIARY_PAGE_{(currentPageIdx * 2) + 2}
+            {(currentPageIdx * 2) + 2}
           </span>
         </div>
       </div>
