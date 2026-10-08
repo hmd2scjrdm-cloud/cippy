@@ -280,7 +280,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         )}
         {product.imageUrl ? (
           <div className="relative w-full h-full flex items-center justify-center overflow-hidden rounded-xl">
-            <img
+            <img loading="lazy" decoding="async"
               src={product.imageUrl}
               alt={product.name}
               referrerPolicy="no-referrer"
@@ -382,7 +382,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                     >
                       {swatchImg ? (
                         <>
-                          <img src={swatchImg} alt={col} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                          <img loading="lazy" decoding="async" src={swatchImg} alt={col} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                           {selectedColor === col && (
                             <span className="absolute inset-0 flex items-center justify-center bg-black/30">
                               <Check className="w-3 h-3 text-white" />
@@ -505,7 +505,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                     >
                       {swatchImg ? (
                         <>
-                          <img src={swatchImg} alt={col} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                          <img loading="lazy" decoding="async" src={swatchImg} alt={col} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                           {selectedColor === col && (
                             <span className="absolute inset-0 flex items-center justify-center bg-black/30">
                               <Check className="w-3 h-3 text-white" />

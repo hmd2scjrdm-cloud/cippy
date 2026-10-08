@@ -175,7 +175,7 @@ export default function ProductDetailModal({
             {/* Primary Image Viewer */}
             <div className="aspect-[3/4] w-full rounded-2xl overflow-hidden bg-gradient-to-b from-pink-50/20 to-pink-100/30 border border-pink-100/40 relative flex items-center justify-center">
               {allImages.length > 0 ? (
-                <img
+                <img loading="lazy" decoding="async"
                   src={allImages[activeImageIndex]}
                   alt={product.name}
                   className="w-full h-full object-cover animate-fade-in"
@@ -402,7 +402,7 @@ export default function ProductDetailModal({
                       >
                         {swatchImg ? (
                           <>
-                            <img src={swatchImg} alt={col} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                            <img loading="lazy" decoding="async" src={swatchImg} alt={col} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                             {selectedColor === col && (
                               <span className="absolute inset-0 flex items-center justify-center bg-black/30">
                                 <Check className="w-3.5 h-3.5 text-white" />

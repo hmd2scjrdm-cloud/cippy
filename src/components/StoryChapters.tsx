@@ -207,7 +207,7 @@ export default function StoryChapters({ activeTheme: activeThemeProp, activeArch
             : 'bg-[#FFFDFC] rounded-2xl border border-pink-50/50'
         }`}>
           {currentChapter.image ? (
-            <img
+            <img loading="lazy" decoding="async"
               src={currentChapter.image}
               alt={currentChapter.title}
               className={`absolute inset-0 w-full h-full object-cover ${isMinimal ? '' : isVintage ? 'rounded-sm' : 'rounded-2xl'}`}

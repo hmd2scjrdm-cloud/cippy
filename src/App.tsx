@@ -13,6 +13,7 @@ import CheckoutPage from './components/CheckoutPage';
 import ProductDetailModal from './components/ProductDetailModal';
 import { Bilingual } from './components/Bilingual';
 import { supabase } from './lib/supabase';
+import { opt, optAll } from './lib/optimizeImage';
 import { signInWithGoogleGmail, sendGmailMessage, logoutGmail, getGmailToken, getGmailEmail } from './lib/gmailService';
 import { ShoppingBag, Star, Sparkles, BookOpen, Heart, ArrowRight, CheckCircle2, ChevronRight, Globe, Compass, RefreshCw, User, Lock, Mail, CreditCard, ClipboardList, LogOut, Truck, Package, Clock, Check, Search, X, TrendingUp, ChevronDown, GitCompare, Award, Calendar, Copy, Send, Bell, ShieldAlert, Trash2, Plus, Users, Activity } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -416,7 +417,7 @@ export default function App() {
     const prodDesc = lang === 'zh' ? (product.cnDescription || product.description) : product.description;
     const prodStory = lang === 'zh' ? (product.cnStory || product.story) : product.story;
     const prodPrice = product.price;
-    const prodImg = product.imageUrl || "https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/005.png";
+    const prodImg = product.imageUrl || opt("https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/005.png");
 
     // Colors based on template style
     let primaryColor = "#B96A73"; // Pink
@@ -851,6 +852,7 @@ export default function App() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [giftBoxTopup, setGiftBoxTopup] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [isCartAnimating, setIsCartAnimating] = useState(false);
   
   // Category filter state
@@ -1306,7 +1308,7 @@ export default function App() {
             stock: Number(p.stock || 0),
             sku: p.sku || undefined,
             sizes: Array.isArray(p.sizes) ? p.sizes : ['S', 'M'],
-            color_images: p.color_images && typeof p.color_images === 'object' ? p.color_images : undefined,
+            color_images: p.color_images && typeof p.color_images === 'object' ? Object.fromEntries(Object.entries(p.color_images).map(([k, v]) => [k, Array.isArray(v) ? optAll(v) : typeof v === 'string' ? opt(v) : v])) as any : undefined,
             description: p.description || "",
             cnDescription: p.description_zh || "商品详情请参考图片与下方的面料、尺码和洗涤资料。如需更多实拍或尺寸协助，请联系 WhatsApp 客服。",
             story: p.story || "",
@@ -1315,9 +1317,9 @@ export default function App() {
             cnDetails: Array.isArray(p.details_zh) ? p.details_zh : [],
             color: p.color || '#B96A73',
             bgGradient: p.bgGradient || 'from-pink-50 to-pink-100',
-            imageUrl: p.image_url || '',
-            detailImages: Array.isArray(p.images) ? p.images : [],
-            images: Array.isArray(p.images) ? p.images : [],
+            imageUrl: opt(p.image_url) || '',
+            detailImages: optAll(p.images),
+            images: optAll(p.images),
             clothingType: p.clothing_type || "",
             series: p.series || "",
             fabric: p.fabric || "",
@@ -1962,7 +1964,7 @@ export default function App() {
           ) : isChaewon ? (
             <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
               {/* Left navigation links: COLLECTION, THE NARRATIVE */}
-              <div className="order-2 lg:order-1 w-full lg:w-1/3 flex flex-wrap items-center justify-center lg:justify-start gap-x-4 gap-y-2 lg:gap-8 min-w-0">
+              <div onClick={() => setMobileNavOpen(false)} className={`order-2 lg:order-1 w-full lg:w-1/3 ${mobileNavOpen ? 'flex' : 'hidden'} lg:flex flex-col lg:flex-row lg:flex-wrap items-center justify-center lg:justify-start gap-x-4 gap-y-3 lg:gap-8 min-w-0`}>
                 <button
                   onClick={() => {
                     setActiveTab('rtw');
@@ -1999,7 +2001,29 @@ export default function App() {
               </div>
 
               {/* Center: CHAEWON Title Logo */}
-              <div className="order-1 lg:order-2 lg:w-1/3 flex justify-center">
+              <div className="order-1 lg:order-2 w-full lg:w-1/3 relative flex justify-center items-center">
+                <button
+                  type="button"
+                  aria-label="Menu"
+                  aria-expanded={mobileNavOpen}
+                  onClick={() => setMobileNavOpen((o) => !o)}
+                  className="lg:hidden absolute left-0 top-1/2 -translate-y-1/2 p-2 -ml-2 text-[#3F2B2B] cursor-pointer"
+                >
+                  {mobileNavOpen ? <X className="w-6 h-6" /> : (
+                    <svg viewBox="0 0 24 24" className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  aria-label="Cart"
+                  onClick={() => setIsCartOpen(true)}
+                  className={`lg:hidden absolute right-0 top-1/2 -translate-y-1/2 p-2 -mr-2 cursor-pointer ${isCartAnimating ? 'animate-cart-shake' : ''} text-[#3F2B2B]`}
+                >
+                  <ShoppingBag className="w-6 h-6" />
+                  {totalCartCount > 0 && (
+                    <span className="absolute top-0 right-0 min-w-[16px] h-4 px-1 rounded-full bg-[#3F2B2B] text-white text-[9px] font-bold flex items-center justify-center">{totalCartCount}</span>
+                  )}
+                </button>
                 <img 
                   src="https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/logo/cippylogo.svg.PNG"
                   alt="Cippy Logo"
@@ -2013,7 +2037,7 @@ export default function App() {
               </div>
 
               {/* Right navigation links: ARCHIVE, MEMBER, ALERTS, CART */}
-              <div className="order-3 lg:order-3 w-full lg:w-1/3 flex flex-wrap items-center justify-center lg:justify-end gap-x-4 gap-y-2 lg:gap-8 min-w-0">
+              <div onClick={() => setMobileNavOpen(false)} className={`order-3 lg:order-3 w-full lg:w-1/3 ${mobileNavOpen ? 'flex' : 'hidden'} lg:flex flex-col lg:flex-row lg:flex-wrap items-center justify-center lg:justify-end gap-x-4 gap-y-3 lg:gap-8 min-w-0`}>
                 <button
                   onClick={() => {
                     setActiveTab('atelier');
@@ -2062,7 +2086,7 @@ export default function App() {
                 </button>
                 <button
                   onClick={() => setIsCartOpen(true)}
-                  className={`text-[11px] tracking-[0.2em] font-bold font-sans transition-all duration-300 cursor-pointer uppercase ${
+                  className={`hidden lg:block text-[11px] tracking-[0.2em] font-bold font-sans transition-all duration-300 cursor-pointer uppercase ${
                     isCartAnimating
                       ? 'animate-cart-shake text-[#3F2B2B]'
                       : 'text-zinc-500 hover:text-[#3F2B2B]'
@@ -2264,8 +2288,8 @@ export default function App() {
                         className="group flex flex-col sm:flex-row items-center gap-6 bg-[#F4F6F2] border border-[#E4E8DF] p-6 rounded-none cursor-pointer transition-all duration-300 hover:bg-[#EFF2EC] hover:translate-x-1"
                       >
                         <div className="w-full sm:w-1/3 bg-white border border-[#E4E8DF] h-32 rounded-none relative overflow-hidden flex items-center justify-center">
-                          <img 
-                            src="https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/004.png"
+                          <img loading="lazy" decoding="async" 
+                            src={opt("https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/004.png")}
                             alt="Sage Blouse"
                             className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
                             referrerPolicy="no-referrer"
@@ -2294,8 +2318,8 @@ export default function App() {
                         className="group flex flex-col sm:flex-row items-center gap-6 bg-[#F4F6F2] border border-[#E4E8DF] p-6 rounded-none cursor-pointer transition-all duration-300 hover:bg-[#EFF2EC] hover:translate-x-1"
                       >
                         <div className="w-full sm:w-1/3 bg-white border border-[#E4E8DF] h-32 rounded-none relative overflow-hidden flex items-center justify-center">
-                          <img 
-                            src="https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/007.png"
+                          <img loading="lazy" decoding="async" 
+                            src={opt("https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/007.png")}
                             alt="Structure Pants"
                             className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
                             referrerPolicy="no-referrer"
@@ -2324,8 +2348,8 @@ export default function App() {
                         className="group flex flex-col sm:flex-row items-center gap-6 bg-[#F4F6F2] border border-[#E4E8DF] p-6 rounded-none cursor-pointer transition-all duration-300 hover:bg-[#EFF2EC] hover:translate-x-1"
                       >
                         <div className="w-full sm:w-1/3 bg-white border border-[#E4E8DF] h-32 rounded-none relative overflow-hidden flex items-center justify-center">
-                          <img 
-                            src="https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/003.png"
+                          <img loading="lazy" decoding="async" 
+                            src={opt("https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/003.png")}
                             alt="Cocoon Dress"
                             className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
                             referrerPolicy="no-referrer"
@@ -2403,8 +2427,8 @@ export default function App() {
                         className="group flex flex-col cursor-pointer"
                       >
                         <div className="relative bg-[#FFF0F2]/50 border border-[#FCE3E6] rounded-2xl overflow-hidden h-[240px] shadow-2xs transition-all duration-300 group-hover:bg-[#FFF0F2]/75 group-hover:scale-[1.01] flex items-center justify-center">
-                          <img 
-                            src="https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/005.png"
+                          <img loading="lazy" decoding="async" 
+                            src={opt("https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/005.png")}
                             alt="Campus Diary Set"
                             className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
                             referrerPolicy="no-referrer"
@@ -2430,8 +2454,8 @@ export default function App() {
                         className="group flex flex-col cursor-pointer"
                       >
                         <div className="relative bg-[#FFF0F2]/50 border border-[#FCE3E6] rounded-2xl overflow-hidden h-[240px] shadow-2xs transition-all duration-300 group-hover:bg-[#FFF0F2]/75 group-hover:scale-[1.01] flex items-center justify-center">
-                          <img 
-                            src="https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/001.png"
+                          <img loading="lazy" decoding="async" 
+                            src={opt("https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/001.png")}
                             alt="Matcha Jacquard Dress"
                             className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
                             referrerPolicy="no-referrer"
@@ -2457,8 +2481,8 @@ export default function App() {
                         className="group flex flex-col cursor-pointer"
                       >
                         <div className="relative bg-[#FFF0F2]/50 border border-[#FCE3E6] rounded-2xl overflow-hidden h-[240px] shadow-2xs transition-all duration-300 group-hover:bg-[#FFF0F2]/75 group-hover:scale-[1.01] flex items-center justify-center">
-                          <img 
-                            src="https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/004.png"
+                          <img loading="lazy" decoding="async" 
+                            src={opt("https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/004.png")}
                             alt="Seoul Street Puff Sleeve"
                             className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
                             referrerPolicy="no-referrer"
@@ -2484,8 +2508,8 @@ export default function App() {
                         className="group flex flex-col cursor-pointer"
                       >
                         <div className="relative bg-[#FFF0F2]/50 border border-[#FCE3E6] rounded-2xl overflow-hidden h-[240px] shadow-2xs transition-all duration-300 group-hover:bg-[#FFF0F2]/75 group-hover:scale-[1.01] flex items-center justify-center">
-                          <img 
-                            src="https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/003.png"
+                          <img loading="lazy" decoding="async" 
+                            src={opt("https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/003.png")}
                             alt="Paris Girl Polka Set"
                             className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
                             referrerPolicy="no-referrer"
@@ -2514,8 +2538,8 @@ export default function App() {
                       
                       {/* Floating Bestseller Badge */}
                       <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5 bg-rose-50 border border-rose-200/60 rounded-full pl-1.5 pr-2.5 py-0.5 shadow-xs">
-                        <img 
-                          src="https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/001.png"
+                        <img loading="lazy" decoding="async" 
+                          src={opt("https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/001.png")}
                           alt="Bestseller"
                           className="w-5 h-5 rounded-full object-cover border border-rose-200"
                           referrerPolicy="no-referrer"
@@ -2637,16 +2661,16 @@ export default function App() {
               ) : isChaewon ? (
                 <div className="grid grid-cols-1 lg:grid-cols-12 border border-[#FBEBF0] rounded-[24px] overflow-hidden bg-white shadow-xs">
                   {/* Left Column: Chapter 01, Large Pink Box with Calligraphy, and the Narrative block */}
-                  <div className="lg:col-span-7 p-6 md:p-8 lg:p-10 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-[#FBEBF0] space-y-8">
+                  <div className="lg:col-span-7 p-4 sm:p-6 md:p-8 lg:p-10 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-[#FBEBF0] space-y-4 lg:space-y-8">
                     <div className="space-y-4">
                       <span className="text-[10px] uppercase font-mono text-zinc-400 font-semibold tracking-[0.25em] block">
                         {lang === 'zh' ? '第一章 — 宽松轮廓美学' : 'CHAPTER 01 — THE LOOSE SILHOUETTE'}
                       </span>
                       
                       {/* Large custom image container with model photo matching mockup exactly */}
-                      <div className="relative bg-[#FFF0F2]/70 rounded-2xl h-[400px] w-full flex items-center justify-center overflow-hidden border border-[#FCE3E6] group">
+                      <div className="relative bg-[#FFF0F2]/70 rounded-2xl h-[260px] sm:h-[340px] lg:h-[400px] w-full flex items-center justify-center overflow-hidden border border-[#FCE3E6] group">
                         <img
-                          src="https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/WhatsApp%20Image%202026-08-20%20at%2019.39.28.jpeg"
+                          src={opt("https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/WhatsApp%20Image%202026-08-20%20at%2019.39.28.jpeg")}
                           alt="Chaewon Campaign"
                           className="absolute inset-0 h-full w-full object-cover group-hover:scale-[1.03] transition-transform duration-[6000ms] ease-out"
                           referrerPolicy="no-referrer"
@@ -2668,7 +2692,7 @@ export default function App() {
                     </div>
 
                     {/* Lower narrative block: brand positioning — A Storybook Wardrobe */}
-                    <div className="bg-[#FFFDFD] border border-[#FBEBF0] rounded-2xl p-6 space-y-2">
+                    <div className="bg-[#FFFDFD] border border-[#FBEBF0] rounded-2xl p-4 lg:p-6 space-y-2">
                       <h3 className="text-2xl md:text-3xl font-serif text-[#3F2B2B] leading-tight font-semibold">
                         A Storybook Wardrobe
                       </h3>
@@ -2682,10 +2706,10 @@ export default function App() {
                   </div>
 
                   {/* Right Column: Fit Profile, description, CTAs and hot releases preview */}
-                  <div className="lg:col-span-5 p-6 md:p-8 lg:p-10 flex flex-col justify-between space-y-8">
+                  <div className="lg:col-span-5 p-4 sm:p-6 md:p-8 lg:p-10 flex flex-col justify-between gap-6 lg:gap-8">
                     
-                    {/* Fit Profile block */}
-                    <div className="space-y-4">
+                    {/* Fit Profile block (below the product preview on mobile so prices show in the first screen) */}
+                    <div className="space-y-4 order-3 lg:order-1">
                       <span className="text-xs font-bold text-[#B96A73] tracking-[0.25em] font-sans uppercase block">
                         {lang === 'zh' ? '版型解析' : 'FIT PROFILE'}
                       </span>
@@ -2721,10 +2745,10 @@ export default function App() {
                     </div>
 
                     {/* Thin border divider */}
-                    <div className="border-t border-[#FBEBF0] w-full" />
+                    <div className="border-t border-[#FBEBF0] w-full order-2" />
 
                     {/* Preview product teasers — always the 4 most recently added products */}
-                    <div className="space-y-3">
+                    <div className="space-y-3 order-1 lg:order-3">
                       <span className="text-[10px] tracking-[0.2em] font-mono text-zinc-400 font-bold uppercase block">
                         {lang === 'zh' ? '新品热预览' : 'HOT RELEASE PREVIEW'}
                       </span>
@@ -2738,7 +2762,7 @@ export default function App() {
                             <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-[#B96A73] z-10" />
                             <div className="w-full h-1/2 rounded-lg overflow-hidden bg-[#FFF0F2]/70">
                               {p.imageUrl && (
-                                <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                <img loading="lazy" decoding="async" src={p.imageUrl} alt={p.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                               )}
                             </div>
                             <div className="space-y-0.5 pt-1">
@@ -2765,8 +2789,8 @@ export default function App() {
                       
                       {/* Huge Arched Frame matching screenshot with real model image */}
                       <div className="relative rounded-t-full h-[380px] w-full flex flex-col justify-center items-center overflow-hidden border border-[#FBE3E6]/60 shadow-xs group">
-                        <img 
-                          src="https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/model-ootd/0019.jpeg"
+                        <img loading="lazy" decoding="async" 
+                          src={opt("https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/model-ootd/0019.jpeg")}
                           alt="Nabi Spring"
                           className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-[6000ms] ease-out"
                           referrerPolicy="no-referrer"
@@ -4345,7 +4369,7 @@ export default function App() {
                               <div className="border-t pt-2.5 flex items-center gap-3">
                                 <div className="w-12 h-12 rounded bg-pink-50 border border-pink-100 overflow-hidden shrink-0">
                                   {alertProduct.imageUrl ? (
-                                    <img src={alertProduct.imageUrl} alt="" className="w-full h-full object-cover" />
+                                    <img loading="lazy" decoding="async" src={alertProduct.imageUrl} alt="" className="w-full h-full object-cover" />
                                   ) : '👗'}
                                 </div>
                                 <div className="space-y-0.5">
@@ -4900,7 +4924,7 @@ export default function App() {
                                         <div className="flex items-center gap-2.5">
                                           <div className="w-10 h-10 rounded bg-[#FFF0F2] flex items-center justify-center font-serif text-[#B96A73] font-bold text-sm overflow-hidden shrink-0 border border-pink-100/30">
                                             {productImg ? (
-                                              <img src={productImg} alt="" className="w-full h-full object-cover" />
+                                              <img loading="lazy" decoding="async" src={productImg} alt="" className="w-full h-full object-cover" />
                                             ) : '👗'}
                                           </div>
                                           <div className="space-y-0.5">
@@ -5323,7 +5347,7 @@ export default function App() {
 
                         {alertProduct.imageUrl && (
                           <div className="my-2.5 rounded-lg overflow-hidden max-h-[140px] border" style={{ borderColor: alertTemplate === 'midnight' ? '#2B2433' : '#FBEBF0' }}>
-                            <img src={alertProduct.imageUrl} alt="" className="w-full h-full object-cover" />
+                            <img loading="lazy" decoding="async" src={alertProduct.imageUrl} alt="" className="w-full h-full object-cover" />
                           </div>
                         )}
 
@@ -5684,7 +5708,7 @@ export default function App() {
             {compareProducts.map(prod => (
               <div key={prod.id} className="relative group shrink-0 w-10 h-10 bg-pink-50 border border-pink-100/60 rounded-lg overflow-hidden">
                 {prod.imageUrl ? (
-                  <img src={prod.imageUrl} alt={prod.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                  <img loading="lazy" decoding="async" src={prod.imageUrl} alt={prod.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-xs text-[#B96A73]" style={{ color: prod.color }}>
                     ★
@@ -5782,7 +5806,7 @@ export default function App() {
                               {/* Thumbnail image or placeholder */}
                               <div className={`w-full h-28 bg-gradient-to-b ${prod.bgGradient} rounded-xl overflow-hidden flex items-center justify-center border border-pink-100/40`}>
                                 {prod.imageUrl ? (
-                                  <img src={prod.imageUrl} alt={prod.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                  <img loading="lazy" decoding="async" src={prod.imageUrl} alt={prod.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                                 ) : (
                                   <div className="text-center font-mono text-[10px]" style={{ color: prod.color }}>
                                     ★ CIPPY ★

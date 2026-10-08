@@ -146,7 +146,7 @@ export default function MixMatchRoom({ onAddProductToCart, activeTheme: activeTh
                     isMinimal ? 'rounded-none border-zinc-200 bg-zinc-50' : 'rounded-lg border-[var(--theme-primary-soft)] bg-[var(--theme-scrollbar-bg)]'
                   } overflow-hidden border shrink-0`}>
                     {top.imageUrl ? (
-                      <img src={top.imageUrl} alt={top.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      <img loading="lazy" decoding="async" src={top.imageUrl} alt={top.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                     ) : (
                       <svg viewBox="0 0 100 100" fill="none" className={`w-full h-full p-2 ${activeTheme.primaryText}`}>
                         <path d={top.svgPath} fill="currentColor" opacity="0.8" />
@@ -196,7 +196,7 @@ export default function MixMatchRoom({ onAddProductToCart, activeTheme: activeTh
                     isMinimal ? 'rounded-none border-zinc-200 bg-zinc-50' : 'rounded-lg border-[var(--theme-primary-soft)] bg-[var(--theme-scrollbar-bg)]'
                   } overflow-hidden border shrink-0`}>
                     {bottom.imageUrl ? (
-                      <img src={bottom.imageUrl} alt={bottom.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      <img loading="lazy" decoding="async" src={bottom.imageUrl} alt={bottom.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                     ) : (
                       <svg viewBox="0 0 100 100" fill="none" className={`w-full h-full p-2 ${activeTheme.primaryText}`}>
                         <path d={bottom.svgPath} fill="currentColor" opacity="0.8" />
@@ -284,7 +284,7 @@ export default function MixMatchRoom({ onAddProductToCart, activeTheme: activeTh
             {/* Top garment photo */}
             <div className="relative z-20 w-40 h-52 rounded-2xl overflow-hidden ring-4 ring-white transition-all duration-500 transform hover:scale-105" style={{ filter: 'drop-shadow(0 6px 10px rgba(0,0,0,0.1))' }}>
               {selectedTop.imageUrl ? (
-                <img src={selectedTop.imageUrl} alt={selectedTop.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                <img loading="lazy" decoding="async" src={selectedTop.imageUrl} alt={selectedTop.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
               ) : (
                 <svg viewBox="0 0 100 100" fill="none" className="w-full h-full" style={{ color: selectedTop.color }}>
                   <path d={selectedTop.svgPath} fill="currentColor" />
@@ -295,7 +295,7 @@ export default function MixMatchRoom({ onAddProductToCart, activeTheme: activeTh
             {/* Bottom garment photo */}
             <div className="relative z-10 w-40 h-52 rounded-2xl overflow-hidden ring-4 ring-white -mt-6 transition-all duration-500 transform hover:scale-105" style={{ filter: 'drop-shadow(0 8px 12px rgba(0,0,0,0.12))' }}>
               {selectedBottom.imageUrl ? (
-                <img src={selectedBottom.imageUrl} alt={selectedBottom.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                <img loading="lazy" decoding="async" src={selectedBottom.imageUrl} alt={selectedBottom.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
               ) : (
                 <svg viewBox="0 0 100 100" fill="none" className="w-full h-full" style={{ color: selectedBottom.color }}>
                   <path d={selectedBottom.svgPath} fill="currentColor" />
