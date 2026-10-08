@@ -789,12 +789,6 @@ function recalcAddOrderTotals() {
 }
 window.recalcAddOrderTotals = recalcAddOrderTotals;
 
-function nextOrderId() {
-  const nums = allOrders.map(o => parseInt(o.order_id, 10)).filter(n => !isNaN(n));
-  const max = nums.length ? Math.max(...nums) : 10009;
-  return String(max + 1);
-}
-
 async function submitAddOrder() {
   const errEl = document.getElementById('aoError');
   errEl.classList.add('hidden');
@@ -806,32 +800,35 @@ async function submitAddOrder() {
   if (!items.length) { errEl.textContent = '请至少添加一件商品'; errEl.classList.remove('hidden'); return; }
 
   const shipping = Math.max(0, parseFloat(document.getElementById('aoShipping').value) || 0);
-  const subtotal = items.reduce((s, i) => s + i.price_myr * i.qty, 0);
-  const total = subtotal + shipping;
-
-  const payload = {
-    order_id: nextOrderId(),
-    customer: {
-      name,
-      phone: document.getElementById('aoPhone').value.trim(),
-      email: document.getElementById('aoEmail').value.trim(),
-      address: document.getElementById('aoAddress').value.trim(),
-    },
-    guest_email: document.getElementById('aoEmail').value.trim() || null,
-    items,
-    totals: { subtotal, shipping, total },
-    status: document.getElementById('aoStatus').value,
-    payment_method: document.getElementById('aoPaymentMethod').value,
-  };
 
   const btn = document.getElementById('aoSubmitBtn');
   btn.textContent = '创建中…'; btn.disabled = true;
 
-  const { data, error } = await sb.from('orders').insert(payload).select();
-
-  if (error) {
+  let created = null;
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    const r = await fetch('/api/admin-create-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
+      body: JSON.stringify({
+        customer: {
+          name,
+          phone: document.getElementById('aoPhone').value.trim(),
+          email: document.getElementById('aoEmail').value.trim(),
+          address: document.getElementById('aoAddress').value.trim(),
+        },
+        items,
+        shipping,
+        status: document.getElementById('aoStatus').value,
+        paymentMethod: document.getElementById('aoPaymentMethod').value,
+      }),
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.error || r.status);
+    created = j.order;
+  } catch (e) {
     btn.textContent = '创建订单'; btn.disabled = false;
-    errEl.textContent = '创建失败：' + error.message; errEl.classList.remove('hidden');
+    errEl.textContent = '创建失败：' + e.message; errEl.classList.remove('hidden');
     return;
   }
 
@@ -844,7 +841,7 @@ async function submitAddOrder() {
   loadProducts();
 
   btn.textContent = '创建订单'; btn.disabled = false;
-  if (data && data[0]) allOrders.unshift(data[0]);
+  if (created) allOrders.unshift(created);
   closeAddOrderModal();
   renderOrders();
 }

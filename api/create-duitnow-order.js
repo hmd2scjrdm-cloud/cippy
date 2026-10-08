@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { nextOrderId } from "./_lib/next-order-id.js";
 
 const SUPABASE_URL = "https://ilzeziznxzaxxudzhdmu.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI";
@@ -95,16 +96,8 @@ export default async function handler(req, res) {
   const verifiedSubtotal = items.reduce((s, i) => s + i._verified_price * Number(i.qty || 1), 0);
   const verifiedTotal = verifiedSubtotal + shipping;
 
-  // Sequential order ID. Must count with the service role key — the anon key can't see
-  // other customers' orders under RLS, so the count always came back as 0 and every
-  // order was getting the same number ("10010").
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY;
-  const countRes = await fetch(`${SUPABASE_URL}/rest/v1/orders?select=id`, {
-    headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}`, Prefer: "count=exact", Range: "0-0" },
-  });
-  const contentRange = countRes.headers.get("content-range") || "0/0";
-  const totalOrders = parseInt(contentRange.split("/")[1] || "0", 10);
-  const orderId = String(10010 + totalOrders);
+  const orderId = await nextOrderId(SUPABASE_URL, serviceKey);
 
   // Save order to Supabase (service role key bypasses RLS)
   const saveRes = await sbFetch("orders", {

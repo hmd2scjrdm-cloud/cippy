@@ -1,5 +1,6 @@
 import Stripe from "stripe";
 import nodemailer from "nodemailer";
+import { nextOrderId } from "./_lib/next-order-id.js";
 
 const SUPABASE_URL = "https://ilzeziznxzaxxudzhdmu.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI";
@@ -209,16 +210,8 @@ export default async function handler(req, res) {
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-  // Sequential order number starting from 10010. Must use the service role key here — anon/user
-  // tokens can't see other customers' orders under RLS, so the count silently came back as 0 and
-  // every single order was getting the same number ("10010").
   const orderCountKey = process.env.SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY;
-  const countRes = await fetch(`${SUPABASE_URL}/rest/v1/orders?select=id`, {
-    headers: { apikey: orderCountKey, Authorization: `Bearer ${orderCountKey}`, Prefer: 'count=exact', Range: '0-0' },
-  });
-  const contentRange = countRes.headers.get('content-range') || '0/0';
-  const totalOrders = parseInt(contentRange.split('/')[1] || '0', 10);
-  const orderId = String(10010 + totalOrders);
+  const orderId = await nextOrderId(SUPABASE_URL, orderCountKey);
 
   // Fetch real prices from DB — never trust frontend price
   const productIds = [...new Set(items.filter(i => !i._is_discount).map(i => i.product_id || i.id).filter(Boolean))];
