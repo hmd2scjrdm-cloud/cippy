@@ -247,7 +247,7 @@ export default function ProductDetailModal({
 
             {/* Design Chronicles (Fairytale Story) — only when there's real copy, an empty
                 block with quote marks and nothing between them reads as broken, not minimal */}
-            {(product.story || product.cnStory) && (
+            {/\p{L}|\p{N}/u.test(tx(product.story, product.cnStory) || '') && (
               <div className="bg-[#FFF9FB] p-4 rounded-xl border border-pink-100/40 space-y-2">
                 <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-[#B96A73] font-bold">
                   <BookOpen className="w-3.5 h-3.5" />
@@ -368,6 +368,14 @@ export default function ProductDetailModal({
                     </span>
                   </div>
                   <p>{tx(calcResult.fitEn, calcResult.fitZh)}</p>
+                  {availableSizes.length > 0 && (
+                    <p className="text-zinc-500">
+                      {tx(
+                        `This item comes in ${availableSizes.join(' / ')} only. If you usually wear a larger size, please ask WhatsApp support before ordering.`,
+                        `本款只有 ${availableSizes.join(' / ')} 码。如果你平时穿更大的码，下单前请先联系 WhatsApp 客服确认。`
+                      )}
+                    </p>
+                  )}
                   <p className="text-zinc-400">
                     {tx('General guide only. Please compare the garment measurements or ask WhatsApp support before ordering.', '此结果仅供一般参考。下单前请对照商品尺寸，或联系 WhatsApp 客服确认。')}
                   </p>
