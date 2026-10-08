@@ -5556,9 +5556,15 @@ export default function App() {
               <div className="md:w-1/3 text-center md:text-left tracking-wider uppercase">
                 &copy; 2026 CIPPY ATELIER. ALL RIGHTS RESERVED.
               </div>
-              <div className="md:w-1/3 flex justify-center gap-6 tracking-widest text-zinc-500">
+              <div className="md:w-1/3 flex flex-wrap justify-center gap-x-6 gap-y-2 tracking-widest text-zinc-500">
                 <a href="https://wa.me/601120861073" target="_blank" rel="noreferrer" className="hover:text-[#3F2B2B] transition-colors">
                   {lang === 'zh' ? '客服 WHATSAPP' : 'WHATSAPP SUPPORT'}
+                </a>
+                <a href="https://www.instagram.com/cippy.kl/" target="_blank" rel="noreferrer" className="hover:text-[#3F2B2B] transition-colors">
+                  INSTAGRAM
+                </a>
+                <a href="mailto:cippy.kl@gmail.com" className="hover:text-[#3F2B2B] transition-colors">
+                  {lang === 'zh' ? '邮箱' : 'EMAIL'}
                 </a>
                 <button
                   onClick={() => { setActiveTab('policies'); document.getElementById('nabi-studio-app-card')?.scrollIntoView({ behavior: 'smooth' }); }}
