@@ -104,10 +104,10 @@ export default async function handler(req, res) {
     if (hasVariantInventory(dbProduct.sizes)) {
       const variant = variantForItem(dbProduct, item);
       if (!variant) return res.status(400).json({ error: `请选择有效的颜色和尺码：${item.name_zh || pid}` });
-      if (Number(variant.stock || 0) < qty && !variant.preorder) return res.status(409).json({ error: `该颜色/尺码库存不足且未开放预购：${item.name_zh || pid}` });
+      // Any quantity above ready stock automatically becomes preorder.
       item.preorder = Number(variant.stock || 0) < qty;
     } else if (Number(dbProduct.stock || 0) < qty) {
-      return res.status(409).json({ error: `商品库存不足：${item.name_zh || pid}` });
+      item.preorder = true;
     }
   }
 

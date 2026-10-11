@@ -67,8 +67,9 @@ function getSizesForColor(sizes: unknown, color: string | null): ('S' | 'M')[] {
     const labels = Array.from(new Set(sizes.filter((s: any) => typeof s === 'string'))) as ('S' | 'M')[];
     return labels.length > 0 ? labels : ['S', 'M'];
   }
-  const filtered = (color ? sizes.filter(s => s.color === color) : sizes)
-    .filter(s => Number(s.stock ?? 0) > 0 || s.preorder === true);
+  // Every configured variant remains selectable. Zero-stock variants automatically
+  // become preorder items instead of disappearing or behaving like ready stock.
+  const filtered = color ? sizes.filter(s => s.color === color) : sizes;
   const labels = Array.from(new Set(filtered.map(s => s.size).filter(Boolean))) as ('S' | 'M')[];
   return labels;
 }
@@ -76,17 +77,22 @@ function getSizesForColor(sizes: unknown, color: string | null): ('S' | 'M')[] {
 function isPreorderSelection(sizes: unknown, color: string | null, size: string | null): boolean {
   if (!isColorSizeEntry(sizes) || !color || !size) return false;
   const entry = sizes.find(s => s.color === color && s.size === size);
-  return Boolean(entry?.preorder && Number(entry.stock || 0) <= 0);
+  return Boolean(entry && Number(entry.stock || 0) <= 0);
 }
 
 function colorLabel(color: string, lang: string): string {
-  if (lang === 'zh') return color;
-  const map: Record<string, string> = {
+  const enMap: Record<string, string> = {
     '白色': 'White', '黑色': 'Black', '粉色': 'Pink', '灰色': 'Grey',
     '白色裙子': 'White', '粉色裙子': 'Pink', '黑色短裤': 'Black', '灰色短裤': 'Grey',
-    '白色上衣': 'White', '棕色上衣': 'Brown', '图片色': 'As shown'
+    '白色上衣': 'White', '棕色上衣': 'Brown', '图片色': 'As shown',
+    '奶白色': 'Milk White', '柔粉色': 'Muted Pink', '轮廓款': 'Outline', '爱心款': 'Sweet Heart'
   };
-  return map[color] || color;
+  const zhMap: Record<string, string> = {
+    'White': '白色', 'Black': '黑色', 'Pink': '粉色', 'Grey': '灰色', 'Brown': '棕色',
+    'As shown': '图片色', 'Milk White': '奶白色', 'Muted Pink': '柔粉色',
+    'Outline': '轮廓款', 'Sweet Heart': '爱心款'
+  };
+  return lang === 'zh' ? (zhMap[color] || color) : (enMap[color] || color);
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -120,7 +126,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const [isPulsing, setIsPulsing] = useState(false);
   const [sizeRequiredHint, setSizeRequiredHint] = useState(false);
   const [colorRequiredHint, setColorRequiredHint] = useState(false);
-  const selectedIsPreorder = isPreorderSelection(product.sizes, selectedColor, selectedSize);
+  const selectedIsPreorder = isColorProduct
+    ? isPreorderSelection(product.sizes, selectedColor, selectedSize)
+    : Number(product.stock || 0) <= 0;
 
   // Auto-pick the size when a color leaves only one option; clear it if it's no longer valid
   React.useEffect(() => {
@@ -152,7 +160,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       setTimeout(() => setColorRequiredHint(false), 1200);
       return;
     }
-    let finalProduct = product;
+    let finalProduct = { ...product, isPreorder: selectedIsPreorder };
     if (isColorProduct && selectedColor) {
       const slug = selectedColor.toLowerCase().replace(/\s+/g, '-');
       finalProduct = {
@@ -162,7 +170,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         selectedColor,
         isPreorder: selectedIsPreorder,
         name: `${product.name} - ${colorLabel(selectedColor, 'en')}`,
-        cnName: `${product.cnName} - ${selectedColor}`,
+        cnName: `${product.cnName} - ${colorLabel(selectedColor, 'zh')}`,
         imageUrl: product.color_images?.[selectedColor] || product.imageUrl,
       };
     }
@@ -181,12 +189,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
   let badgeCnText = '';
   let badgeStyle = '';
 
-  const hasPreorder = isColorSizeEntry(product.sizes) && product.sizes.some(s => s.preorder);
-  const isSoldOut = (product.stock === 0 && !hasPreorder) || product.inStock === false;
+  const hasPreorder = Number(product.stock || 0) <= 0;
+  const isSoldOut = product.inStock === false;
   const isLowStock = !isSoldOut && product.stock !== undefined && product.stock > 0 && product.stock <= 2;
   const isNewArrival = !isSoldOut && !isLowStock && (product.series === "Cippy Sweet" || product.series === "Cippy Summer");
 
-  if (product.stock === 0 && hasPreorder && product.inStock !== false) {
+  if (hasPreorder && !isSoldOut) {
     badgeText = 'Preorder';
     badgeCnText = '预购';
     if (isMinimal) {
@@ -455,7 +463,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <div className="space-y-1">
           <div className="flex items-center justify-between gap-2">
             <span className={`text-[9px] font-bold uppercase tracking-[0.12em] ${activeTheme.accentText}`}>
-              {getPriceTier(product.price).emoji} {getPriceTier(product.price).en}
+              {getPriceTier(product.price).emoji} {lang === 'zh' ? getPriceTier(product.price).zh : getPriceTier(product.price).en}
             </span>
             <span className="font-mono text-xs text-zinc-400 shrink-0">
               RM {product.price}
@@ -521,7 +529,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                     >
                       {swatchImg ? (
                         <>
-                          <img loading="lazy" decoding="async" src={swatchImg} alt={col} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                          <img loading="lazy" decoding="async" src={swatchImg} alt={colorLabel(col, lang)} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                           {selectedColor === col && (
                             <span className="absolute inset-0 flex items-center justify-center bg-black/30">
                               <Check className="w-3 h-3 text-white" />
@@ -563,7 +571,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
               <>{lang === 'zh' ? '请先选择颜色' : 'Please select a color'}</>
             ) : (
               <>
-                <ShoppingBag className="w-3.5 h-3.5" /> {lang === 'zh' ? '加入购物袋' : 'Add Ready-to-Wear'}
+                <ShoppingBag className="w-3.5 h-3.5" /> {selectedIsPreorder
+                  ? (lang === 'zh' ? '预购' : 'Preorder')
+                  : (lang === 'zh' ? '加入购物袋' : 'Add Ready-to-Wear')}
               </>
             )}
           </button>

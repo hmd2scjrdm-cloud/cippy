@@ -32,8 +32,7 @@ function getSizesForColor(sizes: unknown, color: string | null): ('S' | 'M')[] {
     const labels = Array.from(new Set(sizes.filter((s: any) => typeof s === 'string'))) as ('S' | 'M')[];
     return labels.length > 0 ? labels : ['S', 'M'];
   }
-  const filtered = (color ? sizes.filter(s => s.color === color) : sizes)
-    .filter(s => Number(s.stock ?? 0) > 0 || s.preorder === true);
+  const filtered = color ? sizes.filter(s => s.color === color) : sizes;
   const labels = Array.from(new Set(filtered.map(s => s.size).filter(Boolean))) as ('S' | 'M')[];
   return labels;
 }
@@ -41,17 +40,37 @@ function getSizesForColor(sizes: unknown, color: string | null): ('S' | 'M')[] {
 function isPreorderSelection(sizes: unknown, color: string | null, size: string | null): boolean {
   if (!isColorSizeEntry(sizes) || !color || !size) return false;
   const entry = sizes.find(s => s.color === color && s.size === size);
-  return Boolean(entry?.preorder && Number(entry.stock || 0) <= 0);
+  return Boolean(entry && Number(entry.stock || 0) <= 0);
 }
 
 function colorLabel(color: string, lang: 'en' | 'zh'): string {
-  if (lang === 'zh') return color;
-  const map: Record<string, string> = {
+  const enMap: Record<string, string> = {
     '白色': 'White', '黑色': 'Black', '粉色': 'Pink', '灰色': 'Grey',
     '白色裙子': 'White', '粉色裙子': 'Pink', '黑色短裤': 'Black', '灰色短裤': 'Grey',
-    '白色上衣': 'White', '棕色上衣': 'Brown', '图片色': 'As shown'
+    '白色上衣': 'White', '棕色上衣': 'Brown', '图片色': 'As shown',
+    '奶白色': 'Milk White', '柔粉色': 'Muted Pink', '轮廓款': 'Outline', '爱心款': 'Sweet Heart'
   };
-  return map[color] || color;
+  const zhMap: Record<string, string> = {
+    'White': '白色', 'Black': '黑色', 'Pink': '粉色', 'Grey': '灰色', 'Brown': '棕色',
+    'As shown': '图片色', 'Milk White': '奶白色', 'Muted Pink': '柔粉色',
+    'Outline': '轮廓款', 'Sweet Heart': '爱心款'
+  };
+  return lang === 'zh' ? (zhMap[color] || color) : (enMap[color] || color);
+}
+
+function specLabel(value: string | undefined, lang: 'en' | 'zh'): string {
+  if (!value) return lang === 'zh' ? '资料待确认' : 'Not specified';
+  const map: Record<string, [string, string]> = {
+    'Gentle Hand Wash': ['Gentle hand wash', '轻柔手洗'],
+    'Cold gentle wash': ['Cold gentle wash', '冷水轻柔洗涤'],
+    'None': ['No lining', '无内衬'],
+    'Slight': ['Slight stretch', '微弹'],
+    'Medium': ['Medium', '中等'],
+    'High': ['High', '高'],
+    'Low': ['Low', '低']
+  };
+  const translated = map[value];
+  return translated ? translated[lang === 'zh' ? 1 : 0] : value;
 }
 
 export default function ProductDetailModal({
@@ -71,7 +90,9 @@ export default function ProductDetailModal({
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [addedToCart, setAddedToCart] = useState(false);
   const [selectionRequiredHint, setSelectionRequiredHint] = useState<string | null>(null);
-  const selectedIsPreorder = isPreorderSelection(product.sizes, selectedColor, selectedSize);
+  const selectedIsPreorder = isColorProduct
+    ? isPreorderSelection(product.sizes, selectedColor, selectedSize)
+    : Number(product.stock || 0) <= 0;
 
   // Auto-pick the size when a color leaves only one option; clear it if it's no longer valid
   React.useEffect(() => {
@@ -112,7 +133,7 @@ export default function ProductDetailModal({
       setTimeout(() => setSelectionRequiredHint(null), 1500);
       return;
     }
-    let finalProduct = product;
+    let finalProduct = { ...product, isPreorder: selectedIsPreorder };
     if (isColorProduct && selectedColor) {
       const slug = selectedColor.toLowerCase().replace(/\s+/g, '-');
       finalProduct = {
@@ -122,7 +143,7 @@ export default function ProductDetailModal({
         selectedColor,
         isPreorder: selectedIsPreorder,
         name: `${product.name} - ${colorLabel(selectedColor, 'en')}`,
-        cnName: `${product.cnName} - ${selectedColor}`,
+        cnName: `${product.cnName} - ${colorLabel(selectedColor, 'zh')}`,
         imageUrl: product.color_images?.[selectedColor] || product.imageUrl,
       };
     }
@@ -240,7 +261,7 @@ export default function ProductDetailModal({
             <div className="space-y-1.5 border-b border-pink-100/50 pb-4">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#B96A73]">
-                  {getPriceTier(product.price).emoji} {getPriceTier(product.price).en}
+                  {getPriceTier(product.price).emoji} {lang === 'zh' ? getPriceTier(product.price).zh : getPriceTier(product.price).en}
                 </span>
                 <span className="font-mono text-xs text-zinc-400">
                   RM {product.price}.00
@@ -281,7 +302,7 @@ export default function ProductDetailModal({
               </div>
               <div>
                 <span className="text-zinc-400 font-mono">{tx("CARE / 洗涤:", "洗涤:")}</span>
-                <strong className="text-zinc-700 ml-1">{product.care || tx("Cold gentle wash", "冷水轻柔洗涤")}</strong>
+                <strong className="text-zinc-700 ml-1">{specLabel(product.care || 'Cold gentle wash', lang)}</strong>
               </div>
               <div>
                 <span className="text-zinc-400 font-mono">{tx("STOCK / 状态:", "状态:")}</span>
@@ -295,15 +316,15 @@ export default function ProductDetailModal({
               </div>
               <div>
                 <span className="text-zinc-400 font-mono">{tx("LINING / 内衬:", "内衬:")}</span>
-                <strong className="text-zinc-700 ml-1">{product.lining || tx("Not specified", "资料待确认")}</strong>
+                <strong className="text-zinc-700 ml-1">{specLabel(product.lining, lang)}</strong>
               </div>
               <div>
                 <span className="text-zinc-400 font-mono">{tx("STRETCH / 弹性:", "弹性:")}</span>
-                <strong className="text-zinc-700 ml-1">{product.stretch || tx("Not specified", "资料待确认")}</strong>
+                <strong className="text-zinc-700 ml-1">{specLabel(product.stretch, lang)}</strong>
               </div>
               <div>
                 <span className="text-zinc-400 font-mono">{tx("SHEERNESS / 透肤:", "透肤程度:")}</span>
-                <strong className="text-zinc-700 ml-1">{product.transparency || tx("Not specified", "资料待确认")}</strong>
+                <strong className="text-zinc-700 ml-1">{specLabel(product.transparency, lang)}</strong>
               </div>
             </div>
 
