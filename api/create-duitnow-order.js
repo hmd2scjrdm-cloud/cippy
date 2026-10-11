@@ -156,17 +156,30 @@ export default async function handler(req, res) {
         .filter(i => !i._is_discount)
         .map(i => `• ${clean(i.name_zh || i.name)}${i.preorder ? '（预购 7–21 个工作日）' : ''} x${i.qty}  —  ${fmt.format(i._verified_price * i.qty)}`)
         .join("\n");
+      const hasPreorder = items.some(i => !i._is_discount && i.preorder);
+      const fulfilmentNotice = hasPreorder
+        ? `<div style="background:#f5f0ff;border:1px solid #ddd0f5;border-radius:12px;padding:14px 16px;margin:16px 0">
+             <p style="margin:0 0 6px;font-weight:bold;color:#62458a">此订单包含预购商品 · This order includes preorder items</p>
+             <p style="margin:0;font-size:13px;line-height:1.6;color:#5f526d">预购商品预计 7–21 个工作日内发货。现货可能会与预购商品一起寄出。<br>Preorder items are expected to ship in 7–21 working days. Ready-stock items may ship together with them.</p>
+           </div>`
+        : `<div style="background:#eef8f1;border:1px solid #d4eadb;border-radius:12px;padding:14px 16px;margin:16px 0">
+             <p style="margin:0;font-size:13px;color:#376047">现货订单预计 1–3 个工作日内发货。<br>Ready-stock orders are expected to dispatch in 1–3 working days.</p>
+           </div>`;
 
       await transporter.sendMail({
         from: `Cippy <${process.env.GMAIL_USER}>`,
         to: customerEmail,
         bcc: process.env.ORDER_NOTIFY_EMAIL || process.env.GMAIL_USER,
-        subject: `Cippy Order #${orderId} — Pending Payment (DuitNow QR)`,
+        subject: hasPreorder
+          ? `Cippy Preorder #${orderId} — Pending DuitNow Payment`
+          : `Cippy Ready-Stock Order #${orderId} — Pending DuitNow Payment`,
         html: `
 <div style="font-family:sans-serif;max-width:480px;margin:auto;color:#333">
   <h2 style="color:#C4928A">Thank you for your order! 🎀</h2>
   <p>Hi ${clean(customer.name)},</p>
   <p>Your order <strong>#${orderId}</strong> has been placed and is waiting for your DuitNow QR payment.</p>
+
+  ${fulfilmentNotice}
 
   <div style="background:#fdf6f4;border-radius:12px;padding:16px;margin:16px 0">
     <p style="margin:0 0 8px;font-weight:bold">Order Summary</p>

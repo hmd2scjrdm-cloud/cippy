@@ -113,6 +113,7 @@ async function updatePoints(token, userId, orderTotal) {
 }
 
 function buildEmailHtml({ orderId, customer, items, totals, pointsEarned, tier }) {
+  const hasPreorder = (items || []).some(item => !item._is_discount && item.preorder);
   const itemRows = (items || []).map(item => {
     const name = clean(item.name_zh || item.name || "Item");
     const details = [item.size, item.color, item.variant, item.preorder ? '预购 7–21 个工作日' : ''].filter(Boolean).map(clean).join(" · ");
@@ -141,6 +142,14 @@ function buildEmailHtml({ orderId, customer, items, totals, pointsEarned, tier }
   const shipping = Number(totals?.shipping || 0);
   const total = Number(totals?.total || subtotal + shipping);
   const pointsRow = pointsEarned ? `<tr><td style="padding:6px 0;font-size:13px;color:#306946;">获得积分</td><td style="text-align:right;padding:6px 0;font-size:13px;color:#306946;font-weight:600;">+${pointsEarned} pts</td></tr>` : "";
+  const preorderNotice = hasPreorder ? `
+        <div style="background:#f5f0ff;border:1px solid #ddd0f5;border-radius:12px;padding:14px 16px;margin:0 0 20px;">
+          <p style="margin:0 0 6px;font-size:14px;font-weight:700;color:#62458a;">此订单包含预购商品 · This order includes preorder items</p>
+          <p style="margin:0;font-size:12px;line-height:1.6;color:#5f526d;">预购商品预计在 7–21 个工作日内发货。如订单同时包含现货，现货可能会等待预购商品到货后一起寄出。<br>Preorder items are expected to ship in 7–21 working days. Ready-stock items in the same order may ship together with the preorder items.</p>
+        </div>` : `
+        <div style="background:#eef8f1;border:1px solid #d4eadb;border-radius:12px;padding:14px 16px;margin:0 0 20px;">
+          <p style="margin:0;font-size:12px;line-height:1.6;color:#376047;">此订单为现货，预计 1–3 个工作日内发货。<br>This is a ready-stock order and is expected to dispatch in 1–3 working days.</p>
+        </div>`;
 
   return `<!DOCTYPE html><html><head><meta charset="UTF-8"></head>
 <body style="margin:0;padding:0;background:#faf7f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
@@ -170,6 +179,8 @@ function buildEmailHtml({ orderId, customer, items, totals, pointsEarned, tier }
         <p style="margin:0 0 20px;font-size:13px;color:#524344;">${clean(customer?.address).replace(/\n/g, "<br>")}</p>
 
         <div style="border-top:1px solid #f0ebe8;margin-bottom:20px;"></div>
+
+        ${preorderNotice}
 
         <p style="margin:0 0 4px;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#857374;font-weight:600;">商品明细</p>
         <table width="100%" cellpadding="0" cellspacing="0" border="0">${itemRows}</table>
@@ -333,14 +344,17 @@ export default async function handler(req, res) {
         service: "gmail",
         auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD },
       });
-      const html = buildEmailHtml({ orderId, customer, items, totals, pointsEarned: 0 });
+      const hasPreorder = items.some(item => !item._is_discount && item.preorder);
+      const html = buildEmailHtml({ orderId, customer, items, totals: verifiedTotals, pointsEarned: 0 });
       await transporter.sendMail({
         from: `Cippy <${process.env.GMAIL_USER}>`,
         to: user?.email || customer.email,
         bcc: process.env.ORDER_NOTIFY_EMAIL || process.env.GMAIL_USER,
-        subject: `Cippy 订单确认 ${orderId}`,
+        subject: hasPreorder
+          ? `Cippy 预购订单确认 ${orderId} · Preorder confirmed`
+          : `Cippy 现货订单确认 ${orderId} · Ready-stock order confirmed`,
         html,
-        text: `订单 ${orderId}\n\n顾客：${clean(customer.name)}\n电话：${clean(customer.phone)}\n地址：${clean(customer.address)}\n\n合计：${fmt.format(orderTotal)}`,
+        text: `订单 ${orderId}\n\n${hasPreorder ? '此订单包含预购商品，预计 7–21 个工作日内发货。\nThis order includes preorder items and is expected to ship in 7–21 working days.\n\n' : '此订单为现货，预计 1–3 个工作日内发货。\n\n'}顾客：${clean(customer.name)}\n电话：${clean(customer.phone)}\n地址：${clean(customer.address)}\n\n合计：${fmt.format(orderTotal)}`,
       });
     } catch (e) {
       console.error("Email error:", e.message);
