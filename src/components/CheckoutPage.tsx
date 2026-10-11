@@ -92,6 +92,7 @@ export default function CheckoutPage({
   const shippingCost = isFreeShipping ? 0 : (isEastMalaysia ? 15 : 10);
   const giftBoxFee = giftBoxTopup ? 10 : 0;
   const grandTotal = subtotal + shippingCost + giftBoxFee;
+  const hasPreorderItems = cartItems.some(item => item.product.isPreorder);
 
   const applySavedAddress = (addr: SavedAddress) => {
     setFullName(addr.fullName);
@@ -278,6 +279,12 @@ export default function CheckoutPage({
       <h3 className="text-sm font-serif font-bold text-zinc-800 border-b border-pink-100 pb-2">
         {tx("Order Summary", "订单摘要")}
       </h3>
+      {hasPreorderItems && (
+        <div className="rounded-xl border border-violet-200 bg-violet-50 px-3 py-2.5 text-[11px] leading-relaxed text-violet-700">
+          <strong className="block">{tx('This order contains preorder items', '此订单包含预购商品')}</strong>
+          {tx('Preorder items are expected to ship in 7–21 working days. Ready-stock items in the same order may ship together with the preorder items.', '预购商品预计 7–21 个工作日发货。同一订单内的现货可能会等待预购商品到货后一起寄出。')}
+        </div>
+      )}
       <div className="space-y-2 max-h-64 overflow-y-auto">
         {cartItems.map(item => (
           <div key={`${item.product.id}-${item.selectedSize}`} className="flex items-center gap-2 text-xs">
@@ -287,6 +294,11 @@ export default function CheckoutPage({
             <div className="flex-1 min-w-0">
               <p className="truncate font-semibold text-zinc-700">{tx(item.product.name, item.product.cnName)}</p>
               <p className="text-zinc-400">{item.selectedSize} × {item.quantity}</p>
+              {item.product.isPreorder && (
+                <span className="mt-1 inline-flex rounded-full border border-violet-200 bg-violet-50 px-2 py-0.5 text-[10px] font-bold text-violet-700">
+                  {tx('PREORDER · 7–21 working days', '预购商品 · 预计 7–21 个工作日')}
+                </span>
+              )}
             </div>
             <span className="font-mono text-zinc-600">RM {item.product.price * item.quantity}</span>
           </div>
@@ -570,7 +582,11 @@ export default function CheckoutPage({
             data-track-conversion="place_order"
             className="w-full bg-[#B96A73] hover:bg-[#a55962] text-white font-semibold text-sm py-3.5 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-md cursor-pointer disabled:opacity-50"
           >
-            {isPlacing ? tx('Processing...', '处理中...') : tx('Place Order', '确认订购')}
+            {isPlacing
+              ? tx('Processing...', '处理中...')
+              : hasPreorderItems
+                ? tx('Confirm Preorder', '确认预购订单')
+                : tx('Place Order', '确认订购')}
             <Sparkles className="w-4 h-4" />
           </button>
         </div>
