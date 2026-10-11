@@ -63,6 +63,10 @@ export default async function handler(req, res) {
             </div>
             <p style="margin:0 0 16px;font-size:13px;color:#6b7280;line-height:1.6;">您可以前往 <a href="https://spx.com.my" style="color:#C4928A;">spx.com.my</a> 官网，输入以上运单号查询实时物流状态。<br/>You can track your parcel in real time at <a href="https://spx.com.my" style="color:#C4928A;">spx.com.my</a> using the tracking number above.</p>
             ${photoClean ? `<p style="margin:0 0 8px;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#C4928A;font-weight:600;">打包实拍 / Packing Photo</p><img src="${photoClean}" width="100%" style="border-radius:10px;display:block;margin-bottom:16px;max-height:320px;object-fit:cover;" alt="Packing photo"/>` : ""}
+            <div style="background:#fff8e8;border:1px solid #f1dfb4;border-radius:12px;padding:16px 18px;margin:20px 0;">
+              <p style="margin:0 0 7px;font-size:13px;font-weight:700;color:#7a5720;">收货前请注意：录制完整开箱视频</p>
+              <p style="margin:0;font-size:12px;color:#6b5a3d;line-height:1.65;">请在拆开包裹前开始录制，并连续拍摄包裹外观、开封过程及所有商品，请勿暂停或剪辑。如需申请退换或报告商品问题，必须提供完整开箱视频。<br><br><strong>Before opening:</strong> Please record one continuous, unedited video showing the sealed parcel, the opening process and every item. A complete unboxing video is required for return, exchange or damaged-item claims.</p>
+            </div>
           </td></tr>
           <tr><td style="background:#f9fafb;padding:20px 28px;border-top:1px solid #f3f4f6;text-align:center;">
             <p style="margin:0 0 8px;font-size:12px;color:#6b7280;">如有任何问题，欢迎通过 <a href="https://wa.me/601120861073" style="color:#C4928A;">WhatsApp</a> 联系我们。</p>
@@ -86,7 +90,7 @@ export default async function handler(req, res) {
       bcc: process.env.ORDER_NOTIFY_EMAIL || process.env.GMAIL_USER,
       subject: `Cippy 订单 ${orderIdClean} 已发货 · Your order has shipped`,
       html,
-      text: `订单 ${orderIdClean} 已发货\n快递公司: SPX Express\n运单号: ${trackingClean}\n可前往 spx.com.my 查询物流状态。`,
+      text: `订单 ${orderIdClean} 已发货\n快递公司: SPX Express\n运单号: ${trackingClean}\n可前往 spx.com.my 查询物流状态。\n\n收货前请注意：请在拆包前开始录制一段完整、未剪辑的开箱视频。退换货或商品问题申请需提供完整开箱视频。\nBefore opening, record one continuous, unedited unboxing video. It is required for return, exchange or damaged-item claims.`,
     });
     return res.status(200).json({ ok: true });
   } catch (err) {
