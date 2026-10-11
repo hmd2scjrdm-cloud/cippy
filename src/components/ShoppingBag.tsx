@@ -144,6 +144,11 @@ export default function ShoppingBagDrawer({
                         <p className="text-[10px] font-mono text-zinc-400">
                           {tx("Size:", "尺码:")} <strong className="text-zinc-700">{item.selectedSize}</strong>
                         </p>
+                        {item.product.isPreorder && (
+                          <p className="text-[10px] font-semibold text-violet-600">
+                            {tx('Preorder · 7–21 working days', '预购 · 预计 7–21 个工作日')}
+                          </p>
+                        )}
                       </div>
 
                       {/* Quantity selector & price */}

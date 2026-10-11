@@ -1224,7 +1224,7 @@ async function loadProducts() {
       <td class="px-4 py-3 text-sm">${margin !== null ? `<span class="font-medium ${marginColor}">${margin}%</span>` : '—'}</td>
       <td class="px-4 py-3 text-sm">
         <span class="font-semibold">${getDerivedStock(p)}</span>
-        ${isVariantSizes(p.sizes) ? `<details class="mt-1"><summary class="text-[11px] text-[#C4928A] cursor-pointer">查看颜色/尺码</summary><div class="mt-1 space-y-0.5 text-[11px] text-stone-500">${p.sizes.map(s => `<div>${s.color} / ${s.size}: <b>${Number(s.stock || 0)}</b></div>`).join('')}</div></details>` : ''}
+        ${isVariantSizes(p.sizes) ? `<details class="mt-1"><summary class="text-[11px] text-[#C4928A] cursor-pointer">查看颜色/尺码</summary><div class="mt-1 space-y-0.5 text-[11px] text-stone-500">${p.sizes.map(s => `<div>${s.color} / ${s.size}: <b>${Number(s.stock || 0)}</b>${s.preorder ? ' · <span class="text-violet-600">可预购</span>' : ''}</div>`).join('')}</div></details>` : ''}
       </td>
       <td class="px-4 py-3">
         <span class="text-xs px-2 py-1 rounded-full ${p.in_stock ? 'bg-green-100 text-green-700' : 'bg-stone-100 text-stone-400'}">${p.in_stock ? '上架' : '下架'}</span>
@@ -1311,10 +1311,14 @@ function addColorRow(color='', sizes=[], imageUrl='') {
     <div class="grid grid-cols-3 gap-2">
       ${SIZE_OPTIONS.map(sz => {
         const entry = sizes.find(s => s.size === sz);
-        return `<label class="flex flex-col gap-1">
+        return `<label class="flex flex-col gap-1 rounded border border-stone-100 p-2">
           <span class="text-xs text-stone-400">${sz}</span>
           <input type="number" data-size="${sz}" placeholder="库存" min="0" value="${entry ? entry.stock : ''}"
             class="size-stock w-full border border-stone-200 rounded px-2 py-1 text-sm focus:outline-none focus:border-[#C4928A]"/>
+          <span class="flex items-center gap-1 text-[11px] text-violet-600">
+            <input type="checkbox" data-size="${sz}" class="size-preorder" ${entry?.preorder ? 'checked' : ''}/>
+            库存不足时接受预购
+          </span>
         </label>`;
       }).join('')}
     </div>`;
@@ -1360,8 +1364,9 @@ function getColorSizes() {
     const color = row.querySelector('.color-name').value.trim();
     if (!color) return;
     row.querySelectorAll('.size-stock').forEach(inp => {
-      if (inp.value !== '') {
-        result.push({ color, size: inp.dataset.size, stock: parseInt(inp.value) || 0 });
+      const preorder = row.querySelector(`.size-preorder[data-size="${inp.dataset.size}"]`)?.checked || false;
+      if (inp.value !== '' || preorder) {
+        result.push({ color, size: inp.dataset.size, stock: parseInt(inp.value) || 0, preorder });
       }
     });
   });
@@ -1598,6 +1603,7 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
 
   const colorSizes = getColorSizes();
   const totalStock = colorSizes.reduce((sum, entry) => sum + entry.stock, 0);
+  const hasPreorder = colorSizes.some(entry => entry.preorder);
   if (!colorSizes.length) {
     alert('请至少添加一个颜色，并填写该颜色对应尺码的库存（可以是 0）。');
     btn.textContent = '保存商品'; btn.disabled = false;
@@ -1621,7 +1627,7 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
     description: document.getElementById('fDescription').value || null,
     notes: document.getElementById('fNotes').value || null,
     is_new: document.getElementById('fIsNew').checked,
-    in_stock: document.getElementById('fInStock').checked && totalStock > 0,
+    in_stock: document.getElementById('fInStock').checked && (totalStock > 0 || hasPreorder),
     sizes: colorSizes,
     variants: getVariants(),
     series: document.getElementById('fSeries').value || null,

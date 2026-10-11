@@ -50,7 +50,7 @@ const defaultArchetype = {
 
 // product.sizes may be plain strings (['S','M']) or, for color-variant products set up in the
 // admin product manager, per-color/size stock entries like {size, color, stock}.
-function isColorSizeEntry(sizes: unknown): sizes is { size: string; color: string; stock?: number }[] {
+function isColorSizeEntry(sizes: unknown): sizes is { size: string; color: string; stock?: number; preorder?: boolean }[] {
   return Array.isArray(sizes) && sizes.length > 0 && typeof sizes[0] === 'object' && sizes[0] !== null && 'color' in (sizes[0] as object);
 }
 
@@ -68,9 +68,15 @@ function getSizesForColor(sizes: unknown, color: string | null): ('S' | 'M')[] {
     return labels.length > 0 ? labels : ['S', 'M'];
   }
   const filtered = (color ? sizes.filter(s => s.color === color) : sizes)
-    .filter(s => Number(s.stock ?? 0) > 0);
+    .filter(s => Number(s.stock ?? 0) > 0 || s.preorder === true);
   const labels = Array.from(new Set(filtered.map(s => s.size).filter(Boolean))) as ('S' | 'M')[];
   return labels;
+}
+
+function isPreorderSelection(sizes: unknown, color: string | null, size: string | null): boolean {
+  if (!isColorSizeEntry(sizes) || !color || !size) return false;
+  const entry = sizes.find(s => s.color === color && s.size === size);
+  return Boolean(entry?.preorder && Number(entry.stock || 0) <= 0);
 }
 
 function colorLabel(color: string, lang: string): string {
@@ -114,6 +120,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const [isPulsing, setIsPulsing] = useState(false);
   const [sizeRequiredHint, setSizeRequiredHint] = useState(false);
   const [colorRequiredHint, setColorRequiredHint] = useState(false);
+  const selectedIsPreorder = isPreorderSelection(product.sizes, selectedColor, selectedSize);
 
   // Auto-pick the size when a color leaves only one option; clear it if it's no longer valid
   React.useEffect(() => {
@@ -153,6 +160,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         id: `${product.id}-${slug}`,
         baseProductId: product.baseProductId || product.id,
         selectedColor,
+        isPreorder: selectedIsPreorder,
         name: `${product.name} - ${colorLabel(selectedColor, 'en')}`,
         cnName: `${product.cnName} - ${selectedColor}`,
         imageUrl: product.color_images?.[selectedColor] || product.imageUrl,
@@ -173,12 +181,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
   let badgeCnText = '';
   let badgeStyle = '';
 
-  const isSoldOut = product.stock === 0 || product.inStock === false;
+  const hasPreorder = isColorSizeEntry(product.sizes) && product.sizes.some(s => s.preorder);
+  const isSoldOut = (product.stock === 0 && !hasPreorder) || product.inStock === false;
   const isLowStock = !isSoldOut && product.stock !== undefined && product.stock > 0 && product.stock <= 2;
   const isNewArrival = !isSoldOut && !isLowStock && (product.series === "Cippy Sweet" || product.series === "Cippy Summer");
 
-  if (isSoldOut) {
-    // Out of stock still sells — as preorder — rather than blocking the purchase.
+  if (product.stock === 0 && hasPreorder && product.inStock !== false) {
     badgeText = 'Preorder';
     badgeCnText = '预购';
     if (isMinimal) {
@@ -188,6 +196,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
     } else {
       badgeStyle = 'bg-violet-50/95 text-violet-600 border-violet-100 font-sans font-semibold text-[10px] px-2.5 py-0.5 rounded-full';
     }
+  } else if (isSoldOut) {
+    badgeText = 'Sold Out';
+    badgeCnText = '售罄';
+    badgeStyle = 'bg-zinc-100/95 text-zinc-500 border-zinc-200 font-sans font-semibold text-[10px] px-2.5 py-0.5 rounded-full';
   } else if (isLowStock) {
     badgeText = product.stock === 1 ? 'Only 1 Left' : 'Low Stock';
     badgeCnText = product.stock === 1 ? '仅剩 1 件' : '仅余极少';
@@ -426,7 +438,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
               <>{lang === 'zh' ? '请先选择颜色' : 'Please select a color'}</>
             ) : selectedSize && (!isColorProduct || selectedColor) ? (
               <>
-                <ShoppingBag className="w-3 h-3" /> {lang === 'zh' ? `加入 ${selectedSize} 码 · RM ${product.price}` : `Add Size ${selectedSize} · RM ${product.price}`}
+                <ShoppingBag className="w-3 h-3" /> {selectedIsPreorder
+                  ? (lang === 'zh' ? `预购 ${selectedSize} 码 · RM ${product.price}` : `Preorder Size ${selectedSize} · RM ${product.price}`)
+                  : (lang === 'zh' ? `加入 ${selectedSize} 码 · RM ${product.price}` : `Add Size ${selectedSize} · RM ${product.price}`)}
               </>
             ) : (
               <>{lang === 'zh' ? `选择尺码/颜色 · RM ${product.price}` : `Select Options · RM ${product.price}`}</>

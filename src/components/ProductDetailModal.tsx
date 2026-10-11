@@ -15,7 +15,7 @@ interface ProductDetailModalProps {
 
 // product.sizes may be plain strings (['S','M']) or, for color-variant products set up in the
 // admin product manager, per-color/size stock entries like {size, color, stock}.
-function isColorSizeEntry(sizes: unknown): sizes is { size: string; color: string; stock?: number }[] {
+function isColorSizeEntry(sizes: unknown): sizes is { size: string; color: string; stock?: number; preorder?: boolean }[] {
   return Array.isArray(sizes) && sizes.length > 0 && typeof sizes[0] === 'object' && sizes[0] !== null && 'color' in (sizes[0] as object);
 }
 
@@ -33,9 +33,15 @@ function getSizesForColor(sizes: unknown, color: string | null): ('S' | 'M')[] {
     return labels.length > 0 ? labels : ['S', 'M'];
   }
   const filtered = (color ? sizes.filter(s => s.color === color) : sizes)
-    .filter(s => Number(s.stock ?? 0) > 0);
+    .filter(s => Number(s.stock ?? 0) > 0 || s.preorder === true);
   const labels = Array.from(new Set(filtered.map(s => s.size).filter(Boolean))) as ('S' | 'M')[];
   return labels;
+}
+
+function isPreorderSelection(sizes: unknown, color: string | null, size: string | null): boolean {
+  if (!isColorSizeEntry(sizes) || !color || !size) return false;
+  const entry = sizes.find(s => s.color === color && s.size === size);
+  return Boolean(entry?.preorder && Number(entry.stock || 0) <= 0);
 }
 
 function colorLabel(color: string, lang: 'en' | 'zh'): string {
@@ -65,6 +71,7 @@ export default function ProductDetailModal({
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [addedToCart, setAddedToCart] = useState(false);
   const [selectionRequiredHint, setSelectionRequiredHint] = useState<string | null>(null);
+  const selectedIsPreorder = isPreorderSelection(product.sizes, selectedColor, selectedSize);
 
   // Auto-pick the size when a color leaves only one option; clear it if it's no longer valid
   React.useEffect(() => {
@@ -113,6 +120,7 @@ export default function ProductDetailModal({
         id: `${product.id}-${slug}`,
         baseProductId: product.baseProductId || product.id,
         selectedColor,
+        isPreorder: selectedIsPreorder,
         name: `${product.name} - ${colorLabel(selectedColor, 'en')}`,
         cnName: `${product.cnName} - ${selectedColor}`,
         imageUrl: product.color_images?.[selectedColor] || product.imageUrl,
@@ -278,9 +286,11 @@ export default function ProductDetailModal({
               <div>
                 <span className="text-zinc-400 font-mono">{tx("STOCK / 状态:", "状态:")}</span>
                 <strong className={`ml-1 ${(product.stock || 0) > 0 ? 'text-emerald-600' : 'text-zinc-400'}`}>
-                  {(product.stock || 0) > 0
+                  {selectedIsPreorder
+                    ? tx('Preorder (ships in 7–21 working days)', '预购（预计 7–21 个工作日发货）')
+                    : (product.stock || 0) > 0
                     ? tx(`In stock (${availableSizes.join(', ')})`, `现货 (${availableSizes.join('、')})`)
-                    : tx("Pre-order", "预购款")}
+                    : tx("Sold out", "已售罄")}
                 </strong>
               </div>
               <div>
@@ -460,7 +470,9 @@ export default function ProductDetailModal({
                 <>{selectionRequiredHint}</>
               ) : selectedSize ? (
                 <>
-                  <ShoppingBag className="w-4 h-4" /> {tx(`Add Ready-to-Wear (${selectedSize})`, `加入购物车 (${selectedSize})`)}
+                  <ShoppingBag className="w-4 h-4" /> {selectedIsPreorder
+                    ? tx(`Preorder (${selectedSize})`, `预购 (${selectedSize})`)
+                    : tx(`Add Ready-to-Wear (${selectedSize})`, `加入购物车 (${selectedSize})`)}
                 </>
               ) : (
                 <>

@@ -4,13 +4,14 @@ export interface Product {
   // distinct cart line — baseProductId keeps the real DB id so checkout can still verify it.
   baseProductId?: string;
   selectedColor?: string;
+  isPreorder?: boolean;
   sku?: string;
   name: string;
   cnName: string;
   category: string;
   price: number; // In RM (Malaysian Ringgit)
   // Plain size labels, or per-color/size stock entries set up in the admin product manager
-  sizes: string[] | { size: string; color: string; stock?: number }[];
+  sizes: string[] | { size: string; color: string; stock?: number; preorder?: boolean }[];
   color_images?: Record<string, string>; // Optional: color name -> photo URL, set in the admin product manager
   description: string;
   cnDescription: string;

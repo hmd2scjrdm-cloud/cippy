@@ -115,7 +115,7 @@ async function updatePoints(token, userId, orderTotal) {
 function buildEmailHtml({ orderId, customer, items, totals, pointsEarned, tier }) {
   const itemRows = (items || []).map(item => {
     const name = clean(item.name_zh || item.name || "Item");
-    const details = [item.size, item.color, item.variant].filter(Boolean).map(clean).join(" · ");
+    const details = [item.size, item.color, item.variant, item.preorder ? '预购 7–21 个工作日' : ''].filter(Boolean).map(clean).join(" · ");
     const qty = Number(item.qty || 1);
     const price = Number(item.price_myr || 0) * qty;
     const img = item.image_url
@@ -254,7 +254,8 @@ export default async function handler(req, res) {
     if (hasVariantInventory(dbProduct.sizes)) {
       const variant = variantForItem(dbProduct, item);
       if (!variant) return res.status(400).json({ error: `请选择有效的颜色和尺码：${item.name_zh || pid}` });
-      if (Number(variant.stock || 0) < qty) return res.status(409).json({ error: `该颜色/尺码库存不足：${item.name_zh || pid}` });
+      if (Number(variant.stock || 0) < qty && !variant.preorder) return res.status(409).json({ error: `该颜色/尺码库存不足且未开放预购：${item.name_zh || pid}` });
+      item.preorder = Number(variant.stock || 0) < qty;
     } else if (Number(dbProduct.stock || 0) < qty) {
       return res.status(409).json({ error: `商品库存不足：${item.name_zh || pid}` });
     }
@@ -278,7 +279,7 @@ export default async function handler(req, res) {
         currency: "myr",
         product_data: {
           name: String(item.name_zh || item.name || "Item"),
-          description: [item.size, item.color, item.variant].filter(Boolean).join(" / ") || undefined,
+          description: [item.size, item.color, item.variant, item.preorder ? 'Preorder 7–21 working days' : ''].filter(Boolean).join(" / ") || undefined,
           ...(imageUrl ? { images: [imageUrl] } : {}),
         },
         unit_amount: Math.round(item._verified_price * 100),

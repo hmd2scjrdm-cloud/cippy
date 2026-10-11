@@ -155,6 +155,7 @@ export default function CheckoutPage({
       qty: item.quantity,
       size: item.selectedSize,
       color: item.product.selectedColor,
+      preorder: item.product.isPreorder,
       image_url: item.product.imageUrl,
     }));
     if (giftBoxTopup) {
