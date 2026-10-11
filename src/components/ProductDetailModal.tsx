@@ -493,7 +493,7 @@ export default function ProductDetailModal({
                 <>
                   <ShoppingBag className="w-4 h-4" /> {selectedIsPreorder
                     ? tx(`Preorder (${selectedSize})`, `预购 (${selectedSize})`)
-                    : tx(`Add Ready-to-Wear (${selectedSize})`, `加入购物车 (${selectedSize})`)}
+                    : tx(`Add to Cart (${selectedSize})`, `加入购物车 (${selectedSize})`)}
                 </>
               ) : (
                 <>

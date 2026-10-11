@@ -308,7 +308,7 @@ export default function MixMatchRoom({ onAddProductToCart, activeTheme: activeTh
           {showHeartburst && (
             <div className="absolute inset-0 bg-white/80 flex flex-col items-center justify-center z-40 transition-all duration-300">
               <span className="text-4xl animate-bounce">🎀✨</span>
-              <span className={`text-sm ${activeArchetype.fontTitle} ${activeTheme.primaryText} font-bold mt-2`}>{lang === 'zh' ? '已加入购物袋！' : 'Ready-To-Wear Added!'}</span>
+              <span className={`text-sm ${activeArchetype.fontTitle} ${activeTheme.primaryText} font-bold mt-2`}>{lang === 'zh' ? '已加入购物袋！' : 'Added to Cart!'}</span>
             </div>
           )}
 
@@ -404,7 +404,7 @@ export default function MixMatchRoom({ onAddProductToCart, activeTheme: activeTh
                   : `${activeTheme.primaryBg} ${activeTheme.primaryHover} text-white font-sans font-semibold text-xs rounded-xl shadow-sm ${activeTheme.btnShadow}`
               }`}
             >
-              <ShoppingBag className="w-4 h-4" /> {lang === 'zh' ? '加入整套成衣' : 'Add Ready-to-Wear Set'} <ArrowRight className="w-3.5 h-3.5" />
+              <ShoppingBag className="w-4 h-4" /> {lang === 'zh' ? '加入整套购物车' : 'Add Set to Cart'} <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>

@@ -573,7 +573,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               <>
                 <ShoppingBag className="w-3.5 h-3.5" /> {selectedIsPreorder
                   ? (lang === 'zh' ? '预购' : 'Preorder')
-                  : (lang === 'zh' ? '加入购物袋' : 'Add Ready-to-Wear')}
+                  : (lang === 'zh' ? '加入购物车' : 'Add to Cart')}
               </>
             )}
           </button>
