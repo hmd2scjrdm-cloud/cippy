@@ -335,7 +335,7 @@ export default function ProductDetailModal({
               </div>
               <div className="flex items-start gap-2 rounded-lg border border-pink-100 bg-white p-3">
                 <RefreshCw className="mt-0.5 h-4 w-4 shrink-0 text-[#B96A73]" />
-                <span>{tx('Check measurements before ordering. Return or exchange requests follow our 7-day policy and require an unboxing video.', '下单前请核对尺寸。退换申请须符合 7 天政策，并保留完整开箱视频。')}</span>
+                <span>{tx('Check measurements before ordering. Return or exchange requests must be made within 24 hours of delivery and require an unboxing video.', '下单前请核对尺寸。退换申请须在收货后 24 小时内提出，并提供完整开箱视频。')}</span>
               </div>
             </div>
 

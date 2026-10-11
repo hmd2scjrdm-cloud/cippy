@@ -197,8 +197,8 @@ export const POLICIES: PolicySection[] = [
       {
         titleZh: '申请期限',
         titleEn: 'Request period',
-        textZh: '请在收货后 3天内 联系客服提出申请，逾期恕不受理。',
-        textEn: 'Please contact us within 3 days after receiving your parcel. Late requests cannot be accepted.'
+        textZh: '请在收货后 24小时内 联系客服提出申请，逾期恕不受理。',
+        textEn: 'Please contact us within 24 hours after receiving your parcel. Late requests cannot be accepted.'
       },
       {
         titleZh: '换货流程',
@@ -300,13 +300,13 @@ export const POLICIES: PolicySection[] = [
           '商品已穿着使用',
           '特卖/Sale 商品',
           '无开箱视频证明',
-          '超过申请期限（3天）'
+          '超过申请期限（24小时）'
         ],
         listEn: [
           'Item has been worn or washed',
           'Sale items',
           'No unboxing video proof',
-          'Request is made after the 3-day period'
+          'Request is made after the 24-hour period'
         ]
       }
     ]

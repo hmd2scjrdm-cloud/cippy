@@ -95,7 +95,7 @@ export default async function handler(req, res) {
                 <li>视频请保存至少 14 天。<br/><span style="color:#9ca3af;">Please keep the video for at least 14 days.</span></li>
               </ul>
 
-              <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#111827;">⏱ 收货后 3 天内联系我们 / Contact us within 3 days</p>
+              <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#111827;">⏱ 收货后 24 小时内联系我们 / Contact us within 24 hours</p>
               <p style="margin:0 0 14px;font-size:12px;color:#4b5563;line-height:1.7;">通过 <a href="https://wa.me/601120861073" style="color:#C4928A;">WhatsApp</a> 提供订单号、开箱视频和照片，我们会在 1–2 个工作日内审核。逾期或没有完整开箱视频，恕不受理。<br/><span style="color:#9ca3af;">WhatsApp us your order number, the video and photos. We review within 1-2 working days. Late requests or requests without a complete unboxing video cannot be accepted.</span></p>
 
               <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#111827;">🔁 可申请 / Eligible</p>
@@ -127,7 +127,7 @@ export default async function handler(req, res) {
       bcc: process.env.ORDER_NOTIFY_EMAIL || process.env.GMAIL_USER,
       subject: `Cippy 订单 ${orderId} 已发货 · Your order has shipped`,
       html,
-      text: `订单 ${orderId} 已发货\n快递公司: SPX Express\n运单号: ${tracking}\n可前往 spx.com.my 查询物流状态。\n\n售后须知：请在拆包前开始录制完整开箱视频（保存至少14天）；如有问题请在收货后3天内通过 WhatsApp 联系我们 (https://wa.me/601120861073)，并提供订单号、视频和照片。无完整开箱视频、逾期、已穿着/洗涤/去吊牌、特卖及配饰类商品不受理。\nAfter-sales: record a complete unboxing video before opening the parcel (keep it 14 days) and contact us on WhatsApp within 3 days with your order number, video and photos.`,
+      text: `订单 ${orderId} 已发货\n快递公司: SPX Express\n运单号: ${tracking}\n可前往 spx.com.my 查询物流状态。\n\n售后须知：请在拆包前开始录制完整开箱视频（保存至少14天）；如有问题请在收货后24小时内通过 WhatsApp 联系我们 (https://wa.me/601120861073)，并提供订单号、视频和照片。无完整开箱视频、逾期、已穿着/洗涤/去吊牌、特卖及配饰类商品不受理。\nAfter-sales: record a complete unboxing video before opening the parcel (keep it 14 days) and contact us on WhatsApp within 24 hours with your order number, video and photos.`,
     });
     return res.status(200).json({ ok: true });
   } catch (err) {
