@@ -7,6 +7,15 @@ const fmt = new Intl.NumberFormat("en-MY", { style: "currency", currency: "MYR" 
 
 function clean(v) { return String(v ?? "").replace(/[<>]/g, "").trim(); }
 
+function hasVariantInventory(sizes) {
+  return Array.isArray(sizes) && sizes.some(s => s && typeof s === "object" && s.color && s.size);
+}
+
+function variantForItem(product, item) {
+  if (!hasVariantInventory(product.sizes)) return null;
+  return product.sizes.find(s => s.color === item.color && s.size === item.size) || null;
+}
+
 async function getVerifiedUser(token) {
   if (!token) return null;
   const r = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
@@ -36,12 +45,15 @@ async function deductInventory(items, serviceKey) {
     if (!r.ok) continue;
     const [prod] = await r.json();
     if (!prod) continue;
-    const newStock = Math.max(0, Number(prod.stock || 0) - qty);
-    const newSizes = (prod.sizes || []).map(s =>
+    const usesVariants = hasVariantInventory(prod.sizes);
+    const newSizes = usesVariants ? prod.sizes.map(s =>
       s.color === item.color && s.size === item.size
         ? { ...s, stock: Math.max(0, Number(s.stock || 0) - qty) }
         : s
-    );
+    ) : prod.sizes;
+    const newStock = usesVariants
+      ? newSizes.reduce((sum, s) => sum + Math.max(0, Number(s.stock || 0)), 0)
+      : Math.max(0, Number(prod.stock || 0) - qty);
     await fetch(`${SUPABASE_URL}/rest/v1/products?id=eq.${pid}`, {
       method: "PATCH",
       headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}`, "Content-Type": "application/json", Prefer: "return=minimal" },
@@ -67,7 +79,7 @@ export default async function handler(req, res) {
   // Re-fetch and verify prices from DB
   const productIds = [...new Set(items.filter(i => !i._is_discount).map(i => i.product_id || i.id).filter(Boolean))];
   const priceRes = await fetch(
-    `${SUPABASE_URL}/rest/v1/products?id=in.(${productIds.join(",")})&select=id,price_myr,name_zh,name`,
+    `${SUPABASE_URL}/rest/v1/products?id=in.(${productIds.join(",")})&select=id,price_myr,name_zh,name,stock,sizes`,
     { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
   );
   const dbProducts = priceRes.ok ? await priceRes.json() : [];
@@ -88,6 +100,14 @@ export default async function handler(req, res) {
     const dbPrice = Number(priceMap[pid].price_myr || 0);
     if (dbPrice <= 0) return res.status(400).json({ error: `商品价格异常：${item.name_zh || pid}` });
     item._verified_price = dbPrice;
+    const dbProduct = priceMap[pid];
+    if (hasVariantInventory(dbProduct.sizes)) {
+      const variant = variantForItem(dbProduct, item);
+      if (!variant) return res.status(400).json({ error: `请选择有效的颜色和尺码：${item.name_zh || pid}` });
+      if (Number(variant.stock || 0) < qty) return res.status(409).json({ error: `该颜色/尺码库存不足：${item.name_zh || pid}` });
+    } else if (Number(dbProduct.stock || 0) < qty) {
+      return res.status(409).json({ error: `商品库存不足：${item.name_zh || pid}` });
+    }
   }
 
   const merchandiseSubtotal = items.filter(i => !i._is_discount).reduce((s, i) => s + i._verified_price * i.qty, 0);

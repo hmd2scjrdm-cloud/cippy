@@ -374,8 +374,9 @@
           <p class="text-xs text-stone-400 mt-1">预计利润率：<span id="calcMargin" class="font-medium text-green-600">—</span></p>
         </div>
         <div>
-          <label class="text-xs text-stone-500 mb-1 block">库存数量</label>
-          <input id="fStock" type="number" placeholder="0" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4928A]"/>
+          <label class="text-xs text-stone-500 mb-1 block">总库存（颜色 × 尺码自动合计）</label>
+          <input id="fStock" type="number" placeholder="0" readonly class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm bg-stone-50 text-stone-600"/>
+          <p class="text-xs text-stone-400 mt-1">请在下方分别填写每个颜色与尺码的数量。</p>
         </div>
       </div>
 
@@ -768,7 +769,7 @@ async function deductInventoryForOrder(items) {
     const { data: rows, error } = await sb.from('products').select('stock,sizes').eq('id', item.product_id).limit(1);
     if (error || !rows || !rows[0]) continue;
     const prod = rows[0];
-    const newStock = Math.max(0, (prod.stock || 0) - item.qty);
+    let newStock = Math.max(0, (prod.stock || 0) - item.qty);
     let newSizes = prod.sizes;
     if (isVariantSizes(prod.sizes)) {
       newSizes = prod.sizes.map(s =>
@@ -776,6 +777,7 @@ async function deductInventoryForOrder(items) {
           ? { ...s, stock: Math.max(0, (s.stock || 0) - item.qty) }
           : s
       );
+      newStock = newSizes.reduce((sum, s) => sum + Math.max(0, Number(s.stock) || 0), 0);
     }
     await sb.from('products').update({ stock: newStock, in_stock: newStock > 0, sizes: newSizes }).eq('id', item.product_id);
   }
@@ -1182,7 +1184,7 @@ async function loadProducts() {
 
   document.getElementById('statTotal').textContent = data.length;
   document.getElementById('statInStock').textContent = data.filter(p => p.in_stock).length;
-  document.getElementById('statStock').textContent = data.reduce((s, p) => s + (p.stock || 0), 0);
+  document.getElementById('statStock').textContent = data.reduce((s, p) => s + getDerivedStock(p), 0);
 
   const tbody = document.getElementById('productTable');
   if (!data.length) {
@@ -1220,7 +1222,10 @@ async function loadProducts() {
       <td class="px-4 py-3 text-sm font-medium text-stone-700">${costMyr > 0 ? `RM ${costMyr.toFixed(2)}` : '—'}</td>
       <td class="px-4 py-3 text-sm font-bold text-[#C4928A]">${p.price_myr ? `RM ${parseFloat(p.price_myr).toFixed(2)}` : '—'}</td>
       <td class="px-4 py-3 text-sm">${margin !== null ? `<span class="font-medium ${marginColor}">${margin}%</span>` : '—'}</td>
-      <td class="px-4 py-3 text-sm">${p.stock ?? 0}</td>
+      <td class="px-4 py-3 text-sm">
+        <span class="font-semibold">${getDerivedStock(p)}</span>
+        ${isVariantSizes(p.sizes) ? `<details class="mt-1"><summary class="text-[11px] text-[#C4928A] cursor-pointer">查看颜色/尺码</summary><div class="mt-1 space-y-0.5 text-[11px] text-stone-500">${p.sizes.map(s => `<div>${s.color} / ${s.size}: <b>${Number(s.stock || 0)}</b></div>`).join('')}</div></details>` : ''}
+      </td>
       <td class="px-4 py-3">
         <span class="text-xs px-2 py-1 rounded-full ${p.in_stock ? 'bg-green-100 text-green-700' : 'bg-stone-100 text-stone-400'}">${p.in_stock ? '上架' : '下架'}</span>
       </td>
@@ -1259,6 +1264,24 @@ function calcCost() {
 // Color × Size Matrix
 const SIZE_OPTIONS = ['XS','S','M','L','XL','均码'];
 
+function getDerivedStock(product) {
+  if (isVariantSizes(product?.sizes)) {
+    return product.sizes.reduce((sum, entry) => sum + Math.max(0, Number(entry.stock) || 0), 0);
+  }
+  return Math.max(0, Number(product?.stock) || 0);
+}
+
+function updateTotalStock() {
+  const entries = getColorSizes();
+  document.getElementById('fStock').value = entries.reduce((sum, entry) => sum + entry.stock, 0);
+  document.querySelectorAll('.color-row').forEach(row => {
+    const subtotal = Array.from(row.querySelectorAll('.size-stock'))
+      .reduce((sum, input) => sum + Math.max(0, parseInt(input.value, 10) || 0), 0);
+    const subtotalEl = row.querySelector('.color-stock-subtotal');
+    if (subtotalEl) subtotalEl.textContent = `该颜色小计：${subtotal}`;
+  });
+}
+
 function addColorRow(color='', sizes=[], imageUrl='') {
   const id = 'cr_' + Date.now() + '_' + Math.round(Math.random()*9999);
   const div = document.createElement('div');
@@ -1273,13 +1296,17 @@ function addColorRow(color='', sizes=[], imageUrl='') {
         📷 配色图
         <input type="file" accept="image/*" class="hidden color-img-file"/>
       </label>
-      <button type="button" onclick="this.closest('.color-row').remove()" class="text-red-300 hover:text-red-500 text-lg leading-none">×</button>
+      <button type="button" onclick="this.closest('.color-row').remove(); updateTotalStock()" class="text-red-300 hover:text-red-500 text-lg leading-none">×</button>
     </div>
     <div class="flex items-center gap-2">
       <input type="url" placeholder="或粘贴图片链接…" class="color-url-input flex-1 border border-stone-200 rounded px-2 py-1 text-xs focus:outline-none focus:border-[#C4928A]" value="${imageUrl}"/>
       <button type="button" class="color-url-btn text-xs bg-stone-100 hover:bg-stone-200 px-2 py-1 rounded whitespace-nowrap">确认链接</button>
       ${imageUrl ? `<img class="color-img-preview h-10 w-8 object-cover rounded" src="${imageUrl}"/>` : `<img class="color-img-preview h-10 w-8 object-cover rounded hidden" src=""/>`}
       <span class="text-xs text-stone-400 color-img-status">${imageUrl ? '✓' : ''}</span>
+    </div>
+    <div class="flex items-center justify-between">
+      <span class="text-xs text-stone-400">分别填写每个尺码的实际数量</span>
+      <span class="color-stock-subtotal text-xs font-semibold text-[#C4928A]">该颜色小计：0</span>
     </div>
     <div class="grid grid-cols-3 gap-2">
       ${SIZE_OPTIONS.map(sz => {
@@ -1318,8 +1345,12 @@ function addColorRow(color='', sizes=[], imageUrl='') {
   });
 
   urlInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); urlBtn.click(); } });
+  div.addEventListener('input', (e) => {
+    if (e.target.classList.contains('size-stock')) updateTotalStock();
+  });
 
   document.getElementById('colorSizeMatrix').appendChild(div);
+  updateTotalStock();
 }
 window.addColorRow = addColorRow;
 
@@ -1535,6 +1566,7 @@ async function editProduct(id) {
     const colorImgs = p.color_images || {};
     Object.entries(colorGroups).forEach(([color, sizes]) => addColorRow(color, sizes, colorImgs[color] || ''));
   }
+  updateTotalStock();
   // Restore variants
   document.getElementById('variantsList').innerHTML = '';
   (p.variants || []).forEach(v => addVariantRow(v.name, v.price_myr, v.cost_rmb || '', v.image_url || ''));
@@ -1564,6 +1596,14 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
   const costMyr = ((costRmb || 0) + (shippingRmb || 0)) / RMB_TO_MYR;
   const priceMyr = parseFloat(document.getElementById('fPriceMyr').value) || 0;
 
+  const colorSizes = getColorSizes();
+  const totalStock = colorSizes.reduce((sum, entry) => sum + entry.stock, 0);
+  if (!colorSizes.length) {
+    alert('请至少添加一个颜色，并填写该颜色对应尺码的库存（可以是 0）。');
+    btn.textContent = '保存商品'; btn.disabled = false;
+    return;
+  }
+
   const payload = {
     name: document.getElementById('fName').value || document.getElementById('fNameZh').value,
     name_zh: document.getElementById('fNameZh').value,
@@ -1575,14 +1615,14 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
     weight_kg: parseFloat(document.getElementById('fWeight').value) || null,
     price_myr: priceMyr || null,
     price: priceMyr,
-    stock: parseInt(document.getElementById('fStock').value) || 0,
+    stock: totalStock,
     image_url: document.getElementById('fImageUrl').value || null,
     supplier_url: document.getElementById('fSupplierUrl').value || null,
     description: document.getElementById('fDescription').value || null,
     notes: document.getElementById('fNotes').value || null,
     is_new: document.getElementById('fIsNew').checked,
-    in_stock: document.getElementById('fInStock').checked,
-    sizes: getColorSizes(),
+    in_stock: document.getElementById('fInStock').checked && totalStock > 0,
+    sizes: colorSizes,
     variants: getVariants(),
     series: document.getElementById('fSeries').value || null,
     fabric: document.getElementById('fFabric').value || null,

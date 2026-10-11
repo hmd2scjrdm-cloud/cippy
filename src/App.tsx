@@ -1305,7 +1305,9 @@ export default function App() {
             cnName: p.name_zh || p.name || "",
             category: inferProductCategory(p),
             price: Number(p.price_myr || p.price || 0),
-            stock: Number(p.stock || 0),
+            stock: Array.isArray(p.sizes) && p.sizes.some((s: any) => s && typeof s === 'object' && s.color && s.size)
+              ? p.sizes.reduce((sum: number, s: any) => sum + Math.max(0, Number(s.stock || 0)), 0)
+              : Number(p.stock || 0),
             sku: p.sku || undefined,
             sizes: Array.isArray(p.sizes) ? p.sizes : ['S', 'M'],
             color_images: p.color_images && typeof p.color_images === 'object' ? Object.fromEntries(Object.entries(p.color_images).map(([k, v]) => [k, Array.isArray(v) ? optAll(v) : typeof v === 'string' ? opt(v) : v])) as any : undefined,

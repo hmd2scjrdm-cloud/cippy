@@ -154,6 +154,7 @@ export default function CheckoutPage({
       name_zh: item.product.cnName,
       qty: item.quantity,
       size: item.selectedSize,
+      color: item.product.selectedColor,
       image_url: item.product.imageUrl,
     }));
     if (giftBoxTopup) {

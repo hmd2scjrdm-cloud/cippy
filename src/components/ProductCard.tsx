@@ -67,9 +67,10 @@ function getSizesForColor(sizes: unknown, color: string | null): ('S' | 'M')[] {
     const labels = Array.from(new Set(sizes.filter((s: any) => typeof s === 'string'))) as ('S' | 'M')[];
     return labels.length > 0 ? labels : ['S', 'M'];
   }
-  const filtered = color ? sizes.filter(s => s.color === color) : sizes;
+  const filtered = (color ? sizes.filter(s => s.color === color) : sizes)
+    .filter(s => Number(s.stock ?? 0) > 0);
   const labels = Array.from(new Set(filtered.map(s => s.size).filter(Boolean))) as ('S' | 'M')[];
-  return labels.length > 0 ? labels : ['S', 'M'];
+  return labels;
 }
 
 function colorLabel(color: string, lang: string): string {
@@ -151,6 +152,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         ...product,
         id: `${product.id}-${slug}`,
         baseProductId: product.baseProductId || product.id,
+        selectedColor,
         name: `${product.name} - ${colorLabel(selectedColor, 'en')}`,
         cnName: `${product.cnName} - ${selectedColor}`,
         imageUrl: product.color_images?.[selectedColor] || product.imageUrl,
