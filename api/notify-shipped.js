@@ -78,17 +78,35 @@ export default async function handler(req, res) {
             </div>
             <p style="margin:0 0 16px;font-size:13px;color:#6b7280;line-height:1.6;">您可以前往 <a href="https://spx.com.my" style="color:#C4928A;">spx.com.my</a> 官网，输入以上运单号查询实时物流状态。<br/>You can track your parcel in real time at <a href="https://spx.com.my" style="color:#C4928A;">spx.com.my</a> using the tracking number above.</p>
             ${photoUrl ? `<p style="margin:0 0 8px;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#C4928A;font-weight:600;">打包实拍 / Packing Photo</p><img src="${clean(photoUrl)}" width="100%" style="border-radius:10px;display:block;margin-bottom:16px;max-height:320px;object-fit:cover;" alt="Packing photo"/>` : ""}
-            <div style="background:#fff8e8;border:1px solid #f1dfb4;border-radius:12px;padding:16px 18px;margin:20px 0;">
-              <p style="margin:0 0 7px;font-size:13px;font-weight:700;color:#7a5720;">收货前请注意：录制完整开箱视频</p>
-              <p style="margin:0;font-size:12px;color:#6b5a3d;line-height:1.65;">请在拆开包裹前开始录制，并连续拍摄包裹外观、开封过程及所有商品，请勿暂停或剪辑。如需申请退换或报告商品问题，必须提供完整开箱视频。<br><br><strong>Before opening:</strong> Please record one continuous, unedited video showing the sealed parcel, the opening process and every item. A complete unboxing video is required for return, exchange or damaged-item claims.</p>
-            </div>
             <div style="border-top:1px solid #f3f4f6;margin:20px 0;"></div>
             <p style="margin:0 0 4px;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#9ca3af;font-weight:500;">寄送至 / Delivering to</p>
             <p style="margin:0 0 4px;font-size:14px;font-weight:600;color:#111827;">${clean(customer.name)}</p>
             <p style="margin:0;font-size:13px;color:#6b7280;">${clean(customer.address).replace(/\n/g, "<br>")}</p>
           </td></tr>
+          <tr><td style="padding:0 28px 28px;">
+            <div style="background:#fdf6f4;border-radius:12px;padding:20px;">
+              <p style="margin:0 0 4px;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#C4928A;font-weight:600;">售后须知 / After-Sales Notice</p>
+              <p style="margin:0 0 14px;font-size:12px;color:#6b7280;line-height:1.6;">收到包裹后，请先阅读以下内容。<br/>Please read this when your parcel arrives.</p>
+
+              <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#111827;">📹 请全程录制开箱视频 / Record an unboxing video</p>
+              <ul style="margin:0 0 14px;padding-left:18px;font-size:12px;color:#4b5563;line-height:1.7;">
+                <li>拆包前开始录制，先拍清楚未拆封的包裹，中途不暂停、不剪辑。<br/><span style="color:#9ca3af;">Start recording before you open the parcel. Show it sealed, and do not pause or cut.</span></li>
+                <li>逐件拍摄商品正面、背面和吊牌；有问题的部位请近距离特写；如有色差请在自然光下对比。<br/><span style="color:#9ca3af;">Show the front, back and tag of every item, and a close-up of any defect.</span></li>
+                <li>视频请保存至少 14 天。<br/><span style="color:#9ca3af;">Please keep the video for at least 14 days.</span></li>
+              </ul>
+
+              <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#111827;">⏱ 收货后 3 天内联系我们 / Contact us within 3 days</p>
+              <p style="margin:0 0 14px;font-size:12px;color:#4b5563;line-height:1.7;">通过 <a href="https://wa.me/601120861073" style="color:#C4928A;">WhatsApp</a> 提供订单号、开箱视频和照片，我们会在 1–2 个工作日内审核。逾期或没有完整开箱视频，恕不受理。<br/><span style="color:#9ca3af;">WhatsApp us your order number, the video and photos. We review within 1-2 working days. Late requests or requests without a complete unboxing video cannot be accepted.</span></p>
+
+              <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#111827;">🔁 可申请 / Eligible</p>
+              <p style="margin:0 0 14px;font-size:12px;color:#4b5563;line-height:1.7;">错发商品（款式、颜色、尺码）、与描述严重不符、明显制造缺陷。每笔订单限换货 1 次。若属本店责任，来回运费由我们承担。<br/><span style="color:#9ca3af;">Wrong item, major mismatch with the description, or a clear manufacturing defect. One exchange per order. If the issue is on our side, we cover shipping both ways.</span></p>
+
+              <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#111827;">🚫 不接受 / Not accepted</p>
+              <p style="margin:0;font-size:12px;color:#4b5563;line-height:1.7;">不喜欢颜色或款式、1–3cm 尺寸误差、轻微色差、已穿着或洗涤或去除吊牌的商品、特卖商品、配饰类商品。退回商品须全新、附吊牌、无气味污渍。<br/><span style="color:#9ca3af;">Change of mind, 1-3cm measurement difference, minor colour difference, worn / washed / tag removed items, sale items and accessories. Returned items must be brand new with tags, free from scent and stains.</span></p>
+            </div>
+          </td></tr>
           <tr><td style="background:#f9fafb;padding:20px 28px;border-top:1px solid #f3f4f6;text-align:center;">
-            <p style="margin:0 0 8px;font-size:12px;color:#6b7280;">如有任何问题，欢迎通过 <a href="https://wa.me/601120861073" style="color:#C4928A;">WhatsApp</a> 联系我们。</p>
+            <p style="margin:0 0 8px;font-size:12px;color:#6b7280;">如有任何问题，欢迎通过 <a href="https://wa.me/601120861073" style="color:#C4928A;">WhatsApp</a> 联系我们。<br/>Questions? Message us on <a href="https://wa.me/601120861073" style="color:#C4928A;">WhatsApp</a>.</p>
             <p style="margin:0;font-size:11px;color:#d1d5db;letter-spacing:0.08em;">© 2026 CIPPY · All rights reserved</p>
           </td></tr>
         </table>
@@ -109,7 +127,7 @@ export default async function handler(req, res) {
       bcc: process.env.ORDER_NOTIFY_EMAIL || process.env.GMAIL_USER,
       subject: `Cippy 订单 ${orderId} 已发货 · Your order has shipped`,
       html,
-      text: `订单 ${orderId} 已发货\n快递公司: SPX Express\n运单号: ${tracking}\n可前往 spx.com.my 查询物流状态。\n\n收货前请注意：请在拆包前开始录制一段完整、未剪辑的开箱视频。退换货或商品问题申请需提供完整开箱视频。\nBefore opening, record one continuous, unedited unboxing video. It is required for return, exchange or damaged-item claims.`,
+      text: `订单 ${orderId} 已发货\n快递公司: SPX Express\n运单号: ${tracking}\n可前往 spx.com.my 查询物流状态。\n\n售后须知：请在拆包前开始录制完整开箱视频（保存至少14天）；如有问题请在收货后3天内通过 WhatsApp 联系我们 (https://wa.me/601120861073)，并提供订单号、视频和照片。无完整开箱视频、逾期、已穿着/洗涤/去吊牌、特卖及配饰类商品不受理。\nAfter-sales: record a complete unboxing video before opening the parcel (keep it 14 days) and contact us on WhatsApp within 3 days with your order number, video and photos.`,
     });
     return res.status(200).json({ ok: true });
   } catch (err) {
