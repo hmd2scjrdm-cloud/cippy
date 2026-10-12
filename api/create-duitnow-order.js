@@ -57,7 +57,7 @@ async function deductInventory(items, serviceKey) {
     await fetch(`${SUPABASE_URL}/rest/v1/products?id=eq.${pid}`, {
       method: "PATCH",
       headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}`, "Content-Type": "application/json", Prefer: "return=minimal" },
-      body: JSON.stringify({ stock: newStock, in_stock: newStock > 0, sizes: newSizes }),
+      body: JSON.stringify({ stock: newStock, sizes: newSizes }),
     });
   }
 }
