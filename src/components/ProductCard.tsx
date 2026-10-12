@@ -108,6 +108,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   isWishlisted = false,
   onToggleWishlist
 }) => {
+  const storeLang: 'en' | 'zh' = lang === 'zh' ? 'zh' : 'en';
   const activeTheme = activeThemeProp || pinkFallback;
   const activeArchetype = activeArchetypeProp || defaultArchetype;
 
@@ -305,7 +306,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           <div className="relative w-full h-full flex items-center justify-center overflow-hidden rounded-xl">
             <img loading="lazy" decoding="async"
               src={product.imageUrl}
-              alt={product.name}
+              alt={lang === 'zh' ? product.cnName : product.name}
               referrerPolicy="no-referrer"
               className={`w-full h-full object-cover transition-all duration-750 transform ${
                 isMinimal ? 'group-hover:scale-102' : 'group-hover:scale-108 group-hover:rotate-1'
@@ -376,7 +377,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                       : `border-zinc-200 text-zinc-400 hover:border-[var(--theme-primary-soft)] hover:${activeTheme.primaryText}`
                   }`}
                 >
-                  {sz}
+                  {sizeLabel(sz, storeLang)}
                 </button>
               ))}
             </div>
@@ -405,7 +406,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                     >
                       {swatchImg ? (
                         <>
-                          <img loading="lazy" decoding="async" src={swatchImg} alt={col} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                          <img loading="lazy" decoding="async" src={swatchImg} alt={colorLabel(col, lang)} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                           {selectedColor === col && (
                             <span className="absolute inset-0 flex items-center justify-center bg-black/30">
                               <Check className="w-3 h-3 text-white" />
@@ -448,8 +449,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
             ) : selectedSize && (!isColorProduct || selectedColor) ? (
               <>
                 <ShoppingBag className="w-3 h-3" /> {selectedIsPreorder
-                  ? (lang === 'zh' ? `预购 ${sizeLabel(selectedSize, lang)} · RM ${product.price}` : `Preorder ${sizeLabel(selectedSize, lang)} · RM ${product.price}`)
-                  : (lang === 'zh' ? `加入 ${sizeLabel(selectedSize, lang)} · RM ${product.price}` : `Add ${sizeLabel(selectedSize, lang)} · RM ${product.price}`)}
+                  ? (lang === 'zh' ? `预购 ${sizeLabel(selectedSize, storeLang)} · RM ${product.price}` : `Preorder ${sizeLabel(selectedSize, storeLang)} · RM ${product.price}`)
+                  : (lang === 'zh' ? `加入 ${sizeLabel(selectedSize, storeLang)} · RM ${product.price}` : `Add ${sizeLabel(selectedSize, storeLang)} · RM ${product.price}`)}
               </>
             ) : (
               <>{lang === 'zh' ? `选择尺码/颜色 · RM ${product.price}` : `Select Options · RM ${product.price}`}</>
@@ -488,8 +489,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
           <div className="flex items-center justify-between text-xs font-sans">
             <span className="text-zinc-400">
               {availableSizes.length === 1
-                ? (lang === 'zh' ? `仅 ${sizeLabel(availableSizes[0], lang)}：` : `${sizeLabel(availableSizes[0], lang)} only:`)
-                : (lang === 'zh' ? `可选尺码 ${availableSizes.map(size => sizeLabel(size, lang)).join('、')}：` : `Available sizes: ${availableSizes.map(size => sizeLabel(size, lang)).join(', ')}`)}
+                ? (lang === 'zh' ? `仅 ${sizeLabel(availableSizes[0], storeLang)}：` : `${sizeLabel(availableSizes[0], storeLang)} only:`)
+                : (lang === 'zh' ? `可选尺码 ${availableSizes.map(size => sizeLabel(size, storeLang)).join('、')}：` : `Available sizes: ${availableSizes.map(size => sizeLabel(size, storeLang)).join(', ')}`)}
             </span>
             <div className="flex gap-1.5">
               {availableSizes.map((sz) => (
@@ -506,7 +507,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                       : `border-zinc-200 text-zinc-400 hover:border-[var(--theme-primary-soft)] hover:${activeTheme.primaryText}`
                   }`}
                 >
-                  {sizeLabel(sz, lang)}
+                  {sizeLabel(sz, storeLang)}
                 </button>
               ))}
             </div>

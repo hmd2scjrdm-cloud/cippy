@@ -34,6 +34,20 @@ export interface Product {
   stretch?: string;
   transparency?: string;
   care?: string;
+  sizeGuide?: ProductSizeGuideRow[];
+}
+
+export interface ProductSizeGuideRow {
+  size: string;
+  bust?: number | null;
+  shoulder?: number | null;
+  waist?: number | null;
+  hip?: number | null;
+  thigh?: number | null;
+  length?: number | null;
+  pants?: number | null;
+  skirt?: number | null;
+  sleeve?: number | null;
 }
 
 export interface CartItem {

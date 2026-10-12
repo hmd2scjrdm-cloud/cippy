@@ -36,8 +36,27 @@ export function specLabel(value: string | undefined, lang: StoreLanguage): strin
     '棉、聚酯纤维': ['Cotton and polyester', '棉、聚酯纤维'],
     '粘胶纤维、聚酯纤维、氨纶': ['Viscose, polyester and elastane', '粘胶纤维、聚酯纤维、氨纶'],
     '短袖上衣、T恤': ['Short-sleeve top / T-shirt', '短袖上衣、T恤']
+    ,'连衣裙': ['Dress', '连衣裙']
+    ,'开衫': ['Cardigan', '开衫']
+    ,'套装': ['Set', '套装']
+    ,'上衣': ['Top', '上衣']
+    ,'裙子': ['Skirt', '裙子']
+    ,'抹胸上衣': ['Tube top', '抹胸上衣']
+    ,'蛋糕短裙': ['Tiered mini skirt', '蛋糕短裙']
   };
 
-  const translated = values[value.trim()];
-  return translated ? translated[lang === 'zh' ? 1 : 0] : value;
+  const normalized = value.trim();
+  const translated = values[normalized];
+  if (translated) return translated[lang === 'zh' ? 1 : 0];
+
+  // Admin fields are often saved as a Chinese comma-separated list. Translate each
+  // known part so one unfamiliar term does not make the whole English spec Chinese.
+  if (lang === 'en' && containsChinese(normalized)) {
+    return normalized
+      .split(/[,，、/]+/)
+      .map(part => values[part.trim()]?.[0] || part.trim())
+      .filter(Boolean)
+      .join(' / ');
+  }
+  return normalized;
 }

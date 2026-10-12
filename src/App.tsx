@@ -122,20 +122,34 @@ const getEmailHTML = (product: Product, brandConcept: string, siteUrl: string) =
 
 const inferProductCategory = (product: any): string => {
   const raw = String(product.category || '').toLowerCase();
-  const searchable = `${product.name || ''} ${product.name_zh || ''} ${product.clothing_type || ''}`.toLowerCase();
+  const productName = `${product.name || ''} ${product.name_zh || ''}`.toLowerCase();
+  const searchable = `${productName} ${product.clothing_type || ''}`.toLowerCase();
 
-  if (/set|套装|两件套|\+/.test(searchable)) return 'sets';
-  if (/skirt|shorts?|pants?|trousers?|bottom|半身裙|短裙|短裤|长裤|裤/.test(searchable)) return 'bottoms';
-  if (/cardigan|outerwear|jacket|开衫|外套/.test(searchable)) return 'outerwear';
-  if (/tee|t-shirt|tank|top|camisole|shirt|blouse|背心|上衣|短袖|衬衫|抹胸/.test(searchable)) return 'tops';
-  if (/dress|gown|连衣裙|挂脖裙/.test(searchable)) return 'dresses';
+  // Product names express the customer's shopping intent more reliably than a
+  // multi-piece clothing_type field. A title ending in "Top" must not become a set
+  // merely because the admin notes also mention a matching skirt.
+  if (/\bset\b|套装|两件套/.test(productName)) return 'sets';
+  if (/skirt|shorts?|pants?|trousers?|bottom|半身裙|短裙|短裤|长裤|裤/.test(productName)) return 'bottoms';
+  if (/cardigan|outerwear|jacket|开衫|外套/.test(productName)) return 'outerwear';
+  if (/tee|t-shirt|tank|top|camisole|shirt|blouse|背心|上衣|短袖|衬衫|抹胸/.test(productName)) return 'tops';
+  if (/dress|gown|连衣裙|挂脖裙/.test(productName)) return 'dresses';
 
   if (raw === 'dress' || raw === 'dresses') return 'dresses';
   if (raw === 'top' || raw === 'tops') return 'tops';
   if (raw === 'bottom' || raw === 'bottoms') return 'bottoms';
   if (raw === 'outerwear') return 'outerwear';
   if (raw === 'set' || raw === 'sets') return 'sets';
+  if (/set|套装|两件套|\+/.test(searchable)) return 'sets';
+  if (/skirt|shorts?|pants?|trousers?|bottom|半身裙|短裙|短裤|长裤|裤/.test(searchable)) return 'bottoms';
+  if (/cardigan|outerwear|jacket|开衫|外套/.test(searchable)) return 'outerwear';
+  if (/tee|t-shirt|tank|top|camisole|shirt|blouse|背心|上衣|短袖|衬衫|抹胸/.test(searchable)) return 'tops';
+  if (/dress|gown|连衣裙|挂脖裙/.test(searchable)) return 'dresses';
   return 'tops';
+};
+
+const isPlaceholderProductName = (value: unknown): boolean => {
+  const name = String(value || '').trim();
+  return !name || name.length < 2 || /^\d+$/u.test(name);
 };
 
 export default function App() {
@@ -1311,8 +1325,8 @@ export default function App() {
               || '商品详情请参考图片与下方的面料、尺码和洗涤资料。如需更多实拍或尺寸协助，请联系 WhatsApp 客服。';
             return {
             id: String(p.id),
-            name: p.name || "",
-            cnName: p.name_zh || p.name || "",
+            name: isPlaceholderProductName(p.name) ? (fallback?.name || p.name_zh || 'Cippy Piece') : p.name,
+            cnName: isPlaceholderProductName(p.name_zh) ? (fallback?.cnName || p.name || '精选单品') : p.name_zh,
             category: inferProductCategory(p),
             price: Number(p.price_myr || p.price || 0),
             stock: Array.isArray(p.sizes) && p.sizes.some((s: any) => s && typeof s === 'object' && s.color && s.size)
@@ -1330,7 +1344,7 @@ export default function App() {
             color: p.color || '#B96A73',
             bgGradient: p.bgGradient || 'from-pink-50 to-pink-100',
             imageUrl: opt(p.image_url) || '',
-            detailImages: optAll(p.images),
+            detailImages: optAll(p.detail_images),
             images: optAll(p.images),
             clothingType: p.clothing_type || "",
             series: p.series || "",
@@ -1338,7 +1352,8 @@ export default function App() {
             transparency: p.transparency || "Medium",
             stretch: p.stretch || "Slight",
             lining: p.lining || "None",
-            care: p.care || fallback?.care || "Gentle Hand Wash"
+            care: p.care || fallback?.care || "Gentle Hand Wash",
+            sizeGuide: Array.isArray(p.size_guide) ? p.size_guide : (fallback?.sizeGuide || [])
           };
           });
           setDbProducts(mapped);

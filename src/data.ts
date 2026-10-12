@@ -132,7 +132,7 @@ export const products: Product[] = [
   },
   {
     "id": "573351cc-0215-4fb2-b1f5-c6c6908b481f",
-    "name": "A",
+    "name": "Soft Sunday | Simple A-Line Skirt",
     "cnName": "日常｜简约纯色高腰A字包臀短裙",
     "category": "bottoms",
     "price": 40,
@@ -270,7 +270,7 @@ export const products: Product[] = [
   },
   {
     "id": "e26470ef-5ffc-48de-aad4-1521e6b5a32d",
-    "name": "",
+    "name": "Morning Muse | Draped Wide-Leg Pants",
     "cnName": "日常显腿长｜休闲垂感显瘦阔腿长裤",
     "category": "bottoms",
     "price": 40,
@@ -317,7 +317,7 @@ export const products: Product[] = [
     "id": "e3791f4a-949d-41eb-8e45-d091708ba5b2",
     "name": "Seoul Girl | Grey-Brown Knit Tee + Dark Brown Lace Cami · Adjustable Straps",
     "cnName": "首尔少女｜灰棕色针织短袖 + 深棕蕾丝吊带内搭～吊带可调节",
-    "category": "dresses",
+    "category": "tops",
     "price": 120,
     "sizes": [
       "S",
@@ -413,7 +413,7 @@ export const products: Product[] = [
     "id": "90d8f406-18e1-499d-8e16-3797b3e49bb7",
     "name": "Seoul Street | Tie-Front Puff Sleeve Top",
     "cnName": "首尔街拍｜泡泡袖上衣 ",
-    "category": "sets",
+    "category": "tops",
     "price": 45,
     "sizes": [
       "S",

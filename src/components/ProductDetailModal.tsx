@@ -68,6 +68,7 @@ export default function ProductDetailModal({
   isWishlisted,
   onToggleWishlist
 }: ProductDetailModalProps) {
+  const tx = (en: string, zh: string) => (lang === 'zh' ? zh : en);
   const colorOptions = getColorOptions(product.sizes);
   const isColorProduct = colorOptions.length > 0;
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
@@ -79,6 +80,15 @@ export default function ProductDetailModal({
   const selectedIsPreorder = isColorProduct
     ? isPreorderSelection(product.sizes, selectedColor, selectedSize)
     : Number(product.stock || 0) <= 0;
+  const sizeGuide = Array.isArray(product.sizeGuide) ? product.sizeGuide.filter(row => row?.size) : [];
+  const sizeMeasurements = [
+    ['bust', tx('Bust', '胸围')], ['shoulder', tx('Shoulder', '肩宽')],
+    ['waist', tx('Waist', '腰围')], ['hip', tx('Hip', '臀围')],
+    ['thigh', tx('Thigh', '腿围')], ['length', tx('Length', '衣长')],
+    ['pants', tx('Pants', '裤长')], ['skirt', tx('Skirt', '裙长')],
+    ['sleeve', tx('Sleeve', '袖长')]
+  ] as const;
+  const populatedMeasurements = sizeMeasurements.filter(([key]) => sizeGuide.some(row => row[key] != null));
 
   // Auto-pick the size when a color leaves only one option; clear it if it's no longer valid
   React.useEffect(() => {
@@ -166,8 +176,6 @@ export default function ProductDetailModal({
       fitZh
     });
   };
-
-  const tx = (en: string, zh: string) => (lang === 'zh' ? zh : en);
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 sm:p-6 bg-zinc-950/40 backdrop-blur-md">
@@ -331,13 +339,26 @@ export default function ProductDetailModal({
               </summary>
               <ul className="mt-3 list-disc space-y-1.5 pl-4 leading-relaxed">
                 {(lang === 'zh' ? product.cnDetails : product.details).map((detail, index) => <li key={index}>{detail}</li>)}
-                <li>
-                  {tx(
-                    'Model measurements and exact garment measurements are not recorded for this item yet. Please ask WhatsApp support before ordering if length or fit is important to you.',
-                    '此商品暂未录入模特数据与完整实测尺寸。如果您在意衣长、裤长或围度，请在下单前向 WhatsApp 客服确认。'
-                  )}
-                </li>
+                {sizeGuide.length === 0 && <li>{tx(
+                  'Exact garment measurements are not recorded for this item yet. Please ask WhatsApp support before ordering if length or fit is important to you.',
+                  '此商品暂未录入完整实测尺寸。如果您在意衣长、裤长或围度，请在下单前向 WhatsApp 客服确认。'
+                )}</li>}
               </ul>
+              {sizeGuide.length > 0 && (
+                <div className="mt-3 overflow-x-auto">
+                  <table className="min-w-full border-collapse text-center text-[10px]">
+                    <thead><tr>
+                      <th className="border border-pink-100 px-2 py-1">{tx('Size', '尺码')}</th>
+                      {populatedMeasurements.map(([key, label]) => <th key={key} className="border border-pink-100 px-2 py-1 whitespace-nowrap">{label} (cm)</th>)}
+                    </tr></thead>
+                    <tbody>{sizeGuide.map(row => <tr key={row.size}>
+                      <th className="border border-pink-100 px-2 py-1">{sizeLabel(row.size, lang)}</th>
+                      {populatedMeasurements.map(([key]) => <td key={key} className="border border-pink-100 px-2 py-1">{row[key] ?? '—'}</td>)}
+                    </tr>)}</tbody>
+                  </table>
+                  <p className="mt-2 text-zinc-400">{tx('Manual measurement; allow a 1–3cm difference.', '手工测量，1–3cm 误差属正常范围。')}</p>
+                </div>
+              )}
               <a href="https://wa.me/601120861073" target="_blank" rel="noreferrer" className="mt-3 inline-flex font-semibold text-[#B96A73] underline">
                 {tx('Ask about sizing on WhatsApp', '通过 WhatsApp 询问尺码')}
               </a>
