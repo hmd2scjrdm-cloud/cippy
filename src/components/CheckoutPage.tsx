@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { CartItem } from '../types';
 import { supabase } from '../lib/supabase';
 import { Landmark, CreditCard, ShieldCheck, Sparkles, ArrowLeft, CheckCircle2, XCircle, BookUser, X } from 'lucide-react';
+import { sizeLabel } from '../lib/productLocalization';
 
 interface CheckoutPageProps {
   cartItems: CartItem[];
@@ -293,7 +294,7 @@ export default function CheckoutPage({
             </div>
             <div className="flex-1 min-w-0">
               <p className="truncate font-semibold text-zinc-700">{tx(item.product.name, item.product.cnName)}</p>
-              <p className="text-zinc-400">{item.selectedSize} × {item.quantity}</p>
+              <p className="text-zinc-400">{sizeLabel(item.selectedSize, lang)} × {item.quantity}</p>
               {item.product.isPreorder && (
                 <span className="mt-1 inline-flex rounded-full border border-violet-200 bg-violet-50 px-2 py-0.5 text-[10px] font-bold text-violet-700">
                   {tx('PREORDER · 7–21 working days', '预购商品 · 预计 7–21 个工作日')}

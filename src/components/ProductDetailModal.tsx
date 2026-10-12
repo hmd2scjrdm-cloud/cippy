@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Product } from '../types';
 import { X, ShoppingBag, Heart, Check, Sparkles, Scale, BookOpen, AlertCircle, Truck, RefreshCw } from 'lucide-react';
 import { getPriceTier } from '../lib/priceTier';
+import { sizeLabel, specLabel } from '../lib/productLocalization';
 
 interface ProductDetailModalProps {
   product: Product;
@@ -56,21 +57,6 @@ function colorLabel(color: string, lang: 'en' | 'zh'): string {
     'Outline': '轮廓款', 'Sweet Heart': '爱心款'
   };
   return lang === 'zh' ? (zhMap[color] || color) : (enMap[color] || color);
-}
-
-function specLabel(value: string | undefined, lang: 'en' | 'zh'): string {
-  if (!value) return lang === 'zh' ? '资料待确认' : 'Not specified';
-  const map: Record<string, [string, string]> = {
-    'Gentle Hand Wash': ['Gentle hand wash', '轻柔手洗'],
-    'Cold gentle wash': ['Cold gentle wash', '冷水轻柔洗涤'],
-    'None': ['No lining', '无内衬'],
-    'Slight': ['Slight stretch', '微弹'],
-    'Medium': ['Medium', '中等'],
-    'High': ['High', '高'],
-    'Low': ['Low', '低']
-  };
-  const translated = map[value];
-  return translated ? translated[lang === 'zh' ? 1 : 0] : value;
 }
 
 export default function ProductDetailModal({
@@ -293,37 +279,37 @@ export default function ProductDetailModal({
             {/* Specification Checklist */}
             <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-[11px] text-zinc-600 font-sans border-b border-pink-100/30 pb-4">
               <div>
-                <span className="text-zinc-400 font-mono">{tx("FABRIC / 面料:", "面料:")}</span>
-                <strong className="text-zinc-700 ml-1">{product.fabric || tx("Linen Cotton", "高级棉麻混纺")}</strong>
+                <span className="text-zinc-400 font-mono">{tx("FABRIC:", "面料:")}</span>
+                <strong className="text-zinc-700 ml-1">{specLabel(product.fabric || 'Linen Cotton', lang)}</strong>
               </div>
               <div>
-                <span className="text-zinc-400 font-mono">{tx("FIT / 版型:", "版型:")}</span>
-                <strong className="text-zinc-700 ml-1">{product.clothingType || tx("See product photos", "请参考商品图片")}</strong>
+                <span className="text-zinc-400 font-mono">{tx("FIT:", "版型:")}</span>
+                <strong className="text-zinc-700 ml-1">{specLabel(product.clothingType || (lang === 'zh' ? '请参考商品图片' : 'See product photos'), lang)}</strong>
               </div>
               <div>
-                <span className="text-zinc-400 font-mono">{tx("CARE / 洗涤:", "洗涤:")}</span>
+                <span className="text-zinc-400 font-mono">{tx("CARE:", "洗涤:")}</span>
                 <strong className="text-zinc-700 ml-1">{specLabel(product.care || 'Cold gentle wash', lang)}</strong>
               </div>
               <div>
-                <span className="text-zinc-400 font-mono">{tx("STOCK / 状态:", "状态:")}</span>
+                <span className="text-zinc-400 font-mono">{tx("STOCK:", "状态:")}</span>
                 <strong className={`ml-1 ${(product.stock || 0) > 0 ? 'text-emerald-600' : 'text-zinc-400'}`}>
                   {selectedIsPreorder
                     ? tx('Preorder (ships in 7–21 working days)', '预购（预计 7–21 个工作日发货）')
                     : (product.stock || 0) > 0
-                    ? tx(`In stock (${availableSizes.join(', ')})`, `现货 (${availableSizes.join('、')})`)
+                    ? tx(`In stock (${availableSizes.map(size => sizeLabel(size, lang)).join(', ')})`, `现货 (${availableSizes.map(size => sizeLabel(size, lang)).join('、')})`)
                     : tx("Sold out", "已售罄")}
                 </strong>
               </div>
               <div>
-                <span className="text-zinc-400 font-mono">{tx("LINING / 内衬:", "内衬:")}</span>
+                <span className="text-zinc-400 font-mono">{tx("LINING:", "内衬:")}</span>
                 <strong className="text-zinc-700 ml-1">{specLabel(product.lining, lang)}</strong>
               </div>
               <div>
-                <span className="text-zinc-400 font-mono">{tx("STRETCH / 弹性:", "弹性:")}</span>
+                <span className="text-zinc-400 font-mono">{tx("STRETCH:", "弹性:")}</span>
                 <strong className="text-zinc-700 ml-1">{specLabel(product.stretch, lang)}</strong>
               </div>
               <div>
-                <span className="text-zinc-400 font-mono">{tx("SHEERNESS / 透肤:", "透肤程度:")}</span>
+                <span className="text-zinc-400 font-mono">{tx("SHEERNESS:", "透肤程度:")}</span>
                 <strong className="text-zinc-700 ml-1">{specLabel(product.transparency, lang)}</strong>
               </div>
             </div>
@@ -419,7 +405,7 @@ export default function ProductDetailModal({
             {/* Colors selector (if applicable) */}
             {isColorProduct && (
               <div className="flex items-center justify-between text-xs font-sans pt-2 border-t border-pink-100/30 gap-2">
-                <span className="text-zinc-500 font-medium shrink-0">{tx("Choose Color / 颜色:", "选择颜色:")}</span>
+                <span className="text-zinc-500 font-medium shrink-0">{tx("Choose Color:", "选择颜色:")}</span>
                 <div className="flex gap-2 flex-wrap justify-end">
                   {colorOptions.map((col) => {
                     const swatchImg = product.color_images?.[col];
@@ -452,7 +438,7 @@ export default function ProductDetailModal({
 
             {/* Sizes selector */}
             <div className="flex items-center justify-between text-xs font-sans pt-2">
-              <span className="text-zinc-500 font-medium">{tx("Choose your drape size / 尺码:", "选择尺码:")}</span>
+              <span className="text-zinc-500 font-medium">{tx("Choose Size:", "选择尺码:")}</span>
               <div className="flex gap-2">
                 {availableSizes.map((sz) => (
                   <button
@@ -464,7 +450,7 @@ export default function ProductDetailModal({
                         : 'border-zinc-200 text-zinc-400 hover:border-pink-200 hover:text-zinc-700'
                     }`}
                   >
-                    {sz}
+                    {sizeLabel(sz, lang)}
                   </button>
                 ))}
               </div>
@@ -492,8 +478,8 @@ export default function ProductDetailModal({
               ) : selectedSize ? (
                 <>
                   <ShoppingBag className="w-4 h-4" /> {selectedIsPreorder
-                    ? tx(`Preorder (${selectedSize})`, `预购 (${selectedSize})`)
-                    : tx(`Add to Cart (${selectedSize})`, `加入购物车 (${selectedSize})`)}
+                    ? tx(`Preorder (${sizeLabel(selectedSize, lang)})`, `预购 (${sizeLabel(selectedSize, lang)})`)
+                    : tx(`Add to Cart (${sizeLabel(selectedSize, lang)})`, `加入购物车 (${sizeLabel(selectedSize, lang)})`)}
                 </>
               ) : (
                 <>

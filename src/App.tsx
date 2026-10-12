@@ -15,6 +15,7 @@ import { Bilingual } from './components/Bilingual';
 import { supabase } from './lib/supabase';
 import { opt, optAll } from './lib/optimizeImage';
 import { signInWithGoogleGmail, sendGmailMessage, logoutGmail, getGmailToken, getGmailEmail } from './lib/gmailService';
+import { containsChinese } from './lib/productLocalization';
 import { ShoppingBag, Star, Sparkles, BookOpen, Heart, ArrowRight, CheckCircle2, ChevronRight, Globe, Compass, RefreshCw, User, Lock, Mail, CreditCard, ClipboardList, LogOut, Truck, Package, Clock, Check, Search, X, TrendingUp, ChevronDown, GitCompare, Award, Calendar, Copy, Send, Bell, ShieldAlert, Trash2, Plus, Users, Activity } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -1299,7 +1300,16 @@ export default function App() {
         if (data && data.length > 0) {
           // Admin's "上架中" toggle sets in_stock=false to delist a product — hide those from customers.
           const listed = data.filter((p: any) => p.in_stock !== false);
-          const mapped: Product[] = listed.map((p: any) => ({
+          const mapped: Product[] = listed.map((p: any) => {
+            const fallback = products.find(product => product.id === String(p.id));
+            const englishDescription = p.description && !containsChinese(p.description)
+              ? p.description
+              : fallback?.description || 'See the product photos and fit notes for details. Contact WhatsApp support if you need exact measurements.';
+            const chineseDescription = p.description_zh
+              || (containsChinese(p.description) ? p.description : '')
+              || fallback?.cnDescription
+              || '商品详情请参考图片与下方的面料、尺码和洗涤资料。如需更多实拍或尺寸协助，请联系 WhatsApp 客服。';
+            return {
             id: String(p.id),
             name: p.name || "",
             cnName: p.name_zh || p.name || "",
@@ -1311,8 +1321,8 @@ export default function App() {
             sku: p.sku || undefined,
             sizes: Array.isArray(p.sizes) ? p.sizes : ['S', 'M'],
             color_images: p.color_images && typeof p.color_images === 'object' ? Object.fromEntries(Object.entries(p.color_images).map(([k, v]) => [k, Array.isArray(v) ? optAll(v) : typeof v === 'string' ? opt(v) : v])) as any : undefined,
-            description: p.description || "",
-            cnDescription: p.description_zh || "商品详情请参考图片与下方的面料、尺码和洗涤资料。如需更多实拍或尺寸协助，请联系 WhatsApp 客服。",
+            description: englishDescription,
+            cnDescription: chineseDescription,
             story: p.story || "",
             cnStory: p.story_zh || "为马来西亚日常精选的韩系单品，兼顾轻盈穿着感与日常搭配。",
             details: Array.isArray(p.details) ? p.details : [],
@@ -1328,8 +1338,9 @@ export default function App() {
             transparency: p.transparency || "Medium",
             stretch: p.stretch || "Slight",
             lining: p.lining || "None",
-            care: p.care || "Gentle Hand Wash"
-          }));
+            care: p.care || fallback?.care || "Gentle Hand Wash"
+          };
+          });
           setDbProducts(mapped);
         }
       } catch (err) {

@@ -1,6 +1,7 @@
 import React from 'react';
 import { CartItem } from '../types';
 import { X, ShoppingBag, Trash2, ArrowRight, Gift } from 'lucide-react';
+import { sizeLabel } from '../lib/productLocalization';
 
 interface ShoppingBagProps {
   isOpen: boolean;
@@ -39,6 +40,8 @@ export default function ShoppingBagDrawer({
   const giftBoxFee = giftBoxTopup ? 10 : 0;
   const grandTotal = subtotal + shippingCost + giftBoxFee;
   const gapToFreeShipping = shippingThreshold - subtotal;
+  const hasPreorder = cartItems.some(item => item.product.isPreorder);
+  const hasReadyStock = cartItems.some(item => !item.product.isPreorder);
 
   const tx = (en: string, zh: string) => (lang === 'zh' ? zh : en);
 
@@ -58,7 +61,7 @@ export default function ShoppingBagDrawer({
             <div className="flex items-center gap-2">
               <ShoppingBag className="w-5 h-5 text-[#B96A73]" />
               <h2 className="text-lg font-serif font-semibold text-zinc-800">
-                {tx("Your Shopping Bag · 购物袋", "您的购物袋 · 浪漫邂逅")}
+                {tx("Your Shopping Bag", "您的购物袋")}
               </h2>
             </div>
             <button
@@ -142,7 +145,7 @@ export default function ShoppingBagDrawer({
                           {tx(item.product.cnName, item.product.name)}
                         </p>
                         <p className="text-[10px] font-mono text-zinc-400">
-                          {tx("Size:", "尺码:")} <strong className="text-zinc-700">{item.selectedSize}</strong>
+                          {tx("Size:", "尺码:")} <strong className="text-zinc-700">{sizeLabel(item.selectedSize, lang)}</strong>
                         </p>
                         {item.product.isPreorder && (
                           <p className="text-[10px] font-semibold text-violet-600">
@@ -218,32 +221,42 @@ export default function ShoppingBagDrawer({
               {/* Cost calculation */}
               <div className="space-y-1.5 text-xs">
                 <div className="flex justify-between text-zinc-500">
-                  <span>{tx("Bag Subtotal / 成衣小计:", "小计:")}</span>
+                  <span>{tx("Bag Subtotal:", "小计:")}</span>
                   <span className="font-mono text-zinc-800">RM {subtotal}.00</span>
                 </div>
                 {giftBoxTopup && (
                   <div className="flex justify-between text-zinc-500">
-                    <span>{tx("Luxury Gift Wrapping / 奢礼包装:", "奢华礼盒:")}</span>
+                    <span>{tx("Luxury Gift Wrapping:", "奢华礼盒:")}</span>
                     <span className="font-mono text-zinc-800">RM 10.00</span>
                   </div>
                 )}
                 <div className="flex justify-between text-zinc-500">
-                  <span>{tx("Malaysian Shipping / 快递配送:", "快递运费:")}</span>
+                  <span>{tx("Malaysian Shipping:", "快递运费:")}</span>
                   <span className="font-mono text-zinc-800">
                     {isFreeShipping ? tx("FREE", "包邮") : `RM ${shippingCost}.00`}
                   </span>
                 </div>
                 <div className="flex justify-between items-end border-t border-pink-100/50 pt-2 text-sm">
-                  <span className="font-serif font-semibold text-zinc-800">{tx("Total Charged / 实付总额:", "实付总额:")}</span>
+                  <span className="font-serif font-semibold text-zinc-800">{tx("Total Charged:", "实付总额:")}</span>
                   <span className="font-mono text-xl font-bold text-[#B96A73]">RM {grandTotal}.00</span>
                 </div>
               </div>
 
               <div className="rounded-lg border border-pink-100 bg-pink-50/30 px-3 py-2 text-[10px] leading-relaxed text-zinc-500">
-                {tx(
-                  'Shipping shown here uses the West Malaysia rate. Sabah, Sarawak and Labuan update to RM15 after you select your state. Ready stock dispatches in 1-3 working days.',
-                  '此处先按西马 RM10 显示；结账选择 Sabah、Sarawak 或 Labuan 后会自动更新为 RM15。现货于付款后 1–3 个工作日内发货。'
-                )}
+                {hasPreorder
+                  ? hasReadyStock
+                    ? tx(
+                        'This bag contains ready-stock and preorder items. Preorder items ship in 7-21 working days; ready-stock items may ship together with them. West MY RM10, East MY RM15.',
+                        '购物袋同时包含现货与预购商品。预购预计 7–21 个工作日发货，现货可能会等待预购到货后一起寄出。西马 RM10，东马 RM15。'
+                      )
+                    : tx(
+                        'This is a preorder bag. Expected dispatch is 7-21 working days after payment. West MY RM10, East MY RM15.',
+                        '此购物袋全为预购商品，预计付款后 7–21 个工作日发货。西马 RM10，东马 RM15。'
+                      )
+                  : tx(
+                      'Shipping shown here uses the West Malaysia rate. Sabah, Sarawak and Labuan update to RM15 after you select your state. Ready stock dispatches in 1-3 working days.',
+                      '此处先按西马 RM10 显示；结账选择 Sabah、Sarawak 或 Labuan 后会自动更新为 RM15。现货于付款后 1–3 个工作日内发货。'
+                    )}
               </div>
 
               {/* Action buttons */}

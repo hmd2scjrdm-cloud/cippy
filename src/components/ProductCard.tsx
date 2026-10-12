@@ -3,6 +3,7 @@ import { Product } from '../types';
 import { ShoppingBag, Star, Sparkles, Check, GitCompare, Heart } from 'lucide-react';
 import { motion } from 'motion/react';
 import { getPriceTier } from '../lib/priceTier';
+import { sizeLabel } from '../lib/productLocalization';
 
 interface ProductCardProps {
   product: Product;
@@ -447,8 +448,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
             ) : selectedSize && (!isColorProduct || selectedColor) ? (
               <>
                 <ShoppingBag className="w-3 h-3" /> {selectedIsPreorder
-                  ? (lang === 'zh' ? `预购 ${selectedSize} 码 · RM ${product.price}` : `Preorder Size ${selectedSize} · RM ${product.price}`)
-                  : (lang === 'zh' ? `加入 ${selectedSize} 码 · RM ${product.price}` : `Add Size ${selectedSize} · RM ${product.price}`)}
+                  ? (lang === 'zh' ? `预购 ${sizeLabel(selectedSize, lang)} · RM ${product.price}` : `Preorder ${sizeLabel(selectedSize, lang)} · RM ${product.price}`)
+                  : (lang === 'zh' ? `加入 ${sizeLabel(selectedSize, lang)} · RM ${product.price}` : `Add ${sizeLabel(selectedSize, lang)} · RM ${product.price}`)}
               </>
             ) : (
               <>{lang === 'zh' ? `选择尺码/颜色 · RM ${product.price}` : `Select Options · RM ${product.price}`}</>
@@ -487,8 +488,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
           <div className="flex items-center justify-between text-xs font-sans">
             <span className="text-zinc-400">
               {availableSizes.length === 1
-                ? (lang === 'zh' ? `仅 ${availableSizes[0]} 码：` : `${availableSizes[0]} size only:`)
-                : (lang === 'zh' ? `可选尺码 ${availableSizes.join('、')}：` : `Available sizes: ${availableSizes.join(', ')}`)}
+                ? (lang === 'zh' ? `仅 ${sizeLabel(availableSizes[0], lang)}：` : `${sizeLabel(availableSizes[0], lang)} only:`)
+                : (lang === 'zh' ? `可选尺码 ${availableSizes.map(size => sizeLabel(size, lang)).join('、')}：` : `Available sizes: ${availableSizes.map(size => sizeLabel(size, lang)).join(', ')}`)}
             </span>
             <div className="flex gap-1.5">
               {availableSizes.map((sz) => (
@@ -505,7 +506,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                       : `border-zinc-200 text-zinc-400 hover:border-[var(--theme-primary-soft)] hover:${activeTheme.primaryText}`
                   }`}
                 >
-                  {sz}
+                  {sizeLabel(sz, lang)}
                 </button>
               ))}
             </div>
