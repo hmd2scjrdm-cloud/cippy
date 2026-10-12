@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { getSiteConfig, shippingFee, emailCompanyFooterHtml } from "./_lib/site-config.js";
 
 const SUPABASE_URL = "https://ilzeziznxzaxxudzhdmu.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI";
@@ -47,6 +48,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "邮件服务未配置" });
   }
 
+  const siteConfig = await getSiteConfig(SUPABASE_URL, SUPABASE_ANON_KEY);
   const tracking = clean(trackingNumber);
   const orderId = clean(order.order_id);
 
@@ -107,6 +109,7 @@ export default async function handler(req, res) {
           </td></tr>
           <tr><td style="background:#f9fafb;padding:20px 28px;border-top:1px solid #f3f4f6;text-align:center;">
             <p style="margin:0 0 8px;font-size:12px;color:#6b7280;">如有任何问题，欢迎通过 <a href="https://wa.me/601120861073" style="color:#C4928A;">WhatsApp</a> 联系我们。<br/>Questions? Message us on <a href="https://wa.me/601120861073" style="color:#C4928A;">WhatsApp</a>.</p>
+            ${emailCompanyFooterHtml(siteConfig, "#9ca3af")}
             <p style="margin:0;font-size:11px;color:#d1d5db;letter-spacing:0.08em;">© 2026 CIPPY · All rights reserved</p>
           </td></tr>
         </table>

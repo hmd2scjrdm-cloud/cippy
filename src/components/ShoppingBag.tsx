@@ -1,3 +1,4 @@
+import { useSiteConfig } from '../lib/siteConfig';
 import React from 'react';
 import { CartItem } from '../types';
 import { X, ShoppingBag, Trash2, ArrowRight, Gift } from 'lucide-react';
@@ -30,13 +31,14 @@ export default function ShoppingBagDrawer({
   onToggleGiftBoxTopup,
   onProceedToCheckout
 }: ShoppingBagProps) {
+  const siteConfig = useSiteConfig();
   if (!isOpen) return null;
 
   const subtotal = cartItems.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
 
-  const shippingThreshold = 150;
+  const shippingThreshold = siteConfig.freeShippingMin;
   const isFreeShipping = subtotal >= shippingThreshold;
-  const shippingCost = isFreeShipping ? 0 : 10;
+  const shippingCost = isFreeShipping ? 0 : siteConfig.shippingWest;
   const giftBoxFee = giftBoxTopup ? 10 : 0;
   const grandTotal = subtotal + shippingCost + giftBoxFee;
   const gapToFreeShipping = shippingThreshold - subtotal;
@@ -246,16 +248,16 @@ export default function ShoppingBagDrawer({
                 {hasPreorder
                   ? hasReadyStock
                     ? tx(
-                        'This bag contains ready-stock and preorder items. Preorder items ship in 7-21 working days; ready-stock items may ship together with them. West MY RM10, East MY RM15.',
-                        '购物袋同时包含现货与预购商品。预购预计 7–21 个工作日发货，现货可能会等待预购到货后一起寄出。西马 RM10，东马 RM15。'
+                        `This bag contains ready-stock and preorder items. Preorder items ship in 7-21 working days; ready-stock items may ship together with them. West MY RM${siteConfig.shippingWest}, East MY RM${siteConfig.shippingEast}.`,
+                        `购物袋同时包含现货与预购商品。预购预计 7–21 个工作日发货，现货可能会等待预购到货后一起寄出。西马 RM${siteConfig.shippingWest}，东马 RM${siteConfig.shippingEast}。`
                       )
                     : tx(
-                        'This is a preorder bag. Expected dispatch is 7-21 working days after payment. West MY RM10, East MY RM15.',
-                        '此购物袋全为预购商品，预计付款后 7–21 个工作日发货。西马 RM10，东马 RM15。'
+                        `This is a preorder bag. Expected dispatch is 7-21 working days after payment. West MY RM${siteConfig.shippingWest}, East MY RM${siteConfig.shippingEast}.`,
+                        `此购物袋全为预购商品，预计付款后 7–21 个工作日发货。西马 RM${siteConfig.shippingWest}，东马 RM${siteConfig.shippingEast}。`
                       )
                   : tx(
-                      'Shipping shown here uses the West Malaysia rate. Sabah, Sarawak and Labuan update to RM15 after you select your state. Ready stock dispatches in 1-3 working days.',
-                      '此处先按西马 RM10 显示；结账选择 Sabah、Sarawak 或 Labuan 后会自动更新为 RM15。现货于付款后 1–3 个工作日内发货。'
+                      `Shipping shown here uses the West Malaysia rate. Sabah, Sarawak and Labuan update to RM${siteConfig.shippingEast} after you select your state. Ready stock dispatches in 1-3 working days.`,
+                      `此处先按西马 RM${siteConfig.shippingWest} 显示；结账选择 Sabah、Sarawak 或 Labuan 后会自动更新为 RM${siteConfig.shippingEast}。现货于付款后 1–3 个工作日内发货。`
                     )}
               </div>
 

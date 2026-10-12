@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Product } from '../types';
+import { useSiteConfig } from '../lib/siteConfig';
 import { X, ShoppingBag, Heart, Check, Sparkles, Scale, BookOpen, AlertCircle, Truck, RefreshCw } from 'lucide-react';
 import { getPriceTier } from '../lib/priceTier';
 import { sizeLabel, specLabel } from '../lib/productLocalization';
@@ -68,6 +69,7 @@ export default function ProductDetailModal({
   isWishlisted,
   onToggleWishlist
 }: ProductDetailModalProps) {
+  const siteConfig = useSiteConfig();
   const tx = (en: string, zh: string) => (lang === 'zh' ? zh : en);
   const colorOptions = getColorOptions(product.sizes);
   const isColorProduct = colorOptions.length > 0;
@@ -325,7 +327,7 @@ export default function ProductDetailModal({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-zinc-600">
               <div className="flex items-start gap-2 rounded-lg border border-pink-100 bg-white p-3">
                 <Truck className="mt-0.5 h-4 w-4 shrink-0 text-[#B96A73]" />
-                <span>{tx('Ready stock dispatches in 1-3 working days. West MY RM10, East MY RM15; free shipping from RM150.', '现货付款后 1–3 个工作日发货。西马 RM10、东马 RM15；满 RM150 全马免邮。')}</span>
+                <span>{tx(`Ready stock dispatches in 1-3 working days. West MY RM${siteConfig.shippingWest}, East MY RM${siteConfig.shippingEast}; free shipping from RM${siteConfig.freeShippingMin}.`, `现货付款后 1–3 个工作日发货。西马 RM${siteConfig.shippingWest}、东马 RM${siteConfig.shippingEast}；满 RM${siteConfig.freeShippingMin} 全马免邮。`)}</span>
               </div>
               <div className="flex items-start gap-2 rounded-lg border border-pink-100 bg-white p-3">
                 <RefreshCw className="mt-0.5 h-4 w-4 shrink-0 text-[#B96A73]" />

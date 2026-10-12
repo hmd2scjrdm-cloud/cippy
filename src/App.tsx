@@ -14,6 +14,7 @@ import ProductDetailModal from './components/ProductDetailModal';
 import { Bilingual } from './components/Bilingual';
 import { supabase } from './lib/supabase';
 import { opt, optAll } from './lib/optimizeImage';
+import { loadSiteConfig } from './lib/siteConfig';
 import { signInWithGoogleGmail, sendGmailMessage, logoutGmail, getGmailToken, getGmailEmail } from './lib/gmailService';
 import { containsChinese } from './lib/productLocalization';
 import { ShoppingBag, Star, Sparkles, BookOpen, Heart, ArrowRight, CheckCircle2, ChevronRight, Globe, Compass, RefreshCw, User, Lock, Mail, CreditCard, ClipboardList, LogOut, Truck, Package, Clock, Check, Search, X, TrendingUp, ChevronDown, GitCompare, Award, Calendar, Copy, Send, Bell, ShieldAlert, Trash2, Plus, Users, Activity } from 'lucide-react';
@@ -1297,6 +1298,8 @@ export default function App() {
   };
 
   // Effect 1: Load Dynamic Products from Supabase
+  React.useEffect(() => { loadSiteConfig(); }, []);
+
   React.useEffect(() => {
     async function fetchProducts() {
       if (!supabase) return;

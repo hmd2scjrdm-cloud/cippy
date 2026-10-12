@@ -1,6 +1,7 @@
 import Stripe from "stripe";
 import nodemailer from "nodemailer";
 import { nextOrderId } from "./_lib/next-order-id.js";
+import { getSiteConfig, shippingFee, emailCompanyFooterHtml } from "./_lib/site-config.js";
 
 const SUPABASE_URL = "https://ilzeziznxzaxxudzhdmu.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI";
@@ -112,7 +113,7 @@ async function updatePoints(token, userId, orderTotal) {
   return { pointsEarned, newPoints, tier };
 }
 
-function buildEmailHtml({ orderId, customer, items, totals, pointsEarned, tier }) {
+function buildEmailHtml({ orderId, customer, items, totals, pointsEarned, tier, siteConfig }) {
   const hasPreorder = (items || []).some(item => !item._is_discount && item.preorder);
   const itemRows = (items || []).map(item => {
     const name = clean(item.name_zh || item.name || "Item");
@@ -202,6 +203,7 @@ function buildEmailHtml({ orderId, customer, items, totals, pointsEarned, tier }
       </td></tr>
       <tr><td style="background:#faf7f5;padding:18px 28px;border-top:1px solid #f0ebe8;text-align:center;">
         <p style="margin:0 0 6px;font-size:12px;color:#524344;">如有疑问请通过 Instagram 或 WhatsApp 联系我们</p>
+        ${emailCompanyFooterHtml(siteConfig, "#857374")}
         <p style="margin:0;font-size:11px;color:#857374;letter-spacing:0.08em;">© 2025 CIPPY · All rights reserved</p>
       </td></tr>
     </table>
@@ -274,7 +276,8 @@ export default async function handler(req, res) {
 
   const merchandiseSubtotal = items.filter(i => !i._is_discount).reduce((s, i) => s + i._verified_price * i.qty, 0);
   const eastMalaysia = /\b(Sabah|Sarawak|Labuan)\b/i.test(String(customer.address || ""));
-  const shipping = merchandiseSubtotal >= 150 ? 0 : (eastMalaysia ? 15 : 10);
+  const siteConfig = await getSiteConfig(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const shipping = shippingFee(siteConfig, merchandiseSubtotal, eastMalaysia);
   const verifiedSubtotal = items.reduce((s, i) => s + i._verified_price * Number(i.qty || 1), 0);
   const verifiedTotal = verifiedSubtotal + shipping;
   const orderTotal = verifiedTotal;
@@ -345,7 +348,7 @@ export default async function handler(req, res) {
         auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD },
       });
       const hasPreorder = items.some(item => !item._is_discount && item.preorder);
-      const html = buildEmailHtml({ orderId, customer, items, totals: verifiedTotals, pointsEarned: 0 });
+      const html = buildEmailHtml({ orderId, customer, items, totals: verifiedTotals, pointsEarned: 0, siteConfig });
       await transporter.sendMail({
         from: `Cippy <${process.env.GMAIL_USER}>`,
         to: user?.email || customer.email,

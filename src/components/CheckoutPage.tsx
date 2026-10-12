@@ -3,6 +3,7 @@ import { CartItem } from '../types';
 import { supabase } from '../lib/supabase';
 import { Landmark, CreditCard, ShieldCheck, Sparkles, ArrowLeft, CheckCircle2, XCircle, BookUser, X } from 'lucide-react';
 import { sizeLabel } from '../lib/productLocalization';
+import { useSiteConfig } from '../lib/siteConfig';
 
 interface CheckoutPageProps {
   cartItems: CartItem[];
@@ -87,10 +88,11 @@ export default function CheckoutPage({
   const [isUploadingProof, setIsUploadingProof] = useState(false);
 
   const subtotal = cartItems.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
-  const shippingThreshold = 150;
+  const siteConfig = useSiteConfig();
+  const shippingThreshold = siteConfig.freeShippingMin;
   const isFreeShipping = subtotal >= shippingThreshold;
   const isEastMalaysia = ['Sabah', 'Sarawak', 'Labuan'].includes(state);
-  const shippingCost = isFreeShipping ? 0 : (isEastMalaysia ? 15 : 10);
+  const shippingCost = isFreeShipping ? 0 : (isEastMalaysia ? siteConfig.shippingEast : siteConfig.shippingWest);
   const giftBoxFee = giftBoxTopup ? 10 : 0;
   const grandTotal = subtotal + shippingCost + giftBoxFee;
   const hasPreorderItems = cartItems.some(item => item.product.isPreorder);
@@ -422,7 +424,7 @@ export default function CheckoutPage({
 
       <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] text-zinc-600">
         <div className="rounded-xl border border-pink-100 bg-white px-3 py-2.5">{tx('Ready stock: dispatch in 1-3 working days', '现货：1–3 个工作日内发货')}</div>
-        <div className="rounded-xl border border-pink-100 bg-white px-3 py-2.5">{tx('West MY RM10 · East MY RM15 · Free from RM150', '西马 RM10 · 东马 RM15 · 满 RM150 免邮')}</div>
+        <div className="rounded-xl border border-pink-100 bg-white px-3 py-2.5">{tx(`West MY RM${siteConfig.shippingWest} · East MY RM${siteConfig.shippingEast} · Free from RM${siteConfig.freeShippingMin}`, `西马 RM${siteConfig.shippingWest} · 东马 RM${siteConfig.shippingEast} · 满 RM${siteConfig.freeShippingMin} 免邮`)}</div>
         <div className="rounded-xl border border-pink-100 bg-white px-3 py-2.5">{tx('Card via Stripe or DuitNow QR', 'Stripe 信用卡或 DuitNow QR')}</div>
       </div>
 

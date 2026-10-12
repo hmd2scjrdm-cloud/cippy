@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { nextOrderId } from "./_lib/next-order-id.js";
+import { getSiteConfig, shippingFee, emailCompanyFooterHtml } from "./_lib/site-config.js";
 
 const SUPABASE_URL = "https://ilzeziznxzaxxudzhdmu.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI";
@@ -113,7 +114,8 @@ export default async function handler(req, res) {
 
   const merchandiseSubtotal = items.filter(i => !i._is_discount).reduce((s, i) => s + i._verified_price * i.qty, 0);
   const eastMalaysia = /\b(Sabah|Sarawak|Labuan)\b/i.test(String(customer.address || ""));
-  const shipping = merchandiseSubtotal >= 150 ? 0 : (eastMalaysia ? 15 : 10);
+  const siteConfig = await getSiteConfig(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const shipping = shippingFee(siteConfig, merchandiseSubtotal, eastMalaysia);
   const verifiedSubtotal = items.reduce((s, i) => s + i._verified_price * Number(i.qty || 1), 0);
   const verifiedTotal = verifiedSubtotal + shipping;
 
@@ -199,6 +201,7 @@ export default async function handler(req, res) {
   </div>
 
   <p style="color:#999;font-size:12px">We'll confirm your order within 1 hour of receiving your payment receipt. Thank you for shopping with Cippy! 🌸</p>
+  ${emailCompanyFooterHtml(siteConfig, "#999")}
 </div>`,
       });
     } catch (e) {
