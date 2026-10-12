@@ -58,18 +58,20 @@
   .stk-group { border-bottom: 1px solid var(--line); }
   .stk-group:last-child { border-bottom: 0; }
   .stk-head { display: flex; align-items: center; gap: 12px; padding: 14px 18px 6px; }
-  .stk-row { display: grid; grid-template-columns: minmax(0,1fr) 90px 110px 90px; align-items: center; gap: 10px; padding: 6px 18px; font-size: 14px; }
+  .stk-row { display: grid; grid-template-columns: minmax(0,1fr) 110px 90px 110px; align-items: center; gap: 10px; padding: 6px 18px; font-size: 14px; }
   .stk-row:hover { background: #FBF6F3; }
   .stk-row input[type=number] { width: 84px; border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; font-size: 14px; background: #fff; }
   .stk-row input[type=number]:focus { outline: none; border-color: var(--rose); }
+  .stk-row .stk-text { width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; font-size: 14px; background: #fff; }
   .stk-row.changed input[type=number] { border-color: var(--rose); background: var(--rose-soft); }
   .stk-chip { font-size: 11px; border-radius: 999px; padding: 1px 8px; }
-  .stk-bar { position: fixed; bottom: 0; right: 0; left: 232px; background: var(--brown); color: #fff; padding: 12px clamp(16px,4vw,48px); display: flex; align-items: center; gap: 12px; z-index: 40; }
+  .stk-bar { padding-bottom: calc(12px + env(safe-area-inset-bottom)) !important; position: fixed; bottom: 0; right: 0; left: 232px; background: var(--brown); color: #fff; padding: 12px clamp(16px,4vw,48px); display: flex; align-items: center; gap: 12px; z-index: 40; }
   .stk-bar .btn-save { margin-left: auto; background: var(--rose); color: #fff; border: 0; border-radius: 8px; padding: 9px 20px; font-weight: 600; cursor: pointer; }
-  .stk-bar .btn-save:disabled { opacity: .6; cursor: wait; }
+  .stk-bar .btn-save:disabled { opacity: .45; cursor: not-allowed; }
   @media (max-width: 820px) {
-    .stk-row { grid-template-columns: minmax(0,1fr) 90px; }
-    .stk-row .stk-size, .stk-row .stk-chip-wrap { display: none; }
+    .stk-row { grid-template-columns: minmax(0,1fr) 78px 76px 24px; padding-left: 14px; padding-right: 14px; }
+    .stk-row .stk-chip-wrap { display: none; }
+    .stk-row input[type=number] { width: 70px; }
     .stk-bar { left: 0; }
   }
   @media (max-width: 820px) {
@@ -182,7 +184,7 @@
     <div id="stockList" class="bg-white rounded-xl border overflow-hidden" style="border-color:var(--line)"></div>
     <div id="stockBar" class="stk-bar hidden">
       <span id="stockBarText" class="text-sm"></span>
-      <button class="text-sm underline opacity-80" onclick="discardStockEdits()">放弃修改</button>
+      <button id="stockDiscard" class="hidden text-sm underline opacity-80" onclick="discardStockEdits()">放弃修改</button>
       <button id="stockSaveBtn" class="btn-save" onclick="saveStockEdits()">保存修改</button>
     </div>
   </div>
@@ -736,7 +738,7 @@ function switchTab(tab) {
     if (on) el.setAttribute('aria-current', 'page'); else el.removeAttribute('aria-current');
   });
   if (isOrders) loadAdminOrders();
-  if (isStock) renderStock();
+  if (isStock) renderStock(); else document.getElementById('stockBar')?.classList.add('hidden');
   if (isCustomers) loadCustomers();
   if (isSettings) loadSettingsPage();
   if (isAnalytics) { loadAnalytics(); startAnalyticsPolling(); } else { stopAnalyticsPolling(); }
@@ -818,13 +820,14 @@ window.loadAdminOrders = loadAdminOrders;
 // ---- Stock page: edit per-colour/size quantities in one place ----
 let stockEdits = {};   // "productId::color|size" (or "productId::__total") -> new qty
 let stockOrig = {};    // same keys -> qty the admin saw when editing started
+let stockNew = {};     // productId -> [{ color, size, stock }] rows added on this page, not saved yet
 const stockKey = (pid, key) => `${pid}::${key}`;
 
 function stockEntries(p) {
   if (isVariantSizes(p.sizes)) {
     return p.sizes.map(sz => ({ key: `${sz.color}|${sz.size}`, color: sz.color, size: sz.size, stock: Math.max(0, Number(sz.stock) || 0) }));
   }
-  return [{ key: '__total', color: '—', size: '总库存', stock: Math.max(0, Number(p.stock) || 0) }];
+  return [{ key: '__total', color: '未设置颜色', size: '总库存（未设置尺码）', stock: Math.max(0, Number(p.stock) || 0) }];
 }
 
 function renderStock() {
@@ -832,34 +835,66 @@ function renderStock() {
   if (!list) return;
   const q = (document.getElementById('stockSearch').value || '').toLowerCase();
   const onlyLow = document.getElementById('stockOnlyLow').checked;
-  let html = '';
+  const allColors = [...new Set(allProducts.flatMap(p => isVariantSizes(p.sizes) ? p.sizes.map(x => x.color) : []).filter(Boolean))];
+  let html = '<datalist id="stockColors">' + allColors.map(c => `<option value="${esc(c)}"></option>`).join('') + '</datalist>';
   allProducts.forEach(p => {
     if (q && ![p.name, p.name_zh, p.sku].some(v => String(v || '').toLowerCase().includes(q))) return;
-    const entries = stockEntries(p);
+    const hasNew = (stockNew[p.id] || []).length > 0;
+    let entries = stockEntries(p);
+    // The "total only" row is replaced as soon as colour/size rows are added.
+    if (hasNew && !isVariantSizes(p.sizes)) entries = [];
     entries.forEach(e => { const k = stockKey(p.id, e.key); if (!(k in stockEdits)) stockOrig[k] = e.stock; });
     const shown = onlyLow ? entries.filter(e => (stockKey(p.id, e.key) in stockEdits ? stockEdits[stockKey(p.id, e.key)] : e.stock) <= 2) : entries;
-    if (!shown.length) return;
+    if (onlyLow && !shown.length && !hasNew) return;
+    const noVariants = !isVariantSizes(p.sizes);
     html += `<div class="stk-group">
       <div class="stk-head">
         ${p.image_url ? `<img src="${esc(p.image_url)}" class="w-10 h-12 object-cover rounded"/>` : '<div class="w-10 h-12 bg-stone-100 rounded"></div>'}
-        <div class="min-w-0"><p class="font-medium text-stone-800 text-sm">${esc(p.name_zh || p.name)}</p>
+        <div class="min-w-0 flex-1"><p class="font-medium text-stone-800 text-sm">${esc(p.name_zh || p.name)}</p>
         <p class="text-xs text-stone-400">${esc(p.sku || '')}${p.in_stock === false ? ' · <span class="text-stone-500">已下架</span>' : ''}</p></div>
+        <button class="text-xs text-[#C4928A] font-semibold whitespace-nowrap" onclick="addStockNew('${esc(p.id)}')">＋ 添加颜色 / 尺码</button>
       </div>
+      ${noVariants && !hasNew ? '<p class="px-[18px] pb-1 text-[11px] text-amber-600">这件商品还没有设置颜色和尺码，点右上角「添加颜色 / 尺码」按尺码分别记库存。</p>' : ''}
       ${shown.map(e => {
         const k = stockKey(p.id, e.key);
         const val = k in stockEdits ? stockEdits[k] : e.stock;
         const chip = val === 0 ? '<span class="stk-chip bg-violet-100 text-violet-700">预购</span>' : val <= 2 ? '<span class="stk-chip bg-amber-100 text-amber-700">低库存</span>' : '';
         return `<div class="stk-row ${k in stockEdits ? 'changed' : ''}" data-k="${esc(k)}">
           <span class="text-stone-600">${esc(e.color)}</span>
-          <span class="stk-size text-stone-500">${esc(e.size)}</span>
+          <span class="stk-size font-semibold text-stone-700">${esc(e.size)}</span>
           <input type="number" min="0" step="1" value="${val}" data-pid="${esc(p.id)}" data-key="${esc(e.key)}" oninput="onStockInput(this)"/>
           <span class="stk-chip-wrap">${chip}</span>
         </div>`;
       }).join('')}
+      ${(stockNew[p.id] || []).map((n, idx) => `<div class="stk-row changed">
+          <input type="text" list="stockColors" placeholder="颜色" value="${esc(n.color)}" oninput="onStockNewInput('${esc(p.id)}', ${idx}, 'color', this.value)" class="stk-text"/>
+          <select onchange="onStockNewInput('${esc(p.id)}', ${idx}, 'size', this.value)" class="stk-text">${SIZE_OPTIONS.map(z => `<option ${z === n.size ? 'selected' : ''}>${z}</option>`).join('')}</select>
+          <input type="number" min="0" step="1" value="${n.stock}" oninput="onStockNewInput('${esc(p.id)}', ${idx}, 'stock', this.value)"/>
+          <button class="text-stone-400 hover:text-red-500 text-lg leading-none" title="删除这一行" onclick="removeStockNew('${esc(p.id)}', ${idx})">&times;</button>
+        </div>`).join('')}
     </div>`;
   });
-  list.innerHTML = html || '<p class="text-center py-12 text-sm text-stone-400">没有符合条件的商品</p>';
+  list.innerHTML = html;
+  if (list.querySelectorAll('.stk-group').length === 0) list.innerHTML += '<p class="text-center py-12 text-sm text-stone-400">没有符合条件的商品</p>';
   updateStockBar();
+}
+
+function addStockNew(pid) {
+  const p = allProducts.find(x => String(x.id) === String(pid));
+  const rows = (stockNew[pid] = stockNew[pid] || []);
+  const lastColor = rows.length ? rows[rows.length - 1].color : (isVariantSizes(p?.sizes) ? p.sizes[p.sizes.length - 1].color : '');
+  rows.push({ color: lastColor || '', size: 'S', stock: 0 });
+  renderStock();
+}
+function onStockNewInput(pid, idx, field, value) {
+  const row = stockNew[pid]?.[idx]; if (!row) return;
+  row[field] = field === 'stock' ? Math.max(0, parseInt(value, 10) || 0) : value;
+  if (field === 'size') updateStockBar();
+}
+function removeStockNew(pid, idx) {
+  stockNew[pid].splice(idx, 1);
+  if (!stockNew[pid].length) delete stockNew[pid];
+  renderStock();
 }
 
 function onStockInput(input) {
@@ -870,74 +905,98 @@ function onStockInput(input) {
   updateStockBar();
 }
 
+function stockPendingCount() {
+  return Object.keys(stockEdits).length + Object.values(stockNew).reduce((n, rows) => n + rows.length, 0);
+}
 function updateStockBar() {
-  const n = Object.keys(stockEdits).length;
-  document.getElementById('stockBar').classList.toggle('hidden', n === 0 || currentTab !== 'stock');
-  document.getElementById('stockBarText').textContent = `${n} 项未保存`;
+  const n = stockPendingCount();
+  // Always visible on the stock tab so the save button is never "missing"; it is only enabled once something changed.
+  document.getElementById('stockBar').classList.toggle('hidden', currentTab !== 'stock');
+  document.getElementById('stockBarText').textContent = n ? `${n} 项未保存` : '改动库存数字后，在这里点保存';
+  document.getElementById('stockDiscard').classList.toggle('hidden', n === 0);
+  const btn = document.getElementById('stockSaveBtn');
+  if (!btn.dataset.busy) btn.disabled = n === 0;
 }
 
-function discardStockEdits() { stockEdits = {}; renderStock(); }
+function discardStockEdits() { stockEdits = {}; stockNew = {}; renderStock(); }
 
 async function refreshStock() {
-  if (Object.keys(stockEdits).length && !confirm('刷新会放弃未保存的修改，继续吗？')) return;
-  stockEdits = {}; stockOrig = {};
+  if (stockPendingCount() && !confirm('刷新会放弃未保存的修改，继续吗？')) return;
+  stockEdits = {}; stockOrig = {}; stockNew = {};
   await loadProducts();
   renderStock();
 }
 
 async function saveStockEdits() {
-  const edited = Object.keys(stockEdits);
-  if (!edited.length) return;
+  if (!stockPendingCount()) return;
   const btn = document.getElementById('stockSaveBtn');
-  btn.disabled = true; btn.textContent = '保存中…';
+  const reset = () => { delete btn.dataset.busy; btn.textContent = '保存修改'; updateStockBar(); };
+  btn.dataset.busy = '1'; btn.disabled = true; btn.textContent = '保存中…';
   try {
     const byPid = {};
-    edited.forEach(k => { const [pid, key] = k.split('::'); (byPid[pid] ||= {})[key] = stockEdits[k]; });
+    Object.keys(stockEdits).forEach(k => { const [pid, key] = k.split('::'); (byPid[pid] = byPid[pid] || {})[key] = stockEdits[k]; });
+    Object.keys(stockNew).forEach(pid => { byPid[pid] = byPid[pid] || {}; });
     // Re-read the live rows: customers may have ordered since this page loaded, so only the cells
     // that were edited are overwritten and any that moved meanwhile are called out first.
     const { data: fresh, error } = await sb.from('products').select('id,name,name_zh,stock,sizes').in('id', Object.keys(byPid));
     if (error || !fresh) throw new Error(error?.message || '读取最新库存失败');
-    const conflicts = [];
-    const updates = fresh.map(prod => {
+    const conflicts = [], notes = [];
+    const updates = [];
+    for (const prod of fresh) {
       const edits = byPid[String(prod.id)] || {};
       const label = prod.name_zh || prod.name;
-      if (isVariantSizes(prod.sizes)) {
-        const sizes = prod.sizes.map(sz => {
-          const key = `${sz.color}|${sz.size}`;
-          if (!(key in edits)) return sz;
-          const cur = Math.max(0, Number(sz.stock) || 0);
-          const seen = stockOrig[stockKey(prod.id, key)];
-          if (cur !== seen) conflicts.push(`${label} ${sz.color}/${sz.size}：现在是 ${cur}（你打开时是 ${seen}）`);
-          return { ...sz, stock: edits[key] };
-        });
-        return { id: prod.id, payload: { stock: sizes.reduce((sum, sz) => sum + Math.max(0, Number(sz.stock) || 0), 0), sizes } };
+      const added = (stockNew[prod.id] || []).map(n => ({ color: String(n.color || '').trim(), size: n.size, stock: Math.max(0, parseInt(n.stock, 10) || 0) }));
+      if (added.some(n => !n.color)) throw new Error(`「${label}」有新添加的行没填颜色`);
+      const hadVariants = isVariantSizes(prod.sizes);
+      let sizes = hadVariants ? prod.sizes.map(sz => {
+        const key = `${sz.color}|${sz.size}`;
+        if (!(key in edits)) return sz;
+        const cur = Math.max(0, Number(sz.stock) || 0);
+        const seen = stockOrig[stockKey(prod.id, key)];
+        if (cur !== seen) conflicts.push(`${label} ${sz.color}/${sz.size}：现在是 ${cur}（你打开时是 ${seen}）`);
+        return { ...sz, stock: edits[key] };
+      }) : [];
+      if (added.length) {
+        const seenKeys = new Set(sizes.map(sz => `${sz.color}|${sz.size}`));
+        for (const n of added) {
+          const key = `${n.color}|${n.size}`;
+          if (seenKeys.has(key)) throw new Error(`「${label}」已经有 ${n.color} / ${n.size} 这一项了，请直接修改它的数量`);
+          seenKeys.add(key);
+          sizes.push(n);
+        }
+        if (!hadVariants && Math.max(0, Number(prod.stock) || 0) > 0) {
+          notes.push(`${label}：原来总库存 ${prod.stock}，添加颜色/尺码后总库存会变成各尺码之和（${sizes.reduce((a, sz) => a + sz.stock, 0)}）`);
+        }
       }
-      const cur = Math.max(0, Number(prod.stock) || 0);
-      const seen = stockOrig[stockKey(prod.id, '__total')];
-      if (cur !== seen) conflicts.push(`${label}：现在是 ${cur}（你打开时是 ${seen}）`);
-      return { id: prod.id, payload: { stock: edits.__total } };
-    });
-    if (conflicts.length && !confirm('以下库存在你打开页面后已经变动（可能有顾客下单）：\n\n' + conflicts.join('\n') + '\n\n仍然用你输入的数字覆盖吗？')) {
-      btn.disabled = false; btn.textContent = '保存修改';
-      return;
+      if (sizes.length) {
+        updates.push({ id: prod.id, payload: { stock: sizes.reduce((sum, sz) => sum + Math.max(0, Number(sz.stock) || 0), 0), sizes } });
+      } else {
+        const cur = Math.max(0, Number(prod.stock) || 0);
+        const seen = stockOrig[stockKey(prod.id, '__total')];
+        if (cur !== seen) conflicts.push(`${label}：现在是 ${cur}（你打开时是 ${seen}）`);
+        updates.push({ id: prod.id, payload: { stock: edits.__total } });
+      }
     }
+    if (notes.length && !confirm(notes.join('\n') + '\n\n继续保存吗？')) { reset(); return; }
+    if (conflicts.length && !confirm('以下库存在你打开页面后已经变动（可能有顾客下单）：\n\n' + conflicts.join('\n') + '\n\n仍然用你输入的数字覆盖吗？')) { reset(); return; }
     const failed = [];
     for (const u of updates) {
       const { error: upErr } = await sb.from('products').update(u.payload).eq('id', u.id);
       if (upErr) failed.push(upErr.message);
     }
     if (failed.length) throw new Error(failed[0]);
-    stockEdits = {}; stockOrig = {};
+    stockEdits = {}; stockOrig = {}; stockNew = {};
     await loadProducts();
     renderStock();
   } catch (e) {
     alert('保存失败：' + e.message);
   } finally {
-    btn.disabled = false; btn.textContent = '保存修改';
+    reset();
   }
 }
 window.renderStock = renderStock; window.onStockInput = onStockInput; window.discardStockEdits = discardStockEdits;
 window.refreshStock = refreshStock; window.saveStockEdits = saveStockEdits;
+window.addStockNew = addStockNew; window.onStockNewInput = onStockNewInput; window.removeStockNew = removeStockNew;
 
 // ---- Settings page (settings table, key = 'site_config') ----
 async function loadSettingsPage() {
