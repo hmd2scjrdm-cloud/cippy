@@ -327,7 +327,7 @@ export default function ProductDetailModal({
                     ? tx('Preorder (ships in 7–21 working days)', '预购（预计 7–21 个工作日发货）')
                     : (product.stock || 0) > 0
                     ? tx(`In stock (${availableSizes.map(size => sizeLabel(size, lang)).join(', ')})`, `现货 (${availableSizes.map(size => sizeLabel(size, lang)).join('、')})`)
-                    : tx("Sold out", "已售罄")}
+                    : tx('Preorder (ships in 7–21 working days)', '预购（预计 7–21 个工作日发货）')}
                 </strong>
               </div>
               {product.lining && (
