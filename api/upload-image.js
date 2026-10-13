@@ -1,8 +1,8 @@
 import { AwsClient } from "aws4fetch";
+import { isAdminUser } from "./_lib/admin-auth.js";
 
 const SUPABASE_URL = "https://ilzeziznxzaxxudzhdmu.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI";
-const ADMIN_EMAIL = "cippy.kl@gmail.com";
 
 export const config = {
   api: { bodyParser: { sizeLimit: "8mb" } },
@@ -25,7 +25,7 @@ export default async function handler(req, res) {
 
   const token = (req.headers.authorization || "").replace("Bearer ", "");
   const admin = await getVerifiedUser(token);
-  if (!admin || admin.email !== ADMIN_EMAIL) return res.status(403).json({ error: "无权限" });
+  if (!(await isAdminUser(admin, SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY))) return res.status(403).json({ error: "无权限" });
 
   const { R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME, R2_PUBLIC_URL } = process.env;
   if (!R2_ACCOUNT_ID || !R2_ACCESS_KEY_ID || !R2_SECRET_ACCESS_KEY || !R2_BUCKET_NAME || !R2_PUBLIC_URL) {

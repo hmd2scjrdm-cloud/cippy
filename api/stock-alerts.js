@@ -1,10 +1,10 @@
 import nodemailer from "nodemailer";
 import { getSiteConfig } from "./_lib/site-config.js";
 import { backInStockEmail } from "./_lib/back-in-stock-email.js";
+import { isAdminUser } from "./_lib/admin-auth.js";
 
 const SUPABASE_URL = "https://ilzeziznxzaxxudzhdmu.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI";
-const ADMIN_EMAIL = "cippy.kl@gmail.com";
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 const UUID_RE = /^[0-9a-f-]{36}$/i;
 const MAX_PENDING_PER_EMAIL = 10;
@@ -113,7 +113,7 @@ export default async function handler(req, res) {
 
   if (body.action === "notify") {
     const admin = await getVerifiedUser((req.headers.authorization || "").replace("Bearer ", ""));
-    if (!admin || admin.email !== ADMIN_EMAIL) return res.status(403).json({ error: "无权限" });
+    if (!(await isAdminUser(admin, SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY))) return res.status(403).json({ error: "无权限" });
     return notify(body, serviceKey, res);
   }
   return res.status(400).json({ error: "Unknown action" });

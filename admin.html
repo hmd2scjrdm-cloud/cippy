@@ -258,6 +258,15 @@
       <div><label class="adm-label">SSM 注册号</label><input id="setSsm" type="text" class="adm-input"/></div>
       <div><label class="adm-label">公司地址</label><textarea id="setAddress" rows="3" class="adm-input"></textarea></div>
     </div>
+    <div class="adm-card space-y-4">
+      <div><h2 class="adm-h2">管理员</h2><p class="text-xs text-stone-400">管理员可以使用整个后台（订单、库存、客户、设置、网站内容）。对方需要用<b>这个 Google 邮箱</b>登录后台。只有店主可以添加或移除管理员。</p></div>
+      <div id="adminList" class="divide-y" style="border-color:var(--line)"></div>
+      <div id="adminAddRow" class="hidden flex gap-2">
+        <input id="adminNewEmail" type="email" placeholder="对方的 Google 邮箱，例：name@gmail.com" class="adm-input" onkeydown="if(event.key==='Enter')addAdmin()"/>
+        <button class="btn-brand whitespace-nowrap" onclick="addAdmin()">添加管理员</button>
+      </div>
+      <p id="adminMsg" class="text-sm"></p>
+    </div>
     <div class="flex items-center gap-3">
       <button id="setSaveBtn" onclick="saveSettings()" class="btn-brand" style="padding:10px 24px">保存设置</button>
       <span id="setMsg" class="text-sm"></span>
@@ -711,7 +720,8 @@
 <script>
 const SUPABASE_URL = 'https://ilzeziznxzaxxudzhdmu.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI';
-const ALLOWED_EMAILS = ['cippy.kl@gmail.com'];
+const OWNER_EMAIL = 'cippy.kl@gmail.com'; // always an admin; the only one who can add/remove other admins
+let isOwner = false;
 // Products with no colour choice (just the main photo) keep this placeholder colour so per-size stock still works;
 // the shop hides it and never asks the customer to pick a colour.
 const NO_COLOR = '图片色';
@@ -726,12 +736,16 @@ async function init() {
   sb.auth.onAuthStateChange((_, session) => handleSession(session));
 }
 
-function handleSession(session) {
+async function handleSession(session) {
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('unauthorizedScreen').classList.add('hidden');
   document.getElementById('app').classList.add('hidden');
   if (!session) { document.getElementById('loginScreen').classList.remove('hidden'); return; }
-  if (!ALLOWED_EMAILS.includes(session.user.email)) { document.getElementById('unauthorizedScreen').classList.remove('hidden'); return; }
+  const email = String(session.user.email || '').toLowerCase();
+  isOwner = email === OWNER_EMAIL;
+  // Admins are the owner plus whoever the owner added under 设置 → 管理员 (checked by the database, public.is_admin()).
+  const { data: ok, error } = await sb.rpc('is_admin');
+  if (!(ok === true || (error && isOwner))) { document.getElementById('unauthorizedScreen').classList.remove('hidden'); return; }
   document.getElementById('app').classList.remove('hidden');
   loadProducts();
   switchTab(currentTab);
@@ -774,7 +788,7 @@ function switchTab(tab) {
   if (isStock) { loadStockWaiting().then(renderStock); renderStock(); } else document.getElementById('stockBar')?.classList.add('hidden');
   if (isCustomers) loadCustomers();
   if (isContent) loadContentPage(); else document.getElementById('contentBar')?.classList.add('hidden');
-  if (isSettings) loadSettingsPage();
+  if (isSettings) { loadSettingsPage(); loadAdmins(); }
   if (isAnalytics) { loadAnalytics(); startAnalyticsPolling(); } else { stopAnalyticsPolling(); }
 }
 window.switchTab = switchTab;
@@ -1325,6 +1339,43 @@ async function saveContent() {
 }
 window.renderContent = renderContent; window.setContentField = setContentField; window.resetContentField = resetContentField;
 window.discardContentEdits = discardContentEdits; window.uploadContentImage = uploadContentImage; window.saveContent = saveContent;
+
+// ---- Admins list (public.admins; only the owner can add/remove) ----
+async function loadAdmins() {
+  const { data, error } = await sb.from('admins').select('email,added_by,added_at').order('added_at');
+  const list = document.getElementById('adminList');
+  document.getElementById('adminAddRow').classList.toggle('hidden', !isOwner);
+  if (error) { list.innerHTML = '<p class="text-sm text-red-500 py-2">读取管理员列表失败：' + esc(error.message) + '</p>'; return; }
+  list.innerHTML = (data || []).map(a => {
+    const owner = a.email === OWNER_EMAIL;
+    return `<div class="flex items-center gap-3 py-2.5" style="border-color:var(--line)">
+      <span class="flex-1 text-sm text-stone-800 break-all">${esc(a.email)}</span>
+      <span class="text-xs rounded-full px-2 py-0.5 ${owner ? 'bg-[#3F2B2B] text-white' : 'bg-stone-100 text-stone-500'}">${owner ? '店主' : '管理员'}</span>
+      ${isOwner && !owner ? `<button class="text-xs text-red-400 hover:text-red-600" onclick="removeAdmin('${esc(a.email)}')">移除</button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+async function addAdmin() {
+  const msg = document.getElementById('adminMsg');
+  const input = document.getElementById('adminNewEmail');
+  const email = input.value.trim().toLowerCase();
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { msg.textContent = '请填写有效的邮箱'; msg.className = 'text-sm text-red-500'; return; }
+  const { error } = await sb.from('admins').insert({ email, added_by: OWNER_EMAIL });
+  if (error) { msg.textContent = /duplicate|unique/i.test(error.message) ? '这个邮箱已经是管理员了' : '添加失败：' + error.message; msg.className = 'text-sm text-red-500'; return; }
+  input.value = ''; msg.textContent = `已添加 ${email} ✓ 对方用这个 Google 邮箱登录后台即可`; msg.className = 'text-sm text-green-600';
+  loadAdmins();
+}
+
+async function removeAdmin(email) {
+  if (!confirm(`移除管理员 ${email}？对方马上就不能再进入后台。`)) return;
+  const { error } = await sb.from('admins').delete().eq('email', email);
+  const msg = document.getElementById('adminMsg');
+  if (error) { msg.textContent = '移除失败：' + error.message; msg.className = 'text-sm text-red-500'; return; }
+  msg.textContent = `已移除 ${email}`; msg.className = 'text-sm text-stone-500';
+  loadAdmins();
+}
+window.addAdmin = addAdmin; window.removeAdmin = removeAdmin; window.loadAdmins = loadAdmins;
 
 let aoItemRowId = 0;
 

@@ -1,8 +1,8 @@
 import { nextOrderId } from "./_lib/next-order-id.js";
+import { isAdminUser } from "./_lib/admin-auth.js";
 
 const SUPABASE_URL = "https://ilzeziznxzaxxudzhdmu.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI";
-const ADMIN_EMAIL = "cippy.kl@gmail.com";
 
 const ALLOWED_STATUS = ["pending", "paid", "processing", "shipped", "delivered"];
 
@@ -25,7 +25,7 @@ export default async function handler(req, res) {
 
   const token = (req.headers.authorization || "").replace("Bearer ", "");
   const admin = await getVerifiedUser(token);
-  if (!admin || admin.email !== ADMIN_EMAIL) return res.status(403).json({ error: "无权限" });
+  if (!(await isAdminUser(admin, SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY))) return res.status(403).json({ error: "无权限" });
 
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!serviceKey) return res.status(500).json({ error: "Not configured" });
