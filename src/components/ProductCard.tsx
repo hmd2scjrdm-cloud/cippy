@@ -1,3 +1,4 @@
+import { autoSelectedColor, isNoColor, shouldShowColorPicker } from '../lib/productColors';
 import React, { useState } from 'react';
 import { Product } from '../types';
 import { ShoppingBag, Star, Sparkles, Check, GitCompare, Heart } from 'lucide-react';
@@ -121,7 +122,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
   // Color options and per-color sizes come from product.sizes as set up in the admin product manager
   const colorOptions = getColorOptions(product.sizes);
   const isColorProduct = colorOptions.length > 0;
-  const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const showColorPicker = shouldShowColorPicker(colorOptions);
+  const [selectedColor, setSelectedColor] = useState<string | null>(autoSelectedColor(colorOptions));
   const availableSizes = getSizesForColor(product.sizes, selectedColor);
   const [selectedSize, setSelectedSize] = useState<'S' | 'M' | null>(availableSizes.length === 1 ? availableSizes[0] : null);
   const [addedAnimation, setAddedAnimation] = useState(false);
@@ -163,7 +165,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
       return;
     }
     let finalProduct = { ...product, isPreorder: selectedIsPreorder };
-    if (isColorProduct && selectedColor) {
+    if (isColorProduct && selectedColor && isNoColor(selectedColor)) {
+      // No colour choice: keep the product as is, but still record the colour so stock is deducted per size.
+      finalProduct = { ...product, selectedColor, isPreorder: selectedIsPreorder };
+    } else if (isColorProduct && selectedColor) {
       const slug = selectedColor.toLowerCase().replace(/\s+/g, '-');
       finalProduct = {
         ...product,
@@ -383,7 +388,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             </div>
           </div>
 
-          {isColorProduct && (
+          {showColorPicker && (
             <div className="flex items-center justify-between gap-2">
               <span className={`text-[10px] tracking-wider font-bold text-zinc-400 uppercase shrink-0 ${activeArchetype.fontBody}`}>
                 {lang === 'zh' ? '颜色' : 'Color'}
@@ -513,7 +518,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             </div>
           </div>
 
-          {isColorProduct && (
+          {showColorPicker && (
             <div className="flex items-center justify-between text-xs font-sans gap-2">
               <span className="text-zinc-400 shrink-0">{lang === 'zh' ? '选择颜色：' : 'Choose color:'}</span>
               <div className="flex gap-1.5 flex-wrap justify-end">

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Product } from '../types';
+import { autoSelectedColor, isNoColor, shouldShowColorPicker } from '../lib/productColors';
 import { useSiteConfig } from '../lib/siteConfig';
 import { X, ShoppingBag, Heart, Check, Sparkles, Scale, BookOpen, AlertCircle, Truck, RefreshCw } from 'lucide-react';
 import { getPriceTier } from '../lib/priceTier';
@@ -73,7 +74,8 @@ export default function ProductDetailModal({
   const tx = (en: string, zh: string) => (lang === 'zh' ? zh : en);
   const colorOptions = getColorOptions(product.sizes);
   const isColorProduct = colorOptions.length > 0;
-  const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const showColorPicker = shouldShowColorPicker(colorOptions);
+  const [selectedColor, setSelectedColor] = useState<string | null>(autoSelectedColor(colorOptions));
   const availableSizes = getSizesForColor(product.sizes, selectedColor);
   const [selectedSize, setSelectedSize] = useState<'S' | 'M' | null>(availableSizes.length === 1 ? availableSizes[0] : null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -91,6 +93,12 @@ export default function ProductDetailModal({
     ['sleeve', tx('Sleeve', '袖长')]
   ] as const;
   const populatedMeasurements = sizeMeasurements.filter(([key]) => sizeGuide.some(row => row[key] != null));
+
+  // Opening another product: a lone (or placeholder) colour is picked automatically, several colours start unselected
+  React.useEffect(() => {
+    setSelectedColor(autoSelectedColor(colorOptions));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product.id]);
 
   // Auto-pick the size when a color leaves only one option; clear it if it's no longer valid
   React.useEffect(() => {
@@ -132,7 +140,10 @@ export default function ProductDetailModal({
       return;
     }
     let finalProduct = { ...product, isPreorder: selectedIsPreorder };
-    if (isColorProduct && selectedColor) {
+    if (isColorProduct && selectedColor && isNoColor(selectedColor)) {
+      // No colour choice: keep the product as is, but still record the colour so stock is deducted per size.
+      finalProduct = { ...product, selectedColor, isPreorder: selectedIsPreorder };
+    } else if (isColorProduct && selectedColor) {
       const slug = selectedColor.toLowerCase().replace(/\s+/g, '-');
       finalProduct = {
         ...product,
@@ -426,7 +437,7 @@ export default function ProductDetailModal({
             </div>
 
             {/* Colors selector (if applicable) */}
-            {isColorProduct && (
+            {showColorPicker && (
               <div className="flex items-center justify-between text-xs font-sans pt-2 border-t border-pink-100/30 gap-2">
                 <span className="text-zinc-500 font-medium shrink-0">{tx("Choose Color:", "选择颜色:")}</span>
                 <div className="flex gap-2 flex-wrap justify-end">

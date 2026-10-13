@@ -684,6 +684,9 @@
 const SUPABASE_URL = 'https://ilzeziznxzaxxudzhdmu.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI';
 const ALLOWED_EMAILS = ['cippy.kl@gmail.com'];
+// Products with no colour choice (just the main photo) keep this placeholder colour so per-size stock still works;
+// the shop hides it and never asks the customer to pick a colour.
+const NO_COLOR = '图片色';
 const RMB_TO_MYR = 1.65; // MYR = RMB ÷ 1.65
 
 const { createClient } = supabase;
@@ -825,9 +828,9 @@ const stockKey = (pid, key) => `${pid}::${key}`;
 
 function stockEntries(p) {
   if (isVariantSizes(p.sizes)) {
-    return p.sizes.map(sz => ({ key: `${sz.color}|${sz.size}`, color: sz.color, size: sz.size, stock: Math.max(0, Number(sz.stock) || 0) }));
+    return p.sizes.map(sz => ({ key: `${sz.color}|${sz.size}`, color: sz.color === NO_COLOR ? '无颜色（只有主图）' : sz.color, size: sz.size, stock: Math.max(0, Number(sz.stock) || 0) }));
   }
-  return [{ key: '__total', color: '未设置颜色', size: '总库存（未设置尺码）', stock: Math.max(0, Number(p.stock) || 0) }];
+  return [{ key: '__total', color: '未设置尺码', size: '总库存', stock: Math.max(0, Number(p.stock) || 0) }];
 }
 
 function renderStock() {
@@ -835,7 +838,7 @@ function renderStock() {
   if (!list) return;
   const q = (document.getElementById('stockSearch').value || '').toLowerCase();
   const onlyLow = document.getElementById('stockOnlyLow').checked;
-  const allColors = [...new Set(allProducts.flatMap(p => isVariantSizes(p.sizes) ? p.sizes.map(x => x.color) : []).filter(Boolean))];
+  const allColors = [...new Set(allProducts.flatMap(p => isVariantSizes(p.sizes) ? p.sizes.map(x => x.color) : []).filter(c => c && c !== NO_COLOR))];
   let html = '<datalist id="stockColors">' + allColors.map(c => `<option value="${esc(c)}"></option>`).join('') + '</datalist>';
   allProducts.forEach(p => {
     if (q && ![p.name, p.name_zh, p.sku].some(v => String(v || '').toLowerCase().includes(q))) return;
@@ -867,7 +870,7 @@ function renderStock() {
         </div>`;
       }).join('')}
       ${(stockNew[p.id] || []).map((n, idx) => `<div class="stk-row changed">
-          <input type="text" list="stockColors" placeholder="颜色" value="${esc(n.color)}" oninput="onStockNewInput('${esc(p.id)}', ${idx}, 'color', this.value)" class="stk-text"/>
+          <input type="text" list="stockColors" placeholder="颜色（没有可留空）" value="${esc(n.color)}" oninput="onStockNewInput('${esc(p.id)}', ${idx}, 'color', this.value)" class="stk-text"/>
           <select onchange="onStockNewInput('${esc(p.id)}', ${idx}, 'size', this.value)" class="stk-text">${SIZE_OPTIONS.map(z => `<option ${z === n.size ? 'selected' : ''}>${z}</option>`).join('')}</select>
           <input type="number" min="0" step="1" value="${n.stock}" oninput="onStockNewInput('${esc(p.id)}', ${idx}, 'stock', this.value)"/>
           <button class="text-stone-400 hover:text-red-500 text-lg leading-none" title="删除这一行" onclick="removeStockNew('${esc(p.id)}', ${idx})">&times;</button>
@@ -883,7 +886,8 @@ function addStockNew(pid) {
   const p = allProducts.find(x => String(x.id) === String(pid));
   const rows = (stockNew[pid] = stockNew[pid] || []);
   const lastColor = rows.length ? rows[rows.length - 1].color : (isVariantSizes(p?.sizes) ? p.sizes[p.sizes.length - 1].color : '');
-  rows.push({ color: lastColor || '', size: 'S', stock: 0 });
+  const lastShown = lastColor === NO_COLOR ? '' : lastColor;
+  rows.push({ color: lastShown || '', size: 'S', stock: 0 });
   renderStock();
 }
 function onStockNewInput(pid, idx, field, value) {
@@ -945,8 +949,7 @@ async function saveStockEdits() {
     for (const prod of fresh) {
       const edits = byPid[String(prod.id)] || {};
       const label = prod.name_zh || prod.name;
-      const added = (stockNew[prod.id] || []).map(n => ({ color: String(n.color || '').trim(), size: n.size, stock: Math.max(0, parseInt(n.stock, 10) || 0) }));
-      if (added.some(n => !n.color)) throw new Error(`「${label}」有新添加的行没填颜色`);
+      const added = (stockNew[prod.id] || []).map(n => ({ color: String(n.color || '').trim() || NO_COLOR, size: n.size, stock: Math.max(0, parseInt(n.stock, 10) || 0) }));
       const hadVariants = isVariantSizes(prod.sizes);
       let sizes = hadVariants ? prod.sizes.map(sz => {
         const key = `${sz.color}|${sz.size}`;
@@ -1811,7 +1814,7 @@ function addColorRow(color='', sizes=[], imageUrl='') {
   div.dataset.imageUrl = imageUrl;
   div.innerHTML = `
     <div class="flex items-center gap-2">
-      <input type="text" placeholder="颜色（例：黑色）" value="${color}"
+      <input type="text" placeholder="颜色（没有颜色就留空）" value="${color === NO_COLOR ? '' : color}"
         class="color-name flex-1 border border-stone-200 rounded px-2 py-1 text-sm focus:outline-none focus:border-[#C4928A]"/>
       <label class="cursor-pointer text-xs text-[#C4928A] border border-[#C4928A] px-2 py-1 rounded hover:bg-[#fdf0ed] whitespace-nowrap">
         📷 配色图
@@ -1882,8 +1885,7 @@ window.addColorRow = addColorRow;
 function getColorSizes() {
   const result = [];
   document.querySelectorAll('.color-row').forEach(row => {
-    const color = row.querySelector('.color-name').value.trim();
-    if (!color) return;
+    const color = row.querySelector('.color-name').value.trim() || NO_COLOR;
     row.querySelectorAll('.size-stock').forEach(inp => {
       const preorder = row.querySelector(`.size-preorder[data-size="${inp.dataset.size}"]`)?.checked || false;
       if (inp.value !== '' || preorder) {

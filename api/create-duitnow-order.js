@@ -12,9 +12,17 @@ function hasVariantInventory(sizes) {
   return Array.isArray(sizes) && sizes.some(s => s && typeof s === "object" && s.color && s.size);
 }
 
+// An order line may arrive without a colour (products with no colour choice, or older carts). That is only
+// unambiguous when the product has a single colour, so match by size alone in that case.
+function sameVariant(entry, item, sizes) {
+  if (!entry || entry.size !== item.size) return false;
+  if (item.color) return entry.color === item.color;
+  return new Set(sizes.map(x => x && x.color)).size === 1;
+}
+
 function variantForItem(product, item) {
   if (!hasVariantInventory(product.sizes)) return null;
-  return product.sizes.find(s => s.color === item.color && s.size === item.size) || null;
+  return product.sizes.find(s => sameVariant(s, item, product.sizes)) || null;
 }
 
 async function getVerifiedUser(token) {
@@ -48,7 +56,7 @@ async function deductInventory(items, serviceKey) {
     if (!prod) continue;
     const usesVariants = hasVariantInventory(prod.sizes);
     const newSizes = usesVariants ? prod.sizes.map(s =>
-      s.color === item.color && s.size === item.size
+      sameVariant(s, item, prod.sizes)
         ? { ...s, stock: Math.max(0, Number(s.stock || 0) - qty) }
         : s
     ) : prod.sizes;
