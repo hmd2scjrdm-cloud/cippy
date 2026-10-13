@@ -10,7 +10,7 @@ export const storybookChapters: StoryChapter[] = [
     content: "At Cippy, we believe that garments should never confine you. Our loose-fitting philosophy is a love letter to the relaxed Korean aesthetic—tailored with premium drapes that flow with your body, creating a fairytale silhouette that is both high-end and deeply comforting.",
     cnContent: "在 Cippy，我们深信衣物不该是拘束。我们的‘韩系宽松美学’是一首献给随性生活的抒情诗——选用高端垂坠面料，随着身体的律动起伏，营造出既高级又温暖舒适的童话廓形。",
     illustrationType: "dress",
-    image: "/assets/journal/chapter-1.png"
+    image: "/assets/journal/chapter-1.webp"
   },
   {
     id: 2,
@@ -21,7 +21,7 @@ export const storybookChapters: StoryChapter[] = [
     content: "True luxury is effortless. Every Cippy piece is meticulously curated to be the main character of your daily look. No complicated styling required—simply wear, adjust the delicate premium details, and step out into your day with confidence and whimsical beauty.",
     cnContent: "真正的奢华是毫不费力的。Cippy 的每一件 Ready-to-Wear（成衣）都经过精心雕琢，旨在成为你日常穿搭的绝对主角。无需繁复的搭配技巧——轻轻穿上，系好带子，便能自信走入童话般的日常。",
     illustrationType: "bow",
-    image: "/assets/journal/chapter-2.jpeg"
+    image: "/assets/journal/chapter-2.webp"
   },
   {
     id: 3,
@@ -32,7 +32,7 @@ export const storybookChapters: StoryChapter[] = [
     content: "We focus on S and M sizing so every silhouette can be adjusted with greater attention to proportion. From the neckline and waist placement to the overall length and drape, each detail is considered to create a flattering fit that feels comfortable, feminine and easy to wear.",
     cnContent: "我们专注于 S 与 M 两个尺码，让每一件衣服的比例都能获得更细致的调整。从领口、腰线到衣长与垂坠度，我们反复琢磨每一个细节，让衣服自然贴合身形，穿起来舒适、显比例，同时保留 Cippy 独有的温柔感。",
     illustrationType: "stars",
-    image: "/assets/journal/chapter-3.jpg"
+    image: "/assets/journal/chapter-3.webp"
   },
   {
     id: 4,

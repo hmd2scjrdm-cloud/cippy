@@ -1346,6 +1346,7 @@ export default function App() {
             sizes: Array.isArray(p.sizes) ? p.sizes : ['S', 'M'],
             color_images: p.color_images && typeof p.color_images === 'object' ? Object.fromEntries(Object.entries(p.color_images).map(([k, v]) => [k, Array.isArray(v) ? optAll(v) : typeof v === 'string' ? opt(v) : v])) as any : undefined,
             description: englishDescription,
+            stylingNote: p.styling_note || '',
             cnDescription: chineseDescription,
             story: p.story || "",
             cnStory: p.story_zh || "为马来西亚日常精选的韩系单品，兼顾轻盈穿着感与日常搭配。",

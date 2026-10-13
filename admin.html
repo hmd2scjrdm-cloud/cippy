@@ -606,6 +606,12 @@
         <input id="fSupplierUrl" type="url" placeholder="https://item.taobao.com/..." class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4928A]"/>
       </div>
 
+      <!-- Styling note -->
+      <div>
+        <label class="text-xs text-stone-500 mb-1 block">穿搭建议（选填，显示在商品图下面；留空就不显示）</label>
+        <textarea id="fStylingNote" rows="2" placeholder="例：配高腰牛仔裤和小白鞋，整体更显高…" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4928A]"></textarea>
+      </div>
+
       <!-- Description -->
       <div>
         <label class="text-xs text-stone-500 mb-1 block">商品描述</label>
@@ -2301,6 +2307,7 @@ async function editProduct(id) {
   document.getElementById('fImageUrl').value = p.image_url || '';
   document.getElementById('fSupplierUrl').value = p.supplier_url || '';
   document.getElementById('fDescription').value = p.description || '';
+  document.getElementById('fStylingNote').value = p.styling_note || '';
   document.getElementById('fNotes').value = p.notes || '';
   document.getElementById('fSeries').value = p.series || '';
   document.getElementById('fFabric').value = p.fabric || '';
@@ -2377,6 +2384,7 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
     image_url: document.getElementById('fImageUrl').value || null,
     supplier_url: document.getElementById('fSupplierUrl').value || null,
     description: document.getElementById('fDescription').value || null,
+    styling_note: document.getElementById('fStylingNote').value.trim() || null,
     notes: document.getElementById('fNotes').value || null,
     is_new: document.getElementById('fIsNew').checked,
     in_stock: document.getElementById('fInStock').checked,

@@ -14,6 +14,7 @@ export interface Product {
   sizes: string[] | { size: string; color: string; stock?: number; preorder?: boolean }[];
   color_images?: Record<string, string>; // Optional: color name -> photo URL, set in the admin product manager
   description: string;
+  stylingNote?: string;
   cnDescription: string;
   story: string; // The "storybook" fairytale style description
   cnStory: string;

@@ -249,17 +249,16 @@ export default function ProductDetailModal({
             )}
           </div>
 
-          {/* OOTD Note */}
-          <div className="hidden md:flex items-start gap-2.5 bg-[#FFF0F2]/40 rounded-xl p-3 border border-pink-100/30 text-[10px] text-zinc-500 leading-relaxed mt-4">
-            <Sparkles className="w-4 h-4 text-[#B96A73] shrink-0" />
-            <div>
-              <strong>{tx("Cippy Studio Styling Note:", "Cippy 首尔美学穿搭建议：")}</strong>
-              {" "}{tx(
-                "This loose silhouette is cut to layer elegantly. Pair S with high-waisted folds to maximize your vertical proportions.",
-                "此款松弛感成衣专为黄金比例叠穿而生。S 码建议搭配高腰长裤或蛋糕短裙，极佳拉长下半身比例，干净清爽。"
-              )}
+          {/* Styling note: only when this product has its own (set in the admin) */}
+          {product.stylingNote && (
+            <div className="hidden md:flex items-start gap-2.5 bg-[#FFF0F2]/40 rounded-xl p-3 border border-pink-100/30 text-[10px] text-zinc-500 leading-relaxed mt-4">
+              <Sparkles className="w-4 h-4 text-[#B96A73] shrink-0" />
+              <div>
+                <strong>{tx("Styling note:", "穿搭建议：")}</strong>
+                {" "}{product.stylingNote}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Right Side: Details & Interaction */}
@@ -267,7 +266,7 @@ export default function ProductDetailModal({
           <div className="space-y-5">
             {/* Title Block */}
             <div className="space-y-1.5 border-b border-pink-100/50 pb-4">
-              <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center justify-between gap-2 pr-11">
                 <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#B96A73]">
                   {getPriceTier(product.price).emoji} {lang === 'zh' ? getPriceTier(product.price).zh : getPriceTier(product.price).en}
                 </span>
