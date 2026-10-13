@@ -12,6 +12,16 @@ export function sizeLabel(size: string, lang: StoreLanguage): string {
   return normalized;
 }
 
+// Chinese -> English for common fabric and garment words (longest first so "短款上衣" wins over "上衣").
+const TERMS: [string, string][] = ([
+  ['粘胶纤维', 'Viscose'], ['聚酯纤维', 'Polyester'], ['涤纶', 'Polyester'], ['氨纶', 'Spandex'], ['锦纶', 'Nylon'], ['腈纶', 'Acrylic'],
+  ['莫代尔', 'Modal'], ['天丝', 'Tencel'], ['亚麻', 'Linen'], ['羊毛', 'Wool'], ['真丝', 'Silk'], ['纯棉', 'Cotton'], ['棉', 'Cotton'],
+  ['螺纹面料', 'Rib knit'], ['螺纹', 'Rib knit'], ['针织', 'Knit'], ['雪纺', 'Chiffon'], ['蕾丝', 'Lace'], ['牛仔', 'Denim'], ['混纺', 'blend'], ['面料', 'fabric'],
+  ['短款上衣', 'Cropped top'], ['短袖', 'Short-sleeve'], ['长袖', 'Long-sleeve'], ['吊带', 'Cami'], ['背心', 'Tank top'], ['衬衫', 'Shirt'], ['T恤', 'T-shirt'],
+  ['半身裙', 'Skirt'], ['短裙', 'Mini skirt'], ['长裙', 'Maxi skirt'], ['连衣裙', 'Dress'], ['长裤', 'Trousers'], ['休闲裤', 'Casual pants'], ['短裤', 'Shorts'],
+  ['外套', 'Jacket'], ['开衫', 'Cardigan'], ['套装', 'Set'], ['上衣', 'Top'], ['裙子', 'Skirt'], ['裤子', 'Pants'],
+] as [string, string][]).sort((x, y) => y[0].length - x[0].length);
+
 export function specLabel(value: string | undefined, lang: StoreLanguage): string {
   if (!value) return lang === 'zh' ? '资料待确认' : 'Not specified';
 
@@ -49,14 +59,18 @@ export function specLabel(value: string | undefined, lang: StoreLanguage): strin
   const translated = values[normalized];
   if (translated) return translated[lang === 'zh' ? 1 : 0];
 
-  // Admin fields are often saved as a Chinese comma-separated list. Translate each
-  // known part so one unfamiliar term does not make the whole English spec Chinese.
+  // Admin fields are often saved in Chinese (e.g. "95% 聚酯纤维 + 5% 氨纶"). For the English shop, swap the
+  // known fabric / garment terms; anything unfamiliar is left as written rather than guessed.
   if (lang === 'en' && containsChinese(normalized)) {
-    return normalized
-      .split(/[,，、/]+/)
-      .map(part => values[part.trim()]?.[0] || part.trim())
-      .filter(Boolean)
-      .join(' / ');
+    let out = normalized;
+    for (const [zh, en] of TERMS) out = out.split(zh).join(` ${en} `);
+    return out
+      .replace(/\s*[,，、]\s*/g, ', ')
+      .replace(/\s*\/\s*/g, ' / ')
+      .replace(/\s*\+\s*/g, ' + ')
+      .replace(/\s{2,}/g, ' ')
+      .replace(/(^[,\s]+|[,\s]+$)/g, '')
+      .trim();
   }
   return normalized;
 }

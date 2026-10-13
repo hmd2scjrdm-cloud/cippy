@@ -98,8 +98,8 @@ export const products: Product[] = [
       "S",
       "M"
     ],
-    "description": "An effortlessly chic, premium ready-to-wear piece crafted from highly breathable fabric. Perfect for modern, everyday storytelling.",
-    "cnDescription": "一款专为大马气候精选的高端透气成衣。裁剪松弛而优雅，细节精致，完美融入日常韩系氛围穿搭。",
+    "description": "",
+    "cnDescription": "",
     "story": "Reminiscent of sweet collegiate afternoons under breezy trees, this set pairs a delicate dachshund embroidered tube top with a beautifully layered ruffle skirt. Pure youthful magic.",
     "cnStory": "灵感源自绿树微风下的甜美校园午后，精致的腊肠狗刺绣抹胸，搭配层层叠叠的灰色蛋糕短裙，尽显干净纯粹的少女灵动感。",
     "details": [
@@ -140,8 +140,8 @@ export const products: Product[] = [
       "S",
       "M"
     ],
-    "description": "An effortlessly chic, premium ready-to-wear piece crafted from highly breathable fabric. Perfect for modern, everyday storytelling.",
-    "cnDescription": "一款专为大马气候精选的高端透气成衣。裁剪松弛而优雅，细节精致，完美融入日常韩系氛围穿搭。",
+    "description": "",
+    "cnDescription": "",
     "story": "A pristine high-waisted silhouette cut to elongate the legs. Its A-line drape floats gracefully, making it an essential chapter for your daily strolls.",
     "cnStory": "专为修饰小个子比例甄选的高腰 A 字裙摆。利落服帖的线条，走动时却带出轻盈波光，是日常衣橱里最百搭温婉的诗意篇章。",
     "details": [
@@ -185,8 +185,8 @@ export const products: Product[] = [
       "S",
       "M"
     ],
-    "description": "An effortlessly chic, premium ready-to-wear piece crafted from highly breathable fabric. Perfect for modern, everyday storytelling.",
-    "cnDescription": "一款专为大马气候精选的高端透气成衣。裁剪松弛而优雅，细节精致，完美融入日常韩系氛围穿搭。",
+    "description": "",
+    "cnDescription": "",
     "story": "Crafted for high-end lounging and weekend adventures. The gentle drawstring waist ensures effortless wearability, offering a cozy touch of Korean styling.",
     "cnStory": "专为慵懒周末与精致居家打造的抽绳热裤。高品质棉麻混纺，亲肤而有型，在漫步吉隆坡暖风里带来不费力的极致舒适。",
     "details": [
@@ -229,8 +229,8 @@ export const products: Product[] = [
       "S",
       "M"
     ],
-    "description": "An effortlessly chic, premium ready-to-wear piece crafted from highly breathable fabric. Perfect for modern, everyday storytelling.",
-    "cnDescription": "一款专为大马气候精选的高端透气成衣。裁剪松弛而优雅，细节精致，完美融入日常韩系氛围穿搭。",
+    "description": "",
+    "cnDescription": "",
     "story": "A romantic crossover between French elegance and Seoul street style. Features classic cream polka dots and a matching light cover-up, draping like a dream.",
     "cnStory": "法式复古浪漫与首尔街头风的梦幻交织。轻盈的奶白波点吊带裙，搭配同色系防晒微开衫，微风吹拂时宛如漫步巴黎左岸。",
     "details": [
@@ -278,8 +278,8 @@ export const products: Product[] = [
       "S",
       "M"
     ],
-    "description": "An effortlessly chic, premium ready-to-wear piece crafted from highly breathable fabric. Perfect for modern, everyday storytelling.",
-    "cnDescription": "一款专为大马气候精选的高端透气成衣。裁剪松弛而优雅，细节精致，完美融入日常韩系氛围穿搭。",
+    "description": "",
+    "cnDescription": "",
     "story": "A classic high-drape silhouette that elongates the figure beautifully. Fabricated with a soft-touch fluid drape that flows elegantly with every step you take.",
     "cnStory": "拥有神仙垂感的高腰阔腿长裤。天丝麻质地走动时带有如水波般的流动感，瞬间拉长双腿比例，让大马的每一次通勤都充满松弛自信。",
     "details": [
@@ -323,8 +323,8 @@ export const products: Product[] = [
       "S",
       "M"
     ],
-    "description": "An effortlessly chic, premium ready-to-wear piece crafted from highly breathable fabric. Perfect for modern, everyday storytelling.",
-    "cnDescription": "一款专为大马气候精选的高端透气成衣。裁剪松弛而优雅，细节精致，完美融入日常韩系氛围穿搭。",
+    "description": "",
+    "cnDescription": "",
     "story": "A cozy, highly styled layering masterpiece featuring a soft grey-brown knit and a romantic dark brown lace camisole. calibrates modern proportions beautifully.",
     "cnStory": "自带慵懒韩风的叠穿神作。灰棕色微透针织衫，内搭深色蕾丝可调节吊带，冷暖色调优雅互补，在微凉冷气房里舒展无限高级感。",
     "details": [
@@ -368,8 +368,8 @@ export const products: Product[] = [
       "S",
       "M"
     ],
-    "description": "An effortlessly chic, premium ready-to-wear piece crafted from highly breathable fabric. Perfect for modern, everyday storytelling.",
-    "cnDescription": "一款专为大马气候精选的高端透气成衣。裁剪松弛而优雅，细节精致，完美融入日常韩系氛围穿搭。",
+    "description": "",
+    "cnDescription": "",
     "story": "Woven in a rich matcha green jacquard pattern. Perfect for sun-soaked afternoons and relaxing café dates, featuring delicate adjustable straps.",
     "cnStory": "一抹沁人心脾的抹茶提花。精致立体的微雕纹理，在阳光下熠熠生辉。修身裁剪与可调节吊带，让每一刻悠闲下午茶都散发夏日温柔。",
     "details": [
@@ -419,8 +419,8 @@ export const products: Product[] = [
       "S",
       "M"
     ],
-    "description": "An effortlessly chic, premium ready-to-wear piece crafted from highly breathable fabric. Perfect for modern, everyday storytelling.",
-    "cnDescription": "一款专为大马气候精选的高端透气成衣。裁剪松弛而优雅，细节精致，完美融入日常韩系氛围穿搭。",
+    "description": "",
+    "cnDescription": "",
     "story": "An adorable Seoul-inspired top featuring gorgeous puff sleeves and a playful tie-front closure. Highly breathable for warm, bright days.",
     "cnStory": "首尔严选力作，立体蓬松的泡泡袖搭配前幅温柔的小系带。修身显瘦，选用透气微凉感面料，在吉隆坡的骄阳下依然清爽优雅。",
     "details": [
@@ -474,8 +474,8 @@ export const products: Product[] = [
     "sizes": [
       "S"
     ],
-    "description": "An effortlessly chic, premium ready-to-wear piece crafted from highly breathable fabric. Perfect for modern, everyday storytelling.",
-    "cnDescription": "一款专为大马气候精选的高端透气成衣。裁剪松弛而优雅，细节精致，完美融入日常韩系氛围穿搭。",
+    "description": "",
+    "cnDescription": "",
     "story": "Delicately embroidered with floral lace details. Evokes the sweetness and purity of a fairytale romance, tailored for an effortless fit.",
     "cnStory": "宛如初恋般纯净剔透的碎花蕾丝连衣裙。全身布满手工感的花朵刺绣，质地柔软亲肤，系上纤细的背部缎带，一键开启唯美梦境。",
     "details": [
@@ -519,8 +519,8 @@ export const products: Product[] = [
       "S",
       "M"
     ],
-    "description": "An effortlessly chic, premium ready-to-wear piece crafted from highly breathable fabric. Perfect for modern, everyday storytelling.",
-    "cnDescription": "一款专为大马气候精选的高端透气成衣。裁剪松弛而优雅，细节精致，完美融入日常韩系氛围穿搭。",
+    "description": "",
+    "cnDescription": "",
     "story": "An elegant lace halter silhouette in a deep, mysterious navy hue. Cut to float beautifully between day-lit galleries and evening garden parties.",
     "cnStory": "一袭神秘高贵的海军蓝蕾丝挂脖裙。精致钩花蕾丝如海浪般层层倾泻，挂脖剪裁衬托出完美颈部曲线，是美术馆漫步与暮色晚宴的绝佳选择。",
     "details": [

@@ -278,9 +278,11 @@ export default function ProductDetailModal({
                 {tx(product.name, product.cnName)}
               </h1>
               <span className="font-serif text-xs font-semibold text-[#B96A73] block">{product.series || 'Cippy'}</span>
-              <p className="pt-2 text-xs leading-relaxed text-zinc-600">
-                {tx(product.description, product.cnDescription)}
-              </p>
+              {tx(product.description, product.cnDescription) && (
+                <p className="pt-2 text-xs leading-relaxed text-zinc-600">
+                  {tx(product.description, product.cnDescription)}
+                </p>
+              )}
             </div>
 
             {/* Design Chronicles (Fairytale Story) — only when there's real copy, an empty
@@ -299,18 +301,25 @@ export default function ProductDetailModal({
 
             {/* Specification Checklist */}
             <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-[11px] text-zinc-600 font-sans border-b border-pink-100/30 pb-4">
-              <div>
-                <span className="text-zinc-400 font-mono">{tx("FABRIC:", "面料:")}</span>
-                <strong className="text-zinc-700 ml-1">{specLabel(product.fabric || 'Linen Cotton', lang)}</strong>
-              </div>
-              <div>
-                <span className="text-zinc-400 font-mono">{tx("FIT:", "版型:")}</span>
-                <strong className="text-zinc-700 ml-1">{specLabel(product.clothingType || (lang === 'zh' ? '请参考商品图片' : 'See product photos'), lang)}</strong>
-              </div>
-              <div>
-                <span className="text-zinc-400 font-mono">{tx("CARE:", "洗涤:")}</span>
-                <strong className="text-zinc-700 ml-1">{specLabel(product.care || 'Cold gentle wash', lang)}</strong>
-              </div>
+              {/* Only specs that were actually filled in are shown — nothing is guessed. */}
+              {product.fabric && (
+                <div>
+                  <span className="text-zinc-400 font-mono">{tx("FABRIC:", "面料:")}</span>
+                  <strong className="text-zinc-700 ml-1">{specLabel(product.fabric, lang)}</strong>
+                </div>
+              )}
+              {product.clothingType && (
+                <div>
+                  <span className="text-zinc-400 font-mono">{tx("FIT:", "版型:")}</span>
+                  <strong className="text-zinc-700 ml-1">{specLabel(product.clothingType, lang)}</strong>
+                </div>
+              )}
+              {product.care && (
+                <div>
+                  <span className="text-zinc-400 font-mono">{tx("CARE:", "洗涤:")}</span>
+                  <strong className="text-zinc-700 ml-1">{specLabel(product.care, lang)}</strong>
+                </div>
+              )}
               <div>
                 <span className="text-zinc-400 font-mono">{tx("STOCK:", "状态:")}</span>
                 <strong className={`ml-1 ${(product.stock || 0) > 0 ? 'text-emerald-600' : 'text-zinc-400'}`}>
@@ -321,19 +330,31 @@ export default function ProductDetailModal({
                     : tx("Sold out", "已售罄")}
                 </strong>
               </div>
-              <div>
-                <span className="text-zinc-400 font-mono">{tx("LINING:", "内衬:")}</span>
-                <strong className="text-zinc-700 ml-1">{specLabel(product.lining, lang)}</strong>
-              </div>
-              <div>
-                <span className="text-zinc-400 font-mono">{tx("STRETCH:", "弹性:")}</span>
-                <strong className="text-zinc-700 ml-1">{specLabel(product.stretch, lang)}</strong>
-              </div>
-              <div>
-                <span className="text-zinc-400 font-mono">{tx("SHEERNESS:", "透肤程度:")}</span>
-                <strong className="text-zinc-700 ml-1">{specLabel(product.transparency, lang)}</strong>
-              </div>
+              {product.lining && (
+                <div>
+                  <span className="text-zinc-400 font-mono">{tx("LINING:", "内衬:")}</span>
+                  <strong className="text-zinc-700 ml-1">{specLabel(product.lining, lang)}</strong>
+                </div>
+              )}
+              {product.stretch && (
+                <div>
+                  <span className="text-zinc-400 font-mono">{tx("STRETCH:", "弹性:")}</span>
+                  <strong className="text-zinc-700 ml-1">{specLabel(product.stretch, lang)}</strong>
+                </div>
+              )}
+              {product.transparency && (
+                <div>
+                  <span className="text-zinc-400 font-mono">{tx("SHEERNESS:", "透肤程度:")}</span>
+                  <strong className="text-zinc-700 ml-1">{specLabel(product.transparency, lang)}</strong>
+                </div>
+              )}
             </div>
+            <p className="text-[11px] text-zinc-500 -mt-2">
+              {tx('Questions about fabric, lining or measurements?', '想了解面料、内衬或尺寸？')}{' '}
+              <a href="https://wa.me/601120861073" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#B96A73] underline underline-offset-2">
+                {tx('Ask us on WhatsApp', '欢迎 WhatsApp 咨询')}
+              </a>
+            </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-zinc-600">
               <div className="flex items-start gap-2 rounded-lg border border-pink-100 bg-white p-3">

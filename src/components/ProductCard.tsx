@@ -486,9 +486,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
 
         {/* Short description */}
-        <p className={`text-xs text-zinc-500 leading-relaxed text-justify line-clamp-2 ${activeArchetype.fontBody}`}>
-          {lang === 'zh' && product.cnDescription ? product.cnDescription : product.description}
-        </p>
+        {(lang === 'zh' && product.cnDescription ? product.cnDescription : product.description) && (
+          <p className={`text-xs text-zinc-500 leading-relaxed text-justify line-clamp-2 ${activeArchetype.fontBody}`}>
+            {lang === 'zh' && product.cnDescription ? product.cnDescription : product.description}
+          </p>
+        )}
 
         <div className="pt-1.5 mt-auto">
           {/* Mobile: one unambiguous action. Variant products open their details. */}

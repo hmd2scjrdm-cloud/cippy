@@ -18,7 +18,7 @@ import { loadSiteConfig } from './lib/siteConfig';
 import { loadSiteContent, useSiteContent, homeText, homeImage } from './lib/siteContent';
 import { applyContentOverrides } from './lib/contentWalk';
 import { signInWithGoogleGmail, sendGmailMessage, logoutGmail, getGmailToken, getGmailEmail } from './lib/gmailService';
-import { containsChinese } from './lib/productLocalization';
+import { containsChinese, specLabel } from './lib/productLocalization';
 import { ShoppingBag, Star, Sparkles, BookOpen, Heart, ArrowRight, CheckCircle2, ChevronRight, Globe, Compass, RefreshCw, User, Lock, Mail, CreditCard, ClipboardList, LogOut, Truck, Package, Clock, Check, Search, X, TrendingUp, ChevronDown, GitCompare, Award, Calendar, Copy, Send, Bell, ShieldAlert, Trash2, Plus, Users, Activity } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -28,8 +28,8 @@ const getEmailHTML = (product: Product, brandConcept: string, siteUrl: string) =
   const price = product.price;
   const story = product.cnStory || product.story;
   const imageUrl = product.imageUrl || '';
-  const fabric = product.fabric || 'Premium Blended Fabric / 高级混纺面料';
-  const lining = product.lining || 'Lined with soft premium silk / 亲肤顺滑内衬';
+  const fabric = product.fabric || '—';
+  const lining = product.lining || '—';
 
   return `
     <!DOCTYPE html>
@@ -892,8 +892,8 @@ export default function App() {
     const cnName = product.cnName;
     const price = product.price;
     const imageUrl = product.imageUrl || '';
-    const fabric = product.fabric || 'Premium Blended Fabric / 高级混纺面料';
-    const lining = product.lining || 'Lined with soft premium silk / 亲肤顺滑内衬';
+    const fabric = product.fabric || '—';
+    const lining = product.lining || '—';
     const siteUrl = window.location.origin;
 
     // Formatting recipient greeting
@@ -1120,52 +1120,26 @@ export default function App() {
   };
 
   const getProductAttribute = (p: Product, attr: 'fabric' | 'transparency' | 'care' | 'stretch' | 'lining') => {
+    // Only facts the admin entered (or the product's own detail lines); anything else is shown as not specified.
+    const notSpecified = { zh: '资料待确认', en: 'Not specified' };
+    const fromDetails = (zhKeys: string[], enKey: string, zhStrip: RegExp, enStrip: RegExp) => {
+      const zhDetail = p.cnDetails?.find(d => zhKeys.some(k => d.includes(k)));
+      const enDetail = p.details?.find(d => d.toLowerCase().includes(enKey));
+      return zhDetail || enDetail
+        ? { zh: zhDetail ? zhDetail.replace(zhStrip, '') : notSpecified.zh, en: enDetail ? enDetail.replace(enStrip, '') : notSpecified.en }
+        : notSpecified;
+    };
     if (attr === 'fabric') {
-      if (p.fabric) return { en: p.fabric, zh: p.fabric };
-      const zhDetail = p.cnDetails?.find(d => d.includes('面料') || d.includes('材质'));
-      const enDetail = p.details?.find(d => d.toLowerCase().includes('fabric'));
-      return {
-        zh: zhDetail ? zhDetail.replace(/.*(?:面料材质|面料)[：:]\s*/, '') : '高质透气面料',
-        en: enDetail ? enDetail.replace(/.*(?:fabric)[：:]\s*/i, '') : 'Premium breathable fabric'
-      };
+      if (p.fabric) return { en: specLabel(p.fabric, 'en'), zh: p.fabric };
+      return fromDetails(['面料', '材质'], 'fabric', /.*(?:面料材质|面料)[：:]\s*/, /.*(?:fabric)[：:]\s*/i);
     }
     if (attr === 'care') {
-      if (p.care) return { en: p.care, zh: p.care };
-      const zhDetail = p.cnDetails?.find(d => d.includes('洗涤') || d.includes('保养') || d.includes('建议'));
-      const enDetail = p.details?.find(d => d.toLowerCase().includes('care'));
-      return {
-        zh: zhDetail ? zhDetail.replace(/.*(?:洗涤建议|洗涤)[：:]\s*/, '') : '建议冷水轻柔手洗，平铺晾干',
-        en: enDetail ? enDetail.replace(/.*(?:care)[：:]\s*/i, '') : 'Gentle hand wash or dry clean recommended'
-      };
+      if (p.care) return { en: specLabel(p.care, 'en'), zh: specLabel(p.care, 'zh') };
+      return fromDetails(['洗涤', '保养', '建议'], 'care', /.*(?:洗涤建议|洗涤)[：:]\s*/, /.*(?:care)[：:]\s*/i);
     }
-    if (attr === 'transparency') {
-      if (p.transparency) return { en: p.transparency, zh: p.transparency };
-      if (p.category === 'outerwear' || p.category === 'bottoms') {
-        return { zh: '不透光，厚实垂顺', en: 'Opaque with premium drape' };
-      }
-      if (p.name.toLowerCase().includes('mesh') || p.name.toLowerCase().includes('sheer') || p.name.toLowerCase().includes('lace')) {
-        return { zh: '微透，温柔若隐若现（建议浅色内衣）', en: 'Semi-sheer (Nude base garments recommended)' };
-      }
-      return { zh: '不透（自带优质双层内衬或厚实针织）', en: 'Opaque (Fully lined or cozy woven fabric)' };
-    }
-    if (attr === 'stretch') {
-      if (p.stretch) return { en: p.stretch, zh: p.stretch };
-      if (p.name.toLowerCase().includes('knit') || p.name.toLowerCase().includes('sweater') || p.name.toLowerCase().includes('ribbed')) {
-        return { zh: '高弹力，软糯修身贴合', en: 'Highly elastic, cozy form-fitting stretch' };
-      }
-      if (p.name.toLowerCase().includes('elastic') || p.name.toLowerCase().includes('drawstring') || p.category === 'sets') {
-        return { zh: '中等弹力（后腰/抽绳款式，宽松舒适）', en: 'Moderate stretch (Elastic back / drawstring)' };
-      }
-      return { zh: '无弹/微弹（专为立体垂感剪裁打造）', en: 'Non-stretch or micro-stretch (Made for structured drape)' };
-    }
-    if (attr === 'lining') {
-      if (p.lining) return { en: p.lining, zh: p.lining };
-      if (p.category === 'dresses' || p.category === 'sets') {
-        return { zh: '有亲肤顺滑内衬，穿着安心', en: 'Fully lined with smooth skin-friendly lining' };
-      }
-      return { zh: '无内衬（精选舒适单层透气面料）', en: 'Unlined (Lightweight, breathable single-layer fabric)' };
-    }
-    return { zh: '-', en: '-' };
+    const value = attr === 'transparency' ? p.transparency : attr === 'stretch' ? p.stretch : p.lining;
+    if (value) return { en: specLabel(value, 'en'), zh: specLabel(value, 'zh') };
+    return notSpecified;
   };
   
 
@@ -1328,11 +1302,11 @@ export default function App() {
             const fallback = products.find(product => product.id === String(p.id));
             const englishDescription = p.description && !containsChinese(p.description)
               ? p.description
-              : fallback?.description || 'See the product photos and fit notes for details. Contact WhatsApp support if you need exact measurements.';
+              : fallback?.description || '';
             const chineseDescription = p.description_zh
               || (containsChinese(p.description) ? p.description : '')
               || fallback?.cnDescription
-              || '商品详情请参考图片与下方的面料、尺码和洗涤资料。如需更多实拍或尺寸协助，请联系 WhatsApp 客服。';
+              || '';
             return {
             id: String(p.id),
             name: isPlaceholderProductName(p.name) ? (fallback?.name || p.name_zh || 'Cippy Piece') : p.name,
@@ -1360,10 +1334,11 @@ export default function App() {
             clothingType: p.clothing_type || "",
             series: p.series || "",
             fabric: p.fabric || "",
-            transparency: p.transparency || "Medium",
-            stretch: p.stretch || "Slight",
-            lining: p.lining || "None",
-            care: p.care || fallback?.care || "Gentle Hand Wash",
+            // Only what the admin actually filled in; unknown specs are hidden on the product page instead of guessed.
+            transparency: p.transparency || "",
+            stretch: p.stretch || "",
+            lining: p.lining || "",
+            care: p.care || fallback?.care || "",
             sizeGuide: Array.isArray(p.size_guide) ? p.size_guide : (fallback?.sizeGuide || [])
           };
           });
