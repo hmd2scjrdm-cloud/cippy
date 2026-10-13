@@ -771,7 +771,7 @@ function switchTab(tab) {
     if (on) el.setAttribute('aria-current', 'page'); else el.removeAttribute('aria-current');
   });
   if (isOrders) loadAdminOrders();
-  if (isStock) renderStock(); else document.getElementById('stockBar')?.classList.add('hidden');
+  if (isStock) { loadStockWaiting().then(renderStock); renderStock(); } else document.getElementById('stockBar')?.classList.add('hidden');
   if (isCustomers) loadCustomers();
   if (isContent) loadContentPage(); else document.getElementById('contentBar')?.classList.add('hidden');
   if (isSettings) loadSettingsPage();
@@ -851,6 +851,45 @@ async function loadAdminOrders() {
 window.loadAdminOrders = loadAdminOrders;
 
 
+// ---- Back-in-stock alerts: customers who asked to be told when a size is back ----
+let stockWaiting = {};   // productId -> { total, byVariant: { "color|size": n } }
+async function loadStockWaiting() {
+  const { data } = await sb.from('stock_alerts').select('product_id,color,size').is('notified_at', null);
+  stockWaiting = {};
+  (data || []).forEach(a => {
+    const w = (stockWaiting[a.product_id] = stockWaiting[a.product_id] || { total: 0, byVariant: {} });
+    w.total++;
+    const k = `${a.color || ''}|${a.size || ''}`;
+    w.byVariant[k] = (w.byVariant[k] || 0) + 1;
+  });
+}
+
+function showToast(msg, isErr) {
+  const t = document.createElement('div');
+  t.className = 'fixed top-4 left-1/2 -translate-x-1/2 z-[60] px-4 py-2 rounded-lg text-sm text-white shadow-lg';
+  t.style.background = isErr ? '#7A2E21' : '#3F2B2B';
+  t.textContent = msg; document.body.appendChild(t);
+  setTimeout(() => t.remove(), 4500);
+}
+
+// After stock goes up, email everyone waiting for a size that is now in stock (the server decides who).
+async function notifyBackInStock(productIds) {
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    const r = await fetch('/api/stock-alerts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
+      body: JSON.stringify({ action: 'notify', productIds }),
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) { showToast('到货提醒邮件发送失败：' + (j.error || r.status), true); return; }
+    if (j.customers) showToast(`已发送到货提醒给 ${j.customers} 位顾客 ✉️`);
+    if (j.failed) showToast(`${j.failed} 封提醒发送失败，下次保存库存时会再试`, true);
+    await loadStockWaiting();
+  } catch (e) { showToast('到货提醒邮件发送失败：' + e.message, true); }
+}
+window.notifyBackInStock = notifyBackInStock;
+
 // ---- Stock page: edit per-colour/size quantities in one place ----
 let stockEdits = {};   // "productId::color|size" (or "productId::__total") -> new qty
 let stockOrig = {};    // same keys -> qty the admin saw when editing started
@@ -885,14 +924,15 @@ function renderStock() {
       <div class="stk-head">
         ${p.image_url ? `<img src="${esc(p.image_url)}" class="w-10 h-12 object-cover rounded"/>` : '<div class="w-10 h-12 bg-stone-100 rounded"></div>'}
         <div class="min-w-0 flex-1"><p class="font-medium text-stone-800 text-sm">${esc(p.name_zh || p.name)}</p>
-        <p class="text-xs text-stone-400">${esc(p.sku || '')}${p.in_stock === false ? ' · <span class="text-stone-500">已下架</span>' : ''}</p></div>
+        <p class="text-xs text-stone-400">${esc(p.sku || '')}${p.in_stock === false ? ' · <span class="text-stone-500">已下架</span>' : ''}${stockWaiting[p.id]?.total ? ` · <span class="text-[#C4928A] font-semibold">${stockWaiting[p.id].total} 人在等到货</span>` : ''}</p></div>
         <button class="text-xs text-[#C4928A] font-semibold whitespace-nowrap" onclick="addStockNew('${esc(p.id)}')">＋ 添加颜色 / 尺码</button>
       </div>
       ${noVariants && !hasNew ? '<p class="px-[18px] pb-1 text-[11px] text-amber-600">这件商品还没有设置颜色和尺码，点右上角「添加颜色 / 尺码」按尺码分别记库存。</p>' : ''}
       ${shown.map(e => {
         const k = stockKey(p.id, e.key);
         const val = k in stockEdits ? stockEdits[k] : e.stock;
-        const chip = val === 0 ? '<span class="stk-chip bg-violet-100 text-violet-700">预购</span>' : val <= 2 ? '<span class="stk-chip bg-amber-100 text-amber-700">低库存</span>' : '';
+        const waitN = stockWaiting[p.id]?.byVariant[`${e.key === '__total' ? '' : e.key}`] || 0;
+        const chip = (val === 0 ? '<span class="stk-chip bg-violet-100 text-violet-700">预购</span>' : val <= 2 ? '<span class="stk-chip bg-amber-100 text-amber-700">低库存</span>' : '') + (waitN ? ` <span class="stk-chip bg-pink-100 text-pink-700">${waitN} 人等</span>` : '');
         return `<div class="stk-row ${k in stockEdits ? 'changed' : ''}" data-k="${esc(k)}">
           <span class="text-stone-600">${esc(e.color)}</span>
           <span class="stk-size font-semibold text-stone-700">${esc(e.size)}</span>
@@ -1021,6 +1061,8 @@ async function saveStockEdits() {
     if (failed.length) throw new Error(failed[0]);
     stockEdits = {}; stockOrig = {}; stockNew = {};
     await loadProducts();
+    renderStock();
+    await notifyBackInStock(updates.map(u => u.id));
     renderStock();
   } catch (e) {
     alert('保存失败：' + e.message);
@@ -2315,7 +2357,7 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
   }
 
   if (error) alert('保存失败：' + error.message);
-  else { closeModal(); loadProducts(); }
+  else { closeModal(); loadProducts(); if (editId) notifyBackInStock([editId]); }
 
   btn.textContent = '保存商品'; btn.disabled = false;
 });

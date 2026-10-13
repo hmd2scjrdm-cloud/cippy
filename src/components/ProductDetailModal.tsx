@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Product } from '../types';
 import { autoSelectedColor, isNoColor, shouldShowColorPicker } from '../lib/productColors';
 import { useSiteConfig } from '../lib/siteConfig';
+import StockAlertBox from './StockAlertBox';
 import { X, ShoppingBag, Heart, Check, Sparkles, Scale, BookOpen, AlertCircle, Truck, RefreshCw } from 'lucide-react';
 import { getPriceTier } from '../lib/priceTier';
 import { sizeLabel, specLabel } from '../lib/productLocalization';
@@ -492,6 +493,10 @@ export default function ProductDetailModal({
           </div>
 
           {/* Action buttons (Add to cart & Save to wishlist) */}
+          {selectedIsPreorder && selectedSize && (
+            <StockAlertBox productId={String(product.baseProductId || product.id)} color={selectedColor || ''} size={selectedSize} lang={lang === 'zh' ? 'zh' : 'en'} />
+          )}
+
           <div className="pt-4 border-t border-pink-100/40 flex gap-3">
             <button
               onClick={handleAddToCart}
