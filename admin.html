@@ -54,6 +54,15 @@
   .cust-row.head { font-size: 11px; color: var(--muted); letter-spacing: .05em; background: #FBF6F3; }
   .cust-row input[type=number], .cust-row select { border: 1px solid var(--line); border-radius: 8px; padding: 5px 7px; font-size: 13px; background: #fff; width: 100%; }
   @media (max-width: 820px) { .cust-row { grid-template-columns: 1fr 1fr; } .cust-row.head { display: none; } }
+  .ct-card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+  .ct-card.changed { border-color: var(--rose); box-shadow: inset 3px 0 0 var(--rose); }
+  .ct-card textarea { width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font-size: 14px; line-height: 1.55; background: #fff; resize: vertical; }
+  .ct-card textarea:focus, .ct-card input[type=text]:focus { outline: none; border-color: var(--rose); }
+  .ct-card input[type=text] { width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font-size: 14px; background: #fff; }
+  .ct-bar { position: fixed; bottom: 0; right: 0; left: 232px; background: var(--brown); color: #fff; padding: 12px clamp(16px,4vw,48px); padding-bottom: calc(12px + env(safe-area-inset-bottom)); display: flex; align-items: center; gap: 12px; z-index: 40; }
+  .ct-bar .btn-save { margin-left: auto; background: var(--rose); color: #fff; border: 0; border-radius: 8px; padding: 9px 20px; font-weight: 600; cursor: pointer; }
+  .ct-bar .btn-save:disabled { opacity: .45; cursor: not-allowed; }
+  @media (max-width: 820px) { .ct-bar { left: 0; } }
   /* Stock */
   .stk-group { border-bottom: 1px solid var(--line); }
   .stk-group:last-child { border-bottom: 0; }
@@ -115,6 +124,7 @@
       <button id="tabProducts" onclick="switchTab('products')">商品</button>
       <button id="tabStock" onclick="switchTab('stock')">库存</button>
       <button id="tabCustomers" onclick="switchTab('customers')">客户</button>
+      <button id="tabContent" onclick="switchTab('content')">网站内容</button>
       <button id="tabAnalytics" onclick="switchTab('analytics')">实时监控</button>
       <button id="tabSettings" onclick="switchTab('settings')">设置</button>
     </nav>
@@ -206,6 +216,24 @@
     <div id="subsBox" class="hidden">
       <h2 class="adm-h2">月报订阅者</h2>
       <div id="subsList" class="bg-white rounded-xl border p-4 text-sm text-stone-600 space-y-1" style="border-color:var(--line)"></div>
+    </div>
+  </div>
+
+  <!-- Website content Panel -->
+  <div id="contentPanel" class="hidden pb-24 space-y-4 max-w-3xl">
+    <p class="text-sm text-stone-500">改网站上的文字和图片。改完点底部「保存修改」，网站马上更新；点「恢复默认」就回到原来的文字。没改过的内容保持不变。</p>
+    <div class="flex flex-wrap gap-3 items-center">
+      <select id="contentGroup" onchange="renderContent()" class="adm-select"></select>
+      <input id="contentSearch" type="text" placeholder="在所有页面里搜索文字…" oninput="renderContent()"
+        class="flex-1 min-w-[200px] max-w-sm border rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:border-[#C4928A]" style="border-color:var(--line)"/>
+      <a href="index.html" target="_blank" class="text-xs text-stone-400 hover:text-stone-600">查看网站 ↗</a>
+    </div>
+    <p id="contentHint" class="text-xs text-stone-400"></p>
+    <div id="contentList" class="space-y-3"><p class="text-center py-10 text-sm text-stone-400">加载中…</p></div>
+    <div id="contentBar" class="ct-bar hidden">
+      <span id="contentBarText" class="text-sm"></span>
+      <button id="contentDiscard" class="hidden text-sm underline opacity-80" onclick="discardContentEdits()">放弃修改</button>
+      <button id="contentSaveBtn" class="btn-save" onclick="saveContent()">保存修改</button>
     </div>
   </div>
 
@@ -718,7 +746,7 @@ const STATUS_LABELS = { pending:'待付款', pending_payment:'待付款', paid:'
 const STATUS_COLORS = { pending:'bg-red-100 text-red-700', pending_payment:'bg-red-100 text-red-700', paid:'bg-pink-100 text-pink-700', processing:'bg-yellow-100 text-yellow-700', shipped:'bg-blue-100 text-blue-700', delivered:'bg-green-100 text-green-700', cancelled:'bg-stone-100 text-stone-500' };
 
 let currentTab = 'orders';
-const TAB_TITLES = { orders: '订单', products: '商品', stock: '库存', customers: '客户', analytics: '实时监控', settings: '设置' };
+const TAB_TITLES = { orders: '订单', products: '商品', stock: '库存', customers: '客户', content: '网站内容', analytics: '实时监控', settings: '设置' };
 function switchTab(tab) {
   currentTab = tab;
   const isOrders = tab === 'orders';
@@ -727,22 +755,25 @@ function switchTab(tab) {
   const isStock = tab === 'stock';
   const isCustomers = tab === 'customers';
   const isSettings = tab === 'settings';
+  const isContent = tab === 'content';
   document.getElementById('ordersPanel').classList.toggle('hidden', !isOrders);
   document.getElementById('analyticsPanel').classList.toggle('hidden', !isAnalytics);
   document.getElementById('productsPanel').classList.toggle('hidden', !isProducts);
   document.getElementById('stockPanel').classList.toggle('hidden', !isStock);
   document.getElementById('customersPanel').classList.toggle('hidden', !isCustomers);
   document.getElementById('settingsPanel').classList.toggle('hidden', !isSettings);
+  document.getElementById('contentPanel').classList.toggle('hidden', !isContent);
   document.getElementById('productStats').classList.toggle('hidden', !isProducts);
   document.getElementById('addBtn').classList.toggle('hidden', !isProducts);
   document.getElementById('pageTitle').textContent = TAB_TITLES[tab] || '';
-  [['tabOrders', isOrders], ['tabProducts', isProducts], ['tabStock', isStock], ['tabCustomers', isCustomers], ['tabAnalytics', isAnalytics], ['tabSettings', isSettings]].forEach(([id, on]) => {
+  [['tabOrders', isOrders], ['tabProducts', isProducts], ['tabStock', isStock], ['tabCustomers', isCustomers], ['tabContent', isContent], ['tabAnalytics', isAnalytics], ['tabSettings', isSettings]].forEach(([id, on]) => {
     const el = document.getElementById(id);
     if (on) el.setAttribute('aria-current', 'page'); else el.removeAttribute('aria-current');
   });
   if (isOrders) loadAdminOrders();
   if (isStock) renderStock(); else document.getElementById('stockBar')?.classList.add('hidden');
   if (isCustomers) loadCustomers();
+  if (isContent) loadContentPage(); else document.getElementById('contentBar')?.classList.add('hidden');
   if (isSettings) loadSettingsPage();
   if (isAnalytics) { loadAnalytics(); startAnalyticsPolling(); } else { stopAnalyticsPolling(); }
 }
@@ -1147,6 +1178,111 @@ async function saveEditOrder() {
   closeEditOrder(); renderOrders();
 }
 window.openEditOrder = openEditOrder; window.closeEditOrder = closeEditOrder; window.saveEditOrder = saveEditOrder;
+
+// ---- Website content editor (settings table, key = 'site_content': { fieldId: text }) ----
+let contentGroups = null;      // from /content-defaults.json (every editable text and its built-in wording)
+let contentById = {};          // fieldId -> { id, label, text (default), multiline, image }
+let contentOv = {};            // current edits, only where different from the default
+let contentSaved = '{}';       // JSON of what is stored, to count unsaved changes
+
+async function loadContentPage() {
+  const list = document.getElementById('contentList');
+  if (!contentGroups) {
+    try {
+      const r = await fetch('content-defaults.json?v=' + Date.now());
+      contentGroups = (await r.json()).groups;
+    } catch (e) { list.innerHTML = '<p class="text-center py-10 text-sm text-red-500">读取内容列表失败，请刷新重试</p>'; return; }
+    contentById = {};
+    contentGroups.forEach(g => g.fields.forEach(f => { contentById[f.id] = f; }));
+    const sel = document.getElementById('contentGroup');
+    const sections = [...new Set(contentGroups.map(g => g.section))];
+    sel.innerHTML = sections.map(sec => `<optgroup label="${esc(sec)}">${contentGroups.filter(g => g.section === sec).map(g => `<option value="${esc(g.id)}">${esc(g.section === g.label ? g.label : g.label)}</option>`).join('')}</optgroup>`).join('');
+  }
+  if (!Object.keys(contentOv).length) {
+    const { data } = await sb.from('settings').select('value').eq('key', 'site_content').maybeSingle();
+    try { const parsed = JSON.parse(data?.value || '{}'); contentOv = {}; Object.keys(parsed).forEach(id => { if (contentById[id] && parsed[id] && parsed[id] !== contentById[id].text) contentOv[id] = parsed[id]; }); } catch (e) { contentOv = {}; }
+    contentSaved = JSON.stringify(contentOv);
+  }
+  renderContent();
+}
+
+function contentDirtyCount() {
+  const saved = JSON.parse(contentSaved);
+  const ids = new Set([...Object.keys(saved), ...Object.keys(contentOv)]);
+  let n = 0; ids.forEach(id => { if ((saved[id] || '') !== (contentOv[id] || '')) n++; });
+  return n;
+}
+
+function renderContent() {
+  if (!contentGroups) return;
+  const q = (document.getElementById('contentSearch').value || '').trim().toLowerCase();
+  const groupId = document.getElementById('contentGroup').value;
+  let fields;
+  if (q) {
+    fields = contentGroups.flatMap(g => g.fields).filter(f => (f.label + ' ' + f.text + ' ' + (contentOv[f.id] || '')).toLowerCase().includes(q)).slice(0, 80);
+    document.getElementById('contentHint').textContent = `搜索到 ${fields.length} 处文字（最多显示 80 条）`;
+  } else {
+    fields = (contentGroups.find(g => g.id === groupId) || contentGroups[0]).fields;
+    document.getElementById('contentHint').textContent = `这一栏共 ${fields.length} 处文字，粉色框表示你改过的内容。`;
+  }
+  document.getElementById('contentList').innerHTML = fields.map(f => {
+    const edited = f.id in contentOv;
+    const val = edited ? contentOv[f.id] : f.text;
+    const label = `<div class="flex items-start justify-between gap-3 mb-2"><p class="text-xs font-semibold text-stone-500">${esc(f.label)}</p>${edited ? `<button class="text-xs text-[#C4928A] whitespace-nowrap" onclick="resetContentField('${esc(f.id)}')">恢复默认</button>` : ''}</div>`;
+    if (f.image) {
+      return `<div class="ct-card ${edited ? 'changed' : ''}">${label}
+        <img src="${esc(val)}" class="h-40 w-auto max-w-full object-cover rounded-lg border border-stone-100 mb-2" onerror="this.style.opacity=.3"/>
+        <div class="flex gap-2 items-center"><input type="text" value="${esc(val)}" onchange="setContentField('${esc(f.id)}', this.value.trim())"/>
+        <label class="cursor-pointer text-xs text-[#C4928A] border border-[#C4928A] px-3 py-2 rounded-lg hover:bg-[#fdf0ed] whitespace-nowrap">更换图片<input type="file" accept="image/*" class="hidden" onchange="uploadContentImage('${esc(f.id)}', this)"/></label></div>
+        <p id="ctImgStatus_${esc(f.id)}" class="text-xs text-stone-400 mt-1"></p></div>`;
+    }
+    return `<div class="ct-card ${edited ? 'changed' : ''}">${label}
+      <textarea rows="${f.multiline ? 4 : 2}" oninput="setContentField('${esc(f.id)}', this.value, this)">${esc(val)}</textarea>
+      ${edited ? `<p class="text-[11px] text-stone-400 mt-1">原文：${esc(f.text)}</p>` : ''}</div>`;
+  }).join('') || '<p class="text-center py-10 text-sm text-stone-400">没有找到</p>';
+  updateContentBar();
+}
+
+function setContentField(id, value, el) {
+  const def = contentById[id].text;
+  if (value === '' || value === def) delete contentOv[id]; else contentOv[id] = value;
+  const card = el?.closest('.ct-card');
+  if (card) card.classList.toggle('changed', id in contentOv);
+  updateContentBar();
+  if (!el) renderContent();
+}
+function resetContentField(id) { delete contentOv[id]; renderContent(); }
+function discardContentEdits() { contentOv = JSON.parse(contentSaved); renderContent(); }
+
+async function uploadContentImage(id, input) {
+  const file = input.files?.[0]; if (!file) return;
+  const status = document.getElementById('ctImgStatus_' + id); status.textContent = '上传中…';
+  const url = await compressAndUpload(file, 'home');
+  if (!url) { status.textContent = '上传失败，请重试'; return; }
+  setContentField(id, url); // re-renders with the new preview
+}
+
+function updateContentBar() {
+  const n = contentDirtyCount();
+  document.getElementById('contentBar').classList.toggle('hidden', currentTab !== 'content');
+  document.getElementById('contentBarText').textContent = n ? `${n} 处未保存` : '改动文字或图片后，在这里点保存';
+  document.getElementById('contentDiscard').classList.toggle('hidden', n === 0);
+  const btn = document.getElementById('contentSaveBtn');
+  if (!btn.dataset.busy) btn.disabled = n === 0;
+}
+
+async function saveContent() {
+  const btn = document.getElementById('contentSaveBtn');
+  btn.dataset.busy = '1'; btn.disabled = true; btn.textContent = '保存中…';
+  const { error } = await sb.from('settings').upsert({ key: 'site_content', value: JSON.stringify(contentOv), updated_at: new Date().toISOString() }, { onConflict: 'key' });
+  delete btn.dataset.busy; btn.textContent = '保存修改';
+  if (error) { updateContentBar(); alert('保存失败：' + error.message); return; }
+  contentSaved = JSON.stringify(contentOv);
+  renderContent();
+  const t = document.getElementById('contentBarText'); t.textContent = '已保存 ✓ 网站已更新'; setTimeout(updateContentBar, 2500);
+}
+window.renderContent = renderContent; window.setContentField = setContentField; window.resetContentField = resetContentField;
+window.discardContentEdits = discardContentEdits; window.uploadContentImage = uploadContentImage; window.saveContent = saveContent;
 
 let aoItemRowId = 0;
 

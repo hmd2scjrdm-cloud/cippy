@@ -15,6 +15,8 @@ import { Bilingual } from './components/Bilingual';
 import { supabase } from './lib/supabase';
 import { opt, optAll } from './lib/optimizeImage';
 import { loadSiteConfig } from './lib/siteConfig';
+import { loadSiteContent, useSiteContent, homeText, homeImage } from './lib/siteContent';
+import { applyContentOverrides } from './lib/contentWalk';
 import { signInWithGoogleGmail, sendGmailMessage, logoutGmail, getGmailToken, getGmailEmail } from './lib/gmailService';
 import { containsChinese } from './lib/productLocalization';
 import { ShoppingBag, Star, Sparkles, BookOpen, Heart, ArrowRight, CheckCircle2, ChevronRight, Globe, Compass, RefreshCw, User, Lock, Mail, CreditCard, ClipboardList, LogOut, Truck, Package, Clock, Check, Search, X, TrendingUp, ChevronDown, GitCompare, Award, Calendar, Copy, Send, Bell, ShieldAlert, Trash2, Plus, Users, Activity } from 'lucide-react';
@@ -869,6 +871,11 @@ export default function App() {
   const [giftBoxTopup, setGiftBoxTopup] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  // Texts edited in the admin (policies, FAQ, homepage); unedited ones keep the built-in wording.
+  const siteContent = useSiteContent();
+  const policies = React.useMemo(() => applyContentOverrides(POLICIES, 'policy', siteContent), [siteContent]);
+  const faqs = React.useMemo(() => applyContentOverrides(FAQS, 'faq', siteContent), [siteContent]);
+  const hc = (id: string) => homeText(id, lang === 'zh' ? 'zh' : 'en', siteContent);
   const [isCartAnimating, setIsCartAnimating] = useState(false);
   
   // Category filter state
@@ -1298,7 +1305,7 @@ export default function App() {
   };
 
   // Effect 1: Load Dynamic Products from Supabase
-  React.useEffect(() => { loadSiteConfig(); }, []);
+  React.useEffect(() => { loadSiteConfig(); loadSiteContent(); }, []);
 
   React.useEffect(() => {
     async function fetchProducts() {
@@ -2695,13 +2702,13 @@ export default function App() {
                   <div className="lg:col-span-7 p-4 sm:p-6 md:p-8 lg:p-10 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-[#FBEBF0] space-y-4 lg:space-y-8">
                     <div className="space-y-4">
                       <span className="text-[10px] uppercase font-mono text-zinc-400 font-semibold tracking-[0.25em] block">
-                        {lang === 'zh' ? '第一章 — 宽松轮廓美学' : 'CHAPTER 01 — THE LOOSE SILHOUETTE'}
+                        {hc('hero.chapter')}
                       </span>
                       
                       {/* Large custom image container with model photo matching mockup exactly */}
                       <div className="relative bg-[#FFF0F2]/70 rounded-2xl h-[260px] sm:h-[340px] lg:h-[400px] w-full flex items-center justify-center overflow-hidden border border-[#FCE3E6] group">
                         <img
-                          src={opt("https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/WhatsApp%20Image%202026-08-20%20at%2019.39.28.jpeg")}
+                          src={opt(homeImage('hero.image', siteContent))}
                           alt="Chaewon Campaign"
                           className="absolute inset-0 h-full w-full object-cover group-hover:scale-[1.03] transition-transform duration-[6000ms] ease-out"
                           referrerPolicy="no-referrer"
@@ -2713,7 +2720,7 @@ export default function App() {
                         
                         {/* White Stylized Text in Bottom Left */}
                         <div className="absolute bottom-6 left-6 text-white font-serif text-5xl font-bold tracking-widest select-none opacity-95 drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)]">
-                          {lang === 'zh' ? '新品现货' : 'NEW IN'}
+                          {hc('hero.badge')}
                         </div>
                         
                         <div className="absolute top-6 right-6 bg-white/90 backdrop-blur-xs text-[#3F2B2B] font-sans font-bold text-[9px] tracking-[0.25em] px-2.5 py-1 uppercase rounded-sm">
@@ -2725,13 +2732,11 @@ export default function App() {
                     {/* Lower narrative block: brand positioning — A Storybook Wardrobe */}
                     <div className="bg-[#FFFDFD] border border-[#FBEBF0] rounded-2xl p-4 lg:p-6 space-y-2">
                       <h3 className="text-2xl md:text-3xl font-serif text-[#3F2B2B] leading-tight font-semibold">
-                        A Storybook Wardrobe
+                        {homeText('hero.storyTitle', 'en', siteContent)}
                       </h3>
-                      <span className="text-xs font-serif text-[#B96A73] font-medium block">故事衣橱</span>
+                      <span className="text-xs font-serif text-[#B96A73] font-medium block">{homeText('hero.storyTitle', 'zh', siteContent)}</span>
                       <p className="text-xs md:text-[13px] text-zinc-500 font-sans leading-relaxed italic pt-1">
-                        {lang === 'zh'
-                          ? '那些你会一穿再穿的日常。'
-                          : "Pieces you'll reach for, again and again."}
+                        {hc('hero.storyTagline')}
                       </p>
                     </div>
                   </div>
@@ -2742,15 +2747,13 @@ export default function App() {
                     {/* Fit Profile block (below the product preview on mobile so prices show in the first screen) */}
                     <div className="space-y-4 order-3 lg:order-1">
                       <span className="text-xs font-bold text-[#B96A73] tracking-[0.25em] font-sans uppercase block">
-                        {lang === 'zh' ? '版型解析' : 'FIT PROFILE'}
+                        {hc('hero.fitLabel')}
                       </span>
                       <h2 className="font-serif text-3xl md:text-4xl font-semibold italic text-[#3F2B2B] tracking-tight leading-tight">
-                        {lang === 'zh' ? '「温柔大廓形」' : '"The Gentle Over-Size"'}
+                        {hc('hero.fitTitle')}
                       </h2>
                       <p className="text-xs md:text-[13px] text-zinc-500 font-sans leading-relaxed">
-                        {lang === 'zh'
-                          ? '以小个子友好比例与舒适活动空间为重点。每件商品都会显示实际可选尺码；下单前请对照实测尺寸，拿不准可直接咨询客服。'
-                          : 'Petite-friendly proportions with comfortable room to move. Available sizes are shown on each product; compare the garment measurements or ask us before ordering.'}
+                        {hc('hero.fitBody')}
                       </p>
 
                       {/* Action buttons matching mockup styling */}
@@ -2761,7 +2764,7 @@ export default function App() {
                           }}
                           className="bg-[#3F2B2B] hover:bg-[#2F1F1F] text-white px-8 py-3 rounded-lg font-sans tracking-[0.2em] text-[11px] font-bold uppercase transition-all duration-300 cursor-pointer shadow-sm"
                         >
-                          {lang === 'zh' ? '立即选购' : 'SHOP NOW'}
+                          {hc('hero.shopButton')}
                         </button>
                         <button
                           onClick={() => {
@@ -2770,7 +2773,7 @@ export default function App() {
                           }}
                           className="bg-white hover:bg-zinc-50 text-[#3F2B2B] border border-[#3F2B2B]/40 px-8 py-3 rounded-lg font-sans tracking-[0.2em] text-[11px] font-bold uppercase transition-all duration-300 cursor-pointer"
                         >
-                          {lang === 'zh' ? '穿搭画册' : 'LOOKBOOK'}
+                          {hc('hero.lookbookButton')}
                         </button>
                       </div>
                     </div>
@@ -2781,7 +2784,7 @@ export default function App() {
                     {/* Preview product teasers — always the 4 most recently added products */}
                     <div className="space-y-3 order-1 lg:order-3">
                       <span className="text-[10px] tracking-[0.2em] font-mono text-zinc-400 font-bold uppercase block">
-                        {lang === 'zh' ? '新品热预览' : 'HOT RELEASE PREVIEW'}
+                        {hc('hero.previewTitle')}
                       </span>
                       <div className="grid grid-cols-2 gap-4">
                         {dbProducts.slice(0, 4).map((p) => (
@@ -3220,7 +3223,7 @@ export default function App() {
                     </button>
 
                     {/* Each Section Option */}
-                    {POLICIES.map((p, index) => {
+                    {policies.map((p, index) => {
                       const isActive = selectedPolicyId === p.id && !policySearchQuery;
                       return (
                         <button
@@ -3286,7 +3289,7 @@ export default function App() {
                       const matchedFaqs: any[] = [];
 
                       // Search standard policies
-                      POLICIES.forEach((section) => {
+                      policies.forEach((section) => {
                         section.items.forEach((item) => {
                           const matchesZh =
                             item.titleZh.toLowerCase().includes(query) ||
@@ -3307,7 +3310,7 @@ export default function App() {
                       });
 
                       // Search FAQs
-                      FAQS.forEach((faq) => {
+                      faqs.forEach((faq) => {
                         const matchesZh =
                           faq.qZh.toLowerCase().includes(query) ||
                           faq.aZh.toLowerCase().includes(query);
@@ -3431,8 +3434,8 @@ export default function App() {
                     // Display selected policy or All
                     const activeSections =
                       selectedPolicyId === 'all'
-                        ? POLICIES
-                        : POLICIES.filter((p) => p.id === selectedPolicyId);
+                        ? policies
+                        : policies.filter((p) => p.id === selectedPolicyId);
 
                     return (
                       <div className="space-y-12">
@@ -3441,7 +3444,7 @@ export default function App() {
                           <div key={section.id} className="space-y-6">
                             <div className="flex items-center gap-3 border-b border-[#FBEBF0] pb-3">
                               <span className="text-sm font-mono font-bold text-[#B96A73]">
-                                {String(POLICIES.findIndex((p) => p.id === section.id) + 1).padStart(2, '0')} /
+                                {String(policies.findIndex((p) => p.id === section.id) + 1).padStart(2, '0')} /
                               </span>
                               <h3 className="font-serif font-bold text-zinc-800 text-lg md:text-xl">
                                 {lang === 'zh' ? section.zhTitle : section.enTitle} &middot;{' '}
@@ -3530,7 +3533,7 @@ export default function App() {
                             </div>
 
                             <div className="space-y-3">
-                              {FAQS.map((faq, idx) => {
+                              {faqs.map((faq, idx) => {
                                 const isOpen = faqOpenIndex === idx;
                                 return (
                                   <div
