@@ -130,6 +130,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const [isPulsing, setIsPulsing] = useState(false);
   const [sizeRequiredHint, setSizeRequiredHint] = useState(false);
   const [colorRequiredHint, setColorRequiredHint] = useState(false);
+  const [quickAddOpen, setQuickAddOpen] = useState(false);
   const selectedIsPreorder = isColorProduct
     ? isPreorderSelection(product.sizes, selectedColor, selectedSize)
     : Number(product.stock || 0) <= 0;
@@ -347,7 +348,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         )}
 
         {/* Brand category badge */}
-        <span className={`absolute bottom-3 right-3 bg-white/95 backdrop-blur-xs px-2.5 py-0.5 text-[9px] uppercase border font-medium transition-opacity duration-200 group-hover:opacity-0 ${
+        <span className={`absolute bottom-3 right-3 bg-white/95 backdrop-blur-xs px-2.5 py-0.5 text-[9px] uppercase border font-medium transition-opacity duration-200 ${quickAddOpen ? 'md:opacity-0' : ''} ${
           isMinimal 
             ? 'border-zinc-300 font-mono text-zinc-600 rounded-none' 
             : isVintage 
@@ -359,10 +360,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
             : product.category}
         </span>
 
-        {/* 'Quick Add' Button Overlay (Slides up on hover) */}
+        {/* Desktop only: explicit click-to-open Quick Add panel. */}
         <div 
           onClick={(e) => e.stopPropagation()} 
-          className="absolute inset-x-0 bottom-0 bg-white/95 backdrop-blur-md p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-15 flex flex-col gap-2.5 border-t border-[#FBEBF0]/85 shadow-md"
+          className={`hidden md:flex absolute inset-x-0 bottom-0 bg-white/95 backdrop-blur-md p-4 transition-transform duration-300 ease-out z-15 flex-col gap-2.5 border-t border-[#FBEBF0]/85 shadow-md ${quickAddOpen ? 'translate-y-0' : 'translate-y-full'}`}
         >
           <div className="flex items-center justify-between">
             <span className={`text-[10px] tracking-wider font-bold text-zinc-400 uppercase ${activeArchetype.fontBody}`}>
@@ -489,80 +490,15 @@ const ProductCard: React.FC<ProductCardProps> = ({
           {lang === 'zh' && product.cnDescription ? product.cnDescription : product.description}
         </p>
 
-        {/* Interactive size and action buttons */}
-        <div className={`space-y-2 pt-1 border-t ${isMinimal ? 'border-zinc-200' : 'border-[var(--theme-primary-soft)]/30'}`}>
-          <div className="flex items-center justify-between text-xs font-sans">
-            <span className="text-zinc-400">
-              {availableSizes.length === 1
-                ? (lang === 'zh' ? `仅 ${sizeLabel(availableSizes[0], storeLang)}：` : `${sizeLabel(availableSizes[0], storeLang)} only:`)
-                : (lang === 'zh' ? `可选尺码 ${availableSizes.map(size => sizeLabel(size, storeLang)).join('、')}：` : `Available sizes: ${availableSizes.map(size => sizeLabel(size, storeLang)).join(', ')}`)}
-            </span>
-            <div className="flex gap-1.5">
-              {availableSizes.map((sz) => (
-                <button
-                  key={sz}
-                  onClick={() => setSelectedSize(sz)}
-                  className={`w-8 h-6.5 font-semibold border transition-all duration-200 cursor-pointer ${
-                    isMinimal ? 'rounded-none font-mono text-[11px]' : isVintage ? 'rounded-xs font-serif text-[10px]' : 'rounded-md font-serif text-[10px]'
-                  } ${
-                    selectedSize === sz
-                      ? isMinimal
-                        ? 'bg-zinc-900 text-white border-zinc-900'
-                        : `border-[var(--theme-primary-soft)] ${activeTheme.softBg} ${activeTheme.primaryText}`
-                      : `border-zinc-200 text-zinc-400 hover:border-[var(--theme-primary-soft)] hover:${activeTheme.primaryText}`
-                  }`}
-                >
-                  {sizeLabel(sz, storeLang)}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {showColorPicker && (
-            <div className="flex items-center justify-between text-xs font-sans gap-2">
-              <span className="text-zinc-400 shrink-0">{lang === 'zh' ? '选择颜色：' : 'Choose color:'}</span>
-              <div className="flex gap-1.5 flex-wrap justify-end">
-                {colorOptions.map((col) => {
-                  const swatchImg = product.color_images?.[col];
-                  return (
-                    <button
-                      key={col}
-                      type="button"
-                      onClick={() => setSelectedColor(col)}
-                      title={colorLabel(col, lang)}
-                      className={`relative rounded-full border-2 transition-all cursor-pointer overflow-hidden flex items-center justify-center ${
-                        selectedColor === col ? 'border-[#B96A73]' : 'border-zinc-200'
-                      } ${swatchImg ? 'w-6 h-6' : 'px-2 h-6 text-[9px] font-semibold whitespace-nowrap ' + (selectedColor === col ? 'text-[#B96A73] bg-[#FFF0F2]' : 'text-zinc-600')}`}
-                    >
-                      {swatchImg ? (
-                        <>
-                          <img loading="lazy" decoding="async" src={swatchImg} alt={colorLabel(col, lang)} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                          {selectedColor === col && (
-                            <span className="absolute inset-0 flex items-center justify-center bg-black/30">
-                              <Check className="w-3 h-3 text-white" />
-                            </span>
-                          )}
-                        </>
-                      ) : colorLabel(col, lang)}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Quick purchase button */}
-        <div className="pt-1.5">
+        <div className="pt-1.5 mt-auto">
+          {/* Mobile: one unambiguous action. Variant products open their details. */}
           <button
-            onClick={handleAdd}
-            className={`w-full py-2.5 font-semibold text-xs transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer shadow-xs ${
+            onClick={showColorPicker || availableSizes.length > 1 ? handleCardClick : handleAdd}
+            className={`md:hidden w-full py-2.5 font-semibold text-xs transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer shadow-xs ${
               isMinimal ? 'rounded-none font-mono tracking-widest uppercase' : isVintage ? 'rounded-sm font-serif italic' : 'rounded-xl font-sans'
             } ${
               addedAnimation
                 ? 'bg-emerald-500 text-white shadow-emerald-100'
-                : sizeRequiredHint || colorRequiredHint
-                ? 'bg-red-400 text-white'
                 : isMinimal
                 ? 'bg-zinc-900 hover:bg-zinc-800 text-white'
                 : `${activeTheme.primaryBg} ${activeTheme.primaryHover} text-white hover:shadow-md ${activeTheme.btnShadow}`
@@ -572,10 +508,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
               <>
                 <Check className="w-4 h-4" /> {lang === 'zh' ? '已加入购物袋！' : 'Added to Bag!'}
               </>
-            ) : sizeRequiredHint ? (
-              <>{lang === 'zh' ? '请先选择尺码' : 'Please select a size'}</>
-            ) : colorRequiredHint ? (
-              <>{lang === 'zh' ? '请先选择颜色' : 'Please select a color'}</>
+            ) : showColorPicker || availableSizes.length > 1 ? (
+              <>{lang === 'zh' ? '选择款式' : 'View Options'}</>
             ) : (
               <>
                 <ShoppingBag className="w-3.5 h-3.5" /> {selectedIsPreorder
@@ -583,6 +517,21 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   : (lang === 'zh' ? '加入购物车' : 'Add to Cart')}
               </>
             )}
+          </button>
+
+          {/* Desktop: Quick Add is opt-in and no longer appears unexpectedly on hover. */}
+          <button
+            type="button"
+            onClick={() => setQuickAddOpen(open => !open)}
+            aria-expanded={quickAddOpen}
+            className={`hidden md:flex w-full py-2.5 font-semibold text-xs transition-all duration-300 items-center justify-center gap-1.5 cursor-pointer border ${
+              isMinimal ? 'rounded-none font-mono tracking-widest uppercase border-zinc-800' : isVintage ? 'rounded-sm font-serif italic border-amber-900/20' : 'rounded-xl font-sans border-[var(--theme-primary-soft)] text-zinc-700 hover:bg-[var(--theme-primary-soft)]/10'
+            }`}
+          >
+            <ShoppingBag className="w-3.5 h-3.5" />
+            {quickAddOpen
+              ? (lang === 'zh' ? '收起选项' : 'Close Options')
+              : (lang === 'zh' ? '快速加入' : 'Quick Add')}
           </button>
         </div>
 
