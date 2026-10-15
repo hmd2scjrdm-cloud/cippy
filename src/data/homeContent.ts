@@ -17,7 +17,7 @@ export const HOME_FIELDS: HomeField[] = [
   { id: 'hero.storyTagline', label: '品牌标语下面的一句话', en: "Pieces you'll reach for, again and again.", zh: '那些你会一穿再穿的日常。' },
   { id: 'hero.fitLabel', label: '版型小标题', en: 'FIT PROFILE', zh: '版型解析' },
   { id: 'hero.fitTitle', label: '版型大标题', en: '"The Gentle Over-Size"', zh: '「温柔大廓形」' },
-  { id: 'hero.fitBody', label: '版型说明', multiline: true, en: 'Petite-friendly proportions with comfortable room to move. Available sizes are shown on each product; compare the garment measurements or ask us before ordering.', zh: '以小个子友好比例与舒适活动空间为重点。每件商品都会显示实际可选尺码；下单前请对照实测尺寸，拿不准可直接咨询客服。' },
+  { id: 'hero.fitBody', label: '版型说明', multiline: true, en: 'Petite-friendly proportions with comfortable room to move. Available sizes are shown on each product; compare the garment measurements or ask us before ordering. Currently offered in S–M and Freesize; no larger sizes yet.', zh: '以小个子友好比例与舒适活动空间为重点。每件商品都会显示实际可选尺码；下单前请对照实测尺寸，拿不准可直接咨询客服。目前提供 S–M 与均码，暂无大码。' },
   { id: 'hero.shopButton', label: '主按钮文字', en: 'SHOP NOW', zh: '立即选购' },
   { id: 'hero.lookbookButton', label: '第二个按钮文字', en: 'OUR STORY', zh: '品牌故事' },
   { id: 'hero.previewTitle', label: '新品预览标题', en: 'HOT RELEASE PREVIEW', zh: '新品热预览' },

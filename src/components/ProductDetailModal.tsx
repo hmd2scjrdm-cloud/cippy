@@ -3,6 +3,7 @@ import { Product } from '../types';
 import { autoSelectedColor, isNoColor, shouldShowColorPicker } from '../lib/productColors';
 import { useSiteConfig } from '../lib/siteConfig';
 import StockAlertBox from './StockAlertBox';
+import SizeRequestBox from './SizeRequestBox';
 import { X, ShoppingBag, Heart, Check, Sparkles, Scale, BookOpen, AlertCircle, Truck, RefreshCw } from 'lucide-react';
 import { getPriceTier } from '../lib/priceTier';
 import { sizeLabel, specLabel } from '../lib/productLocalization';
@@ -16,6 +17,10 @@ interface ProductDetailModalProps {
   isWishlisted: boolean;
   onToggleWishlist: (product: Product) => void;
 }
+
+// Body range our S–M / Freesize pieces are cut for (kg / cm). Above it the Sizing Fairy won't recommend a size.
+const SIZE_FAIRY_MAX_WEIGHT_KG = 60;
+const SIZE_FAIRY_MAX_HEIGHT_CM = 170;
 
 // product.sizes may be plain strings (['S','M']) or, for color-variant products set up in the
 // admin product manager, per-color/size stock entries like {size, color, stock}.
@@ -115,7 +120,7 @@ export default function ProductDetailModal({
   const [height, setHeight] = useState<string>("");
   const [weight, setWeight] = useState<string>("");
   const [calcResult, setCalcResult] = useState<{
-    size: 'S' | 'M';
+    size: 'S' | 'M' | null; // null = outside the range our S–M pieces are cut for
     fitEn: string;
     fitZh: string;
   } | null>(null);
@@ -174,6 +179,15 @@ export default function ProductDetailModal({
     let fitEn = "";
     let fitZh = "";
 
+    // Our pieces are cut for S–M (and Freesize). Beyond this range a recommendation would be a guess, so say so.
+    if (w > SIZE_FAIRY_MAX_WEIGHT_KG || h > SIZE_FAIRY_MAX_HEIGHT_CM) {
+      setCalcResult({
+        size: null,
+        fitEn: "Your numbers are above the range our S–M pieces are cut for, so this item may fit snug. Please compare the garment measurements with your own, or ask WhatsApp support before ordering.",
+        fitZh: "你的身高体重超出了我们 S–M 款式的常规适穿范围，这件可能会偏紧。下单前请对照商品实测尺寸和你自己的尺寸，或先联系 WhatsApp 客服。"
+      });
+      return;
+    }
     if (h > 163 || w > 52) {
       recommendedSize = 'M';
       fitEn = "M is the closer starting point based on height and weight. Please compare the garment measurements before ordering.";
@@ -434,13 +448,20 @@ export default function ProductDetailModal({
 
               {calcResult && (
                 <div className="bg-pink-50/30 p-3 rounded-lg border border-pink-100/30 text-[11px] leading-relaxed text-zinc-600 space-y-1">
-                  <div className="flex items-center gap-1">
-                    <Check className="w-3.5 h-3.5 text-emerald-500" />
-                    <span>
-                      {tx("Recommended Size:", "仙子推荐尺码:")}{" "}
-                      <strong className="text-sm font-serif text-[#B96A73]">{calcResult.size}</strong>
-                    </span>
-                  </div>
+                  {calcResult.size ? (
+                    <div className="flex items-center gap-1">
+                      <Check className="w-3.5 h-3.5 text-emerald-500" />
+                      <span>
+                        {tx("Recommended Size:", "仙子推荐尺码:")}{" "}
+                        <strong className="text-sm font-serif text-[#B96A73]">{calcResult.size}</strong>
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1 text-amber-700 font-semibold">
+                      <AlertCircle className="w-3.5 h-3.5" />
+                      {tx('This may not fit you', '这件可能不太合身')}
+                    </div>
+                  )}
                   <p>{tx(calcResult.fitEn, calcResult.fitZh)}</p>
                   {availableSizes.length > 0 && (
                     <p className="text-zinc-500">
@@ -510,6 +531,13 @@ export default function ProductDetailModal({
                 ))}
               </div>
             </div>
+            <p className="text-[10px] text-zinc-400 text-right -mt-3">
+              {tx(
+                `Offered in ${getSizesForColor(product.sizes, null).map(sz => sizeLabel(sz, lang)).join(' / ')} only · no larger sizes yet`,
+                `本款只有 ${getSizesForColor(product.sizes, null).map(sz => sizeLabel(sz, lang)).join(' / ')} · 暂无更大尺码`
+              )}
+            </p>
+            <SizeRequestBox productId={String(product.baseProductId || product.id)} lang={lang === 'zh' ? 'zh' : 'en'} />
           </div>
 
           {/* Action buttons (Add to cart & Save to wishlist) */}

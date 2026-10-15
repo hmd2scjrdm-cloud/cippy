@@ -213,6 +213,12 @@
       <div class="cust-row head"><span>姓名 / 邮箱</span><span>电话</span><span>订单</span><span>累计消费</span><span>会员等级</span><span>积分</span></div>
       <div id="custList"><p class="text-center py-10 text-sm text-stone-400">加载中…</p></div>
     </div>
+    <div id="sizeReqBox" class="hidden space-y-2">
+      <h2 class="adm-h2">尺码需求登记</h2>
+      <p class="text-xs text-stone-400">顾客在商品页点「需要更大尺码？」登记的。可以用它判断要不要做大码。</p>
+      <div id="sizeReqSummary" class="flex flex-wrap gap-2"></div>
+      <div id="sizeReqList" class="bg-white rounded-xl border overflow-hidden text-sm" style="border-color:var(--line)"></div>
+    </div>
     <div id="subsBox" class="hidden">
       <h2 class="adm-h2">月报订阅者</h2>
       <div id="subsList" class="bg-white rounded-xl border p-4 text-sm text-stone-600 space-y-1" style="border-color:var(--line)"></div>
@@ -1175,10 +1181,11 @@ let customerRows = [];
 let customerProfiles = [];
 async function loadCustomers() {
   document.getElementById('custList').innerHTML = '<p class="text-center py-10 text-sm text-stone-400">加载中…</p>';
-  const [ordersRes, profilesRes, subsRes] = await Promise.all([
+  const [ordersRes, profilesRes, subsRes, sizeRes] = await Promise.all([
     sb.from('orders').select('*').order('created_at', { ascending: false }),
     sb.from('profiles').select('*'),
     sb.from('monthly_report_subscriptions').select('email,active'),
+    sb.from('size_requests').select('email,wanted_size,height_cm,weight_kg,created_at,products(name,name_zh)').order('created_at', { ascending: false }),
   ]);
   if (ordersRes.data) allOrders = ordersRes.data;
   customerProfiles = profilesRes.data || [];
@@ -1199,7 +1206,22 @@ async function loadCustomers() {
   const subs = (subsRes.data || []).filter(x => x.active);
   document.getElementById('subsBox').classList.toggle('hidden', !subs.length);
   document.getElementById('subsList').innerHTML = subs.map(x => `<div>${esc(x.email)}</div>`).join('');
+  renderSizeRequests(sizeRes.data || []);
   renderCustomers();
+}
+
+function renderSizeRequests(rows) {
+  document.getElementById('sizeReqBox').classList.toggle('hidden', !rows.length);
+  const counts = {};
+  rows.forEach(r => { counts[r.wanted_size] = (counts[r.wanted_size] || 0) + 1; });
+  document.getElementById('sizeReqSummary').innerHTML = Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([sz, n]) => `<span class="text-xs rounded-full px-3 py-1 bg-white border" style="border-color:var(--line)"><b>${esc(sz)}</b> · ${n} 人</span>`).join('');
+  document.getElementById('sizeReqList').innerHTML = rows.map(r => `<div class="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-2.5 border-b" style="border-color:var(--line)">
+    <span class="font-semibold w-14">${esc(r.wanted_size)}</span>
+    <span class="flex-1 min-w-[160px] break-all">${esc(r.email)}</span>
+    <span class="text-stone-500 text-xs">${r.height_cm ? esc(r.height_cm) + 'cm' : '—'} / ${r.weight_kg ? esc(r.weight_kg) + 'kg' : '—'}</span>
+    <span class="text-stone-400 text-xs">${esc(r.products?.name_zh || r.products?.name || '')}</span>
+    <span class="text-stone-400 text-xs">${new Date(r.created_at).toLocaleDateString('zh-CN')}</span>
+  </div>`).join('');
 }
 
 function renderCustomers() {

@@ -55,6 +55,33 @@ async function subscribe(body, serviceKey, res) {
   return res.status(200).json({ ok: true });
 }
 
+const WANTED_SIZES = ["XS", "S", "M", "L", "XL", "XXL", "XXXL", "Other"];
+const MAX_SIZE_REQUESTS_PER_EMAIL = 5;
+
+// A customer tells us which (bigger) size they would buy; the admin sees the demand under 客户.
+async function sizeRequest(body, serviceKey, res) {
+  const addr = String(body.email || "").trim().toLowerCase();
+  const wanted = String(body.wantedSize || "").trim();
+  if (!EMAIL_RE.test(addr) || addr.length > 200) return res.status(400).json({ error: "请填写有效的邮箱" });
+  if (!WANTED_SIZES.includes(wanted)) return res.status(400).json({ error: "请选择想要的尺码" });
+  const num = (v, lo, hi) => { const n = parseFloat(v); return Number.isFinite(n) && n >= lo && n <= hi ? n : null; };
+  const productId = UUID_RE.test(String(body.productId || "")) ? body.productId : null;
+
+  const existing = await sb(`size_requests?email=eq.${encodeURIComponent(addr)}&select=id`, serviceKey);
+  if (existing.ok && (await existing.json()).length >= MAX_SIZE_REQUESTS_PER_EMAIL) return res.status(429).json({ error: "你已经提交过几次了，我们已记录" });
+
+  const r = await sb("size_requests", serviceKey, {
+    method: "POST",
+    headers: { Prefer: "return=minimal" },
+    body: JSON.stringify({ email: addr, wanted_size: wanted, height_cm: num(body.heightCm, 100, 230), weight_kg: num(body.weightKg, 25, 250), product_id: productId }),
+  });
+  if (!r.ok) {
+    console.error("size request insert failed:", r.status, await r.text().catch(() => ""));
+    return res.status(500).json({ error: "保存失败，请稍后再试" });
+  }
+  return res.status(200).json({ ok: true });
+}
+
 async function notify(body, serviceKey, res) {
   const ids = [...new Set((Array.isArray(body.productIds) ? body.productIds : []).filter((id) => UUID_RE.test(String(id))))];
   if (!ids.length) return res.status(200).json({ sent: 0, customers: 0 });
@@ -110,6 +137,7 @@ export default async function handler(req, res) {
   const body = req.body || {};
 
   if (body.action === "subscribe") return subscribe(body, serviceKey, res);
+  if (body.action === "size_request") return sizeRequest(body, serviceKey, res);
 
   if (body.action === "notify") {
     const admin = await getVerifiedUser((req.headers.authorization || "").replace("Bearer ", ""));
