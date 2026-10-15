@@ -376,6 +376,44 @@
   </div>
 </div>
 
+<!-- Edit Order Items Modal -->
+<div id="editItemsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background:rgba(0,0,0,0.4)">
+  <div class="bg-white rounded-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto p-6 space-y-4">
+    <div class="flex items-center justify-between">
+      <p class="font-bold text-stone-800">编辑订单 <span id="eiOrderId" class="font-mono text-stone-400"></span></p>
+      <button onclick="closeEditItems()" class="text-stone-300 hover:text-stone-500 text-2xl leading-none">&times;</button>
+    </div>
+    <p class="text-xs text-stone-400 -mt-2">修改商品、数量、单价、颜色 / 尺码，也可以添加或删除商品。收件信息和运费请用旁边的「编辑收件信息 / 运费」。</p>
+    <div>
+      <div class="flex items-center justify-between mb-2">
+        <label class="adm-label !mb-0">商品明细</label>
+        <button onclick="eiAddRow()" class="text-xs text-[#C4928A] font-semibold hover:underline">+ 添加商品行</button>
+      </div>
+      <div id="eiRows" class="space-y-3"></div>
+    </div>
+    <div class="grid grid-cols-2 gap-3 items-end bg-stone-50 rounded-xl p-3">
+      <div>
+        <label class="adm-label">支付方式</label>
+        <select id="eiPayment" class="adm-input"></select>
+      </div>
+      <div class="text-right text-sm text-stone-600 space-y-0.5">
+        <p>小计 <span id="eiSubtotal" class="font-mono">RM 0.00</span></p>
+        <p>运费 <span id="eiShipping" class="font-mono">RM 0.00</span></p>
+        <p class="text-base font-bold text-stone-800">合计 <span id="eiTotal" class="font-mono">RM 0.00</span></p>
+      </div>
+    </div>
+    <label class="flex items-start gap-2 text-xs text-stone-600 cursor-pointer">
+      <input id="eiStock" type="checkbox" checked class="mt-0.5 accent-[#C4928A]"/>
+      <span>同步调整库存：数量增加就多扣库存，减少或删除就把库存加回来（只对选了商品的行生效）</span>
+    </label>
+    <p id="eiError" class="hidden text-xs text-red-500"></p>
+    <div class="flex gap-3">
+      <button onclick="closeEditItems()" class="flex-1 py-2.5 border border-stone-200 rounded-xl text-sm text-stone-500 hover:bg-stone-50">取消</button>
+      <button id="eiSaveBtn" onclick="saveEditItems()" class="flex-1 py-2.5 bg-[#C4928A] text-white rounded-xl text-sm font-semibold hover:opacity-90">保存订单</button>
+    </div>
+  </div>
+</div>
+
 <!-- Edit Order Modal -->
 <div id="editOrderModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background:rgba(0,0,0,0.4)">
   <div class="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 space-y-4">
@@ -1383,6 +1421,189 @@ async function removeAdmin(email) {
 }
 window.addAdmin = addAdmin; window.removeAdmin = removeAdmin; window.loadAdmins = loadAdmins;
 
+// ---- Edit an existing order's items (products, qty, price, colour/size) ----
+let eiOrderId = null;
+let eiRows = [];   // { orig, product_id, name, color, size, qty, price }
+const EI_PAYMENTS = [['manual', '银行转账 / DuitNow'], ['duitnow', 'DuitNow QR'], ['stripe', 'Stripe 卡'], ['cash', '现金'], ['other', '其他']];
+
+const eiVariantProduct = pid => allProducts.find(p => String(p.id) === String(pid));
+const eiColors = pid => { const p = eiVariantProduct(pid); return p && isVariantSizes(p.sizes) ? [...new Set(p.sizes.map(x => x.color))] : []; };
+const eiSizes = (pid, color) => { const p = eiVariantProduct(pid); if (!p) return []; if (isVariantSizes(p.sizes)) return [...new Set(p.sizes.filter(x => !color || x.color === color).map(x => x.size))]; return Array.isArray(p.sizes) ? p.sizes.filter(x => typeof x === 'string') : []; };
+
+async function openEditItems(id) {
+  const o = allOrders.find(x => x.id === id); if (!o) return;
+  if (!allProducts.length) await loadProducts();
+  eiOrderId = id;
+  eiRows = (o.items || []).map(it => ({
+    orig: it, product_id: it.product_id || it.baseProductId || '', name: it.name_zh || it.name || '',
+    color: it.color || '', size: it.size || '', qty: Math.max(1, parseInt(it.qty, 10) || 1), price: Number(it.price_myr ?? it._verified_price ?? 0) || 0,
+  }));
+  document.getElementById('eiOrderId').textContent = '#' + o.order_id;
+  const cur = o.payment_method || 'manual';
+  const opts = EI_PAYMENTS.some(([v]) => v === cur) ? EI_PAYMENTS : [[cur, cur], ...EI_PAYMENTS];
+  document.getElementById('eiPayment').innerHTML = opts.map(([v, l]) => `<option value="${esc(v)}" ${v === cur ? 'selected' : ''}>${esc(l)}</option>`).join('');
+  document.getElementById('eiError').classList.add('hidden');
+  document.getElementById('eiStock').checked = true;
+  renderEditItemRows();
+  document.getElementById('editItemsModal').classList.remove('hidden');
+}
+function closeEditItems() { document.getElementById('editItemsModal').classList.add('hidden'); eiOrderId = null; eiRows = []; }
+
+function renderEditItemRows() {
+  const colorLabel = c => (c === NO_COLOR ? '无颜色' : c);
+  document.getElementById('eiRows').innerHTML = eiRows.map((r, i) => {
+    const colors = eiColors(r.product_id), sizes = eiSizes(r.product_id, r.color);
+    return `<div class="rounded-xl border p-3 space-y-2" style="border-color:var(--line)">
+      <div class="flex gap-2 items-center">
+        <select onchange="eiPick(${i}, this.value)" class="adm-input flex-1 min-w-0 !py-1.5 text-xs">
+          <option value="">— 自定义商品 —</option>
+          ${allProducts.map(p => `<option value="${esc(p.id)}" ${String(p.id) === String(r.product_id) ? 'selected' : ''}>${esc(p.name_zh || p.name)}</option>`).join('')}
+        </select>
+        <button onclick="eiRemoveRow(${i})" class="text-stone-300 hover:text-red-500 text-xl leading-none px-1" title="删除这一行">&times;</button>
+      </div>
+      <div class="grid grid-cols-6 gap-2">
+        <input type="text" value="${esc(r.name)}" placeholder="商品名称" oninput="eiSet(${i}, 'name', this.value)" class="adm-input col-span-6 sm:col-span-2 !py-1.5 text-xs"/>
+        <input type="text" list="eiColors_${i}" value="${esc(r.color)}" placeholder="颜色" oninput="eiSet(${i}, 'color', this.value); eiRefreshSizes(${i})" class="adm-input col-span-3 sm:col-span-1 !py-1.5 text-xs"/>
+        <datalist id="eiColors_${i}">${colors.map(c => `<option value="${esc(c)}">${esc(colorLabel(c))}</option>`).join('')}</datalist>
+        <input type="text" list="eiSizes_${i}" value="${esc(r.size)}" placeholder="尺码" oninput="eiSet(${i}, 'size', this.value)" class="adm-input col-span-3 sm:col-span-1 !py-1.5 text-xs"/>
+        <datalist id="eiSizes_${i}">${sizes.map(z => `<option value="${esc(z)}"></option>`).join('')}</datalist>
+        <input type="number" min="1" step="1" value="${r.qty}" oninput="eiSet(${i}, 'qty', this.value)" class="adm-input col-span-3 sm:col-span-1 !py-1.5 text-xs" title="数量"/>
+        <input type="number" min="0" step="0.01" value="${r.price}" oninput="eiSet(${i}, 'price', this.value)" class="adm-input col-span-3 sm:col-span-1 !py-1.5 text-xs" title="单价 (RM)"/>
+      </div>
+    </div>`;
+  }).join('') || '<p class="text-xs text-stone-400 py-3 text-center">还没有商品，点右上角「+ 添加商品行」</p>';
+  eiRecalc();
+}
+
+function eiRefreshSizes(i) {
+  const r = eiRows[i]; const dl = document.getElementById('eiSizes_' + i); if (!dl) return;
+  dl.innerHTML = eiSizes(r.product_id, r.color).map(z => `<option value="${esc(z)}"></option>`).join('');
+}
+function eiSet(i, field, value) {
+  const r = eiRows[i]; if (!r) return;
+  if (field === 'qty') r.qty = Math.max(1, parseInt(value, 10) || 1);
+  else if (field === 'price') r.price = Math.max(0, parseFloat(value) || 0);
+  else r[field] = value;
+  eiRecalc();
+}
+function eiPick(i, pid) {
+  const r = eiRows[i]; r.product_id = pid;
+  const p = eiVariantProduct(pid);
+  if (p) {
+    r.name = p.name_zh || p.name || '';
+    r.price = Number(p.price_myr || p.price || 0);
+    const colors = eiColors(pid);
+    r.color = colors.length === 1 ? colors[0] : '';
+    r.size = '';
+    const sizes = eiSizes(pid, r.color);
+    if (sizes.length === 1) r.size = sizes[0];
+  }
+  renderEditItemRows();
+}
+function eiAddRow() { eiRows.push({ orig: null, product_id: '', name: '', color: '', size: '', qty: 1, price: 0 }); renderEditItemRows(); }
+function eiRemoveRow(i) { eiRows.splice(i, 1); renderEditItemRows(); }
+
+function eiRecalc() {
+  const o = allOrders.find(x => x.id === eiOrderId); if (!o) return;
+  const fmt = n => `RM ${n.toFixed(2)}`;
+  const subtotal = eiRows.reduce((sum, r) => sum + r.price * r.qty, 0);
+  const shipping = Number(o.totals?.shipping || 0);
+  document.getElementById('eiSubtotal').textContent = fmt(subtotal);
+  document.getElementById('eiShipping').textContent = fmt(shipping);
+  document.getElementById('eiTotal').textContent = fmt(subtotal + shipping);
+}
+
+// Same colour/size matching as the order APIs: a line without a colour matches when the product has a single colour.
+function eiSameVariant(entry, color, size, sizes) {
+  if (!entry || entry.size !== size) return false;
+  if (color) return entry.color === color;
+  return new Set(sizes.map(x => x && x.color)).size === 1;
+}
+
+// delta > 0 takes more stock (order got bigger), delta < 0 puts stock back. Re-reads each product first.
+async function eiAdjustStock(deltas) {
+  const byPid = {};
+  deltas.forEach(d => { (byPid[d.pid] = byPid[d.pid] || []).push(d); });
+  const problems = [], restored = [];
+  for (const [pid, list] of Object.entries(byPid)) {
+    const { data: rows, error } = await sb.from('products').select('stock,sizes,name,name_zh').eq('id', pid).limit(1);
+    const prod = rows?.[0];
+    if (error || !prod) { problems.push(`读取商品失败（${pid}）`); continue; }
+    const label = prod.name_zh || prod.name;
+    let sizes = prod.sizes, stock = Math.max(0, Number(prod.stock) || 0);
+    if (isVariantSizes(prod.sizes)) {
+      sizes = prod.sizes.map(x => ({ ...x }));
+      for (const d of list) {
+        const hit = sizes.find(x => eiSameVariant(x, d.color, d.size, sizes));
+        if (!hit) { problems.push(`${label} ${d.color || ''}/${d.size || ''} 在库存里找不到，没有调整`); continue; }
+        hit.stock = Math.max(0, (Number(hit.stock) || 0) - d.delta);
+        if (d.delta < 0) restored.push(pid);
+      }
+      stock = sizes.reduce((sum, x) => sum + Math.max(0, Number(x.stock) || 0), 0);
+    } else {
+      const total = list.reduce((sum, d) => sum + d.delta, 0);
+      stock = Math.max(0, stock - total);
+      if (total < 0) restored.push(pid);
+    }
+    const payload = isVariantSizes(prod.sizes) ? { stock, sizes } : { stock };
+    const { error: upErr } = await sb.from('products').update(payload).eq('id', pid);
+    if (upErr) problems.push(`${label} 库存更新失败：${upErr.message}`);
+  }
+  return { problems, restored: [...new Set(restored)] };
+}
+
+async function saveEditItems() {
+  const o = allOrders.find(x => x.id === eiOrderId); if (!o) return;
+  const err = document.getElementById('eiError');
+  const rows = eiRows.filter(r => r.name.trim() || r.product_id);
+  if (!rows.length) { err.textContent = '请至少保留一件商品（要整单作废，请把状态改成「已取消」）'; err.classList.remove('hidden'); return; }
+  if (rows.some(r => !r.name.trim())) { err.textContent = '有商品行没有名称'; err.classList.remove('hidden'); return; }
+
+  const items = rows.map(r => {
+    const base = r.orig ? { ...r.orig } : {};
+    const it = { ...base, product_id: r.product_id || base.product_id || null, name: r.name.trim(), name_zh: r.name.trim(), qty: r.qty, price_myr: r.price };
+    if (r.color) it.color = r.color; else delete it.color;
+    if (r.size) it.size = r.size; else delete it.size;
+    delete it._verified_price;
+    return it;
+  });
+  const subtotal = items.reduce((sum, it) => sum + it.price_myr * it.qty, 0);
+  const shipping = Number(o.totals?.shipping || 0);
+  const totals = { ...(o.totals || {}), subtotal, shipping, total: subtotal + shipping };
+  const payment_method = document.getElementById('eiPayment').value;
+
+  // stock deltas per product/colour/size: new quantity minus what the order had
+  const tally = {};
+  const add = (it, sign) => {
+    if (!it.product_id || it._is_discount) return;
+    const k = `${it.product_id}|${it.color || ''}|${it.size || ''}`;
+    tally[k] = tally[k] || { pid: it.product_id, color: it.color || '', size: it.size || '', delta: 0 };
+    tally[k].delta += sign * (parseInt(it.qty, 10) || 0);
+  };
+  (o.items || []).forEach(it => add(it, -1));
+  items.forEach(it => add(it, +1));
+  const deltas = Object.values(tally).filter(d => d.delta !== 0);
+  const adjust = document.getElementById('eiStock').checked && deltas.length;
+
+  const btn = document.getElementById('eiSaveBtn'); btn.disabled = true; btn.textContent = '保存中…';
+  const { error } = await sb.from('orders').update({ items, totals, payment_method }).eq('id', o.id);
+  if (error) { btn.disabled = false; btn.textContent = '保存订单'; err.textContent = '保存失败：' + error.message; err.classList.remove('hidden'); return; }
+  o.items = items; o.totals = totals; o.payment_method = payment_method;
+
+  let note = '订单已保存 ✓';
+  if (adjust) {
+    const { problems, restored } = await eiAdjustStock(deltas);
+    await loadProducts();
+    if (problems.length) alert('订单已保存，但库存有几项没有调整：\n\n' + problems.join('\n') + '\n\n请到「库存」页手动核对。');
+    else note += '，库存已同步';
+    if (restored.length) notifyBackInStock(restored);
+  }
+  btn.disabled = false; btn.textContent = '保存订单';
+  closeEditItems(); renderOrders(); showToast(note);
+}
+window.openEditItems = openEditItems; window.closeEditItems = closeEditItems; window.saveEditItems = saveEditItems;
+window.eiPick = eiPick; window.eiSet = eiSet; window.eiAddRow = eiAddRow; window.eiRemoveRow = eiRemoveRow; window.eiRefreshSizes = eiRefreshSizes;
+
 let aoItemRowId = 0;
 
 function openAddOrderModal() {
@@ -1700,7 +1921,10 @@ function renderOrders() {
             <p class="text-xs text-stone-500">运费：${o.totals?.shipping === 0 ? 'FREE' : fmt.format(o.totals?.shipping || 0)}</p>
             <p class="text-sm font-bold text-stone-800 mt-1">合计：${total}</p>
             ${o.payment_method ? `<p class="text-xs text-stone-400 mt-1">支付方式：${esc(o.payment_method)}</p>` : ''}
-            <button onclick="openEditOrder('${o.id}')" class="mt-3 text-xs text-[#C4928A] border border-[#C4928A] px-2 py-1 rounded hover:bg-[#fdf0ed]">编辑收件信息 / 运费</button>
+            <div class="mt-3 flex flex-col gap-2 items-start">
+              <button onclick="openEditItems('${o.id}')" class="text-xs font-semibold bg-[#C4928A] text-white px-3 py-1.5 rounded hover:opacity-90">编辑订单</button>
+              <button onclick="openEditOrder('${o.id}')" class="text-xs text-[#C4928A] border border-[#C4928A] px-2 py-1 rounded hover:bg-[#fdf0ed]">编辑收件信息 / 运费</button>
+            </div>
           </div>
           ${o.status === 'shipped' || o.tracking_number ? `
           <div class="min-w-[140px]">
