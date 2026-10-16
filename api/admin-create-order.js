@@ -30,7 +30,7 @@ export default async function handler(req, res) {
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!serviceKey) return res.status(500).json({ error: "Not configured" });
 
-  const { customer = {}, items = [], shipping = 0, status = "paid", paymentMethod = "manual" } = req.body || {};
+  const { customer = {}, items = [], shipping = 0, discount = 0, discountNote = "", status = "paid", paymentMethod = "manual" } = req.body || {};
   if (!Array.isArray(items) || !items.length) return res.status(400).json({ error: "请至少添加一件商品" });
   if (!ALLOWED_STATUS.includes(status)) return res.status(400).json({ error: "订单状态不合法" });
 
@@ -47,6 +47,8 @@ export default async function handler(req, res) {
 
   const shippingNum = Math.max(0, Number(shipping) || 0);
   const subtotal = cleanItems.reduce((s, i) => s + i.price_myr * i.qty, 0);
+  // Discount is a flat RM amount taken off the order; it can never push the total below zero.
+  const discountNum = Math.min(Math.max(0, Number(discount) || 0), subtotal + shippingNum);
   const email = String(customer.email || "").trim();
 
   const row = {
@@ -59,7 +61,7 @@ export default async function handler(req, res) {
     },
     guest_email: email || null,
     items: cleanItems,
-    totals: { subtotal, shipping: shippingNum, total: subtotal + shippingNum },
+    totals: { subtotal, shipping: shippingNum, discount: discountNum, discount_note: String(discountNote || "").slice(0, 120), total: subtotal + shippingNum - discountNum },
     status,
     payment_method: String(paymentMethod).slice(0, 40),
   };
