@@ -30,7 +30,7 @@ export default async function handler(req, res) {
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!serviceKey) return res.status(500).json({ error: "Not configured" });
 
-  const { customer = {}, items = [], shipping = 0, discount = 0, discountNote = "", status = "paid", paymentMethod = "manual" } = req.body || {};
+  const { customer = {}, items = [], shipping = 0, discount = 0, discountNote = "", createdAt = "", status = "paid", paymentMethod = "manual" } = req.body || {};
   if (!Array.isArray(items) || !items.length) return res.status(400).json({ error: "请至少添加一件商品" });
   if (!ALLOWED_STATUS.includes(status)) return res.status(400).json({ error: "订单状态不合法" });
 
@@ -51,7 +51,19 @@ export default async function handler(req, res) {
   const discountNum = Math.min(Math.max(0, Number(discount) || 0), subtotal + shippingNum);
   const email = String(customer.email || "").trim();
 
+  // Optional back-dated order (manual entry of an earlier sale): not in the future, not older than 5 years.
+  let createdIso = null;
+  if (createdAt) {
+    const d = new Date(createdAt);
+    const now = Date.now();
+    if (Number.isNaN(d.getTime()) || d.getTime() > now + 24 * 3600e3 || d.getTime() < now - 5 * 365 * 24 * 3600e3) {
+      return res.status(400).json({ error: "创建日期不合法" });
+    }
+    createdIso = d.toISOString();
+  }
+
   const row = {
+    ...(createdIso ? { created_at: createdIso } : {}),
     order_id: await nextOrderId(SUPABASE_URL, serviceKey),
     customer: {
       name: String(customer.name || "").trim(),
