@@ -355,13 +355,63 @@
   </div>
 </div>
 
+<!-- EasyParcel Modal -->
+<div id="easyParcelModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background:rgba(0,0,0,0.4)">
+  <div class="bg-white rounded-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto p-6 space-y-5">
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <p class="font-bold text-stone-800">EasyParcel 发货</p>
+        <p class="text-xs text-stone-400 mt-0.5">订单 <span id="epOrderId" class="font-mono"></span> · <span id="epMode">Demo</span></p>
+      </div>
+      <button onclick="closeEasyParcel()" class="text-stone-300 hover:text-stone-500 text-2xl leading-none">&times;</button>
+    </div>
+    <div class="rounded-xl bg-amber-50 border border-amber-100 px-4 py-3 text-xs text-amber-800">
+      请先确认地址和包裹资料。选择报价后点击付款会从 EasyParcel credit 扣款，并自动取得 AWB 运单号。
+    </div>
+    <div class="space-y-3">
+      <p class="text-xs font-bold text-stone-500 uppercase tracking-wide">收件资料</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div><label class="adm-label">姓名 *</label><input id="epName" class="adm-input"/></div>
+        <div><label class="adm-label">电话 *</label><input id="epPhone" class="adm-input"/></div>
+        <div class="sm:col-span-2"><label class="adm-label">地址第 1 行 * <span class="font-normal text-stone-400">最多 35 字符</span></label><input id="epAddress1" maxlength="35" class="adm-input"/></div>
+        <div class="sm:col-span-2"><label class="adm-label">地址第 2 行</label><input id="epAddress2" maxlength="35" class="adm-input"/></div>
+        <div><label class="adm-label">城市 *</label><input id="epCity" maxlength="35" class="adm-input"/></div>
+        <div><label class="adm-label">州属 *</label><select id="epState" class="adm-input">
+          <option value="">选择州属</option><option>Johor</option><option>Kedah</option><option>Kelantan</option><option>Melaka</option>
+          <option>Negeri Sembilan</option><option>Pahang</option><option>Perak</option><option>Perlis</option><option>Penang</option>
+          <option>Sabah</option><option>Sarawak</option><option>Selangor</option><option>Terengganu</option>
+          <option>Kuala Lumpur</option><option>Putrajaya</option><option>Labuan</option>
+        </select></div>
+        <div><label class="adm-label">邮政编码 *</label><input id="epPostcode" maxlength="5" inputmode="numeric" class="adm-input"/></div>
+        <div><label class="adm-label">Email</label><input id="epEmail" type="email" class="adm-input"/></div>
+      </div>
+    </div>
+    <div class="space-y-3">
+      <p class="text-xs font-bold text-stone-500 uppercase tracking-wide">包裹资料</p>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div><label class="adm-label">重量 kg *</label><input id="epWeight" type="number" min="0.01" step="0.01" value="0.5" class="adm-input"/></div>
+        <div><label class="adm-label">长 cm</label><input id="epLength" type="number" min="1" step="1" value="28" class="adm-input"/></div>
+        <div><label class="adm-label">宽 cm</label><input id="epWidth" type="number" min="1" step="1" value="20" class="adm-input"/></div>
+        <div><label class="adm-label">高 cm</label><input id="epHeight" type="number" min="1" step="1" value="8" class="adm-input"/></div>
+      </div>
+    </div>
+    <p id="epError" class="hidden rounded-lg bg-red-50 text-red-700 px-3 py-2 text-xs"></p>
+    <div id="epRates" class="hidden space-y-2"></div>
+    <div class="flex gap-3">
+      <button onclick="closeEasyParcel()" class="flex-1 py-2.5 border border-stone-200 rounded-xl text-sm text-stone-500 hover:bg-stone-50">取消</button>
+      <button id="epQuoteBtn" onclick="loadEasyParcelRates()" class="flex-1 py-2.5 bg-[#C4928A] text-white rounded-xl text-sm font-semibold hover:opacity-90">查询运费</button>
+      <button id="epBookBtn" onclick="bookEasyParcel()" class="hidden flex-1 py-2.5 bg-stone-800 text-white rounded-xl text-sm font-semibold hover:bg-stone-700">付款并取得运单</button>
+    </div>
+  </div>
+</div>
+
 <!-- Tracking Modal -->
 <div id="trackingModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background:rgba(0,0,0,0.4)">
   <div class="bg-white rounded-2xl w-full max-w-sm p-6 space-y-4">
     <div class="flex items-center justify-between">
       <div>
         <p class="font-bold text-stone-800">填写运单号</p>
-        <p class="text-xs text-stone-400 mt-0.5">订单 <span id="trackingOrderId"></span> · 快递公司：SPX Express</p>
+        <p class="text-xs text-stone-400 mt-0.5">订单 <span id="trackingOrderId"></span> · 手动填写运单</p>
       </div>
       <button onclick="closeTrackingModal()" class="text-stone-300 hover:text-stone-500 text-2xl leading-none">&times;</button>
     </div>
@@ -1995,7 +2045,8 @@ function renderOrders() {
         </div>
       </div>
       <div class="ocard-foot">
-        ${canShip ? `<button class="btn-brand" onclick="updateOrderStatus('${o.id}','shipped',document.getElementById('sel_${o.id}'))">填写运单号并发货</button>` : ''}
+        ${canShip ? `<button class="btn-brand" onclick="openEasyParcel('${o.id}')">EasyParcel 发货</button>
+        <button class="text-xs text-stone-500 border border-stone-200 rounded-lg px-3 py-2 hover:bg-stone-50" onclick="updateOrderStatus('${o.id}','shipped',document.getElementById('sel_${o.id}'))">手动填写运单</button>` : ''}
         <select id="sel_${o.id}" onchange="updateOrderStatus('${o.id}', this.value, this)" class="adm-select">${statusOptions}</select>
         <button class="more-btn ml-auto text-xs text-stone-400 hover:text-stone-600" onclick="toggleOrderDetail('${o.id}')">详情 ▾</button>
       </div>
@@ -2015,8 +2066,10 @@ function renderOrders() {
           </div>
           ${o.status === 'shipped' || o.tracking_number ? `
           <div class="min-w-[140px]">
-            <p class="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-2">运单号 · SPX Express</p>
+            <p class="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-2">运单号 · ${esc(c.easyparcel?.courier || '手动填写')}</p>
             <p id="tracking_${o.id}" class="text-sm font-mono text-stone-700">${esc(o.tracking_number || '—')}</p>
+            ${c.easyparcel?.awb_label_url ? `<a href="${esc(c.easyparcel.awb_label_url)}" target="_blank" rel="noopener" class="mt-2 inline-block text-xs text-[#C4928A] underline">下载运单 PDF</a>` : ''}
+            ${c.easyparcel?.tracking_url ? `<a href="${esc(c.easyparcel.tracking_url)}" target="_blank" rel="noopener" class="mt-2 ml-3 inline-block text-xs text-[#C4928A] underline">查看物流</a>` : ''}
             <button onclick="event.stopPropagation();editTracking('${o.id}')" class="mt-2 text-xs text-[#C4928A] border border-[#C4928A] px-2 py-1 rounded hover:bg-[#fdf0ed]">修改运单号</button>
           </div>` : ''}
           ${c.shipment_photo_url ? `
@@ -2055,6 +2108,172 @@ function applyDetailState() {
     }
   }
 }
+
+let easyParcelOrderId = null;
+let easyParcelRates = [];
+
+function parseShippingAddress(value) {
+  const raw = String(value || '').trim();
+  const match = raw.match(/^(.*?)(?:,\s*)?(\d{5})\s+([^,]+),\s*Malaysia\s*$/i);
+  const street = (match?.[1] || raw).replace(/,\s*$/, '').trim();
+  const parts = street.split(',').map(x => x.trim()).filter(Boolean);
+  const city = parts.length > 1 ? parts.pop() : '';
+  const first = parts.join(', ') || street;
+  return {
+    address1: first.slice(0, 35),
+    address2: first.slice(35, 70).trim(),
+    city,
+    postcode: match?.[2] || '',
+    state: match?.[3]?.trim() || '',
+  };
+}
+
+function easyParcelPayload(action) {
+  return {
+    action,
+    orderId: easyParcelOrderId,
+    recipient: {
+      name: document.getElementById('epName').value.trim(),
+      phone: document.getElementById('epPhone').value.trim(),
+      email: document.getElementById('epEmail').value.trim(),
+      address1: document.getElementById('epAddress1').value.trim(),
+      address2: document.getElementById('epAddress2').value.trim(),
+      city: document.getElementById('epCity').value.trim(),
+      state: document.getElementById('epState').value,
+      postcode: document.getElementById('epPostcode').value.trim(),
+    },
+    parcel: {
+      weight: Number(document.getElementById('epWeight').value),
+      length: Number(document.getElementById('epLength').value),
+      width: Number(document.getElementById('epWidth').value),
+      height: Number(document.getElementById('epHeight').value),
+    },
+  };
+}
+
+function showEasyParcelError(message) {
+  const el = document.getElementById('epError');
+  el.textContent = message || 'EasyParcel 操作失败';
+  el.classList.remove('hidden');
+}
+
+function openEasyParcel(id) {
+  const o = allOrders.find(x => x.id === id);
+  if (!o) return;
+  easyParcelOrderId = id;
+  easyParcelRates = [];
+  const c = o.customer || {};
+  const parsed = parseShippingAddress(c.address);
+  document.getElementById('epOrderId').textContent = o.order_id || '';
+  document.getElementById('epMode').textContent = '等待连接';
+  document.getElementById('epName').value = c.name || '';
+  document.getElementById('epPhone').value = c.phone || '';
+  document.getElementById('epEmail').value = c.email || o.guest_email || '';
+  document.getElementById('epAddress1').value = parsed.address1;
+  document.getElementById('epAddress2').value = parsed.address2;
+  document.getElementById('epCity').value = parsed.city;
+  document.getElementById('epState').value = parsed.state;
+  document.getElementById('epPostcode').value = parsed.postcode;
+  document.getElementById('epWeight').value = '0.5';
+  document.getElementById('epLength').value = '28';
+  document.getElementById('epWidth').value = '20';
+  document.getElementById('epHeight').value = '8';
+  document.getElementById('epError').classList.add('hidden');
+  document.getElementById('epRates').classList.add('hidden');
+  document.getElementById('epRates').innerHTML = '';
+  document.getElementById('epBookBtn').classList.add('hidden');
+  document.getElementById('epQuoteBtn').classList.remove('hidden');
+  document.getElementById('easyParcelModal').classList.remove('hidden');
+}
+window.openEasyParcel = openEasyParcel;
+
+function closeEasyParcel() {
+  document.getElementById('easyParcelModal').classList.add('hidden');
+  easyParcelOrderId = null;
+  easyParcelRates = [];
+}
+window.closeEasyParcel = closeEasyParcel;
+
+async function easyParcelRequest(payload) {
+  const { data: { session } } = await sb.auth.getSession();
+  const r = await fetch('/api/easyparcel', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
+    body: JSON.stringify(payload),
+  });
+  const json = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(json.error || `EasyParcel error (${r.status})`);
+  return json;
+}
+
+async function loadEasyParcelRates() {
+  const btn = document.getElementById('epQuoteBtn');
+  const error = document.getElementById('epError');
+  error.classList.add('hidden');
+  btn.disabled = true; btn.textContent = '查询中…';
+  try {
+    const json = await easyParcelRequest(easyParcelPayload('rates'));
+    easyParcelRates = json.rates || [];
+    document.getElementById('epMode').textContent = json.mode === 'live' ? '正式模式' : 'Demo 模式';
+    const list = document.getElementById('epRates');
+    if (!easyParcelRates.length) throw new Error('这个地址暂时没有可用的快递报价');
+    list.innerHTML = `<p class="text-xs font-bold text-stone-500 uppercase tracking-wide">选择快递报价</p>` + easyParcelRates.map((rate, index) => `
+      <label class="flex items-center gap-3 border border-stone-200 rounded-xl p-3 cursor-pointer hover:border-[#C4928A]">
+        <input type="radio" name="epRate" value="${esc(rate.serviceId)}" ${index === 0 ? 'checked' : ''}/>
+        ${rate.logo ? `<img src="${esc(rate.logo)}" alt="" class="w-10 h-8 object-contain"/>` : ''}
+        <span class="min-w-0 flex-1"><strong class="block text-sm text-stone-800">${esc(rate.courier)}</strong><span class="block text-xs text-stone-400">${esc(rate.service)}${rate.delivery ? ` · ${esc(rate.delivery)}` : ''}</span></span>
+        <strong class="text-sm text-stone-800">RM ${Number(rate.price).toFixed(2)}</strong>
+      </label>`).join('');
+    list.classList.remove('hidden');
+    btn.classList.add('hidden');
+    document.getElementById('epBookBtn').classList.remove('hidden');
+  } catch (e) {
+    showEasyParcelError(e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = '重新查询运费';
+  }
+}
+window.loadEasyParcelRates = loadEasyParcelRates;
+
+async function bookEasyParcel() {
+  const selected = document.querySelector('input[name="epRate"]:checked');
+  if (!selected) { showEasyParcelError('请先选择一个快递报价'); return; }
+  const rate = easyParcelRates.find(x => x.serviceId === selected.value);
+  const mode = document.getElementById('epMode').textContent;
+  if (!confirm(`确认使用 ${rate?.courier || '所选快递'}（RM ${Number(rate?.price || 0).toFixed(2)}）？\n\n${mode === '正式模式' ? '此操作会扣除 EasyParcel credit。' : '目前是 Demo 模式，不会产生真实出货。'}`)) return;
+  const btn = document.getElementById('epBookBtn');
+  document.getElementById('epError').classList.add('hidden');
+  btn.disabled = true; btn.textContent = '建立并付款中…';
+  try {
+    const payload = easyParcelPayload('book');
+    payload.serviceId = selected.value;
+    const json = await easyParcelRequest(payload);
+    const shipment = json.shipment;
+    const o = allOrders.find(x => x.id === easyParcelOrderId);
+    if (o) {
+      o.status = 'shipped';
+      o.tracking_number = shipment.awb;
+      o.customer = { ...(o.customer || {}), easyparcel: shipment };
+    }
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      const notify = await fetch('/api/notify-shipped', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
+        body: JSON.stringify({ id: easyParcelOrderId, trackingNumber: shipment.awb, courier: shipment.courier, trackingUrl: shipment.tracking_url }),
+      });
+      if (!notify.ok) showToast('运单已建立，但发货邮件发送失败，请稍后重试', true);
+    } catch { showToast('运单已建立，但发货邮件发送失败，请稍后重试', true); }
+    showToast(`${shipment.courier} 运单已建立：${shipment.awb}`);
+    closeEasyParcel();
+    renderOrders();
+  } catch (e) {
+    showEasyParcelError(e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = '付款并取得运单';
+  }
+}
+window.bookEasyParcel = bookEasyParcel;
 
 async function updateOrderStatus(id, status, selectEl) {
   if (status === 'shipped') {

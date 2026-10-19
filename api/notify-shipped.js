@@ -29,7 +29,7 @@ export default async function handler(req, res) {
   const admin = await getVerifiedUser(token);
   if (!(await isAdminUser(admin, SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY))) return res.status(403).json({ error: "无权限" });
 
-  const { id, trackingNumber, photoUrl } = req.body || {};
+  const { id, trackingNumber, photoUrl, courier: requestedCourier, trackingUrl: requestedTrackingUrl } = req.body || {};
   if (!id || !trackingNumber) return res.status(400).json({ error: "Missing id or trackingNumber" });
 
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY;
@@ -51,6 +51,17 @@ export default async function handler(req, res) {
   const siteConfig = await getSiteConfig(SUPABASE_URL, SUPABASE_ANON_KEY);
   const tracking = clean(trackingNumber);
   const orderId = clean(order.order_id);
+  const easyParcel = customer.easyparcel || {};
+  const courier = clean(requestedCourier || easyParcel.courier || "SPX Express");
+  let trackingUrl = clean(requestedTrackingUrl || easyParcel.tracking_url || (courier === "SPX Express" ? "https://spx.com.my" : ""));
+  try {
+    const parsed = new URL(trackingUrl);
+    if (parsed.protocol !== "https:") trackingUrl = "";
+    else trackingUrl = parsed.href;
+  } catch { trackingUrl = ""; }
+  const trackingLine = trackingUrl
+    ? `您可以前往 <a href="${trackingUrl}" style="color:#C4928A;">物流查询页面</a> 查看实时状态。<br/>Track your parcel on the <a href="${trackingUrl}" style="color:#C4928A;">courier tracking page</a>.`
+    : "请使用以上运单号前往快递公司官网查询物流状态。<br/>Use the tracking number above on the courier's official tracking page.";
 
   const html = `<!DOCTYPE html>
 <html>
@@ -74,11 +85,11 @@ export default async function handler(req, res) {
           <tr><td style="padding:28px;">
             <div style="background:#fdf6f4;border-radius:12px;padding:18px 20px;margin-bottom:20px;">
               <p style="margin:0 0 6px;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#C4928A;font-weight:600;">快递公司 / Courier</p>
-              <p style="margin:0 0 14px;font-size:15px;font-weight:600;color:#111827;">SPX Express</p>
+              <p style="margin:0 0 14px;font-size:15px;font-weight:600;color:#111827;">${courier}</p>
               <p style="margin:0 0 6px;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#C4928A;font-weight:600;">运单号 / Tracking Number</p>
               <p style="margin:0;font-size:18px;font-weight:700;color:#111827;font-family:monospace;letter-spacing:0.03em;">${tracking}</p>
             </div>
-            <p style="margin:0 0 16px;font-size:13px;color:#6b7280;line-height:1.6;">您可以前往 <a href="https://spx.com.my" style="color:#C4928A;">spx.com.my</a> 官网，输入以上运单号查询实时物流状态。<br/>You can track your parcel in real time at <a href="https://spx.com.my" style="color:#C4928A;">spx.com.my</a> using the tracking number above.</p>
+            <p style="margin:0 0 16px;font-size:13px;color:#6b7280;line-height:1.6;">${trackingLine}</p>
             ${photoUrl ? `<p style="margin:0 0 8px;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#C4928A;font-weight:600;">打包实拍 / Packing Photo</p><img src="${clean(photoUrl)}" width="100%" style="border-radius:10px;display:block;margin-bottom:16px;max-height:320px;object-fit:cover;" alt="Packing photo"/>` : ""}
             <div style="border-top:1px solid #f3f4f6;margin:20px 0;"></div>
             <p style="margin:0 0 4px;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#9ca3af;font-weight:500;">寄送至 / Delivering to</p>
@@ -130,7 +141,7 @@ export default async function handler(req, res) {
       bcc: process.env.ORDER_NOTIFY_EMAIL || process.env.GMAIL_USER,
       subject: `Cippy 订单 ${orderId} 已发货 · Your order has shipped`,
       html,
-      text: `订单 ${orderId} 已发货\n快递公司: SPX Express\n运单号: ${tracking}\n可前往 spx.com.my 查询物流状态。\n\n售后须知：请在拆包前开始录制完整开箱视频（保存至少14天）；如有问题请在收货后24小时内通过 WhatsApp 联系我们 (https://wa.me/601120861073)，并提供订单号、视频和照片。无完整开箱视频、逾期、已穿着/洗涤/去吊牌、特卖及配饰类商品不受理。\nAfter-sales: record a complete unboxing video before opening the parcel (keep it 14 days) and contact us on WhatsApp within 24 hours with your order number, video and photos.`,
+      text: `订单 ${orderId} 已发货\n快递公司: ${courier}\n运单号: ${tracking}${trackingUrl ? `\n物流查询: ${trackingUrl}` : ""}\n\n售后须知：请在拆包前开始录制完整开箱视频（保存至少14天）；如有问题请在收货后24小时内通过 WhatsApp 联系我们 (https://wa.me/601120861073)，并提供订单号、视频和照片。无完整开箱视频、逾期、已穿着/洗涤/去吊牌、特卖及配饰类商品不受理。\nAfter-sales: record a complete unboxing video before opening the parcel (keep it 14 days) and contact us on WhatsApp within 24 hours with your order number, video and photos.`,
     });
     return res.status(200).json({ ok: true });
   } catch (err) {

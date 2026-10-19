@@ -104,8 +104,8 @@ export const POLICIES: PolicySection[] = [
       {
         titleZh: 'Courier 公司',
         titleEn: 'Courier',
-        textZh: '本店使用 SPX Express 配送，确保快速安全到达。',
-        textEn: 'We use SPX Express for delivery where available.'
+        textZh: '本店通过 EasyParcel 按地区与时效选择合适的本地快递，实际承运公司会显示在发货通知和订单物流中。',
+        textEn: 'We book suitable local couriers through EasyParcel. Your actual courier will be shown in the shipping email and order tracking.'
       },
       {
         titleZh: '运费计算',
