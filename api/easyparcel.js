@@ -2,7 +2,7 @@ import { isAdminUser } from "./_lib/admin-auth.js";
 import { easyParcelCall, easyParcelConfig, stateCode, validateConfig } from "./_lib/easyparcel.js";
 
 const SUPABASE_URL = "https://ilzeziznxzaxxudzhdmu.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJpbHpleml6bnh6YXh4dWR6aGRtdSIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzgxNjY5NTgzLCJleHAiOjIwOTcyNDU1ODN9.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI";
 
 function clean(value, max = 100) { return String(value ?? "").replace(/[<>]/g, "").trim().slice(0, max); }
 function positive(value, fallback = 0) { const n = Number(value); return Number.isFinite(n) && n > 0 ? n : fallback; }
