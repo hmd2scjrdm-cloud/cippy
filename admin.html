@@ -384,7 +384,7 @@
           <option>Kuala Lumpur</option><option>Putrajaya</option><option>Labuan</option>
         </select></div>
         <div><label class="adm-label">邮政编码 *</label><input id="epPostcode" maxlength="5" inputmode="numeric" class="adm-input"/></div>
-        <div><label class="adm-label">Email</label><input id="epEmail" type="email" class="adm-input"/><p class="text-xs text-stone-500 mt-1">顾客未填写邮箱时，运单和发货通知会发到店主邮箱。</p></div>
+        <div><label class="adm-label">Email</label><input id="epEmail" type="email" class="adm-input"/><p class="text-xs text-stone-500 mt-1">建立运单时不会通知顾客；上传出货照片并确认发货后才寄出通知。</p></div>
       </div>
     </div>
     <div class="space-y-3">
@@ -411,15 +411,15 @@
   <div class="bg-white rounded-2xl w-full max-w-sm p-6 space-y-4">
     <div class="flex items-center justify-between">
       <div>
-        <p class="font-bold text-stone-800">填写运单号</p>
-        <p class="text-xs text-stone-400 mt-0.5">订单 <span id="trackingOrderId"></span> · 手动填写运单</p>
+        <p class="font-bold text-stone-800">确认发货</p>
+        <p class="text-xs text-stone-400 mt-0.5">订单 <span id="trackingOrderId"></span> · 运单号可自动带入</p>
       </div>
       <button onclick="closeTrackingModal()" class="text-stone-300 hover:text-stone-500 text-2xl leading-none">&times;</button>
     </div>
     <input id="trackingInput" type="text" placeholder="例：SPXMY000000000"
       onkeydown="if(event.key==='Enter')confirmShipping()"
       class="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#C4928A]"/>
-    <p class="text-xs text-stone-400">保存后将自动发送发货邮件通知顾客（运单号可留空，之后再补填）</p>
+    <p class="text-xs text-stone-400">EasyParcel 订单请先上传出货照片，确认发货后才会发送顾客邮件。</p>
     <div>
       <label class="block text-xs font-semibold text-stone-500 mb-1.5">出货照片（选填，会附在发货邮件里）</label>
       <input id="shipmentPhotoInput" type="file" accept="image/*" onchange="previewShipmentPhoto(event)"
@@ -428,7 +428,7 @@
     </div>
     <div class="flex gap-3">
       <button onclick="closeTrackingModal()" class="flex-1 py-2.5 border border-stone-200 rounded-xl text-sm text-stone-500 hover:bg-stone-50">取消</button>
-      <button id="confirmShipBtn" onclick="confirmShipping()" class="flex-1 py-2.5 bg-[#C4928A] text-white rounded-xl text-sm font-semibold hover:opacity-90">确认发货</button>
+      <button id="confirmShipBtn" onclick="confirmShipping()" class="flex-1 py-2.5 bg-[#C4928A] text-white rounded-xl text-sm font-semibold hover:opacity-90">确认发货并通知</button>
     </div>
   </div>
 </div>
@@ -2050,8 +2050,9 @@ function renderOrders() {
         </div>
       </div>
       <div class="ocard-foot">
-        ${canShip ? `<button class="btn-brand" onclick="openEasyParcel('${o.id}')">EasyParcel 发货</button>
+        ${canShip && !c.easyparcel?.awb ? `<button class="btn-brand" onclick="openEasyParcel('${o.id}')">建立 EasyParcel 运单</button>
         <button class="text-xs text-stone-500 border border-stone-200 rounded-lg px-3 py-2 hover:bg-stone-50" onclick="updateOrderStatus('${o.id}','shipped',document.getElementById('sel_${o.id}'))">手动填写运单</button>` : ''}
+        ${canShip && c.easyparcel?.awb ? `<button class="btn-brand" onclick="editTracking('${o.id}')">上传照片并确认发货</button>` : ''}
         <select id="sel_${o.id}" onchange="updateOrderStatus('${o.id}', this.value, this)" class="adm-select">${statusOptions}</select>
         <button class="more-btn ml-auto text-xs text-stone-400 hover:text-stone-600" onclick="toggleOrderDetail('${o.id}')">详情 ▾</button>
       </div>
@@ -2075,7 +2076,7 @@ function renderOrders() {
             <p id="tracking_${o.id}" class="text-sm font-mono text-stone-700">${esc(o.tracking_number || '—')}</p>
             ${c.easyparcel?.awb_label_url ? `<a href="${esc(c.easyparcel.awb_label_url)}" target="_blank" rel="noopener" class="mt-2 inline-block text-xs text-[#C4928A] underline">下载运单 PDF</a>` : ''}
             ${c.easyparcel?.tracking_url ? `<a href="${esc(c.easyparcel.tracking_url)}" target="_blank" rel="noopener" class="mt-2 ml-3 inline-block text-xs text-[#C4928A] underline">查看物流</a>` : ''}
-            <button onclick="event.stopPropagation();editTracking('${o.id}')" class="mt-2 text-xs text-[#C4928A] border border-[#C4928A] px-2 py-1 rounded hover:bg-[#fdf0ed]">修改运单号</button>
+        <button onclick="event.stopPropagation();editTracking('${o.id}')" class="mt-2 text-xs text-[#C4928A] border border-[#C4928A] px-2 py-1 rounded hover:bg-[#fdf0ed]">${c.easyparcel && o.status !== 'shipped' ? '上传照片并确认发货' : '修改运单号 / 出货照片'}</button>
           </div>` : ''}
           ${c.shipment_photo_url ? `
           <div class="min-w-[100px]">
@@ -2261,20 +2262,10 @@ async function bookEasyParcel() {
     const shipment = json.shipment;
     const o = allOrders.find(x => x.id === easyParcelOrderId);
     if (o) {
-      o.status = 'shipped';
       o.tracking_number = shipment.awb;
       o.customer = { ...(o.customer || {}), easyparcel: shipment };
     }
-    try {
-      const { data: { session } } = await sb.auth.getSession();
-      const notify = await fetch('/api/notify-shipped', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
-        body: JSON.stringify({ id: easyParcelOrderId, trackingNumber: shipment.awb, courier: shipment.courier, trackingUrl: shipment.tracking_url }),
-      });
-      if (!notify.ok) showToast('运单已建立，但发货邮件发送失败，请稍后重试', true);
-    } catch { showToast('运单已建立，但发货邮件发送失败，请稍后重试', true); }
-    showToast(`${shipment.courier} 运单已建立：${shipment.awb}`);
+    showToast(`${shipment.courier} 运单已建立：${shipment.awb}，上传出货照片后再确认发货`);
     closeEasyParcel();
     renderOrders();
   } catch (e) {
@@ -2380,6 +2371,11 @@ async function confirmShipping() {
   const tracking = document.getElementById('trackingInput').value.trim();
   const id = pendingShipId;
   if (!id) return;
+  const o = allOrders.find(x => x.id === id);
+  if (o?.customer?.easyparcel && !pendingShipmentPhotoFile && !o.customer.shipment_photo_url) {
+    alert('请先上传出货照片，再确认 EasyParcel 订单发货。');
+    return;
+  }
 
   const btn = document.getElementById('confirmShipBtn');
   btn.textContent = '保存中…'; btn.disabled = true;
@@ -2400,8 +2396,7 @@ async function confirmShipping() {
   }
 
   const fromDropdown = !!pendingShipSelect;
-  const o = allOrders.find(x => x.id === id);
-  const update = fromDropdown
+  const update = fromDropdown || (o?.customer?.easyparcel && o.status !== 'shipped')
     ? { status: 'shipped', tracking_number: tracking }
     : { tracking_number: tracking };
   if (photoUrl) update.customer = { ...(o?.customer || {}), shipment_photo_url: photoUrl };
@@ -2411,12 +2406,12 @@ async function confirmShipping() {
   if (error) { btn.textContent = '确认发货'; btn.disabled = false; alert('保存失败：' + error.message); return; }
 
   if (o) {
-    if (fromDropdown) o.status = 'shipped';
+    if (update.status === 'shipped') o.status = 'shipped';
     o.tracking_number = tracking;
     if (photoUrl) o.customer = { ...(o.customer || {}), shipment_photo_url: photoUrl };
   }
 
-  if (fromDropdown) updateBadge(id, 'shipped');
+  if (update.status === 'shipped') updateBadge(id, 'shipped');
   const trackEl = document.getElementById('tracking_' + id);
   if (trackEl) trackEl.textContent = tracking || '—';
 

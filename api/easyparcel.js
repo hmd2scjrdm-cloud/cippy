@@ -130,7 +130,8 @@ export default async function handler(req, res) {
         send_addr1: input.recipient.address1, send_addr2: input.recipient.address2, send_addr3: input.recipient.address3,
         send_addr4: "", send_city: input.recipient.city, send_state: input.recipient.state,
         send_code: input.recipient.postcode, send_country: "MY", collect_date: clean(req.body?.collectDate, 10) || malaysiaDate(),
-        sms: "0", send_email: input.recipient.email, REQ_ID: clean(order.order_id, 100),
+        // EasyParcel may email this address as soon as an AWB is booked. Keep customer notification for final dispatch.
+        sms: "0", send_email: clean(process.env.ORDER_NOTIFY_EMAIL || process.env.GMAIL_USER, 35), REQ_ID: clean(order.order_id, 100),
         reference: clean(order.order_id, 25), cod_enabled: "false",
       };
       const submitted = await easyParcelCall(config, "EPSubmitOrderBulk", {
@@ -153,7 +154,7 @@ export default async function handler(req, res) {
         booked_at: new Date().toISOString(), recipient: input.recipient, parcel: input.parcel,
       };
       await updateOrder(order.id, {
-        status: "shipped", tracking_number: shipping.awb,
+        tracking_number: shipping.awb,
         customer: { ...(order.customer || {}), easyparcel: shipping },
       }, serviceKey);
       return res.status(200).json({ ok: true, shipment: shipping });
