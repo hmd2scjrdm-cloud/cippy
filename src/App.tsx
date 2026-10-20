@@ -1543,6 +1543,11 @@ export default function App() {
     return matchesCategory && matchesSearch;
   });
 
+  const featuredProduct = dbProducts.find(p => p.id === 'e59bbfe1-abfa-439f-b433-88eb20d9d011');
+  const homePreviewProducts = featuredProduct
+    ? [featuredProduct, ...dbProducts.filter(p => p.id !== featuredProduct.id)].slice(0, 4)
+    : dbProducts.slice(0, 4);
+
   // Sort products dynamically based on selected criteria
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     if (sortBy === 'price-asc') {
@@ -2763,7 +2768,7 @@ export default function App() {
                         {hc('hero.previewTitle')}
                       </span>
                       <div className="grid grid-cols-2 gap-4">
-                        {dbProducts.slice(0, 4).map((p) => (
+                        {homePreviewProducts.map((p) => (
                           <div
                             key={p.id}
                             onClick={() => setSelectedProduct(p)}
@@ -2777,7 +2782,7 @@ export default function App() {
                             </div>
                             <div className="space-y-0.5 pt-1">
                               <h4 className="text-[10px] sm:text-[11px] font-sans font-bold text-zinc-700 tracking-wider uppercase group-hover:text-[#B96A73] transition-colors line-clamp-1">
-                                {p.name}
+                                {lang === 'zh' ? p.cnName : p.name}
                               </h4>
                               <span className="text-[10px] font-mono text-[#B96A73] font-semibold">RM {p.price}</span>
                             </div>
@@ -2899,6 +2904,24 @@ export default function App() {
                     </div>
                   </div>
                 </div>
+              )}
+
+              {featuredProduct && (
+                <section className="mx-4 sm:mx-6 lg:mx-10 mb-10 border-y border-[#FBEBF0] py-6 sm:py-8">
+                  <div className="grid grid-cols-1 sm:grid-cols-[minmax(0,240px)_1fr] gap-5 sm:gap-8 items-center">
+                    <button type="button" onClick={() => setSelectedProduct(featuredProduct)} className="w-full aspect-[4/5] sm:aspect-square overflow-hidden bg-[#FFF0F2] cursor-pointer text-left">
+                      {featuredProduct.imageUrl && <img src={featuredProduct.imageUrl} alt={lang === 'zh' ? featuredProduct.cnName : featuredProduct.name} className="w-full h-full object-cover" loading="lazy" />}
+                    </button>
+                    <div className="min-w-0 space-y-3">
+                      <p className="text-[11px] font-semibold uppercase tracking-widest text-[#B96A73]">{lang === 'zh' ? '本周首推' : 'Featured this week'}</p>
+                      <h2 className="font-serif text-2xl sm:text-3xl text-[#3F2B2B] leading-tight">{lang === 'zh' ? featuredProduct.cnName : featuredProduct.name}</h2>
+                      <p className="text-sm text-zinc-600">RM {featuredProduct.price.toFixed(2)}</p>
+                      <button type="button" onClick={() => setSelectedProduct(featuredProduct)} className="bg-[#3F2B2B] text-white px-6 py-3 text-xs font-semibold cursor-pointer hover:bg-[#5B4242] transition-colors">
+                        {lang === 'zh' ? '查看商品' : 'View product'}
+                      </button>
+                    </div>
+                  </div>
+                </section>
               )}
 
               {/* Product catalog section */}
