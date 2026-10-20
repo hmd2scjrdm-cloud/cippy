@@ -42,7 +42,9 @@ export default async function handler(req, res) {
 
   const customer = order.customer || {};
   const customerEmail = clean(customer.email || order.guest_email).toLowerCase();
-  if (!customerEmail.includes("@")) return res.status(400).json({ error: "该订单没有顾客邮箱" });
+  const ownerEmail = clean(process.env.ORDER_NOTIFY_EMAIL || process.env.GMAIL_USER).toLowerCase();
+  const recipientEmail = customerEmail.includes("@") ? customerEmail : ownerEmail;
+  if (!recipientEmail.includes("@")) return res.status(500).json({ error: "店主通知邮箱未配置" });
 
   if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
     return res.status(500).json({ error: "邮件服务未配置" });
@@ -137,8 +139,8 @@ export default async function handler(req, res) {
     });
     await transporter.sendMail({
       from: `Cippy <${process.env.GMAIL_USER}>`,
-      to: customerEmail,
-      bcc: process.env.ORDER_NOTIFY_EMAIL || process.env.GMAIL_USER,
+      to: recipientEmail,
+      ...(recipientEmail !== ownerEmail ? { bcc: ownerEmail } : {}),
       subject: `Cippy 订单 ${orderId} 已发货 · Your order has shipped`,
       html,
       text: `订单 ${orderId} 已发货\n快递公司: ${courier}\n运单号: ${tracking}${trackingUrl ? `\n物流查询: ${trackingUrl}` : ""}\n\n售后须知：请在拆包前开始录制完整开箱视频（保存至少14天）；如有问题请在收货后24小时内通过 WhatsApp 联系我们 (https://wa.me/601120861073)，并提供订单号、视频和照片。无完整开箱视频、逾期、已穿着/洗涤/去吊牌、特卖及配饰类商品不受理。\nAfter-sales: record a complete unboxing video before opening the parcel (keep it 14 days) and contact us on WhatsApp within 24 hours with your order number, video and photos.`,

@@ -43,7 +43,7 @@ function parcelInput(body, order) {
     recipient: {
       name: clean(recipient.name || customer.name, 35),
       phone: clean(recipient.phone || customer.phone, 16),
-      email: clean(recipient.email || customer.email || order.guest_email, 35),
+      email: clean(recipient.email || customer.email || order.guest_email || process.env.ORDER_NOTIFY_EMAIL || process.env.GMAIL_USER, 35),
       address1: clean(recipient.address1, 35),
       address2: clean(recipient.address2, 35),
       address3: clean(recipient.address3, 35),
