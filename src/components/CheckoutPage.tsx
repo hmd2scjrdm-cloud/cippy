@@ -31,6 +31,10 @@ interface SavedAddress {
   fullName: string;
   phone: string;
   address: string;
+  address1?: string;
+  address2?: string;
+  address3?: string;
+  city?: string;
   state: string;
   postalCode: string;
 }
@@ -71,7 +75,10 @@ export default function CheckoutPage({
   const [fullName, setFullName] = useState(currentUser?.user_metadata?.name || "");
   const [email, setEmail] = useState(currentUser?.email || "");
   const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
+  const [address1, setAddress1] = useState("");
+  const [address2, setAddress2] = useState("");
+  const [address3, setAddress3] = useState("");
+  const [city, setCity] = useState("");
   const [state, setState] = useState("Selangor");
   const [postalCode, setPostalCode] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('manual');
@@ -100,7 +107,10 @@ export default function CheckoutPage({
   const applySavedAddress = (addr: SavedAddress) => {
     setFullName(addr.fullName);
     setPhone(addr.phone);
-    setAddress(addr.address);
+    setAddress1(addr.address1 || addr.address || "");
+    setAddress2(addr.address2 || "");
+    setAddress3(addr.address3 || "");
+    setCity(addr.city || "");
     setState(addr.state);
     setPostalCode(addr.postalCode);
   };
@@ -113,9 +123,9 @@ export default function CheckoutPage({
 
   const maybeSaveAddress = () => {
     if (!saveAddressChecked) return;
-    const exists = savedAddresses.some(a => a.address === address && a.postalCode === postalCode && a.phone === phone);
+    const exists = savedAddresses.some(a => a.address1 === address1 && a.address2 === address2 && a.address3 === address3 && a.city === city && a.postalCode === postalCode && a.phone === phone);
     if (exists) return;
-    const next = [...savedAddresses, { id: `addr-${Date.now()}`, fullName, phone, address, state, postalCode }];
+    const next = [...savedAddresses, { id: `addr-${Date.now()}`, fullName, phone, address: [address1, address2, address3, city].filter(Boolean).join(', '), address1, address2, address3, city, state, postalCode }];
     setSavedAddresses(next);
     localStorage.setItem(ADDRESS_BOOK_KEY, JSON.stringify(next));
   };
@@ -180,7 +190,7 @@ export default function CheckoutPage({
   };
 
   const validateForm = () => {
-    if (!fullName || !phone || !address || !postalCode) {
+    if (!fullName.trim() || !phone.trim() || !address1.trim() || !city.trim() || !postalCode.trim()) {
       setErrorMsg(tx("Please fill in all required delivery details!", "请填写所有必填的配送信息哦。"));
       return false;
     }
@@ -201,6 +211,10 @@ export default function CheckoutPage({
       setErrorMsg(tx("Malaysian postcodes must contain 5 digits.", "马来西亚邮政编码应为 5 位数字。"));
       return false;
     }
+    if ([fullName, address1, address2, address3, city].some(value => value.trim().length > 35)) {
+      setErrorMsg(tx('Each recipient name, address line and city must be 35 characters or fewer.', '收件姓名、每行地址和城市不可超过 35 个字符。'));
+      return false;
+    }
     return true;
   };
 
@@ -209,7 +223,13 @@ export default function CheckoutPage({
       name: fullName,
       email: email || currentUser?.email,
       phone,
-      address: `${address}, ${postalCode} ${state}, Malaysia`,
+      address: `${[address1, address2, address3, city].map(value => value.trim()).filter(Boolean).join(', ')}, ${postalCode.trim()} ${state}, Malaysia`,
+      address1: address1.trim(),
+      address2: address2.trim(),
+      address3: address3.trim(),
+      city: city.trim(),
+      state,
+      postcode: postalCode.trim(),
       ...(proofUrl ? { payment_proof_url: proofUrl } : {}),
     },
     items: buildItemsPayload(),
@@ -468,7 +488,7 @@ export default function CheckoutPage({
 
             <div className="space-y-1.5 text-xs">
               <label className="block text-zinc-500 font-medium">{tx('Full Name *', '收件人姓名 *')}</label>
-              <input id="checkout-name" name="name" autoComplete="name" type="text" required value={fullName} onChange={e => setFullName(e.target.value)} placeholder={tx('Full name', '收件人姓名')}
+              <input id="checkout-name" name="name" autoComplete="name" type="text" required maxLength={35} value={fullName} onChange={e => setFullName(e.target.value)} placeholder={tx('Full name', '收件人姓名')}
                 className="w-full text-sm bg-pink-50/10 border border-pink-100 rounded-xl px-3 py-2.5 text-zinc-700 focus:outline-none focus:border-pink-300" />
             </div>
 
@@ -479,9 +499,24 @@ export default function CheckoutPage({
             </div>
 
             <div className="space-y-1.5 text-xs">
-              <label className="block text-zinc-500 font-medium">{tx('Delivery Address *', '收件详细地址 *')}</label>
-              <textarea id="checkout-address" name="street-address" autoComplete="street-address" required rows={2} value={address} onChange={e => setAddress(e.target.value)} placeholder={tx('Unit, street, area and city', '门牌、街道、地区与城市')}
-                className="w-full text-sm bg-pink-50/10 border border-pink-100 rounded-xl px-3 py-2 text-zinc-700 focus:outline-none focus:border-pink-300 resize-none" />
+              <label className="block text-zinc-500 font-medium">{tx('Address line 1 *', '地址第 1 行 *')}</label>
+              <input id="checkout-address" name="address-line1" autoComplete="address-line1" required maxLength={35} value={address1} onChange={e => setAddress1(e.target.value)} placeholder={tx('Unit / house number and street', '门牌、楼层及街道')}
+                className="w-full text-sm bg-pink-50/10 border border-pink-100 rounded-xl px-3 py-2.5 text-zinc-700 focus:outline-none focus:border-pink-300" />
+            </div>
+            <div className="space-y-1.5 text-xs">
+              <label className="block text-zinc-500 font-medium">{tx('Address line 2 (optional)', '地址第 2 行（选填）')}</label>
+              <input id="checkout-address2" name="address-line2" autoComplete="address-line2" maxLength={35} value={address2} onChange={e => setAddress2(e.target.value)} placeholder={tx('Building or neighbourhood', '大厦或住宅区')}
+                className="w-full text-sm bg-pink-50/10 border border-pink-100 rounded-xl px-3 py-2.5 text-zinc-700 focus:outline-none focus:border-pink-300" />
+            </div>
+            <div className="space-y-1.5 text-xs">
+              <label className="block text-zinc-500 font-medium">{tx('Address line 3 (optional)', '地址第 3 行（选填）')}</label>
+              <input id="checkout-address3" maxLength={35} value={address3} onChange={e => setAddress3(e.target.value)} placeholder={tx('Additional address details', '其他地址补充')}
+                className="w-full text-sm bg-pink-50/10 border border-pink-100 rounded-xl px-3 py-2.5 text-zinc-700 focus:outline-none focus:border-pink-300" />
+            </div>
+            <div className="space-y-1.5 text-xs">
+              <label className="block text-zinc-500 font-medium">{tx('City *', '城市 *')}</label>
+              <input id="checkout-city" name="address-level2" autoComplete="address-level2" required maxLength={35} value={city} onChange={e => setCity(e.target.value)} placeholder={tx('City / town', '城市 / 城镇')}
+                className="w-full text-sm bg-pink-50/10 border border-pink-100 rounded-xl px-3 py-2.5 text-zinc-700 focus:outline-none focus:border-pink-300" />
             </div>
 
             <div className="grid grid-cols-2 gap-3">

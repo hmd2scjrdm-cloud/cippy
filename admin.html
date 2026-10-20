@@ -375,6 +375,7 @@
         <div><label class="adm-label">电话 *</label><input id="epPhone" class="adm-input"/></div>
         <div class="sm:col-span-2"><label class="adm-label">地址第 1 行 * <span class="font-normal text-stone-400">最多 35 字符</span></label><input id="epAddress1" maxlength="35" class="adm-input"/></div>
         <div class="sm:col-span-2"><label class="adm-label">地址第 2 行</label><input id="epAddress2" maxlength="35" class="adm-input"/></div>
+        <div class="sm:col-span-2"><label class="adm-label">地址第 3 行</label><input id="epAddress3" maxlength="35" class="adm-input"/></div>
         <div><label class="adm-label">城市 *</label><input id="epCity" maxlength="35" class="adm-input"/></div>
         <div><label class="adm-label">州属 *</label><select id="epState" class="adm-input">
           <option value="">选择州属</option><option>Johor</option><option>Kedah</option><option>Kelantan</option><option>Melaka</option>
@@ -1379,6 +1380,10 @@ async function saveEditOrder() {
   if (!Number.isFinite(shipping) || shipping < 0) { err.textContent = '运费必须是 0 或以上的数字'; err.classList.remove('hidden'); return; }
   const email = document.getElementById('eoEmail').value.trim();
   const customer = { ...(o.customer || {}), name: document.getElementById('eoName').value.trim(), phone: document.getElementById('eoPhone').value.trim(), email, address: document.getElementById('eoAddress').value.trim() };
+  if (customer.address !== o.customer?.address) {
+    delete customer.address1; delete customer.address2; delete customer.address3;
+    delete customer.city; delete customer.state; delete customer.postcode;
+  }
   const subtotal = Number(o.totals?.subtotal || 0);
   const totals = { ...(o.totals || {}), subtotal, shipping, total: orderTotal(subtotal, shipping, o.totals?.discount) };
   const btn = document.getElementById('eoSaveBtn'); btn.disabled = true; btn.textContent = '保存中…';
@@ -2138,6 +2143,7 @@ function easyParcelPayload(action) {
       email: document.getElementById('epEmail').value.trim(),
       address1: document.getElementById('epAddress1').value.trim(),
       address2: document.getElementById('epAddress2').value.trim(),
+      address3: document.getElementById('epAddress3').value.trim(),
       city: document.getElementById('epCity').value.trim(),
       state: document.getElementById('epState').value,
       postcode: document.getElementById('epPostcode').value.trim(),
@@ -2163,7 +2169,10 @@ function openEasyParcel(id) {
   easyParcelOrderId = id;
   easyParcelRates = [];
   const c = o.customer || {};
-  const parsed = parseShippingAddress(c.address);
+  const parsed = c.address1 && c.city ? {
+    address1: c.address1, address2: c.address2 || '', address3: c.address3 || '',
+    city: c.city, state: c.state || '', postcode: c.postcode || '',
+  } : parseShippingAddress(c.address);
   document.getElementById('epOrderId').textContent = o.order_id || '';
   document.getElementById('epMode').textContent = '等待连接';
   document.getElementById('epName').value = c.name || '';
@@ -2171,6 +2180,7 @@ function openEasyParcel(id) {
   document.getElementById('epEmail').value = c.email || o.guest_email || '';
   document.getElementById('epAddress1').value = parsed.address1;
   document.getElementById('epAddress2').value = parsed.address2;
+  document.getElementById('epAddress3').value = parsed.address3 || '';
   document.getElementById('epCity').value = parsed.city;
   document.getElementById('epState').value = parsed.state;
   document.getElementById('epPostcode').value = parsed.postcode;
