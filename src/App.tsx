@@ -15,7 +15,7 @@ import { Bilingual } from './components/Bilingual';
 import { supabase } from './lib/supabase';
 import { opt, optAll } from './lib/optimizeImage';
 import { loadSiteConfig } from './lib/siteConfig';
-import { loadSiteContent, useSiteContent, homeText, homeImage } from './lib/siteContent';
+import { loadSiteContent, useSiteContent, homeImage } from './lib/siteContent';
 import { applyContentOverrides } from './lib/contentWalk';
 import { signInWithGoogleGmail, sendGmailMessage, logoutGmail, getGmailToken, getGmailEmail } from './lib/gmailService';
 import { containsChinese, specLabel } from './lib/productLocalization';
@@ -875,7 +875,6 @@ export default function App() {
   const siteContent = useSiteContent();
   const policies = React.useMemo(() => applyContentOverrides(POLICIES, 'policy', siteContent), [siteContent]);
   const faqs = React.useMemo(() => applyContentOverrides(FAQS, 'faq', siteContent), [siteContent]);
-  const hc = (id: string) => homeText(id, lang === 'zh' ? 'zh' : 'en', siteContent);
   const [isCartAnimating, setIsCartAnimating] = useState(false);
   
   // Category filter state
@@ -1544,9 +1543,6 @@ export default function App() {
   });
 
   const featuredProduct = dbProducts.find(p => p.id === 'e59bbfe1-abfa-439f-b433-88eb20d9d011');
-  const homePreviewProducts = featuredProduct
-    ? [featuredProduct, ...dbProducts.filter(p => p.id !== featuredProduct.id)].slice(0, 4)
-    : dbProducts.slice(0, 4);
 
   // Sort products dynamically based on selected criteria
   const sortedProducts = [...filteredProducts].sort((a, b) => {
@@ -2251,7 +2247,7 @@ export default function App() {
           
           {/* RTW Edition Tab */}
           {activeTab === 'rtw' && (
-            <div className="space-y-16 animate-fade-in">
+            <div className="space-y-8 animate-fade-in">
               
               {/* Editorial Section matching screenshot exactly */}
               {isYunseo ? (
@@ -2678,119 +2674,25 @@ export default function App() {
                   </div>
                 </div>
               ) : isChaewon ? (
-                <div className="grid grid-cols-1 lg:grid-cols-12 border border-[#FBEBF0] rounded-[24px] overflow-hidden bg-white shadow-xs">
-                  {/* Left Column: Chapter 01, Large Pink Box with Calligraphy, and the Narrative block */}
-                  <div className="lg:col-span-7 p-4 sm:p-6 md:p-8 lg:p-10 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-[#FBEBF0] space-y-4 lg:space-y-8">
-                    <div className="space-y-4">
-                      <span className="text-[10px] uppercase font-mono text-zinc-400 font-semibold tracking-[0.25em] block">
-                        {hc('hero.chapter')}
-                      </span>
-                      
-                      {/* Large custom image container with model photo matching mockup exactly */}
-                      <div className="relative bg-[#FFF0F2]/70 rounded-2xl h-[260px] sm:h-[340px] lg:h-[400px] w-full flex items-center justify-center overflow-hidden border border-[#FCE3E6] group">
-                        <img
-                          src={opt(homeImage('hero.image', siteContent))}
-                          alt="Chaewon Campaign"
-                          className="absolute inset-0 h-full w-full object-cover group-hover:scale-[1.03] transition-transform duration-[6000ms] ease-out"
-                          referrerPolicy="no-referrer"
-                        />
-                        {/* Elegant thin dashed border inside the box */}
-                        <div className="absolute inset-4 border border-dashed border-white/60 rounded-xl pointer-events-none" />
-                        
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/10" />
-                        
-                        {/* White Stylized Text in Bottom Left */}
-                        <div className="absolute bottom-6 left-6 text-white font-serif text-5xl font-bold tracking-widest select-none opacity-95 drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)]">
-                          {hc('hero.badge')}
-                        </div>
-                        
-                        <div className="absolute top-6 right-6 bg-white/90 backdrop-blur-xs text-[#3F2B2B] font-sans font-bold text-[9px] tracking-[0.25em] px-2.5 py-1 uppercase rounded-sm">
-                          Cippy Atelier
-                        </div>
-                      </div>
+                <div className="relative h-[400px] sm:h-[370px] lg:h-[380px] overflow-hidden bg-[#F8F1F2]">
+                    <img
+                      src={siteContent['home.hero.featuredImage.url'] || featuredProduct?.images?.[0] || featuredProduct?.imageUrl || opt(homeImage('hero.image', siteContent))}
+                      alt={featuredProduct ? (lang === 'zh' ? featuredProduct.cnName : featuredProduct.name) : 'Cippy collection'}
+                      className="absolute inset-0 w-full h-full object-cover object-center"
+                      fetchPriority="high"
+                      referrerPolicy="no-referrer"
+                    />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
+                  <div className="absolute inset-x-0 bottom-0 px-5 pb-7 sm:px-10 sm:pb-10 lg:px-14 lg:pb-12 text-white">
+                    <p className="text-[11px] font-semibold uppercase tracking-widest text-white/85">{lang === 'zh' ? 'Cippy 本周首推' : 'Featured this week'}</p>
+                    <h1 className="mt-2 max-w-2xl font-serif text-2xl sm:text-4xl lg:text-5xl leading-tight text-white">
+                      {featuredProduct ? (lang === 'zh' ? '修身收腰螺纹 T 恤' : 'Waist-Fit Ribbed Tee') : (lang === 'zh' ? '适合日常的韩系女装' : 'Korean style for everyday')}
+                    </h1>
+                    {featuredProduct && <p className="mt-3 text-base font-medium">RM {featuredProduct.price.toFixed(2)}</p>}
+                    <div className="mt-5 flex flex-wrap gap-3">
+                      {featuredProduct && <button type="button" onClick={() => setSelectedProduct(featuredProduct)} className="bg-white px-6 py-3 text-xs font-semibold text-[#3F2B2B] transition-colors hover:bg-[#F8F1F2] cursor-pointer">{lang === 'zh' ? '查看商品' : 'View product'}</button>}
+                      <button type="button" onClick={() => document.getElementById('garments-section')?.scrollIntoView({ behavior: 'smooth' })} className="border border-white/80 px-6 py-3 text-xs font-semibold text-white transition-colors hover:bg-white/10 cursor-pointer">{lang === 'zh' ? '浏览全部' : 'Browse all'}</button>
                     </div>
-
-                    {/* Lower narrative block: brand positioning — A Storybook Wardrobe */}
-                    <div className="bg-[#FFFDFD] border border-[#FBEBF0] rounded-2xl p-4 lg:p-6 space-y-2">
-                      <h3 className="text-2xl md:text-3xl font-serif text-[#3F2B2B] leading-tight font-semibold">
-                        {homeText('hero.storyTitle', 'en', siteContent)}
-                      </h3>
-                      <span className="text-xs font-serif text-[#B96A73] font-medium block">{homeText('hero.storyTitle', 'zh', siteContent)}</span>
-                      <p className="text-xs md:text-[13px] text-zinc-500 font-sans leading-relaxed italic pt-1">
-                        {hc('hero.storyTagline')}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Right Column: Fit Profile, description, CTAs and hot releases preview */}
-                  <div className="lg:col-span-5 p-4 sm:p-6 md:p-8 lg:p-10 flex flex-col justify-between gap-6 lg:gap-8">
-                    
-                    {/* Fit Profile block (below the product preview on mobile so prices show in the first screen) */}
-                    <div className="space-y-4 order-3 lg:order-1">
-                      <span className="text-xs font-bold text-[#B96A73] tracking-[0.25em] font-sans uppercase block">
-                        {hc('hero.fitLabel')}
-                      </span>
-                      <h2 className="font-serif text-3xl md:text-4xl font-semibold italic text-[#3F2B2B] tracking-tight leading-tight">
-                        {hc('hero.fitTitle')}
-                      </h2>
-                      <p className="text-xs md:text-[13px] text-zinc-500 font-sans leading-relaxed">
-                        {hc('hero.fitBody')}
-                      </p>
-
-                      {/* Action buttons matching mockup styling */}
-                      <div className="flex flex-wrap gap-3 pt-2">
-                        <button
-                          onClick={() => {
-                            document.getElementById('garments-section')?.scrollIntoView({ behavior: 'smooth' });
-                          }}
-                          className="bg-[#3F2B2B] hover:bg-[#2F1F1F] text-white px-8 py-3 rounded-lg font-sans tracking-[0.2em] text-[11px] font-bold uppercase transition-all duration-300 cursor-pointer shadow-sm"
-                        >
-                          {hc('hero.shopButton')}
-                        </button>
-                        <button
-                          onClick={() => {
-                            setActiveTab('journal');
-                            document.getElementById('nabi-studio-app-card')?.scrollIntoView({ behavior: 'smooth' });
-                          }}
-                          className="bg-white hover:bg-zinc-50 text-[#3F2B2B] border border-[#3F2B2B]/40 px-8 py-3 rounded-lg font-sans tracking-[0.2em] text-[11px] font-bold uppercase transition-all duration-300 cursor-pointer"
-                        >
-                          {hc('hero.lookbookButton')}
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Thin border divider */}
-                    <div className="border-t border-[#FBEBF0] w-full order-2" />
-
-                    {/* Preview product teasers — always the 4 most recently added products */}
-                    <div className="space-y-3 order-1 lg:order-3">
-                      <span className="text-[10px] tracking-[0.2em] font-mono text-zinc-400 font-bold uppercase block">
-                        {hc('hero.previewTitle')}
-                      </span>
-                      <div className="grid grid-cols-2 gap-4">
-                        {homePreviewProducts.map((p) => (
-                          <div
-                            key={p.id}
-                            onClick={() => setSelectedProduct(p)}
-                            className="group relative bg-[#FFF0F2]/40 border border-[#FBEBF0] rounded-2xl p-4 flex flex-col justify-between h-[160px] overflow-hidden hover:bg-[#FFF0F2]/60 transition-all duration-300 cursor-pointer"
-                          >
-                            <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-[#B96A73] z-10" />
-                            <div className="w-full h-1/2 rounded-lg overflow-hidden bg-[#FFF0F2]/70">
-                              {p.imageUrl && (
-                                <img loading="lazy" decoding="async" src={p.imageUrl} alt={p.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                              )}
-                            </div>
-                            <div className="space-y-0.5 pt-1">
-                              <h4 className="text-[10px] sm:text-[11px] font-sans font-bold text-zinc-700 tracking-wider uppercase group-hover:text-[#B96A73] transition-colors line-clamp-1">
-                                {lang === 'zh' ? p.cnName : p.name}
-                              </h4>
-                              <span className="text-[10px] font-mono text-[#B96A73] font-semibold">RM {p.price}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
                   </div>
                 </div>
               ) : (
@@ -2904,24 +2806,6 @@ export default function App() {
                     </div>
                   </div>
                 </div>
-              )}
-
-              {featuredProduct && (
-                <section className="mx-4 sm:mx-6 lg:mx-10 mb-10 border-y border-[#FBEBF0] py-6 sm:py-8">
-                  <div className="grid grid-cols-1 sm:grid-cols-[minmax(0,240px)_1fr] gap-5 sm:gap-8 items-center">
-                    <button type="button" onClick={() => setSelectedProduct(featuredProduct)} className="w-full aspect-[4/5] sm:aspect-square overflow-hidden bg-[#FFF0F2] cursor-pointer text-left">
-                      {featuredProduct.imageUrl && <img src={featuredProduct.imageUrl} alt={lang === 'zh' ? featuredProduct.cnName : featuredProduct.name} className="w-full h-full object-cover" loading="lazy" />}
-                    </button>
-                    <div className="min-w-0 space-y-3">
-                      <p className="text-[11px] font-semibold uppercase tracking-widest text-[#B96A73]">{lang === 'zh' ? '本周首推' : 'Featured this week'}</p>
-                      <h2 className="font-serif text-2xl sm:text-3xl text-[#3F2B2B] leading-tight">{lang === 'zh' ? featuredProduct.cnName : featuredProduct.name}</h2>
-                      <p className="text-sm text-zinc-600">RM {featuredProduct.price.toFixed(2)}</p>
-                      <button type="button" onClick={() => setSelectedProduct(featuredProduct)} className="bg-[#3F2B2B] text-white px-6 py-3 text-xs font-semibold cursor-pointer hover:bg-[#5B4242] transition-colors">
-                        {lang === 'zh' ? '查看商品' : 'View product'}
-                      </button>
-                    </div>
-                  </div>
-                </section>
               )}
 
               {/* Product catalog section */}
