@@ -2817,7 +2817,7 @@ export default function App() {
                     <h2 className="text-2xl md:text-3xl font-serif text-zinc-800 tracking-tight">
                       {lang === 'zh' ? '成衣目录' : 'Our Ready-to-Wear Catalogue'}
                     </h2>
-                    <p className="text-xs text-zinc-400 font-sans mt-0.5">
+                    <p className="text-xs text-zinc-500 font-sans mt-1 leading-relaxed">
                       {lang === 'zh'
                         ? '为马来西亚日常精选的韩系成衣。每件商品页均显示实际可选尺码。'
                         : 'Korean-inspired ready-to-wear curated for Malaysian days. Available sizes are shown on each product.'}
@@ -2830,7 +2830,7 @@ export default function App() {
                     <div className="flex flex-wrap gap-1.5 flex-1 xl:flex-initial">
                       {[
                         { id: 'all', label: 'All Garments', cnLabel: '全部成衣' },
-                        { id: 'wishlist', label: `Saves (${wishlist.length})`, cnLabel: '我的收藏 💖' },
+                        { id: 'wishlist', label: `Saves (${wishlist.length})`, cnLabel: '我的收藏' },
                         { id: 'dresses', label: 'Dresses', cnLabel: '连衣裙' },
                         { id: 'sets', label: 'Sets', cnLabel: '套装搭配' },
                         { id: 'tops', label: 'Tops', cnLabel: '上装' },
@@ -2840,7 +2840,7 @@ export default function App() {
                         <button
                           key={cat.id}
                           onClick={() => setSelectedCategory(cat.id as any)}
-                          className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold tracking-tight transition-all duration-200 cursor-pointer ${
+                          className={`px-3.5 py-1.5 rounded-xl text-xs tracking-normal transition-all duration-200 cursor-pointer ${lang === 'zh' ? 'font-serif font-medium' : 'font-sans font-medium'} ${
                             selectedCategory === cat.id
                               ? `bg-[#FFF0F2] text-[#B96A73] border border-[#FBEBF0]`
                               : `text-zinc-500 hover:text-[#B96A73] hover:bg-[#FFF0F2]/30 border border-transparent`
