@@ -1,4 +1,5 @@
 import { isAdminUser } from "../_lib/admin-auth.js";
+import { buildSalesReport } from "../_lib/sales-report.js";
 const SUPABASE_URL = "https://ilzeziznxzaxxudzhdmu.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI";
 
@@ -25,6 +26,23 @@ async function fetchRows(serviceKey, query) {
   });
   if (!r.ok) return [];
   return r.json();
+}
+
+async function fetchAllRows(serviceKey, table, select, filters = []) {
+  const rows = [];
+  for (let offset = 0; offset < 20000; offset += 1000) {
+    const params = new URLSearchParams({ select, limit: '1000', offset: String(offset), order: 'created_at.asc' });
+    if (table === 'products') params.delete('order');
+    for (const [key, value] of filters) params.append(key, value);
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${params}`, {
+      headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
+    });
+    if (!r.ok) throw new Error(`Could not read ${table}`);
+    const page = await r.json();
+    rows.push(...page);
+    if (page.length < 1000) return rows;
+  }
+  throw new Error(`Too many ${table} rows; choose a shorter date range`);
 }
 
 function serveTracker(req, res) {
@@ -96,9 +114,12 @@ async function handleCollect(req, res) {
   if (!serviceKey) return res.status(500).json({ error: "Not configured" });
 
   const body = req.body || {};
-  const eventType = body.event_type === "conversion" ? "conversion" : body.event_type === "pageview" ? "pageview" : null;
+  const eventType = ["conversion", "pageview", "product_impression", "product_view"].includes(body.event_type) ? body.event_type : null;
   if (!eventType || !body.visitor_id || !body.session_id) {
     return res.status(400).json({ error: "Invalid payload" });
+  }
+  if (eventType.startsWith("product_") && !/^product:[0-9a-f-]{36}$/i.test(String(body.path || ""))) {
+    return res.status(400).json({ error: "Invalid product" });
   }
 
   const row = {
@@ -197,6 +218,34 @@ async function handleStats(req, res) {
   });
 }
 
+async function handleReport(req, res) {
+  const token = (req.headers.authorization || '').replace('Bearer ', '');
+  const admin = await getVerifiedUser(token);
+  if (!(await isAdminUser(admin, SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY))) return res.status(403).json({ error: '无权限' });
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!serviceKey) return res.status(503).json({ error: '报表服务未配置' });
+  const from = String(req.query?.from || '');
+  const to = String(req.query?.to || '');
+  const start = Date.parse(from);
+  const end = Date.parse(to);
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start || end - start > 366 * 86400000) {
+    return res.status(400).json({ error: '请选择有效的日期范围（最多 366 天）' });
+  }
+  const dates = [['created_at', `gte.${new Date(start).toISOString()}`], ['created_at', `lt.${new Date(end).toISOString()}`]];
+  try {
+    const [products, orders, events] = await Promise.all([
+      fetchAllRows(serviceKey, 'products', 'id,sku,name,name_zh,price_myr,stock'),
+      fetchAllRows(serviceKey, 'orders', 'created_at,status,items', dates),
+      fetchAllRows(serviceKey, 'analytics_events', 'site_id,event_type,path,session_id,created_at', dates),
+    ]);
+    res.setHeader('Cache-Control', 'no-store');
+    return res.status(200).json(buildSalesReport(products, orders, events, from, to));
+  } catch (error) {
+    console.error('sales report error', error);
+    return res.status(503).json({ error: error.message || '报表生成失败' });
+  }
+}
+
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
@@ -208,6 +257,7 @@ export default async function handler(req, res) {
   if (action === "tracker" && req.method === "GET") return serveTracker(req, res);
   if (action === "collect" && req.method === "POST") return handleCollect(req, res);
   if (action === "stats" && req.method === "GET") return handleStats(req, res);
+  if (action === "report" && req.method === "GET") return handleReport(req, res);
 
   return res.status(404).json({ error: "Not found" });
 }

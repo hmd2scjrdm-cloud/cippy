@@ -5,6 +5,7 @@ import { ShoppingBag, Star, Sparkles, Check, GitCompare, Heart } from 'lucide-re
 import { motion } from 'motion/react';
 import { getPriceTier } from '../lib/priceTier';
 import { sizeLabel } from '../lib/productLocalization';
+import { trackProductImpression } from '../lib/productAnalytics';
 
 interface ProductCardProps {
   product: Product;
@@ -131,6 +132,19 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const [sizeRequiredHint, setSizeRequiredHint] = useState(false);
   const [colorRequiredHint, setColorRequiredHint] = useState(false);
   const [quickAddOpen, setQuickAddOpen] = useState(false);
+  const cardRef = React.useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    const node = cardRef.current;
+    if (!node || !('IntersectionObserver' in window)) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        trackProductImpression(product.baseProductId || product.id);
+        observer.disconnect();
+      }
+    }, { threshold: 0.5 });
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [product.id, product.baseProductId]);
   const selectedIsPreorder = isColorProduct
     ? isPreorderSelection(product.sizes, selectedColor, selectedSize)
     : Number(product.stock || 0) <= 0;
@@ -246,6 +260,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   return (
     <div
+      ref={cardRef}
       className={`flex flex-col justify-between overflow-hidden relative group h-full ${activeArchetype.cardStyle}`}
       id={`product-card-${product.id}`}
     >

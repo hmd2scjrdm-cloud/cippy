@@ -7,6 +7,7 @@ import SizeRequestBox from './SizeRequestBox';
 import { X, ShoppingBag, Heart, Check, Sparkles, Scale, BookOpen, AlertCircle, Truck, RefreshCw } from 'lucide-react';
 import { getPriceTier } from '../lib/priceTier';
 import { sizeLabel, specLabel } from '../lib/productLocalization';
+import { trackProductView } from '../lib/productAnalytics';
 
 interface ProductDetailModalProps {
   product: Product;
@@ -105,6 +106,10 @@ export default function ProductDetailModal({
     setSelectedColor(autoSelectedColor(colorOptions));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product.id]);
+
+  React.useEffect(() => {
+    if (isOpen) trackProductView(product.baseProductId || product.id);
+  }, [isOpen, product.id, product.baseProductId]);
 
   // Auto-pick the size when a color leaves only one option; clear it if it's no longer valid
   React.useEffect(() => {

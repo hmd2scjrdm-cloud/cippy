@@ -281,6 +281,13 @@
 
   <!-- Analytics Panel -->
   <div id="analyticsPanel" class="hidden pb-12 space-y-4">
+    <div class="adm-card flex flex-wrap items-end gap-3">
+      <div><label class="adm-label" for="reportFrom">报表开始日期</label><input id="reportFrom" type="date" class="adm-input"/></div>
+      <div><label class="adm-label" for="reportTo">报表结束日期</label><input id="reportTo" type="date" class="adm-input"/></div>
+      <button id="downloadSalesReportBtn" onclick="downloadSalesReport()" class="btn-brand">导出销售 · SKU · 曝光 CSV</button>
+      <p id="reportError" class="hidden w-full text-xs text-red-600" role="alert"></p>
+      <p class="w-full text-xs text-stone-500">曝光率＝看过商品卡片的会话 ÷ 网站会话；详情点击率＝详情浏览会话 ÷ 商品曝光会话。购买参考转化率＝已付款订单数 ÷ 详情浏览会话，不能视为精确订单归因。历史曝光数据无法补算。</p>
+    </div>
     <div class="flex items-center justify-between">
       <p class="text-xs text-stone-400">过去 24 小时数据 · <span id="analyticsUpdatedAt">—</span> 更新 · 每 10 秒自动刷新</p>
       <button onclick="loadAnalytics()" class="text-xs text-stone-400 hover:text-stone-600">↻ 手动刷新</button>
@@ -971,6 +978,51 @@ async function loadAnalytics() {
     : '<p class="text-xs text-stone-300">暂无转化事件</p>';
 }
 window.loadAnalytics = loadAnalytics;
+
+function reportDate(date) {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kuala_Lumpur', year: 'numeric', month: '2-digit', day: '2-digit' }).format(date);
+}
+document.getElementById('reportTo').value = reportDate(new Date());
+document.getElementById('reportFrom').value = reportDate(new Date(Date.now() - 29 * 86400000));
+
+async function downloadSalesReport() {
+  const from = document.getElementById('reportFrom').value;
+  const to = document.getElementById('reportTo').value;
+  const errorEl = document.getElementById('reportError');
+  errorEl.classList.add('hidden');
+  if (!from || !to || from > to) {
+    errorEl.textContent = '请选择有效的开始和结束日期'; errorEl.classList.remove('hidden'); return;
+  }
+  const btn = document.getElementById('downloadSalesReportBtn');
+  btn.disabled = true; btn.textContent = '生成报表中…';
+  try {
+    const end = new Date(`${to}T00:00:00+08:00`);
+    end.setUTCDate(end.getUTCDate() + 1);
+    const params = new URLSearchParams({ from: new Date(`${from}T00:00:00+08:00`).toISOString(), to: end.toISOString() });
+    const { data: { session } } = await sb.auth.getSession();
+    const response = await fetch(`/api/analytics/report?${params}`, { headers: { Authorization: `Bearer ${session?.access_token || ''}` } });
+    const report = await response.json();
+    if (!response.ok) throw new Error(report.error || '报表生成失败');
+    const quote = value => {
+      const text = String(value ?? '');
+      return `"${(/^[=+\-@\t\r]/.test(text) ? "'" : '') + text.replace(/"/g, '""')}\"`;
+    };
+    const percent = value => value == null ? '' : (value * 100).toFixed(2) + '%';
+    const headers = ['SKU', '商品名称', '商品 ID', '已付款订单数', '售出件数', '销售额 MYR', '当前售价 MYR', '当前库存', '商品曝光会话', '详情浏览会话', '网站会话', '商品曝光率', '详情点击率', '购买参考转化率', '曝光数据覆盖'];
+    const lines = [headers.map(quote).join(',')];
+    for (const row of report.rows) {
+      lines.push([row.sku, row.name, row.productId, row.orderCount, row.unitsSold, row.salesMyr.toFixed(2), row.currentPrice == null ? '' : row.currentPrice.toFixed(2), row.currentStock ?? '', row.impressions, row.detailSessions, report.siteSessions, percent(row.exposureRate), percent(row.detailRate), percent(row.orderPerDetailRate), report.trackingCoverage === 'full' ? '完整' : '仅追踪启用后'].map(quote).join(','));
+    }
+    const url = URL.createObjectURL(new Blob(['\uFEFF' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' }));
+    const link = document.createElement('a'); link.href = url; link.download = `cippy-sku-sales-${from}-to-${to}.csv`; link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch (error) {
+    errorEl.textContent = error.message; errorEl.classList.remove('hidden');
+  } finally {
+    btn.disabled = false; btn.textContent = '导出销售 · SKU · 曝光 CSV';
+  }
+}
+window.downloadSalesReport = downloadSalesReport;
 
 let allOrders = [];
 let allProducts = [];
