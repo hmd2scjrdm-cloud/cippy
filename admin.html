@@ -770,7 +770,8 @@
           <button type="button" onclick="addDetailUrl()" class="text-xs bg-[#f0e8e6] hover:bg-[#e8d8d4] text-[#C4928A] px-3 py-1 rounded whitespace-nowrap">+ 添加链接</button>
         </div>
         <p id="detailUploadStatus" class="text-xs text-stone-400 mt-1 hidden">上传中…</p>
-        <div id="detailPreviewList" class="flex flex-wrap gap-2 mt-2"></div>
+        <p class="text-xs text-stone-500 mt-2">为每张细节图写观察重点，再生成中英双语文案；可修改后随商品保存。</p>
+        <div id="detailPreviewList" class="space-y-3 mt-2"></div>
       </div>
 
       <!-- Notes -->
@@ -2516,6 +2517,7 @@ async function saveTracking(id, value) {
   const { error } = await sb.from('orders').update({ tracking_number }).eq('id', id);
   if (error) alert('保存失败：' + error.message);
   else {
+    if (!editId) document.getElementById('editId').value = productId;
     const o = allOrders.find(x => x.id === id);
     if (o) o.tracking_number = tracking_number;
   }
@@ -2850,6 +2852,7 @@ function openModal(title) {
   document.getElementById('modal').classList.remove('hidden');
   if (!document.getElementById('editId').value) {
     currentDetailImages = [];
+    currentDetailCopy = {};
     renderDetailPreviews([]);
     document.getElementById('fDetailImgs').value = '';
   }
@@ -2866,6 +2869,7 @@ function closeModal() {
   document.getElementById('variantsList').innerHTML = '';
   document.getElementById('sizeGuideRows').innerHTML = '';
   currentDetailImages = [];
+  currentDetailCopy = {};
   currentExtraImages = [];
   document.getElementById('fPairingProductId').value = '';
   document.getElementById('fPairingDiscount').value = '';
@@ -2899,6 +2903,12 @@ async function editProduct(id) {
   document.getElementById('fSeries').value = p.series || '';
   document.getElementById('fFabric').value = p.fabric || '';
   document.getElementById('fClothingType').value = p.clothing_type || '';
+  currentDetailCopy = {};
+  const { data: detailCopyRow } = await sb.from('settings').select('value').eq('key', `product_detail_${p.id}`).maybeSingle();
+  try {
+    const entries = JSON.parse(detailCopyRow?.value || '[]');
+    if (Array.isArray(entries)) entries.forEach(entry => { if (entry?.url) currentDetailCopy[entry.url] = entry; });
+  } catch (err) { console.warn('Detail copy could not be loaded', err); }
   renderDetailPreviews(p.detail_images || []);
   renderExtraPreviews(p.images || []);
   renderSizeGuide(p.size_guide || []);
@@ -2989,6 +2999,8 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
   };
 
   const editId = document.getElementById('editId').value;
+  const productId = editId || crypto.randomUUID();
+  if (!editId) payload.id = productId;
   const doSave = () => editId
     ? sb.from('products').update(payload).eq('id', editId)
     : sb.from('products').insert(payload);
@@ -3003,13 +3015,21 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
   }
 
   if (error) alert('保存失败：' + error.message);
-  else { closeModal(); loadProducts(); if (editId) notifyBackInStock([editId]); }
+  else {
+    const details = currentDetailImages.map(url => currentDetailCopy[url]).filter(Boolean);
+    const { error: copyError } = await sb.from('settings').upsert({
+      key: `product_detail_${productId}`, value: JSON.stringify(details), updated_at: new Date().toISOString()
+    }, { onConflict: 'key' });
+    if (copyError) alert('商品已保存，但细节文案保存失败：' + copyError.message);
+    else { closeModal(); loadProducts(); if (editId) notifyBackInStock([editId]); }
+  }
 
   btn.textContent = '保存商品'; btn.disabled = false;
 });
 
 // Detail images state
 let currentDetailImages = [];
+let currentDetailCopy = {};
 
 function makeSortable(el, getArr, rerender) {
   let dragIdx = null;
@@ -3026,13 +3046,62 @@ function renderDetailPreviews(urls) {
   currentDetailImages = urls || [];
   const el = document.getElementById('detailPreviewList');
   el.innerHTML = currentDetailImages.map((url, i) => `
-    <div class="relative group cursor-grab active:cursor-grabbing" draggable="true">
-      <img src="${url}" class="w-20 h-20 object-cover rounded border border-stone-200 pointer-events-none"/>
-      <button type="button" onclick="removeDetailImg(${i})" class="absolute -top-1 -right-1 w-5 h-5 bg-red-400 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">×</button>
+    <div class="border border-stone-200 rounded-lg p-3">
+      <div class="flex gap-3 items-start">
+        <img src="${esc(url)}" class="w-24 h-24 object-cover rounded border border-stone-200"/>
+        <div class="flex-1 min-w-0">
+          <div class="flex justify-between items-center mb-2"><strong class="text-sm">细节图 ${i + 1}</strong><div class="flex gap-2"><button type="button" onclick="moveDetailImg(${i}, -1)" aria-label="上移" class="text-xs border px-2 py-1">↑</button><button type="button" onclick="moveDetailImg(${i}, 1)" aria-label="下移" class="text-xs border px-2 py-1">↓</button><button type="button" onclick="removeDetailImg(${i})" class="text-xs text-red-700">删除</button></div></div>
+          <textarea data-detail-field="note" data-detail-index="${i}" rows="2" placeholder="这张图想让顾客注意什么？可用中文或英文。" class="w-full border border-stone-200 rounded p-2 text-sm">${esc(currentDetailCopy[url]?.note || '')}</textarea>
+          <button type="button" onclick="generateDetailCopy(${i})" class="mt-2 text-xs bg-[#f0e8e6] text-[#8d5b55] px-3 py-2 rounded">生成中英双语文案</button>
+          <span id="detailGenerateStatus${i}" class="text-xs text-stone-500 ml-2"></span>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+        ${['zh','en'].map(lang => `<div class="space-y-2"><strong class="text-xs">${lang === 'zh' ? '中文' : 'English'}</strong>
+          <input data-detail-field="${lang}.label" data-detail-index="${i}" placeholder="${lang === 'zh' ? '小标题' : 'Small label'}" value="${esc(currentDetailCopy[url]?.[lang]?.label || '')}" class="w-full border border-stone-200 rounded p-2 text-sm"/>
+          <input data-detail-field="${lang}.headline" data-detail-index="${i}" placeholder="${lang === 'zh' ? '标题' : 'Headline'}" value="${esc(currentDetailCopy[url]?.[lang]?.headline || '')}" class="w-full border border-stone-200 rounded p-2 text-sm"/>
+          <textarea data-detail-field="${lang}.explanation" data-detail-index="${i}" rows="3" placeholder="${lang === 'zh' ? '说明' : 'Explanation'}" class="w-full border border-stone-200 rounded p-2 text-sm">${esc(currentDetailCopy[url]?.[lang]?.explanation || '')}</textarea>
+          <textarea data-detail-field="${lang}.points" data-detail-index="${i}" rows="2" placeholder="${lang === 'zh' ? '重点（每行一项）' : 'Key points (one per line)'}" class="w-full border border-stone-200 rounded p-2 text-sm">${esc(currentDetailCopy[url]?.[lang]?.points || '')}</textarea>
+        </div>`).join('')}
+      </div>
     </div>
   `).join('');
-  makeSortable(el, () => currentDetailImages, renderDetailPreviews);
 }
+
+document.getElementById('detailPreviewList').addEventListener('input', e => {
+  const field = e.target.dataset.detailField;
+  const url = currentDetailImages[Number(e.target.dataset.detailIndex)];
+  if (!field || !url) return;
+  const entry = currentDetailCopy[url] ||= { url, note: '', zh: {}, en: {} };
+  const parts = field.split('.');
+  if (parts.length === 1) entry[field] = e.target.value;
+  else (entry[parts[0]] ||= {})[parts[1]] = e.target.value;
+});
+
+function moveDetailImg(index, offset) {
+  const target = index + offset;
+  if (target < 0 || target >= currentDetailImages.length) return;
+  [currentDetailImages[index], currentDetailImages[target]] = [currentDetailImages[target], currentDetailImages[index]];
+  renderDetailPreviews(currentDetailImages);
+}
+window.moveDetailImg = moveDetailImg;
+
+async function generateDetailCopy(index) {
+  const url = currentDetailImages[index];
+  const note = currentDetailCopy[url]?.note?.trim();
+  const status = document.getElementById(`detailGenerateStatus${index}`);
+  if (!note) { status.textContent = '请先写这张图的观察重点'; return; }
+  status.textContent = '生成中…';
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    const response = await fetch('/api/generate-detail-copy', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` }, body: JSON.stringify({ imageUrl: url, note }) });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || '生成失败');
+    currentDetailCopy[url] = { ...currentDetailCopy[url], url, note, zh: data.zh, en: data.en };
+    renderDetailPreviews(currentDetailImages);
+  } catch (err) { status.textContent = err.message || '生成失败'; }
+}
+window.generateDetailCopy = generateDetailCopy;
 
 function removeDetailImg(i) {
   currentDetailImages.splice(i, 1);

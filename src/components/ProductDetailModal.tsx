@@ -8,6 +8,10 @@ import { X, ShoppingBag, Heart, Check, Sparkles, Scale, BookOpen, AlertCircle, T
 import { getPriceTier } from '../lib/priceTier';
 import { sizeLabel, specLabel } from '../lib/productLocalization';
 import { trackProductView } from '../lib/productAnalytics';
+import { supabase } from '../lib/supabase';
+import { opt } from '../lib/optimizeImage';
+
+type DetailCopy = { url: string; zh?: { label?: string; headline?: string; explanation?: string; points?: string }; en?: { label?: string; headline?: string; explanation?: string; points?: string } };
 
 interface ProductDetailModalProps {
   product: Product;
@@ -86,6 +90,7 @@ export default function ProductDetailModal({
   const availableSizes = getSizesForColor(product.sizes, selectedColor);
   const [selectedSize, setSelectedSize] = useState<'S' | 'M' | null>(availableSizes.length === 1 ? availableSizes[0] : null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [detailCopy, setDetailCopy] = useState<DetailCopy[]>([]);
   const [addedToCart, setAddedToCart] = useState(false);
   const [selectionRequiredHint, setSelectionRequiredHint] = useState<string | null>(null);
   const selectedIsPreorder = isColorProduct
@@ -109,6 +114,21 @@ export default function ProductDetailModal({
 
   React.useEffect(() => {
     if (isOpen) trackProductView(product.baseProductId || product.id);
+  }, [isOpen, product.id, product.baseProductId]);
+
+  React.useEffect(() => {
+    if (!isOpen) return;
+    let active = true;
+    setDetailCopy([]);
+    supabase.from('settings').select('value').eq('key', `product_detail_${product.baseProductId || product.id}`).maybeSingle()
+      .then(({ data }) => {
+        if (!active) return;
+        try {
+          const parsed = JSON.parse(data?.value || '[]');
+          setDetailCopy(Array.isArray(parsed) ? parsed.filter((entry: DetailCopy) => entry?.url) : []);
+        } catch { setDetailCopy([]); }
+      });
+    return () => { active = false; };
   }, [isOpen, product.id, product.baseProductId]);
 
   // Auto-pick the size when a color leaves only one option; clear it if it's no longer valid
@@ -416,6 +436,22 @@ export default function ProductDetailModal({
                 {tx('Ask about sizing on WhatsApp', '通过 WhatsApp 询问尺码')}
               </a>
             </details>
+
+            {detailCopy.filter(entry => entry.zh?.headline && entry.en?.headline).length > 0 && (
+              <section className="space-y-5 border-t border-pink-100 pt-5">
+                <h3 className="text-base font-semibold text-zinc-800">{tx('The details', '细节看这里')}</h3>
+                {detailCopy.filter(entry => entry.zh?.headline && entry.en?.headline).map((entry, index) => {
+                  const copy = lang === 'zh' ? entry.zh! : entry.en!;
+                  return <div key={`${entry.url}-${index}`} className="space-y-2">
+                    <img src={opt(entry.url)} alt={copy.headline || tx('Product detail', '商品细节')} loading="lazy" className="w-full object-cover" />
+                    {copy.label && <p className="text-[10px] font-semibold uppercase text-[#B96A73]">{copy.label}</p>}
+                    <h4 className="text-sm font-semibold text-zinc-800">{copy.headline}</h4>
+                    {copy.explanation && <p className="text-xs leading-relaxed text-zinc-600">{copy.explanation}</p>}
+                    {copy.points && <ul className="list-disc pl-4 text-xs leading-relaxed text-zinc-600">{copy.points.split('\n').filter(Boolean).map((point, pointIndex) => <li key={pointIndex}>{point}</li>)}</ul>}
+                  </div>;
+                })}
+              </section>
+            )}
 
             {/* Interactive Sizing Fairy Calculator */}
             <div className="bg-[#FFFDFC] rounded-xl p-4 border border-pink-100/50 space-y-3 shadow-xs">
