@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { downloadAwb } from './easyparcel.js';
+import { downloadAwb } from '../api/easyparcel.js';
 
 function response() {
   return {

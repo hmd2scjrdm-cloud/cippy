@@ -1,21 +1,7 @@
 import { GoogleGenAI } from '@google/genai';
-import { isAdminUser } from './_lib/admin-auth.js';
 
-const SUPABASE_URL = 'https://ilzeziznxzaxxudzhdmu.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI';
-
-export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  const token = (req.headers.authorization || '').replace(/^Bearer /, '');
-  if (!token) return res.status(403).json({ error: '无权限' });
-  const userResponse = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
-    headers: { apikey: process.env.VITE_SUPABASE_ANON_KEY || SUPABASE_ANON_KEY, Authorization: `Bearer ${token}` }
-  });
-  const user = userResponse.ok ? await userResponse.json() : null;
-  if (!(await isAdminUser(user, SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY))) return res.status(403).json({ error: '无权限' });
+export async function generateDetailCopy({ imageUrl, note }, res) {
   if (!process.env.GEMINI_API_KEY) return res.status(503).json({ error: '请先在 Vercel 设置 GEMINI_API_KEY' });
-
-  const { imageUrl, note } = req.body || {};
   if (typeof note !== 'string' || !note.trim() || note.length > 1000) return res.status(400).json({ error: '请填写简短的观察重点' });
   let url;
   try { url = new URL(imageUrl); } catch { return res.status(400).json({ error: '图片链接无效' }); }
