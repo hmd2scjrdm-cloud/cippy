@@ -24,6 +24,25 @@ test('AWB download rejects links outside EasyParcel', async () => {
   assert.equal(res.code, 400);
 });
 
+test('AWB download accepts other EasyParcel subdomains', async () => {
+  const previousFetch = globalThis.fetch;
+  globalThis.fetch = async url => {
+    assert.equal(url.hostname, 'app.easyparcel.my');
+    return new Response(Buffer.from('%PDF-1.7\nexample'), { status: 200 });
+  };
+  try {
+    const res = response();
+    await downloadAwb({ order_id: '10040', customer: { easyparcel: { awb: '123', awb_label_url: 'https://app.easyparcel.my/label.pdf' } } }, res);
+    assert.equal(res.code, 200);
+  } finally { globalThis.fetch = previousFetch; }
+});
+
+test('AWB download rejects lookalike domains', async () => {
+  const res = response();
+  await downloadAwb({ customer: { easyparcel: { awb: '123', awb_label_url: 'https://connect.easyparcel.my.evil.example/label.pdf' } } }, res);
+  assert.equal(res.code, 400);
+});
+
 test('AWB download returns an attachment for a valid PDF', async () => {
   const previousFetch = globalThis.fetch;
   globalThis.fetch = async (url, options) => {

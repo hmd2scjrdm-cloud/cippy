@@ -84,7 +84,8 @@ export async function downloadAwb(order, res) {
   if (!shipment?.awb || !shipment?.awb_label_url) return res.status(404).json({ error: "这张订单还没有可下载的 EasyParcel AWB" });
   let labelUrl;
   try { labelUrl = new URL(shipment.awb_label_url); } catch { return res.status(400).json({ error: "运单链接无效" }); }
-  if (!['connect.easyparcel.my', 'demo.connect.easyparcel.my'].includes(labelUrl.hostname) || !['http:', 'https:'].includes(labelUrl.protocol)) {
+  const easyParcelHost = /^(?:[a-z0-9-]+\.)*easyparcel\.(?:my|com)$/i.test(labelUrl.hostname);
+  if (!easyParcelHost || !['http:', 'https:'].includes(labelUrl.protocol) || labelUrl.username || labelUrl.password) {
     return res.status(400).json({ error: "不是 EasyParcel 运单链接" });
   }
   labelUrl.protocol = 'https:';
