@@ -526,6 +526,13 @@
     </div>
     <p class="text-xs text-stone-400 -mt-2">用于线下 / WhatsApp / 现金等非网站下单的订单，提交后会自动扣减对应商品库存（选了颜色/尺码的会精确扣该变体的库存）。</p>
 
+    <div class="rounded-lg border border-stone-200 bg-stone-50 p-3 space-y-2">
+      <label for="aoPaste" class="block text-xs font-semibold text-stone-600">粘贴顾客收件资料 / 订单文字</label>
+      <textarea id="aoPaste" rows="5" maxlength="5000" placeholder="收件人：Amy Tan&#10;电话：012-3456789&#10;地址：No. 12 Jalan Mawar, 43000 Kajang, Selangor&#10;商品：SKU-001 x2 / Pink / M" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4928A]"></textarea>
+      <div class="flex items-center gap-3"><button type="button" onclick="fillOrderFromText()" class="bg-white border border-[#C4928A] text-[#8d5b55] rounded-lg px-3 py-2 text-xs font-semibold">识别并填入</button><span class="text-xs text-stone-500">仅填表，不会建立订单或寄邮件</span></div>
+      <p id="aoImportResult" role="status" class="hidden text-xs text-stone-600 whitespace-pre-line"></p>
+    </div>
+
     <div class="grid grid-cols-2 gap-3">
       <div class="col-span-2">
         <label class="block text-xs font-semibold text-stone-500 mb-1">顾客姓名 *</label>
@@ -543,6 +550,9 @@
         <label class="block text-xs font-semibold text-stone-500 mb-1">收货地址</label>
         <textarea id="aoAddress" rows="2" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4928A]"></textarea>
       </div>
+      <div><label class="block text-xs font-semibold text-stone-500 mb-1">城市</label><input id="aoCity" type="text" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4928A]"/></div>
+      <div><label class="block text-xs font-semibold text-stone-500 mb-1">邮政编码</label><input id="aoPostcode" type="text" inputmode="numeric" maxlength="5" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4928A]"/></div>
+      <div class="col-span-2"><label class="block text-xs font-semibold text-stone-500 mb-1">州属</label><select id="aoState" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4928A]"><option value="">选择州属</option><option>Johor</option><option>Kedah</option><option>Kelantan</option><option>Melaka</option><option>Negeri Sembilan</option><option>Pahang</option><option>Perak</option><option>Perlis</option><option>Penang</option><option>Sabah</option><option>Sarawak</option><option>Selangor</option><option>Terengganu</option><option>Kuala Lumpur</option><option>Putrajaya</option><option>Labuan</option></select></div>
     </div>
 
     <div>
@@ -853,6 +863,7 @@
   </div>
 </div>
 
+<script src="/admin-order-import.js"></script>
 <script>
 const SUPABASE_URL = 'https://ilzeziznxzaxxudzhdmu.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI';
@@ -1792,10 +1803,15 @@ window.eiPick = eiPick; window.eiSet = eiSet; window.eiAddRow = eiAddRow; window
 let aoItemRowId = 0;
 
 function openAddOrderModal() {
+  document.getElementById('aoPaste').value = '';
+  document.getElementById('aoImportResult').classList.add('hidden');
   document.getElementById('aoName').value = '';
   document.getElementById('aoPhone').value = '';
   document.getElementById('aoEmail').value = '';
   document.getElementById('aoAddress').value = '';
+  document.getElementById('aoCity').value = '';
+  document.getElementById('aoState').value = '';
+  document.getElementById('aoPostcode').value = '';
   document.getElementById('aoShipping').value = '0';
   document.getElementById('aoDiscount').value = '0';
   document.getElementById('aoDate').value = localDateStr(new Date());
@@ -1814,6 +1830,55 @@ function closeAddOrderModal() {
   document.getElementById('addOrderModal').classList.add('hidden');
 }
 window.closeAddOrderModal = closeAddOrderModal;
+
+function fillOrderFromText() {
+  const input = document.getElementById('aoPaste').value.trim();
+  const resultEl = document.getElementById('aoImportResult');
+  if (!input) { resultEl.textContent = '请先粘贴顾客提供的文字'; resultEl.classList.remove('hidden'); return; }
+  const parsed = parseCippyOrderText(input);
+  for (const fieldId of ['aoName', 'aoPhone', 'aoEmail', 'aoAddress', 'aoCity', 'aoState', 'aoPostcode']) document.getElementById(fieldId).value = '';
+  for (const [key, fieldId] of Object.entries({ name: 'aoName', phone: 'aoPhone', email: 'aoEmail', address: 'aoAddress', city: 'aoCity', state: 'aoState', postcode: 'aoPostcode' })) {
+    if (parsed[key]) document.getElementById(fieldId).value = parsed[key];
+  }
+  const notices = [...parsed.warnings];
+  if (parsed.items.length) {
+    document.getElementById('aoItemsList').innerHTML = '';
+    parsed.items.forEach(item => {
+      addOrderItemRow();
+      const row = document.getElementById('aoItemsList').lastElementChild;
+      const id = row.id.replace('aoRow_', '');
+      const select = row.querySelector('select');
+      const query = item.query.toLowerCase().replace(/\s+/g, ' ').trim();
+      const product = allProducts.find(p => [p.sku, p.name, p.name_zh].some(value => String(value || '').toLowerCase().replace(/\s+/g, ' ').trim() === query));
+      if (!product) {
+        document.getElementById(`aoRowName_${id}`).value = item.query;
+        notices.push(`商品「${item.query}」未匹配，请手动选择商品并确认价格`);
+      } else {
+        select.value = product.id;
+        onAoProductPick(id, select);
+        const colorEl = document.getElementById(`aoRowColor_${id}`);
+        const sizeEl = document.getElementById(`aoRowSize_${id}`);
+        if (item.color && !document.getElementById(`aoRowVariant_${id}`).classList.contains('hidden')) {
+          const option = [...colorEl.options].find(option => option.value.toLowerCase() === item.color.toLowerCase());
+          if (option) { colorEl.value = option.value; onAoColorPick(id); }
+          else notices.push(`商品「${item.query}」的颜色未匹配，请手动选择`);
+        }
+        if (item.size && !document.getElementById(`aoRowVariant_${id}`).classList.contains('hidden')) {
+          const option = [...sizeEl.options].find(option => option.value.toLowerCase() === item.size.toLowerCase());
+          if (option) sizeEl.value = option.value;
+          else notices.push(`商品「${item.query}」的尺码未匹配，请手动选择`);
+        }
+      }
+      document.getElementById(`aoRowQty_${id}`).value = item.qty;
+    });
+  }
+  document.getElementById('aoStatus').value = 'pending';
+  recalcAddOrderTotals();
+  const filled = [parsed.name && '姓名', parsed.phone && '电话', parsed.email && '邮箱', parsed.address && '地址', parsed.city && '城市', parsed.state && '州属', parsed.postcode && '邮编', parsed.items.length && `${parsed.items.length} 件商品`].filter(Boolean);
+  resultEl.textContent = `已填入：${filled.join('、') || '无可识别资料'}。订单保持「待付款」，请核对商品、金额与地址后再创建。${notices.length ? '\n请检查：' + notices.join('；') : ''}`;
+  resultEl.classList.remove('hidden');
+}
+window.fillOrderFromText = fillOrderFromText;
 
 function isVariantSizes(sizes) {
   return Array.isArray(sizes) && sizes.length > 0 && typeof sizes[0] === 'object' && sizes[0] !== null && 'color' in sizes[0];
@@ -1943,6 +2008,10 @@ async function submitAddOrder() {
 
   const name = document.getElementById('aoName').value.trim();
   if (!name) { errEl.textContent = '请填写顾客姓名'; errEl.classList.remove('hidden'); return; }
+  const postcode = document.getElementById('aoPostcode').value.trim();
+  if (postcode && !/^\d{5}$/.test(postcode)) { errEl.textContent = '马来西亚邮编须为 5 位数字'; errEl.classList.remove('hidden'); return; }
+  const phone = document.getElementById('aoPhone').value.trim().replace(/[^+\d]/g, '');
+  if (phone && !/^(?:\+?60|0)\d{8,10}$/.test(phone)) { errEl.textContent = '电话号码格式不正确，请检查马来西亚号码'; errEl.classList.remove('hidden'); return; }
 
   const items = collectAoItems();
   if (!items.length) { errEl.textContent = '请至少添加一件商品'; errEl.classList.remove('hidden'); return; }
@@ -1963,9 +2032,12 @@ async function submitAddOrder() {
       body: JSON.stringify({
         customer: {
           name,
-          phone: document.getElementById('aoPhone').value.trim(),
+          phone,
           email: document.getElementById('aoEmail').value.trim(),
           address: document.getElementById('aoAddress').value.trim(),
+          city: document.getElementById('aoCity').value.trim(),
+          state: document.getElementById('aoState').value,
+          postcode,
         },
         items,
         shipping,

@@ -50,6 +50,11 @@ export default async function handler(req, res) {
   // Discount is a flat RM amount taken off the order; it can never push the total below zero.
   const discountNum = Math.min(Math.max(0, Number(discount) || 0), subtotal + shippingNum);
   const email = String(customer.email || "").trim();
+  const fullAddress = String(customer.address || "").trim();
+  const postcode = String(customer.postcode || "").trim();
+  const streetAddress = postcode && fullAddress.includes(postcode)
+    ? fullAddress.split(postcode)[0].replace(/[,\s]+$/, "").trim()
+    : fullAddress;
 
   // Optional back-dated order (manual entry of an earlier sale): not in the future, not older than 5 years.
   let createdIso = null;
@@ -69,7 +74,14 @@ export default async function handler(req, res) {
       name: String(customer.name || "").trim(),
       phone: String(customer.phone || "").trim(),
       email,
-      address: String(customer.address || "").trim(),
+      address: fullAddress,
+      ...(streetAddress && customer.city && customer.state && /^\d{5}$/.test(postcode) ? {
+        address1: streetAddress.slice(0, 35),
+        address2: streetAddress.slice(35, 70),
+        city: String(customer.city).trim().slice(0, 35),
+        state: String(customer.state).trim().slice(0, 35),
+        postcode,
+      } : {}),
     },
     guest_email: email || null,
     items: cleanItems,
