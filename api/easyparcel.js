@@ -79,6 +79,30 @@ function rateRows(data) {
   })).filter(rate => rate.serviceId && rate.courier && rate.price > 0).sort((a, b) => a.price - b.price);
 }
 
+export async function downloadAwb(order, res) {
+  const shipment = order.customer?.easyparcel;
+  if (!shipment?.awb || !shipment?.awb_label_url) return res.status(404).json({ error: "这张订单还没有可下载的 EasyParcel AWB" });
+  let labelUrl;
+  try { labelUrl = new URL(shipment.awb_label_url); } catch { return res.status(400).json({ error: "运单链接无效" }); }
+  if (!['connect.easyparcel.my', 'demo.connect.easyparcel.my'].includes(labelUrl.hostname) || !['http:', 'https:'].includes(labelUrl.protocol)) {
+    return res.status(400).json({ error: "不是 EasyParcel 运单链接" });
+  }
+  labelUrl.protocol = 'https:';
+  const label = await fetch(labelUrl, { redirect: 'error', signal: AbortSignal.timeout(15000) });
+  if (!label.ok) return res.status(502).json({ error: "EasyParcel 暂时无法提供 AWB，请稍后重试" });
+  const declaredSize = Number(label.headers.get('content-length') || 0);
+  if (declaredSize > 10_000_000) return res.status(502).json({ error: "AWB 文件超过 10MB" });
+  const pdf = Buffer.from(await label.arrayBuffer());
+  if (pdf.length > 10_000_000 || pdf.toString('ascii', 0, 5) !== '%PDF-') {
+    return res.status(502).json({ error: "EasyParcel 返回的不是 PDF 运单" });
+  }
+  const safeOrder = clean(order.order_id || order.id, 60).replace(/[^a-zA-Z0-9_-]/g, '_');
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', `attachment; filename="cippy-awb-${safeOrder}.pdf"`);
+  res.setHeader('Cache-Control', 'private, no-store');
+  return res.status(200).send(pdf);
+}
+
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
@@ -96,6 +120,7 @@ export default async function handler(req, res) {
     const { action, orderId } = req.body || {};
     const order = await getOrder(orderId, serviceKey);
     if (!order) return res.status(404).json({ error: "找不到订单" });
+    if (action === 'download-awb') return await downloadAwb(order, res);
     const input = parcelInput(req.body || {}, order);
     const inputError = validateShipment(input);
     if (inputError) return res.status(400).json({ error: inputError });

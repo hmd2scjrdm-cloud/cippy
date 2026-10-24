@@ -2103,6 +2103,8 @@ function renderOrders() {
         </div>
       </div>
       <div class="ocard-foot">
+        <button class="text-xs text-stone-600 border border-stone-200 rounded-lg px-3 py-2 hover:bg-stone-50" onclick="downloadOrderPage('${o.id}')">下载订单单据</button>
+        ${c.easyparcel?.awb_label_url ? `<button class="text-xs text-stone-600 border border-stone-200 rounded-lg px-3 py-2 hover:bg-stone-50" onclick="downloadEasyParcelAwb('${o.id}', this)">下载 AWB PDF</button>` : ''}
         ${canShip && !c.easyparcel?.awb ? `<button class="btn-brand" onclick="openEasyParcel('${o.id}')">建立 EasyParcel 运单</button>
         <button class="text-xs text-stone-500 border border-stone-200 rounded-lg px-3 py-2 hover:bg-stone-50" onclick="updateOrderStatus('${o.id}','shipped',document.getElementById('sel_${o.id}'))">手动填写运单</button>` : ''}
         ${canShip && c.easyparcel?.awb ? `<button class="btn-brand" onclick="editTracking('${o.id}')">上传照片并确认发货</button>` : ''}
@@ -2127,7 +2129,7 @@ function renderOrders() {
           <div class="min-w-[140px]">
             <p class="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-2">运单号 · ${esc(c.easyparcel?.courier || '手动填写')}</p>
             <p id="tracking_${o.id}" class="text-sm font-mono text-stone-700">${esc(o.tracking_number || '—')}</p>
-            ${c.easyparcel?.awb_label_url ? `<a href="${esc(c.easyparcel.awb_label_url)}" target="_blank" rel="noopener" class="mt-2 inline-block text-xs text-[#C4928A] underline">下载运单 PDF</a>` : ''}
+            ${c.easyparcel?.awb_label_url ? `<button onclick="downloadEasyParcelAwb('${o.id}', this)" class="mt-2 inline-block text-xs text-[#C4928A] underline">下载运单 PDF</button>` : ''}
             ${c.easyparcel?.tracking_url ? `<a href="${esc(c.easyparcel.tracking_url)}" target="_blank" rel="noopener" class="mt-2 ml-3 inline-block text-xs text-[#C4928A] underline">查看物流</a>` : ''}
         <button onclick="event.stopPropagation();editTracking('${o.id}')" class="mt-2 text-xs text-[#C4928A] border border-[#C4928A] px-2 py-1 rounded hover:bg-[#fdf0ed]">${c.easyparcel && o.status !== 'shipped' ? '上传照片并确认发货' : '修改运单号 / 出货照片'}</button>
           </div>` : ''}
@@ -2328,6 +2330,65 @@ async function bookEasyParcel() {
   }
 }
 window.bookEasyParcel = bookEasyParcel;
+
+async function downloadEasyParcelAwb(id, button) {
+  const oldText = button.textContent;
+  button.disabled = true;
+  button.textContent = '下载中…';
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    const response = await fetch('/api/easyparcel', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
+      body: JSON.stringify({ action: 'download-awb', orderId: id }),
+    });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.error || `下载失败 (${response.status})`);
+    }
+    const order = allOrders.find(row => row.id === id);
+    const filename = `cippy-awb-${String(order?.order_id || id).replace(/[^a-zA-Z0-9_-]/g, '_')}.pdf`;
+    const url = URL.createObjectURL(await response.blob());
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  } catch (error) { alert(error.message || 'AWB 下载失败'); }
+  finally { button.disabled = false; button.textContent = oldText; }
+}
+window.downloadEasyParcelAwb = downloadEasyParcelAwb;
+
+function downloadOrderPage(id) {
+  const order = allOrders.find(row => row.id === id);
+  if (!order) { alert('找不到订单'); return; }
+  const customer = order.customer || {};
+  const money = value => `RM ${Number(value || 0).toFixed(2)}`;
+  const address = [customer.address1, customer.address2, customer.address3, customer.postcode, customer.city, customer.state]
+    .filter(Boolean).join(', ') || customer.address || '—';
+  const rows = (order.items || []).map((item, index) => {
+    const qty = Number(item.qty || 1);
+    const option = [item.size, item.color, item.variant].filter(Boolean).join(' / ');
+    return `<tr><td>${index + 1}</td><td><strong>${esc(item.name_zh || item.name || 'Item')}</strong>${option ? `<small>${esc(option)}</small>` : ''}${item.sku ? `<small>SKU: ${esc(item.sku)}</small>` : ''}</td><td>${qty}</td><td>${money(item.price_myr)}</td><td>${money(Number(item.price_myr || 0) * qty)}</td></tr>`;
+  }).join('');
+  const html = `<!doctype html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CIPPY 订单 ${esc(order.order_id || id)}</title><style>
+    @page{size:A4;margin:16mm}*{box-sizing:border-box}body{font-family:Arial,"PingFang SC","Microsoft YaHei",sans-serif;color:#2e2928;max-width:900px;margin:0 auto;padding:24px;font-size:13px;line-height:1.5}header{display:flex;justify-content:space-between;align-items:start;border-bottom:2px solid #c4928a;padding-bottom:18px}h1{font-size:25px;letter-spacing:2px;margin:0}h2{font-size:14px;margin:0 0 9px}p{margin:3px 0}.muted{color:#777}.grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:24px 0}.box{border:1px solid #ded8d5;padding:16px;min-height:110px}table{width:100%;border-collapse:collapse;margin-top:18px}th{text-align:left;background:#f7f1ef;font-weight:600}td,th{padding:10px;border-bottom:1px solid #e7e1de;vertical-align:top}td:nth-child(3),td:nth-child(4),td:nth-child(5),th:nth-child(3),th:nth-child(4),th:nth-child(5){text-align:right}small{display:block;color:#777}.totals{width:260px;margin:20px 0 0 auto}.totals p{display:flex;justify-content:space-between;padding:4px 0}.total{border-top:2px solid #c4928a;font-size:16px;font-weight:700;padding-top:10px!important}.toolbar{text-align:right;margin-bottom:16px}.toolbar button{background:#c4928a;color:white;border:0;padding:9px 14px;cursor:pointer}@media print{body{padding:0}.toolbar{display:none}}
+  </style></head><body><div class="toolbar"><button onclick="window.print()">打印 / 另存为 PDF</button></div><header><div><h1>CIPPY</h1><p class="muted">订单单据 / Order sheet</p></div><div><strong>#${esc(order.order_id || id)}</strong><p>${esc(new Date(order.created_at).toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur' }))}</p><p>状态: ${esc(STATUS_LABELS[order.status] || order.status || '—')}</p></div></header>
+  <div class="grid"><section class="box"><h2>收件人 / Recipient</h2><p>${esc(customer.name || '—')}</p><p>${esc(customer.phone || '—')}</p><p>${esc(customer.email || order.guest_email || '—')}</p><p>${esc(address)}</p></section><section class="box"><h2>配送 / Shipping</h2><p>快递: ${esc(customer.easyparcel?.courier || '—')}</p><p>运单号: ${esc(order.tracking_number || '—')}</p><p>付款方式: ${esc(order.payment_method || '—')}</p></section></div>
+  <h2>商品 / Items</h2><table><thead><tr><th>#</th><th>商品</th><th>数量</th><th>单价</th><th>金额</th></tr></thead><tbody>${rows || '<tr><td colspan="5">暂无商品资料</td></tr>'}</tbody></table><div class="totals"><p><span>小计</span><span>${money(order.totals?.subtotal)}</span></p><p><span>运费</span><span>${money(order.totals?.shipping)}</span></p>${Number(order.totals?.discount) > 0 ? `<p><span>优惠</span><span>-${money(order.totals.discount)}</span></p>` : ''}<p class="total"><span>合计</span><span>${money(order.totals?.total)}</span></p></div>
+  <p class="muted" style="margin-top:48px;border-top:1px solid #ded8d5;padding-top:12px">CIPPY · 内部订单与配货记录。此单据不会自动通知顾客。</p></body></html>`;
+  const url = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `cippy-order-${String(order.order_id || id).replace(/[^a-zA-Z0-9_-]/g, '_')}.html`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
+window.downloadOrderPage = downloadOrderPage;
 
 async function updateOrderStatus(id, status, selectEl) {
   if (status === 'shipped') {
