@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { CartItem } from '../types';
 import { supabase } from '../lib/supabase';
-import { Landmark, CreditCard, ShieldCheck, Sparkles, ArrowLeft, CheckCircle2, XCircle, BookUser, X } from 'lucide-react';
+import { Landmark, CreditCard, ShieldCheck, Sparkles, ArrowLeft, CheckCircle2, XCircle, BookUser, X, ClipboardPaste } from 'lucide-react';
 import { sizeLabel } from '../lib/productLocalization';
 import { useSiteConfig } from '../lib/siteConfig';
+import { splitStreetIntoLines } from '../lib/checkoutAddressImport';
 
 interface CheckoutPageProps {
   cartItems: CartItem[];
@@ -40,6 +41,16 @@ interface SavedAddress {
 }
 
 const ADDRESS_BOOK_KEY = 'cippy_saved_addresses';
+
+interface PastedDeliveryDetails {
+  name: string;
+  phone: string;
+  email: string;
+  street: string;
+  city: string;
+  state: string;
+  postcode: string;
+}
 
 function loadSavedAddresses(): SavedAddress[] {
   try {
@@ -79,8 +90,12 @@ export default function CheckoutPage({
   const [address2, setAddress2] = useState("");
   const [address3, setAddress3] = useState("");
   const [city, setCity] = useState("");
-  const [state, setState] = useState("Selangor");
+  const [state, setState] = useState("");
   const [postalCode, setPostalCode] = useState("");
+  const [pastedDeliveryText, setPastedDeliveryText] = useState("");
+  const [pasteResult, setPasteResult] = useState<string | null>(null);
+  const [needsAddressConfirmation, setNeedsAddressConfirmation] = useState(false);
+  const [addressConfirmed, setAddressConfirmed] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('manual');
   const [isPlacing, setIsPlacing] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -113,6 +128,40 @@ export default function CheckoutPage({
     setCity(addr.city || "");
     setState(addr.state);
     setPostalCode(addr.postalCode);
+    setNeedsAddressConfirmation(false);
+    setAddressConfirmed(false);
+  };
+
+  const fillFromPastedText = () => {
+    const parser = (window as Window & { parseCippyOrderText?: (text: string) => PastedDeliveryDetails }).parseCippyOrderText;
+    if (!pastedDeliveryText.trim() || !parser) {
+      setPasteResult(tx('Paste your delivery details first.', '请先粘贴收件资料。'));
+      return;
+    }
+    const parsed = parser(pastedDeliveryText);
+    const addressLines = splitStreetIntoLines(parsed.street);
+    if (parsed.street && !addressLines.length) {
+      setPasteResult(tx('The address is too long to split safely. Please enter it manually.', '地址太长，无法安全分成三行，请手动填写。'));
+      return;
+    }
+    const found = [parsed.name, parsed.phone, parsed.email, parsed.street, parsed.city, parsed.state, parsed.postcode].filter(Boolean).length;
+    if (!found) {
+      setPasteResult(tx('We could not recognise delivery details. Please fill in the form manually.', '未能识别收件资料，请手动填写。'));
+      return;
+    }
+    if (parsed.name) setFullName(parsed.name.slice(0, 35));
+    if (!currentUser && parsed.email) setEmail(parsed.email);
+    setPhone(parsed.phone || '');
+    setAddress1(addressLines[0] || '');
+    setAddress2(addressLines[1] || '');
+    setAddress3(addressLines[2] || '');
+    setCity(parsed.city || '');
+    setState(MALAYSIAN_STATES.includes(parsed.state) ? parsed.state : '');
+    setPostalCode(parsed.postcode || '');
+    setNeedsAddressConfirmation(true);
+    setAddressConfirmed(false);
+    setErrorMsg(null);
+    setPasteResult(tx('Details filled. Check every field below, especially your address, state and postcode.', '已填入资料。请逐项核对，特别是地址、州属和邮编。'));
   };
 
   const removeSavedAddress = (id: string) => {
@@ -190,8 +239,12 @@ export default function CheckoutPage({
   };
 
   const validateForm = () => {
-    if (!fullName.trim() || !phone.trim() || !address1.trim() || !city.trim() || !postalCode.trim()) {
+    if (!fullName.trim() || !phone.trim() || !address1.trim() || !city.trim() || !state || !postalCode.trim()) {
       setErrorMsg(tx("Please fill in all required delivery details!", "请填写所有必填的配送信息哦。"));
+      return false;
+    }
+    if (needsAddressConfirmation && !addressConfirmed) {
+      setErrorMsg(tx('Please check the auto-filled delivery details and confirm the address.', '请先核对自动填入的收件资料，并确认地址无误。'));
       return false;
     }
     if (!currentUser && !email) {
@@ -478,6 +531,24 @@ export default function CheckoutPage({
               </div>
             )}
 
+            <details className="border-b border-pink-100 pb-4 text-xs">
+              <summary className="flex cursor-pointer items-center gap-2 text-[#B96A73] font-semibold">
+                <ClipboardPaste className="h-4 w-4" />
+                {tx('Paste delivery details to fill this form', '粘贴收件资料，自动填表')}
+              </summary>
+              <div className="mt-3 space-y-2">
+                <label htmlFor="checkout-paste" className="block text-zinc-500">{tx('Your delivery details', '收件资料')}</label>
+                <textarea id="checkout-paste" rows={4} maxLength={3000} value={pastedDeliveryText} onChange={e => setPastedDeliveryText(e.target.value)}
+                  placeholder={tx('Name: Amy Tan\nPhone: 012-3456789\nAddress: No. 12 Jalan Mawar, 43000 Kajang, Selangor', '收件人：Amy Tan\n电话：012-3456789\n地址：No. 12 Jalan Mawar, 43000 Kajang, Selangor')}
+                  className="w-full resize-y rounded-lg border border-pink-100 bg-white px-3 py-2 text-sm text-zinc-700 focus:outline-none focus:border-pink-300" />
+                <button type="button" onClick={fillFromPastedText} className="border border-[#B96A73] px-3 py-2 text-[#B96A73] font-semibold hover:bg-pink-50">
+                  {tx('Fill delivery form', '识别并填入')}
+                </button>
+                <p className="text-[11px] leading-relaxed text-zinc-500">{tx('Auto-fill may be inaccurate. Please double-check the recipient name, phone, full address, state and postcode before ordering.', '自动识别不一定准确。下单前请再次核对收件人、电话、完整地址、州属和邮编。')}</p>
+                {pasteResult && <p role="status" className="text-[11px] font-medium text-[#8f545d]">{pasteResult}</p>}
+              </div>
+            </details>
+
             {!currentUser && (
               <div className="space-y-1.5 text-xs">
                 <label className="block text-zinc-500 font-medium">{tx('Email *', '邮箱 *')}</label>
@@ -524,6 +595,7 @@ export default function CheckoutPage({
                 <label className="block text-zinc-500 font-medium">{tx('State *', '收件州属 *')}</label>
                 <select id="checkout-state" name="address-level1" autoComplete="address-level1" value={state} onChange={e => setState(e.target.value)}
                   className="w-full text-sm bg-pink-50/10 border border-pink-100 rounded-xl px-3 py-2.5 text-zinc-700 focus:outline-none focus:border-pink-300">
+                  <option value="">{tx('Select state', '选择州属')}</option>
                   {MALAYSIAN_STATES.map(st => <option key={st} value={st}>{st}</option>)}
                 </select>
               </div>
@@ -533,6 +605,13 @@ export default function CheckoutPage({
                   className="w-full text-sm bg-pink-50/10 border border-pink-100 rounded-xl px-3 py-2.5 text-zinc-700 focus:outline-none focus:border-pink-300" />
               </div>
             </div>
+
+            {needsAddressConfirmation && (
+              <label className="flex items-start gap-2 text-[11px] leading-relaxed text-zinc-600 cursor-pointer">
+                <input type="checkbox" checked={addressConfirmed} onChange={e => setAddressConfirmed(e.target.checked)} className="mt-0.5 h-4 w-4 accent-[#B96A73]" />
+                <span>{tx('I have checked the auto-filled name, phone and full delivery address.', '我已再次核对自动填入的姓名、电话和完整收件地址。')}</span>
+              </label>
+            )}
 
             <label className="flex items-center gap-2 text-[11px] text-zinc-500 cursor-pointer select-none pt-1">
               <input type="checkbox" checked={saveAddressChecked} onChange={e => setSaveAddressChecked(e.target.checked)}
