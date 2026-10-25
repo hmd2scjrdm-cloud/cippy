@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 import { getSiteConfig, shippingFee, emailCompanyFooterHtml } from "./_lib/site-config.js";
 import { isAdminUser } from "./_lib/admin-auth.js";
+import { orderRevisionEmail } from "./_lib/order-revision-email.js";
 
 const SUPABASE_URL = "https://ilzeziznxzaxxudzhdmu.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI";
@@ -29,16 +30,31 @@ export default async function handler(req, res) {
   const admin = await getVerifiedUser(token);
   if (!(await isAdminUser(admin, SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY))) return res.status(403).json({ error: "无权限" });
 
-  const { id, trackingNumber, photoUrl, courier: requestedCourier, trackingUrl: requestedTrackingUrl } = req.body || {};
-  if (!id || !trackingNumber) return res.status(400).json({ error: "Missing id or trackingNumber" });
+  const { action, id, trackingNumber, photoUrl, courier: requestedCourier, trackingUrl: requestedTrackingUrl } = req.body || {};
+  if (!id || (action !== 'order-revision' && !trackingNumber)) return res.status(400).json({ error: "Missing id or trackingNumber" });
 
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY;
-  const orderRes = await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${id}&select=*`, {
+  const orderRes = await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${encodeURIComponent(id)}&select=*`, {
     headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
   });
   const orders = orderRes.ok ? await orderRes.json() : [];
   const order = orders[0];
   if (!order) return res.status(404).json({ error: "找不到订单" });
+
+  if (action === 'order-revision') {
+    const email = String(order.customer?.email || order.guest_email || '').trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: "顾客没有有效邮箱，无法寄送更新副本" });
+    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) return res.status(500).json({ error: "邮件服务未配置" });
+    const message = orderRevisionEmail(order, req.body?.note);
+    try {
+      const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD } });
+      await transporter.sendMail({ from: `Cippy <${process.env.GMAIL_USER}>`, to: email, subject: message.subject, html: message.html, text: message.text });
+      return res.status(200).json({ ok: true });
+    } catch (error) {
+      console.error('order revision email failed', error);
+      return res.status(502).json({ error: '订单已保存，但更新邮件寄送失败' });
+    }
+  }
 
   const customer = order.customer || {};
   const customerEmail = clean(customer.email || order.guest_email).toLowerCase();

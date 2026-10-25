@@ -457,7 +457,7 @@
       <p class="font-bold text-stone-800">编辑订单 <span id="eiOrderId" class="font-mono text-stone-400"></span></p>
       <button onclick="closeEditItems()" class="text-stone-300 hover:text-stone-500 text-2xl leading-none">&times;</button>
     </div>
-    <p class="text-xs text-stone-400 -mt-2">修改商品、数量、单价、颜色 / 尺码，也可以添加或删除商品。收件信息和运费请用旁边的「编辑收件信息 / 运费」。</p>
+    <p class="text-xs text-stone-400 -mt-2">修改商品、数量、单价、颜色 / 尺码及供货方式。现货与预订会保留在同一订单号下，分别列出。收件信息和运费请用旁边的「编辑收件信息 / 运费」。</p>
     <div>
       <div class="flex items-center justify-between mb-2">
         <label class="adm-label !mb-0">商品明细</label>
@@ -495,6 +495,15 @@
       <input id="eiStock" type="checkbox" checked class="mt-0.5 accent-[#C4928A]"/>
       <span>同步调整库存：数量增加就多扣库存，减少或删除就把库存加回来（只对选了商品的行生效）</span>
     </label>
+    <p class="text-xs text-stone-400">仅改变现货 / 预订标记不会自动调整库存；如实际库存有变动，请同时到「库存」页核对。</p>
+    <label class="flex items-start gap-2 text-sm text-stone-700 cursor-pointer">
+      <input id="eiNotifyCustomer" type="checkbox" class="mt-1 accent-[#C4928A]"/>
+      <span>保存后寄一份更新后的订单副本给顾客（不勾选就不发邮件）</span>
+    </label>
+    <div>
+      <label class="adm-label" for="eiRevisionNote">给顾客的更正说明（选填，仅勾选寄送时使用）</label>
+      <textarea id="eiRevisionNote" rows="2" maxlength="500" class="adm-input" placeholder="例：经核对，粉色 M 码需改为预订，预计 7–21 个工作日发货。"></textarea>
+    </div>
     <p id="eiError" class="hidden text-xs text-red-500"></p>
     <div class="flex gap-3">
       <button onclick="closeEditItems()" class="flex-1 py-2.5 border border-stone-200 rounded-xl text-sm text-stone-500 hover:bg-stone-50">取消</button>
@@ -1620,7 +1629,7 @@ window.addAdmin = addAdmin; window.removeAdmin = removeAdmin; window.loadAdmins 
 
 // ---- Edit an existing order's items (products, qty, price, colour/size) ----
 let eiOrderId = null;
-let eiRows = [];   // { orig, product_id, name, color, size, qty, price }
+let eiRows = [];   // { orig, product_id, name, color, size, qty, price, preorder }
 const EI_PAYMENTS = [['manual', '银行转账 / DuitNow'], ['duitnow', 'DuitNow QR'], ['stripe', 'Stripe 卡'], ['cash', '现金'], ['other', '其他']];
 
 const eiVariantProduct = pid => allProducts.find(p => String(p.id) === String(pid));
@@ -1633,7 +1642,7 @@ async function openEditItems(id) {
   eiOrderId = id;
   eiRows = (o.items || []).map(it => ({
     orig: it, product_id: it.product_id || it.baseProductId || '', name: it.name_zh || it.name || '',
-    color: it.color || '', size: it.size || '', qty: Math.max(1, parseInt(it.qty, 10) || 1), price: Number(it.price_myr ?? it._verified_price ?? 0) || 0,
+    color: it.color || '', size: it.size || '', qty: Math.max(1, parseInt(it.qty, 10) || 1), price: Number(it.price_myr ?? it._verified_price ?? 0) || 0, preorder: it.preorder === true,
   }));
   document.getElementById('eiOrderId').textContent = '#' + o.order_id;
   const cur = o.payment_method || 'manual';
@@ -1644,6 +1653,8 @@ async function openEditItems(id) {
   document.getElementById('eiDate').value = localDateStr(new Date(o.created_at));
   document.getElementById('eiDiscountNote').value = o.totals?.discount_note || '';
   document.getElementById('eiStock').checked = true;
+  document.getElementById('eiNotifyCustomer').checked = false;
+  document.getElementById('eiRevisionNote').value = '';
   renderEditItemRows();
   document.getElementById('editItemsModal').classList.remove('hidden');
 }
@@ -1667,8 +1678,17 @@ function renderEditItemRows() {
         <datalist id="eiColors_${i}">${colors.map(c => `<option value="${esc(c)}">${esc(colorLabel(c))}</option>`).join('')}</datalist>
         <input type="text" list="eiSizes_${i}" value="${esc(r.size)}" placeholder="尺码" oninput="eiSet(${i}, 'size', this.value)" class="adm-input col-span-3 sm:col-span-1 !py-1.5 text-xs"/>
         <datalist id="eiSizes_${i}">${sizes.map(z => `<option value="${esc(z)}"></option>`).join('')}</datalist>
-        <input type="number" min="1" step="1" value="${r.qty}" oninput="eiSet(${i}, 'qty', this.value)" class="adm-input col-span-3 sm:col-span-1 !py-1.5 text-xs" title="数量"/>
+        <input type="number" min="1" step="1" value="${r.qty}" onchange="eiSet(${i}, 'qty', this.value)" class="adm-input col-span-3 sm:col-span-1 !py-1.5 text-xs" title="数量"/>
         <input type="number" min="0" step="0.01" value="${r.price}" oninput="eiSet(${i}, 'price', this.value)" class="adm-input col-span-3 sm:col-span-1 !py-1.5 text-xs" title="单价 (RM)"/>
+      </div>
+      <div class="flex flex-wrap items-center gap-3 text-xs">
+        <label class="flex items-center gap-1">供货方式
+          <select onchange="eiSet(${i}, 'preorder', this.value === 'preorder')" class="adm-input !py-1 !px-2 !w-auto">
+            <option value="ready" ${r.preorder ? '' : 'selected'}>现货 · 1–3 工作日</option>
+            <option value="preorder" ${r.preorder ? 'selected' : ''}>预订 · 7–21 工作日</option>
+          </select>
+        </label>
+        ${r.qty > 1 ? `<button type="button" onclick="eiSplitRow(${i})" class="text-[#C4928A] underline">拆分数量，分别标记现货 / 预订</button>` : ''}
       </div>
     </div>`;
   }).join('') || '<p class="text-xs text-stone-400 py-3 text-center">还没有商品，点右上角「+ 添加商品行」</p>';
@@ -1684,7 +1704,7 @@ function eiSet(i, field, value) {
   if (field === 'qty') r.qty = Math.max(1, parseInt(value, 10) || 1);
   else if (field === 'price') r.price = Math.max(0, parseFloat(value) || 0);
   else r[field] = value;
-  eiRecalc();
+  if (field === 'qty') renderEditItemRows(); else eiRecalc();
 }
 function eiPick(i, pid) {
   const r = eiRows[i]; r.product_id = pid;
@@ -1700,7 +1720,14 @@ function eiPick(i, pid) {
   }
   renderEditItemRows();
 }
-function eiAddRow() { eiRows.push({ orig: null, product_id: '', name: '', color: '', size: '', qty: 1, price: 0 }); renderEditItemRows(); }
+function eiAddRow() { eiRows.push({ orig: null, product_id: '', name: '', color: '', size: '', qty: 1, price: 0, preorder: false }); renderEditItemRows(); }
+function eiSplitRow(i) {
+  const row = eiRows[i];
+  if (!row || row.qty < 2) return;
+  row.qty -= 1;
+  eiRows.splice(i + 1, 0, { ...row, qty: 1, preorder: !row.preorder });
+  renderEditItemRows();
+}
 function eiRemoveRow(i) { eiRows.splice(i, 1); renderEditItemRows(); }
 
 function eiRecalc() {
@@ -1764,7 +1791,7 @@ async function saveEditItems() {
 
   const items = rows.map(r => {
     const base = r.orig ? { ...r.orig } : {};
-    const it = { ...base, product_id: r.product_id || base.product_id || null, name: r.name.trim(), name_zh: r.name.trim(), qty: r.qty, price_myr: r.price };
+    const it = { ...base, product_id: r.product_id || base.product_id || null, name: r.name.trim(), name_zh: r.name.trim(), qty: r.qty, price_myr: r.price, preorder: r.preorder === true };
     if (r.color) it.color = r.color; else delete it.color;
     if (r.size) it.size = r.size; else delete it.size;
     delete it._verified_price;
@@ -1776,6 +1803,11 @@ async function saveEditItems() {
   const discount_note = document.getElementById('eiDiscountNote').value.trim();
   const totals = { ...(o.totals || {}), subtotal, shipping, discount, discount_note, total: orderTotal(subtotal, shipping, discount) };
   const payment_method = document.getElementById('eiPayment').value;
+  const notifyCustomer = document.getElementById('eiNotifyCustomer').checked;
+  const revisionNote = document.getElementById('eiRevisionNote').value.trim();
+  if (notifyCustomer && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(o.customer?.email || o.guest_email || ''))) {
+    err.textContent = '顾客没有有效邮箱。请先补齐邮箱，或取消勾选寄送副本。'; err.classList.remove('hidden'); return;
+  }
 
   // stock deltas per product/colour/size: new quantity minus what the order had
   const tally = {};
@@ -1811,11 +1843,30 @@ async function saveEditItems() {
     else note += '，库存已同步';
     if (restored.length) notifyBackInStock(restored);
   }
+  if (notifyCustomer) {
+    btn.textContent = '发送更新副本中…';
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      const response = await fetch('/api/notify-shipped', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
+        body: JSON.stringify({ action: 'order-revision', id: o.id, note: revisionNote }),
+      });
+      if (!response.ok) {
+        const result = await response.json().catch(() => ({}));
+        throw new Error(result.error || `HTTP ${response.status}`);
+      }
+      note += '，已寄送更新副本';
+    } catch (mailError) {
+      alert(`订单已保存，但顾客邮件未寄出：${mailError.message}。请检查邮箱后再处理。`);
+      note += '，邮件未寄出';
+    }
+  }
   btn.disabled = false; btn.textContent = '保存订单';
   closeEditItems(); renderOrders(); showToast(note);
 }
 window.openEditItems = openEditItems; window.closeEditItems = closeEditItems; window.saveEditItems = saveEditItems;
-window.eiPick = eiPick; window.eiSet = eiSet; window.eiAddRow = eiAddRow; window.eiRemoveRow = eiRemoveRow; window.eiRefreshSizes = eiRefreshSizes;
+window.eiPick = eiPick; window.eiSet = eiSet; window.eiAddRow = eiAddRow; window.eiRemoveRow = eiRemoveRow; window.eiSplitRow = eiSplitRow; window.eiRefreshSizes = eiRefreshSizes;
 
 let aoItemRowId = 0;
 
@@ -2190,7 +2241,7 @@ function renderOrders() {
     const statusOptions = Object.entries(STATUS_LABELS).filter(([v]) => v !== 'pending_payment' || o.status === 'pending_payment').map(([v,l]) =>
       `<option value="${v}" ${o.status===v?'selected':''}>${l}</option>`).join('');
     const items = o.items || [];
-    const itemsHtml = items.map(item => {
+    const itemHtml = item => {
       const detail = [item.size, item.color, item.variant].filter(Boolean).map(esc).join(' / ');
       return `<div class="flex items-center gap-3 py-1.5">
         ${item.image_url ? `<img src="${esc(item.image_url)}" class="w-10 h-12 object-cover rounded flex-shrink-0"/>` : '<div class="w-10 h-12 bg-stone-100 rounded flex-shrink-0"></div>'}
@@ -2200,7 +2251,13 @@ function renderOrders() {
           <p class="text-xs text-stone-500">x${esc(item.qty || 1)} · MYR ${(Number(item.price_myr||0)*Number(item.qty||1)).toFixed(2)}</p>
         </div>
       </div>`;
-    }).join('') || '<p class="text-xs text-stone-400">无商品信息</p>';
+    };
+    const readyItems = items.filter(item => !item.preorder);
+    const preorderItems = items.filter(item => item.preorder);
+    const itemsHtml = items.length ? [
+      readyItems.length ? `<p class="text-xs font-bold text-emerald-700">现货 · Ready stock</p>${readyItems.map(itemHtml).join('')}` : '',
+      preorderItems.length ? `<p class="text-xs font-bold text-violet-700 mt-2">预订 · Preorder (7–21 工作日)</p>${preorderItems.map(itemHtml).join('')}` : '',
+    ].join('') : '<p class="text-xs text-stone-400">无商品信息</p>';
     const canShip = TODO_STATUSES.includes(o.status);
 
     return `
@@ -2486,11 +2543,14 @@ function orderPageHtml(order) {
   const money = value => `RM ${Number(value || 0).toFixed(2)}`;
   const address = [customer.address1, customer.address2, customer.address3, customer.postcode, customer.city, customer.state]
     .filter(Boolean).join(', ') || customer.address || '—';
-  const rows = (order.items || []).map((item, index) => {
+  const rows = [
+    { label: '现货 / Ready stock', items: (order.items || []).filter(item => !item.preorder) },
+    { label: '预订 / Preorder · 7–21 working days', items: (order.items || []).filter(item => item.preorder) },
+  ].filter(group => group.items.length).map(group => `<tr><th colspan="5">${group.label}</th></tr>${group.items.map((item, index) => {
     const qty = Number(item.qty || 1);
     const option = [item.size, item.color, item.variant].filter(Boolean).join(' / ');
     return `<tr><td>${index + 1}</td><td><strong>${esc(item.name_zh || item.name || 'Item')}</strong>${option ? `<small>${esc(option)}</small>` : ''}${item.sku ? `<small>SKU: ${esc(item.sku)}</small>` : ''}</td><td>${qty}</td><td>${money(item.price_myr)}</td><td>${money(Number(item.price_myr || 0) * qty)}</td></tr>`;
-  }).join('');
+  }).join('')}`).join('');
   const html = `<!doctype html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CIPPY 订单 ${esc(order.order_id || id)}</title><style>
     @page{size:4in 6in;margin:0}*{box-sizing:border-box}html{background:#fff}body{font-family:Arial,"PingFang SC","Microsoft YaHei",sans-serif;color:#2e2928;width:4in;min-height:6in;margin:0 auto;padding:0.16in;font-size:9px;line-height:1.35}header{display:flex;justify-content:space-between;gap:10px;align-items:start;border-bottom:1px solid #c4928a;padding-bottom:8px}h1{font-size:18px;letter-spacing:1px;margin:0}h2{font-size:10px;margin:0 0 5px}p{margin:2px 0;overflow-wrap:anywhere}.muted{color:#777}.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.box{border:1px solid #ded8d5;padding:7px;min-width:0;overflow-wrap:anywhere}table{width:100%;border-collapse:collapse;margin-top:7px;table-layout:fixed}th{text-align:left;background:#f7f1ef;font-weight:600}td,th{padding:4px 2px;border-bottom:1px solid #e7e1de;vertical-align:top;overflow-wrap:anywhere}td:first-child,th:first-child{width:18px}td:nth-child(3),th:nth-child(3){width:24px;text-align:right}td:nth-child(4),th:nth-child(4),td:nth-child(5),th:nth-child(5){width:55px;text-align:right}small{display:block;color:#777}.totals{width:170px;margin:10px 0 0 auto}.totals p{display:flex;justify-content:space-between;padding:2px 0}.total{border-top:1px solid #c4928a;font-size:11px;font-weight:700;padding-top:6px!important}.toolbar{text-align:right;margin-bottom:8px}.toolbar button{background:#c4928a;color:white;border:0;padding:6px 10px;cursor:pointer}@media print{body{padding:0.16in}.toolbar{display:none}}
   </style></head><body><div class="toolbar"><button onclick="window.print()">打印 / 另存为 PDF</button></div><header><div><h1>CIPPY</h1><p class="muted">订单单据 / Order sheet</p></div><div><strong>#${esc(order.order_id || id)}</strong><p>${esc(new Date(order.created_at).toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur' }))}</p><p>状态: ${esc(STATUS_LABELS[order.status] || order.status || '—')}</p></div></header>

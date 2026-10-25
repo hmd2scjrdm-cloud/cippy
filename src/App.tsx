@@ -4830,8 +4830,8 @@ export default function App() {
                                 <div className="space-y-3">
                                   {itemsArray.map((item: any, idx: number) => {
                                     const resolvedProduct = dbProducts.find(p => p.id === String(item.id || item.product?.id).split('-')[0] || p.id === String(item.id || item.product?.id));
-                                    const productName = resolvedProduct ? (lang === 'zh' ? resolvedProduct.cnName : resolvedProduct.name) : (item.name || item.product?.name || 'Cippy Wear');
-                                    const productPrice = resolvedProduct ? resolvedProduct.price : (item.price_myr || item.product?.price || 0);
+                                    const productName = (lang === 'zh' ? item.name_zh : item.name_en) || item.name || (resolvedProduct ? (lang === 'zh' ? resolvedProduct.cnName : resolvedProduct.name) : item.product?.name) || 'Cippy Wear';
+                                    const productPrice = Number(item.price_myr ?? (resolvedProduct ? resolvedProduct.price : item.product?.price) ?? 0);
                                     const productImg = resolvedProduct?.imageUrl || item.product?.imageUrl || item.product?.image_url;
                                     const itemSize = item.size || item.selectedSize || 'S';
                                     const itemQty = item.qty || item.quantity || 1;
@@ -4851,6 +4851,9 @@ export default function App() {
                                             <p className="text-[10px] text-zinc-400">
                                               Size: <strong className="text-zinc-600 font-mono font-bold">{itemSize}</strong> · Qty: <strong className="text-zinc-600 font-mono font-bold">{itemQty}</strong>
                                             </p>
+                                            <span className={`text-[10px] font-semibold ${item.preorder ? 'text-violet-700' : 'text-emerald-700'}`}>
+                                              {item.preorder ? (lang === 'zh' ? '预订 · 预计 7–21 个工作日' : 'Preorder · 7–21 working days') : (lang === 'zh' ? '现货 · 预计 1–3 个工作日' : 'Ready stock · 1–3 working days')}
+                                            </span>
                                           </div>
                                         </div>
                                         <span className="font-mono font-bold text-zinc-700">RM {productPrice * itemQty}</span>
