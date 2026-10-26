@@ -45,10 +45,11 @@ export default async function handler(req, res) {
     const email = String(order.customer?.email || order.guest_email || '').trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: "顾客没有有效邮箱，无法寄送更新副本" });
     if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) return res.status(500).json({ error: "邮件服务未配置" });
+    const ownerEmail = clean(process.env.ORDER_NOTIFY_EMAIL || process.env.GMAIL_USER).toLowerCase();
     const message = orderRevisionEmail(order, req.body?.note);
     try {
       const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD } });
-      await transporter.sendMail({ from: `Cippy <${process.env.GMAIL_USER}>`, to: email, subject: message.subject, html: message.html, text: message.text });
+      await transporter.sendMail({ from: `Cippy <${process.env.GMAIL_USER}>`, to: email, ...(ownerEmail && ownerEmail !== email.toLowerCase() ? { bcc: ownerEmail } : {}), subject: message.subject, html: message.html, text: message.text });
       return res.status(200).json({ ok: true });
     } catch (error) {
       console.error('order revision email failed', error);
