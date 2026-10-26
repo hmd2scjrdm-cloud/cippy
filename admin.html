@@ -456,13 +456,6 @@
 </div>
 
 <!-- Split Shipment Modal -->
-<div id="awbFallbackModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background:rgba(0,0,0,0.4)">
-  <div class="bg-white rounded-xl w-full max-w-sm p-5 space-y-4">
-    <p class="font-semibold text-stone-800">AWB 下载未完成</p>
-    <p id="awbFallbackMessage" class="text-sm text-stone-600"></p>
-    <div class="flex gap-2 justify-end"><button onclick="document.getElementById('awbFallbackModal').classList.add('hidden')" class="border border-stone-200 rounded px-3 py-2 text-sm">关闭</button><a id="awbFallbackLink" target="_blank" rel="noopener noreferrer" class="bg-[#C4928A] text-white rounded px-3 py-2 text-sm">打开 EasyParcel 原始运单</a></div>
-  </div>
-</div>
 <div id="splitShipModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background:rgba(0,0,0,0.4)">
   <div class="bg-white rounded-xl w-full max-w-lg max-h-[92vh] overflow-y-auto p-6 space-y-4">
     <div class="flex items-center justify-between">
@@ -2595,20 +2588,7 @@ async function downloadEasyParcelAwb(id, button, historyIndex) {
     link.click();
     link.remove();
     setTimeout(() => URL.revokeObjectURL(url), 60000);
-  } catch (error) {
-    const order = allOrders.find(row => row.id === id);
-    const shipment = historyIndex === undefined ? order?.customer?.easyparcel : order?.customer?.easyparcel_history?.[historyIndex];
-    let labelUrl = '';
-    try {
-      const url = new URL(shipment?.awb_label_url || '');
-      if (/^(?:[a-z0-9-]+\.)*easyparcel\.(?:my|com)$/i.test(url.hostname) && ['https:', 'http:'].includes(url.protocol) && !url.username && !url.password) labelUrl = url.href;
-    } catch { /* No usable original label link. */ }
-    if (labelUrl) {
-      document.getElementById('awbFallbackMessage').textContent = `${error.message || '服务器无法下载 PDF'}。可以尝试在 EasyParcel 打开原始运单。`;
-      document.getElementById('awbFallbackLink').href = labelUrl;
-      document.getElementById('awbFallbackModal').classList.remove('hidden');
-    } else alert(error.message || 'AWB 下载失败');
-  }
+  } catch (error) { alert(error.message || 'AWB 下载失败，请在本页重试'); }
   finally { button.disabled = false; button.textContent = oldText; }
 }
 window.downloadEasyParcelAwb = downloadEasyParcelAwb;

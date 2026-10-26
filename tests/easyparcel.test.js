@@ -47,7 +47,7 @@ test('AWB download returns an attachment for a valid PDF', async () => {
   const previousFetch = globalThis.fetch;
   globalThis.fetch = async (url, options) => {
     assert.equal(url.protocol, 'https:');
-    assert.equal(options.redirect, 'error');
+    assert.equal(options.redirect, 'manual');
     return new Response(Buffer.from('%PDF-1.7\nexample'), { status: 200, headers: { 'Content-Type': 'application/pdf' } });
   };
   try {
@@ -79,9 +79,37 @@ test('AWB download returns a useful error when EasyParcel cannot be fetched', as
     const res = response();
     await downloadAwb({ id: 'order-1', customer: { easyparcel: { awb: '123', awb_label_url: 'https://connect.easyparcel.my/?ac=AWBLabel&id=abc' } } }, res);
     assert.equal(res.code, 502);
-    assert.match(res.body.error, /原始运单链接/);
+    assert.match(res.body.error, /本页重试/);
     assert.doesNotMatch(res.body.error, /fetch failed/);
   } finally { globalThis.fetch = previousFetch; console.error = previousError; }
+});
+
+test('AWB download follows a safe PDF redirect', async () => {
+  const previousFetch = globalThis.fetch;
+  let calls = 0;
+  globalThis.fetch = async url => {
+    calls += 1;
+    if (calls === 1) return new Response(null, { status: 302, headers: { Location: 'https://connect.easyparcel.my/label.pdf' } });
+    assert.equal(url.href, 'https://connect.easyparcel.my/label.pdf');
+    return new Response(Buffer.from('%PDF-1.7\nexample'), { status: 200 });
+  };
+  try {
+    const res = response();
+    await downloadAwb({ customer: { easyparcel: { awb: '123', awb_label_url: 'https://connect.easyparcel.my/?ac=AWBLabel&id=abc' } } }, res);
+    assert.equal(res.code, 200);
+    assert.equal(calls, 2);
+  } finally { globalThis.fetch = previousFetch; }
+});
+
+test('AWB download blocks unsafe redirects', async () => {
+  const previousFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(null, { status: 302, headers: { Location: 'http://127.0.0.1/private' } });
+  try {
+    const res = response();
+    await downloadAwb({ customer: { easyparcel: { awb: '123', awb_label_url: 'https://connect.easyparcel.my/?ac=AWBLabel&id=abc' } } }, res);
+    assert.equal(res.code, 502);
+    assert.match(res.body.error, /未经允许/);
+  } finally { globalThis.fetch = previousFetch; }
 });
 
 test('completed orders can rebook with explicit acknowledgement of the old AWB', () => {

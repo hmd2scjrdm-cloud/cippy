@@ -108,11 +108,27 @@ export async function downloadAwb(order, res) {
   }
   labelUrl.protocol = 'https:';
   let label;
+  let currentUrl = labelUrl;
   try {
-    label = await fetch(labelUrl, { redirect: 'error', signal: AbortSignal.timeout(15000) });
+    for (let hop = 0; hop < 4; hop += 1) {
+      label = await fetch(currentUrl, { redirect: 'manual', signal: AbortSignal.timeout(15000) });
+      if (![301, 302, 303, 307, 308].includes(label.status)) break;
+      const location = label.headers.get('location');
+      if (!location) return res.status(502).json({ error: 'EasyParcel 运单跳转缺少地址' });
+      const nextUrl = new URL(location, currentUrl);
+      const host = nextUrl.hostname.toLowerCase();
+      const trustedHost = /^(?:[a-z0-9-]+\.)*easyparcel\.(?:my|com)$/.test(host)
+        || /^(?:[a-z0-9-]+\.)*s3[.-](?:[a-z0-9-]+\.)?amazonaws\.com$/.test(host)
+        || /^(?:[a-z0-9-]+\.)*cloudfront\.net$/.test(host);
+      if (nextUrl.protocol !== 'https:' || nextUrl.username || nextUrl.password || !trustedHost) {
+        return res.status(502).json({ error: 'EasyParcel 运单跳转到未经允许的地址，已停止下载' });
+      }
+      currentUrl = nextUrl;
+      if (hop === 3) return res.status(502).json({ error: 'EasyParcel 运单跳转次数过多' });
+    }
   } catch (error) {
     console.error('EasyParcel AWB fetch failed', { orderId: order.id, host: labelUrl.hostname, error });
-    return res.status(502).json({ error: '服务器暂时无法取得 EasyParcel PDF，请使用原始运单链接下载' });
+    return res.status(502).json({ error: '暂时无法连接 EasyParcel 取得运单，请稍后在本页重试' });
   }
   if (!label.ok) return res.status(502).json({ error: "EasyParcel 暂时无法提供 AWB，请稍后重试" });
   const declaredSize = Number(label.headers.get('content-length') || 0);
