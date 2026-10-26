@@ -107,7 +107,13 @@ export async function downloadAwb(order, res) {
     return res.status(400).json({ error: "不是 EasyParcel 运单链接" });
   }
   labelUrl.protocol = 'https:';
-  const label = await fetch(labelUrl, { redirect: 'error', signal: AbortSignal.timeout(15000) });
+  let label;
+  try {
+    label = await fetch(labelUrl, { redirect: 'error', signal: AbortSignal.timeout(15000) });
+  } catch (error) {
+    console.error('EasyParcel AWB fetch failed', { orderId: order.id, host: labelUrl.hostname, error });
+    return res.status(502).json({ error: '服务器暂时无法取得 EasyParcel PDF，请使用原始运单链接下载' });
+  }
   if (!label.ok) return res.status(502).json({ error: "EasyParcel 暂时无法提供 AWB，请稍后重试" });
   const declaredSize = Number(label.headers.get('content-length') || 0);
   if (declaredSize > 10_000_000) return res.status(502).json({ error: "AWB 文件超过 10MB" });

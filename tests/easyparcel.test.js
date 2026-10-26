@@ -70,6 +70,20 @@ test('AWB download rejects a non-PDF response', async () => {
   } finally { globalThis.fetch = previousFetch; }
 });
 
+test('AWB download returns a useful error when EasyParcel cannot be fetched', async () => {
+  const previousFetch = globalThis.fetch;
+  const previousError = console.error;
+  globalThis.fetch = async () => { throw new TypeError('fetch failed'); };
+  console.error = () => {};
+  try {
+    const res = response();
+    await downloadAwb({ id: 'order-1', customer: { easyparcel: { awb: '123', awb_label_url: 'https://connect.easyparcel.my/?ac=AWBLabel&id=abc' } } }, res);
+    assert.equal(res.code, 502);
+    assert.match(res.body.error, /原始运单链接/);
+    assert.doesNotMatch(res.body.error, /fetch failed/);
+  } finally { globalThis.fetch = previousFetch; console.error = previousError; }
+});
+
 test('completed orders can rebook with explicit acknowledgement of the old AWB', () => {
   const order = { status: 'completed', tracking_number: 'OLD123', customer: { easyparcel: { awb: 'OLD123' } } };
   const body = { rebook: true, rebookReason: '客户地址更正', expectedAwb: 'OLD123', expectedTracking: 'OLD123', rebookAttemptId: 'ca2651f3-4f20-4400-b0ba-9e425bbbe12a' };
