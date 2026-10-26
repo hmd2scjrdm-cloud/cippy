@@ -453,7 +453,7 @@ export default function CheckoutPage({
         </div>
         <div className="bg-[#FFFBF7] border border-amber-900/10 rounded-xl p-4 text-left text-xs text-zinc-600 space-y-3">
           <p className="font-bold text-zinc-800">{tx('Scan to Pay via DuitNow QR:', '扫码 DuitNow QR 付款：')}</p>
-          <img src="/assets/payment/duitnow-qr.jpg" alt="DuitNow QR" className="w-40 mx-auto rounded-lg border border-amber-900/10" />
+          <img src="/assets/payment/duitnow-cippy-kl.jpeg" alt="CIPPY.KL DuitNow QR" className="w-full max-w-60 h-auto mx-auto" />
           <div className="bg-red-50 border border-red-100 rounded-lg p-2.5 text-red-700 font-semibold">
             {tx(
               `Please transfer the exact amount of RM ${manualOrderPlaced.total.toFixed(2)} only — not more, not less — for verification and anti-money-laundering compliance.`,
@@ -642,7 +642,7 @@ export default function CheckoutPage({
             {paymentMethod === 'manual' && (
               <div className="p-4 bg-[#FFFBF7] border border-amber-900/10 rounded-xl text-xs text-zinc-600 leading-relaxed space-y-3">
                 <p className="font-bold text-zinc-800">{tx('DuitNow QR Transfer', 'DuitNow QR 转账')}</p>
-                <img src="/assets/payment/duitnow-qr.jpg" alt="DuitNow QR" className="w-32 mx-auto rounded-lg border border-amber-900/10" />
+                <img src="/assets/payment/duitnow-cippy-kl.jpeg" alt="CIPPY.KL DuitNow QR" className="w-full max-w-60 h-auto mx-auto" />
                 <p className="text-red-700 font-semibold bg-red-50 border border-red-100 rounded-lg p-2">
                   {tx('Please transfer the exact order amount only — not more, not less — for verification and anti-money-laundering compliance.', '请务必转账订单确切金额，不要多转或少转，以便核实并符合反洗黑钱规范。')}
                 </p>
