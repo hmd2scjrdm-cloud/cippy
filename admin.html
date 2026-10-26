@@ -455,6 +455,26 @@
   </div>
 </div>
 
+<!-- Split Shipment Modal -->
+<div id="splitShipModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background:rgba(0,0,0,0.4)">
+  <div class="bg-white rounded-xl w-full max-w-lg max-h-[92vh] overflow-y-auto p-6 space-y-4">
+    <div class="flex items-center justify-between">
+      <div><p class="font-bold text-stone-800">分批出货</p><p id="splitShipOrderId" class="text-xs text-stone-400"></p></div>
+      <button onclick="closeSplitShipment()" aria-label="关闭" class="text-stone-400 text-xl">&times;</button>
+    </div>
+    <p class="text-xs text-stone-500">只填写本次包裹要寄出的数量。未寄商品会留在订单里，最后一批完成后整单才标记已发货。</p>
+    <div id="splitShipLines" class="space-y-2"></div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <label class="text-xs text-stone-600">快递公司 *<input id="splitShipCourier" class="adm-input mt-1" placeholder="EasyParcel / SPX"/></label>
+      <label class="text-xs text-stone-600">本次运单号 *<input id="splitShipTracking" class="adm-input mt-1" placeholder="输入本次包裹的 AWB"/></label>
+    </div>
+    <label class="block text-xs text-stone-600">本次包裹照片<input id="splitShipPhoto" type="file" accept="image/*" class="block mt-1 w-full text-xs"/><span class="block text-stone-400 mt-1">EasyParcel 包裹必须上传本次照片。</span></label>
+    <label class="flex items-center gap-2 text-xs text-stone-700"><input id="splitShipNotify" type="checkbox" checked class="accent-[#C4928A]">通知顾客本次包裹，店主收到副本</label>
+    <p id="splitShipError" class="hidden rounded bg-red-50 text-red-700 p-2 text-xs"></p>
+    <div class="flex gap-2"><button onclick="closeSplitShipment()" class="flex-1 border border-stone-200 rounded px-3 py-2 text-sm">取消</button><button id="splitShipSave" onclick="saveSplitShipment()" class="flex-1 bg-[#C4928A] text-white rounded px-3 py-2 text-sm font-semibold">记录本次出货</button></div>
+  </div>
+</div>
+
 <!-- Edit Order Items Modal -->
 <div id="editItemsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background:rgba(0,0,0,0.4)">
   <div class="bg-white rounded-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto p-6 space-y-4">
@@ -1730,7 +1750,7 @@ function eiSplitRow(i) {
   const row = eiRows[i];
   if (!row || row.qty < 2) return;
   row.qty -= 1;
-  eiRows.splice(i + 1, 0, { ...row, qty: 1, preorder: !row.preorder });
+  eiRows.splice(i + 1, 0, { ...row, orig: null, qty: 1, preorder: !row.preorder });
   renderEditItemRows();
 }
 function eiRemoveRow(i) { eiRows.splice(i, 1); renderEditItemRows(); }
@@ -1799,9 +1819,18 @@ async function saveEditItems() {
     const it = { ...base, product_id: r.product_id || base.product_id || null, name: r.name.trim(), name_zh: r.name.trim(), qty: r.qty, price_myr: r.price, preorder: r.preorder === true };
     if (r.color) it.color = r.color; else delete it.color;
     if (r.size) it.size = r.size; else delete it.size;
+    if (r.orig && (String(r.orig.product_id || r.orig.baseProductId || '') !== String(it.product_id || '') || String(r.orig.color || '') !== String(it.color || '') || String(r.orig.size || '') !== String(it.size || ''))) delete it.fulfillment_line_id;
     delete it._verified_price;
     return it;
   });
+  const sent = new Map();
+  for (const shipment of (Array.isArray(o.customer?.shipments) ? o.customer.shipments : [])) for (const line of shipment.lines || []) sent.set(line.line_id, (sent.get(line.line_id) || 0) + Number(line.qty || 0));
+  for (const [lineId, qty] of sent) {
+    const matching = items.filter(item => item.fulfillment_line_id === lineId);
+    if (matching.length !== 1 || Number(matching[0].qty) < qty) {
+      err.textContent = '已有出货记录的商品不能删除、更换款式/尺码，或把数量改得少于已寄数量。请先核对出货记录。'; err.classList.remove('hidden'); return;
+    }
+  }
   const subtotal = items.reduce((sum, it) => sum + it.price_myr * it.qty, 0);
   const shipping = Number(o.totals?.shipping || 0);
   const discount = Math.max(0, parseFloat(document.getElementById('eiDiscount').value) || 0);
@@ -2288,10 +2317,9 @@ function renderOrders() {
       <div class="ocard-foot">
         <button class="text-xs text-stone-600 border border-stone-200 rounded-lg px-3 py-2 hover:bg-stone-50" onclick="downloadOrderPage('${o.id}')">下载订单单据</button>
         ${c.easyparcel?.awb_label_url ? `<button class="text-xs text-stone-600 border border-stone-200 rounded-lg px-3 py-2 hover:bg-stone-50" onclick="downloadEasyParcelAwb('${o.id}', this)">下载 AWB PDF</button>` : ''}
-        ${canShip && !c.easyparcel?.awb && !o.tracking_number ? `<button class="btn-brand" onclick="openEasyParcel('${o.id}')">建立 EasyParcel 运单</button>
-        <button class="text-xs text-stone-500 border border-stone-200 rounded-lg px-3 py-2 hover:bg-stone-50" onclick="updateOrderStatus('${o.id}','shipped',document.getElementById('sel_${o.id}'))">手动填写运单</button>` : ''}
-        ${canShip && c.easyparcel?.awb ? `<button class="btn-brand" onclick="editTracking('${o.id}')">上传照片并确认发货</button>` : ''}
-        ${['paid', 'processing', 'shipped', 'delivered', 'completed'].includes(o.status) && (c.easyparcel?.awb || o.tracking_number || ['shipped', 'delivered', 'completed'].includes(o.status)) ? `<button class="text-xs text-stone-600 border border-stone-200 rounded-lg px-3 py-2 hover:bg-stone-50" onclick="openEasyParcel('${o.id}', true)">重新建立 AWB</button>` : ''}
+        ${canShip && !c.easyparcel?.awb && !o.tracking_number ? `<button class="btn-brand" onclick="openEasyParcel('${o.id}')">建立 EasyParcel 运单</button>` : ''}
+        ${canShip ? `<button class="btn-brand" onclick="openSplitShipment('${o.id}')">选择商品并确认出货</button>` : ''}
+        ${['paid', 'processing', 'shipped', 'delivered', 'completed'].includes(o.status) && (c.easyparcel?.awb || o.tracking_number || ['shipped', 'delivered', 'completed'].includes(o.status)) ? `<button class="text-xs text-stone-600 border border-stone-200 rounded-lg px-3 py-2 hover:bg-stone-50" onclick="openEasyParcel('${o.id}', true)">${Array.isArray(c.shipments) && c.shipments.length && canShip ? '为下一批建立 AWB' : '重新建立 AWB'}</button>` : ''}
         <select id="sel_${o.id}" onchange="updateOrderStatus('${o.id}', this.value, this)" class="adm-select">${statusOptions}</select>
         <button class="more-btn ml-auto text-xs text-stone-400 hover:text-stone-600" onclick="toggleOrderDetail('${o.id}')">详情 ▾</button>
       </div>
@@ -2316,7 +2344,7 @@ function renderOrders() {
             ${c.easyparcel?.awb_label_url ? `<button onclick="downloadEasyParcelAwb('${o.id}', this)" class="mt-2 inline-block text-xs text-[#C4928A] underline">下载运单 PDF</button>` : ''}
             ${c.easyparcel?.tracking_url ? `<a href="${esc(c.easyparcel.tracking_url)}" target="_blank" rel="noopener" class="mt-2 ml-3 inline-block text-xs text-[#C4928A] underline">查看物流</a>` : ''}
             ${Array.isArray(c.easyparcel_history) && c.easyparcel_history.length ? `<div class="mt-3 border-t border-stone-100 pt-2"><p class="text-xs font-semibold text-stone-400 mb-1">旧运单历史</p>${c.easyparcel_history.map((old, index) => `<p class="text-xs text-stone-500">${esc(old.courier || old.provider || '运单')} · ${esc(old.awb || '—')}${old.awb_label_url ? ` <button onclick="downloadEasyParcelAwb('${o.id}', this, ${index})" class="text-[#C4928A] underline">下载旧 AWB</button>` : ''}</p>`).join('')}</div>` : ''}
-        <button onclick="event.stopPropagation();editTracking('${o.id}')" class="mt-2 text-xs text-[#C4928A] border border-[#C4928A] px-2 py-1 rounded hover:bg-[#fdf0ed]">${c.easyparcel && o.status !== 'shipped' ? '上传照片并确认发货' : '修改运单号 / 出货照片'}</button>
+            ${Array.isArray(c.shipments) && c.shipments.length ? `<div class="mt-3 border-t border-stone-100 pt-2"><p class="text-xs font-semibold text-stone-400 mb-1">分批出货记录</p>${c.shipments.map((shipment, index) => `<div class="text-xs text-stone-600 py-1"><strong>第 ${index + 1} 批 · ${esc(shipment.courier)} · ${esc(shipment.tracking_number)}</strong><div>${(shipment.lines || []).map(line => { const item = items.find(x => x.fulfillment_line_id === line.line_id); return `${esc(item?.name_zh || item?.name || '商品已调整')} ×${esc(line.qty)}`; }).join('、')}</div>${shipment.photo_url ? `<a href="${esc(shipment.photo_url)}" target="_blank" rel="noopener" class="text-[#C4928A] underline">查看照片</a>` : ''}</div>`).join('')}</div>` : `<button onclick="event.stopPropagation();editTracking('${o.id}')" class="mt-2 text-xs text-[#C4928A] border border-[#C4928A] px-2 py-1 rounded hover:bg-[#fdf0ed]">修改旧运单号 / 出货照片</button>`}
           </div>` : ''}
           ${c.shipment_photo_url ? `
           <div class="min-w-[100px]">
@@ -2416,7 +2444,7 @@ function openEasyParcel(id, rebook = false) {
   const c = o.customer || {};
   document.getElementById('epRebookNotice').classList.toggle('hidden', !rebook);
   document.getElementById('epPreviousAwb').textContent = c.easyparcel?.awb || o.tracking_number || '无旧运单号';
-  document.getElementById('epRebookReason').value = '';
+  document.getElementById('epRebookReason').value = rebook && Array.isArray(c.shipments) && c.shipments.length ? '分批出货：下一批包裹' : '';
   const parsed = c.address1 && c.city ? {
     address1: c.address1, address2: c.address2 || '', address3: c.address3 || '',
     city: c.city, state: c.state || '', postcode: c.postcode || '',
@@ -2659,15 +2687,13 @@ window.downloadOrderBatch = downloadOrderBatch;
 
 async function updateOrderStatus(id, status, selectEl) {
   if (status === 'shipped') {
-    // Show tracking modal
-    pendingShipId = id;
-    pendingShipSelect = selectEl;
-    const o = allOrders.find(x => x.id === id);
-    document.getElementById('trackingInput').value = o?.tracking_number || '';
-    document.getElementById('trackingOrderId').textContent = o?.order_id || '';
-    resetShipmentPhotoPicker();
-    document.getElementById('trackingModal').classList.remove('hidden');
-    document.getElementById('trackingInput').focus();
+    openSplitShipment(id);
+    return;
+  }
+  const current = allOrders.find(x => x.id === id);
+  if (['delivered', 'completed'].includes(status) && current?.customer?.shipments?.length && splitShipmentProgress(current).some(row => row.remaining > 0)) {
+    alert('订单还有商品未寄出，请先记录剩余包裹');
+    if (selectEl) selectEl.value = current.status;
     return;
   }
   const { error } = await sb.from('orders').update({ status }).eq('id', id);
@@ -2678,6 +2704,89 @@ async function updateOrderStatus(id, status, selectEl) {
   updateBadge(id, status);
 }
 window.updateOrderStatus = updateOrderStatus;
+
+let splitShipId = null;
+let splitShipRequestId = null;
+function splitShipmentProgress(order) {
+  const shipments = Array.isArray(order.customer?.shipments) ? order.customer.shipments : [];
+  return (order.items || []).map((item, index) => {
+    if (item._is_discount) return { item, index, remaining: 0 };
+    const shipped = shipments.reduce((sum, shipment) => sum + (shipment.lines || []).filter(line => line.line_id && line.line_id === item.fulfillment_line_id).reduce((n, line) => n + Number(line.qty || 0), 0), 0);
+    return { item, index, remaining: Math.max(0, Number(item.qty || 1) - shipped) };
+  });
+}
+function openSplitShipment(id) {
+  const order = allOrders.find(row => row.id === id);
+  if (!order || !['paid', 'processing'].includes(order.status)) { alert('请先把订单设为「已付款」或「处理中」'); return; }
+  const rows = splitShipmentProgress(order).filter(row => row.remaining > 0);
+  if (!rows.length) { alert('这张订单的商品已全部记录出货'); return; }
+  splitShipId = id;
+  splitShipRequestId = crypto.randomUUID();
+  document.getElementById('splitShipOrderId').textContent = `订单 #${order.order_id} · 尚有 ${rows.reduce((n, row) => n + row.remaining, 0)} 件未寄`;
+  document.getElementById('splitShipLines').innerHTML = rows.map(({ item, index, remaining }) => `<label class="flex items-center gap-3 border border-stone-200 rounded p-2 text-xs"><span class="flex-1 min-w-0"><strong class="block text-stone-800">${esc(item.name_zh || item.name || 'Item')}</strong><span class="text-stone-500">${esc([item.color, item.size].filter(Boolean).join(' / '))}${item.preorder ? ' · 预订' : ' · 现货'} · 未寄 ${remaining}</span></span><input class="split-ship-qty adm-input !w-20" data-index="${index}" type="number" min="0" max="${remaining}" step="1" value="0" aria-label="本次寄出 ${esc(item.name_zh || item.name || '商品')} 数量"></label>`).join('');
+  const currentAwb = order.customer?.easyparcel?.awb || '';
+  const used = (Array.isArray(order.customer?.shipments) ? order.customer.shipments : []).some(shipment => shipment.tracking_number === currentAwb);
+  document.getElementById('splitShipTracking').value = used ? '' : (currentAwb || order.tracking_number || '');
+  document.getElementById('splitShipCourier').value = order.customer?.easyparcel?.courier || '';
+  document.getElementById('splitShipPhoto').value = '';
+  document.getElementById('splitShipNotify').checked = true;
+  document.getElementById('splitShipError').classList.add('hidden');
+  document.getElementById('splitShipModal').classList.remove('hidden');
+}
+window.openSplitShipment = openSplitShipment;
+function closeSplitShipment() {
+  document.getElementById('splitShipModal').classList.add('hidden');
+  if (splitShipId) {
+    const select = document.getElementById('sel_' + splitShipId);
+    const order = allOrders.find(row => row.id === splitShipId);
+    if (select && order) select.value = order.status;
+  }
+  splitShipId = null;
+  splitShipRequestId = null;
+}
+window.closeSplitShipment = closeSplitShipment;
+async function saveSplitShipment() {
+  const order = allOrders.find(row => row.id === splitShipId);
+  if (!order) return;
+  const errorEl = document.getElementById('splitShipError');
+  errorEl.classList.add('hidden');
+  const trackingNumber = document.getElementById('splitShipTracking').value.trim();
+  const courier = document.getElementById('splitShipCourier').value.trim();
+  const lines = [];
+  for (const input of document.querySelectorAll('.split-ship-qty')) {
+    const qty = Number(input.value);
+    if (!Number.isInteger(qty) || qty < 0 || qty > Number(input.max)) { errorEl.textContent = '请检查本次寄出数量'; errorEl.classList.remove('hidden'); return; }
+    if (qty > 0) {
+      const index = Number(input.dataset.index);
+      const item = order.items[index];
+      lines.push({ index, qty, expectedName: item.name_zh || item.name || '', expectedQty: Number(item.qty || 1), expectedSize: item.size || '', expectedColor: item.color || '' });
+    }
+  }
+  if (!lines.length || !trackingNumber || !courier) { errorEl.textContent = '请选择商品数量，并填写本次快递公司和运单号'; errorEl.classList.remove('hidden'); return; }
+  const photoFile = document.getElementById('splitShipPhoto').files?.[0];
+  if (order.customer?.easyparcel?.awb === trackingNumber && !photoFile) { errorEl.textContent = 'EasyParcel 包裹请上传本次出货照片'; errorEl.classList.remove('hidden'); return; }
+  const button = document.getElementById('splitShipSave');
+  button.disabled = true; button.textContent = '保存中…';
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    const token = session?.access_token || '';
+    if (!token) throw new Error('管理员登录已过期，请重新登录');
+    const photoUrl = photoFile ? await uploadShipmentPhoto(token, photoFile) : '';
+    const response = await fetch('/api/notify-shipped', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ action: 'record-shipment', id: order.id, requestId: splitShipRequestId, lines, trackingNumber, courier, photoUrl, notifyCustomer: document.getElementById('splitShipNotify').checked }),
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error || `保存失败 (${response.status})`);
+    const index = allOrders.findIndex(row => row.id === order.id);
+    if (index >= 0) allOrders[index] = result.order;
+    closeSplitShipment();
+    renderOrders();
+    showToast(result.emailError || (result.emailSent ? '本次包裹已记录，顾客和店主已收到邮件' : '本次包裹已记录，未寄邮件'));
+  } catch (error) { errorEl.textContent = error.message; errorEl.classList.remove('hidden'); }
+  finally { button.disabled = false; button.textContent = '记录本次出货'; }
+}
+window.saveSplitShipment = saveSplitShipment;
 
 function updateBadge(id, status) {
   const badge = document.getElementById('badge_' + id);
@@ -2736,12 +2845,12 @@ async function uploadImageToR2(blob, filename) {
   return j.url;
 }
 
-async function uploadShipmentPhoto(token) {
-  const fileBase64 = await fileToBase64(pendingShipmentPhotoFile);
+async function uploadShipmentPhoto(token, file = pendingShipmentPhotoFile) {
+  const fileBase64 = await fileToBase64(file);
   const r = await fetch('/api/upload-shipment-photo', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ fileBase64, fileName: pendingShipmentPhotoFile.name, contentType: pendingShipmentPhotoFile.type }),
+    body: JSON.stringify({ fileBase64, fileName: file.name, contentType: file.type }),
   });
   const j = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error(j.error || '照片上传失败');

@@ -2,6 +2,7 @@ import nodemailer from "nodemailer";
 import { getSiteConfig, shippingFee, emailCompanyFooterHtml } from "./_lib/site-config.js";
 import { isAdminUser } from "./_lib/admin-auth.js";
 import { orderRevisionEmail } from "./_lib/order-revision-email.js";
+import { prepareShipment, shipmentEmail } from "./_lib/order-shipments.js";
 
 const SUPABASE_URL = "https://ilzeziznxzaxxudzhdmu.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI";
@@ -31,7 +32,7 @@ export default async function handler(req, res) {
   if (!(await isAdminUser(admin, SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY))) return res.status(403).json({ error: "无权限" });
 
   const { action, id, trackingNumber, photoUrl, courier: requestedCourier, trackingUrl: requestedTrackingUrl } = req.body || {};
-  if (!id || (action !== 'order-revision' && !trackingNumber)) return res.status(400).json({ error: "Missing id or trackingNumber" });
+  if (!id || (action !== 'order-revision' && action !== 'record-shipment' && !trackingNumber)) return res.status(400).json({ error: "Missing id or trackingNumber" });
 
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY;
   const orderRes = await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${encodeURIComponent(id)}&select=*`, {
@@ -40,6 +41,41 @@ export default async function handler(req, res) {
   const orders = orderRes.ok ? await orderRes.json() : [];
   const order = orders[0];
   if (!order) return res.status(404).json({ error: "找不到订单" });
+
+  if (action === 'record-shipment') {
+    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return res.status(503).json({ error: '订单服务尚未配置' });
+    let prepared;
+    try { prepared = prepareShipment(order, req.body || {}); }
+    catch (error) { return res.status(409).json({ error: error.message }); }
+    if (order.customer?.easyparcel?.awb === prepared.shipment.tracking_number && !prepared.shipment.photo_url) {
+      return res.status(400).json({ error: 'EasyParcel 包裹请先上传本次出货照片' });
+    }
+    const customer = { ...(order.customer || {}), shipments: prepared.shipments };
+    const patch = { items: prepared.items, customer, tracking_number: prepared.shipment.tracking_number, status: prepared.allShipped ? 'shipped' : 'processing' };
+    const saved = await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+      body: JSON.stringify(patch),
+    });
+    const savedRows = saved.ok ? await saved.json() : [];
+    if (!saved.ok || !savedRows.length) return res.status(502).json({ error: '发货记录保存失败，请刷新后检查订单' });
+    if (req.body?.notifyCustomer !== true) return res.status(200).json({ ok: true, order: savedRows[0], emailSent: false });
+    const ownerEmail = clean(process.env.ORDER_NOTIFY_EMAIL || process.env.GMAIL_USER).toLowerCase();
+    const customerEmail = clean(order.customer?.email || order.guest_email).toLowerCase();
+    const recipient = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail) ? customerEmail : ownerEmail;
+    if (!recipient || !process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+      return res.status(200).json({ ok: true, order: savedRows[0], emailSent: false, emailError: '发货已记录，但通知邮箱或邮件服务未配置' });
+    }
+    const message = shipmentEmail(savedRows[0], prepared.shipment, prepared.remaining);
+    try {
+      const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD } });
+      await transporter.sendMail({ from: `Cippy <${process.env.GMAIL_USER}>`, to: recipient, ...(ownerEmail && recipient !== ownerEmail ? { bcc: ownerEmail } : {}), ...message });
+      return res.status(200).json({ ok: true, order: savedRows[0], emailSent: true });
+    } catch (error) {
+      console.error('partial shipment email failed', error);
+      return res.status(200).json({ ok: true, order: savedRows[0], emailSent: false, emailError: '发货已记录，但邮件寄送失败；请勿重复记录同一包裹' });
+    }
+  }
 
   if (action === 'order-revision') {
     const email = String(order.customer?.email || order.guest_email || '').trim();

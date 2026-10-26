@@ -4611,6 +4611,10 @@ export default function App() {
                           } catch {
                             itemsArray = [];
                           }
+                          const shipmentRecords: any[] = Array.isArray(ord.customer?.shipments) ? ord.customer.shipments : [];
+                          const shippedUnits = shipmentRecords.reduce((sum: number, shipment: any) => sum + (shipment.lines || []).reduce((n: number, line: any) => n + Number(line.qty || 0), 0), 0);
+                          const orderedUnits = itemsArray.reduce((sum: number, item: any) => sum + (item._is_discount ? 0 : Number(item.qty || item.quantity || 1)), 0);
+                          const partlyShipped = shippedUnits > 0 && shippedUnits < orderedUnits;
 
                           const statusStr = ord.status || 'pending';
                           let statusStepIndex = 0;
@@ -4646,7 +4650,11 @@ export default function App() {
                                 </div>
                                 <div className="space-y-0.5 sm:text-right">
                                   <span className="font-mono text-[10px] text-zinc-400 uppercase tracking-widest block">STATUS</span>
-                                  {statusStr === 'pending' || statusStr === 'unpaid' ? (
+                                  {partlyShipped ? (
+                                    <span className="inline-flex items-center text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-100 px-2.5 py-0.5 rounded-full">
+                                      {lang === 'zh' ? `部分出货 · 还有 ${orderedUnits - shippedUnits} 件未寄` : `Partially shipped · ${orderedUnits - shippedUnits} item(s) remaining`}
+                                    </span>
+                                  ) : statusStr === 'pending' || statusStr === 'unpaid' ? (
                                     <span className="inline-flex items-center gap-1 text-[10px] font-bold tracking-widest bg-amber-50 text-amber-600 border border-amber-100 px-2.5 py-0.5 rounded-full uppercase">
                                       {lang === 'zh' ? '等候处理 (Pending)' : 'Pending'}
                                     </span>
@@ -4862,6 +4870,18 @@ export default function App() {
                                   })}
                                 </div>
                               </div>
+
+                              {shipmentRecords.length > 0 && (
+                                <div className="border-t border-zinc-100 pt-3 space-y-2">
+                                  <strong className="text-xs text-zinc-700">{lang === 'zh' ? '包裹与运单' : 'Parcels & tracking'}</strong>
+                                  {shipmentRecords.map((shipment: any, index: number) => (
+                                    <div key={shipment.id || index} className="text-xs text-zinc-600 border-l-2 border-[#B96A73] pl-3">
+                                      <p className="font-semibold">{lang === 'zh' ? `第 ${index + 1} 批` : `Parcel ${index + 1}`} · {shipment.courier || (lang === 'zh' ? '快递' : 'Courier')} · <span className="font-mono select-all">{shipment.tracking_number}</span></p>
+                                      <p>{(shipment.lines || []).map((line: any) => { const item = itemsArray.find((entry: any) => entry.fulfillment_line_id === line.line_id); return `${(lang === 'zh' ? item?.name_zh : item?.name_en) || item?.name || item?.name_zh || (lang === 'zh' ? '商品' : 'Item')} ×${line.qty}`; }).join(' · ')}</p>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
 
                               {/* Order breakdown footer details */}
                               <div className="border-t pt-3 border-zinc-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-xs">
