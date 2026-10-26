@@ -385,6 +385,11 @@
     <div class="rounded-xl bg-amber-50 border border-amber-100 px-4 py-3 text-xs text-amber-800">
       请先确认地址和包裹资料。选择报价后点击付款会从 EasyParcel credit 扣款，并自动取得 AWB 运单号。
     </div>
+    <div id="epRebookNotice" class="hidden rounded-xl bg-rose-50 border border-rose-200 px-4 py-3 text-xs text-rose-800 space-y-2">
+      <p>重新建立会再次扣除 EasyParcel credit。旧运单不会自动取消或退款，旧运单资料会保留在订单历史；不会自动更改订单状态或通知顾客。</p>
+      <p>现有运单号：<strong id="epPreviousAwb"></strong></p>
+      <label class="block">重新建立原因 * <input id="epRebookReason" maxlength="300" class="adm-input mt-1" placeholder="例如：地址填写错误，需重新寄送"/></label>
+    </div>
     <div class="space-y-3">
       <p class="text-xs font-bold text-stone-500 uppercase tracking-wide">收件资料</p>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -922,8 +927,8 @@ document.getElementById('loginBtn').addEventListener('click', () =>
 document.getElementById('logoutBtn').addEventListener('click', () => sb.auth.signOut());
 document.getElementById('logoutBtn2').addEventListener('click', () => sb.auth.signOut());
 
-const STATUS_LABELS = { pending:'待付款', pending_payment:'待付款', paid:'已付款', processing:'处理中', shipped:'已发货', delivered:'已送达', cancelled:'已取消' };
-const STATUS_COLORS = { pending:'bg-red-100 text-red-700', pending_payment:'bg-red-100 text-red-700', paid:'bg-pink-100 text-pink-700', processing:'bg-yellow-100 text-yellow-700', shipped:'bg-blue-100 text-blue-700', delivered:'bg-green-100 text-green-700', cancelled:'bg-stone-100 text-stone-500' };
+const STATUS_LABELS = { pending:'待付款', pending_payment:'待付款', paid:'已付款', processing:'处理中', shipped:'已发货', delivered:'已送达', completed:'已完成', cancelled:'已取消' };
+const STATUS_COLORS = { pending:'bg-red-100 text-red-700', pending_payment:'bg-red-100 text-red-700', paid:'bg-pink-100 text-pink-700', processing:'bg-yellow-100 text-yellow-700', shipped:'bg-blue-100 text-blue-700', delivered:'bg-green-100 text-green-700', completed:'bg-green-100 text-green-700', cancelled:'bg-stone-100 text-stone-500' };
 
 let currentTab = 'orders';
 const TAB_TITLES = { orders: '订单', products: '商品', stock: '库存', customers: '客户', content: '网站内容', analytics: '实时监控', settings: '设置' };
@@ -2192,6 +2197,7 @@ function orderMatchesFilter(o, f) {
   if (!f) return true;
   if (f === 'todo') return TODO_STATUSES.includes(o.status);
   if (f === 'pending') return UNPAID_STATUSES.includes(o.status);
+  if (f === 'delivered') return ['delivered', 'completed'].includes(o.status);
   return o.status === f;
 }
 function updateOrderCounts() {
@@ -2199,6 +2205,7 @@ function updateOrderCounts() {
   allOrders.forEach(o => {
     if (TODO_STATUSES.includes(o.status)) counts.todo++;
     else if (UNPAID_STATUSES.includes(o.status)) counts.pending++;
+    else if (o.status === 'completed') counts.delivered++;
     else if (counts[o.status] !== undefined) counts[o.status]++;
   });
   document.querySelectorAll('.status-filter-btn').forEach(b => {
@@ -2281,9 +2288,10 @@ function renderOrders() {
       <div class="ocard-foot">
         <button class="text-xs text-stone-600 border border-stone-200 rounded-lg px-3 py-2 hover:bg-stone-50" onclick="downloadOrderPage('${o.id}')">下载订单单据</button>
         ${c.easyparcel?.awb_label_url ? `<button class="text-xs text-stone-600 border border-stone-200 rounded-lg px-3 py-2 hover:bg-stone-50" onclick="downloadEasyParcelAwb('${o.id}', this)">下载 AWB PDF</button>` : ''}
-        ${canShip && !c.easyparcel?.awb ? `<button class="btn-brand" onclick="openEasyParcel('${o.id}')">建立 EasyParcel 运单</button>
+        ${canShip && !c.easyparcel?.awb && !o.tracking_number ? `<button class="btn-brand" onclick="openEasyParcel('${o.id}')">建立 EasyParcel 运单</button>
         <button class="text-xs text-stone-500 border border-stone-200 rounded-lg px-3 py-2 hover:bg-stone-50" onclick="updateOrderStatus('${o.id}','shipped',document.getElementById('sel_${o.id}'))">手动填写运单</button>` : ''}
         ${canShip && c.easyparcel?.awb ? `<button class="btn-brand" onclick="editTracking('${o.id}')">上传照片并确认发货</button>` : ''}
+        ${['paid', 'processing', 'shipped', 'delivered', 'completed'].includes(o.status) && (c.easyparcel?.awb || o.tracking_number || ['shipped', 'delivered', 'completed'].includes(o.status)) ? `<button class="text-xs text-stone-600 border border-stone-200 rounded-lg px-3 py-2 hover:bg-stone-50" onclick="openEasyParcel('${o.id}', true)">重新建立 AWB</button>` : ''}
         <select id="sel_${o.id}" onchange="updateOrderStatus('${o.id}', this.value, this)" class="adm-select">${statusOptions}</select>
         <button class="more-btn ml-auto text-xs text-stone-400 hover:text-stone-600" onclick="toggleOrderDetail('${o.id}')">详情 ▾</button>
       </div>
@@ -2307,6 +2315,7 @@ function renderOrders() {
             <p id="tracking_${o.id}" class="text-sm font-mono text-stone-700">${esc(o.tracking_number || '—')}</p>
             ${c.easyparcel?.awb_label_url ? `<button onclick="downloadEasyParcelAwb('${o.id}', this)" class="mt-2 inline-block text-xs text-[#C4928A] underline">下载运单 PDF</button>` : ''}
             ${c.easyparcel?.tracking_url ? `<a href="${esc(c.easyparcel.tracking_url)}" target="_blank" rel="noopener" class="mt-2 ml-3 inline-block text-xs text-[#C4928A] underline">查看物流</a>` : ''}
+            ${Array.isArray(c.easyparcel_history) && c.easyparcel_history.length ? `<div class="mt-3 border-t border-stone-100 pt-2"><p class="text-xs font-semibold text-stone-400 mb-1">旧运单历史</p>${c.easyparcel_history.map((old, index) => `<p class="text-xs text-stone-500">${esc(old.courier || old.provider || '运单')} · ${esc(old.awb || '—')}${old.awb_label_url ? ` <button onclick="downloadEasyParcelAwb('${o.id}', this, ${index})" class="text-[#C4928A] underline">下载旧 AWB</button>` : ''}</p>`).join('')}</div>` : ''}
         <button onclick="event.stopPropagation();editTracking('${o.id}')" class="mt-2 text-xs text-[#C4928A] border border-[#C4928A] px-2 py-1 rounded hover:bg-[#fdf0ed]">${c.easyparcel && o.status !== 'shipped' ? '上传照片并确认发货' : '修改运单号 / 出货照片'}</button>
           </div>` : ''}
           ${c.shipment_photo_url ? `
@@ -2348,6 +2357,8 @@ function applyDetailState() {
 
 let easyParcelOrderId = null;
 let easyParcelRates = [];
+let easyParcelRebook = false;
+let easyParcelAttemptId = null;
 
 function parseShippingAddress(value) {
   const raw = String(value || '').trim();
@@ -2395,12 +2406,17 @@ function showEasyParcelError(message) {
   el.classList.remove('hidden');
 }
 
-function openEasyParcel(id) {
+function openEasyParcel(id, rebook = false) {
   const o = allOrders.find(x => x.id === id);
   if (!o) return;
   easyParcelOrderId = id;
   easyParcelRates = [];
+  easyParcelRebook = rebook;
+  easyParcelAttemptId = rebook ? crypto.randomUUID() : null;
   const c = o.customer || {};
+  document.getElementById('epRebookNotice').classList.toggle('hidden', !rebook);
+  document.getElementById('epPreviousAwb').textContent = c.easyparcel?.awb || o.tracking_number || '无旧运单号';
+  document.getElementById('epRebookReason').value = '';
   const parsed = c.address1 && c.city ? {
     address1: c.address1, address2: c.address2 || '', address3: c.address3 || '',
     city: c.city, state: c.state || '', postcode: c.postcode || '',
@@ -2433,6 +2449,8 @@ function closeEasyParcel() {
   document.getElementById('easyParcelModal').classList.add('hidden');
   easyParcelOrderId = null;
   easyParcelRates = [];
+  easyParcelRebook = false;
+  easyParcelAttemptId = null;
 }
 window.closeEasyParcel = closeEasyParcel;
 
@@ -2481,22 +2499,32 @@ async function bookEasyParcel() {
   const selected = document.querySelector('input[name="epRate"]:checked');
   if (!selected) { showEasyParcelError('请先选择一个快递报价'); return; }
   const rate = easyParcelRates.find(x => x.serviceId === selected.value);
+  const reason = document.getElementById('epRebookReason').value.trim();
+  if (easyParcelRebook && reason.length < 5) { showEasyParcelError('请填写至少 5 个字的重新建立原因'); return; }
   const mode = document.getElementById('epMode').textContent;
-  if (!confirm(`确认使用 ${rate?.courier || '所选快递'}（RM ${Number(rate?.price || 0).toFixed(2)}）？\n\n${mode === '正式模式' ? '此操作会扣除 EasyParcel credit。' : '目前是 Demo 模式，不会产生真实出货。'}`)) return;
+  if (!confirm(`确认${easyParcelRebook ? '重新建立' : '建立'} ${rate?.courier || '所选快递'} AWB（RM ${Number(rate?.price || 0).toFixed(2)}）？\n\n${mode === '正式模式' ? `此操作会${easyParcelRebook ? '再次' : ''}扣除 EasyParcel credit。` : '目前是 Demo 模式，不会产生真实出货。'}${easyParcelRebook ? '\n旧运单不会自动取消或退款，原订单状态不变，也不会自动通知顾客。' : ''}`)) return;
   const btn = document.getElementById('epBookBtn');
   document.getElementById('epError').classList.add('hidden');
   btn.disabled = true; btn.textContent = '建立并付款中…';
   try {
     const payload = easyParcelPayload('book');
     payload.serviceId = selected.value;
+    if (easyParcelRebook) {
+      const old = allOrders.find(x => x.id === easyParcelOrderId);
+      payload.rebook = true;
+      payload.rebookReason = reason;
+      payload.expectedAwb = old?.customer?.easyparcel?.awb || '';
+      payload.expectedTracking = old?.tracking_number || '';
+      payload.rebookAttemptId = easyParcelAttemptId;
+    }
     const json = await easyParcelRequest(payload);
     const shipment = json.shipment;
     const o = allOrders.find(x => x.id === easyParcelOrderId);
     if (o) {
       o.tracking_number = shipment.awb;
-      o.customer = { ...(o.customer || {}), easyparcel: shipment };
+      o.customer = { ...(o.customer || {}), easyparcel: shipment, easyparcel_history: json.history || o.customer?.easyparcel_history || [] };
     }
-    showToast(`${shipment.courier} 运单已建立：${shipment.awb}，上传出货照片后再确认发货`);
+    showToast(`${shipment.courier} 运单已${easyParcelRebook ? '重新' : ''}建立：${shipment.awb}。${easyParcelRebook ? '原订单状态未更改，请核对后再通知顾客。' : '上传出货照片后再确认发货。'}`);
     closeEasyParcel();
     renderOrders();
   } catch (e) {
@@ -2507,7 +2535,7 @@ async function bookEasyParcel() {
 }
 window.bookEasyParcel = bookEasyParcel;
 
-async function downloadEasyParcelAwb(id, button) {
+async function downloadEasyParcelAwb(id, button, historyIndex) {
   const oldText = button.textContent;
   button.disabled = true;
   button.textContent = '下载中…';
@@ -2516,14 +2544,14 @@ async function downloadEasyParcelAwb(id, button) {
     const response = await fetch('/api/easyparcel', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
-      body: JSON.stringify({ action: 'download-awb', orderId: id }),
+      body: JSON.stringify({ action: 'download-awb', orderId: id, ...(historyIndex === undefined ? {} : { historyIndex }) }),
     });
     if (!response.ok) {
       const error = await response.json().catch(() => ({}));
       throw new Error(error.error || `下载失败 (${response.status})`);
     }
     const order = allOrders.find(row => row.id === id);
-    const filename = `cippy-awb-${String(order?.order_id || id).replace(/[^a-zA-Z0-9_-]/g, '_')}.pdf`;
+    const filename = `cippy-awb-${String(order?.order_id || id).replace(/[^a-zA-Z0-9_-]/g, '_')}${historyIndex === undefined ? '' : `-old-${historyIndex + 1}`}.pdf`;
     const url = URL.createObjectURL(await response.blob());
     const link = document.createElement('a');
     link.href = url;

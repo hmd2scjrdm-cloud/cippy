@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { downloadAwb } from '../api/easyparcel.js';
+import { bookingError, downloadAwb } from '../api/easyparcel.js';
 
 function response() {
   return {
@@ -68,4 +68,19 @@ test('AWB download rejects a non-PDF response', async () => {
     await downloadAwb({ customer: { easyparcel: { awb: '123', awb_label_url: 'https://connect.easyparcel.my/?ac=AWBLabel&id=abc' } } }, res);
     assert.equal(res.code, 502);
   } finally { globalThis.fetch = previousFetch; }
+});
+
+test('completed orders can rebook with explicit acknowledgement of the old AWB', () => {
+  const order = { status: 'completed', tracking_number: 'OLD123', customer: { easyparcel: { awb: 'OLD123' } } };
+  const body = { rebook: true, rebookReason: '客户地址更正', expectedAwb: 'OLD123', expectedTracking: 'OLD123', rebookAttemptId: 'ca2651f3-4f20-4400-b0ba-9e425bbbe12a' };
+  assert.equal(bookingError(order, body), '');
+  assert.match(bookingError(order, { ...body, expectedAwb: 'STALE' }), /已改变/);
+  assert.match(bookingError(order, { ...body, rebookReason: '' }), /原因/);
+  assert.match(bookingError(order, { ...body, rebookAttemptId: '' }), /请求编号/);
+  assert.match(bookingError(order, { ...body, rebook: false }), /已付款/);
+});
+
+test('cancelled orders cannot rebook', () => {
+  const order = { status: 'cancelled', customer: {} };
+  assert.match(bookingError(order, { rebook: true }), /只有已付款/);
 });

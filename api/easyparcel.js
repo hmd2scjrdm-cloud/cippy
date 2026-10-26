@@ -79,6 +79,24 @@ function rateRows(data) {
   })).filter(rate => rate.serviceId && rate.courier && rate.price > 0).sort((a, b) => a.price - b.price);
 }
 
+export function bookingError(order, body) {
+  const rebook = body?.rebook === true;
+  const status = String(order.status || '').toLowerCase();
+  if (!(rebook ? ['paid', 'processing', 'shipped', 'delivered', 'completed'] : ['paid', 'processing']).includes(status)) {
+    return '只有已付款、处理中、已发货或已送达的订单可以建立或重新建立运单';
+  }
+  const oldAwb = clean(order.customer?.easyparcel?.awb, 60);
+  if (!rebook && oldAwb) return `该订单已有 EasyParcel 运单：${oldAwb}`;
+  if (rebook) {
+    if (clean(body?.rebookReason, 300).length < 5) return '请填写重新建立运单的原因';
+    if (clean(body?.expectedAwb, 60) !== oldAwb || clean(body?.expectedTracking, 60) !== clean(order.tracking_number, 60)) {
+      return '旧运单资料已改变，请刷新订单后重新操作，避免重复扣款';
+    }
+    if (!/^[a-f0-9-]{36}$/i.test(String(body?.rebookAttemptId || ''))) return '缺少重新建立请求编号，请重新打开窗口';
+  }
+  return '';
+}
+
 export async function downloadAwb(order, res) {
   const shipment = order.customer?.easyparcel;
   if (!shipment?.awb || !shipment?.awb_label_url) return res.status(404).json({ error: "这张订单还没有可下载的 EasyParcel AWB" });
@@ -121,7 +139,15 @@ export default async function handler(req, res) {
     const { action, orderId } = req.body || {};
     const order = await getOrder(orderId, serviceKey);
     if (!order) return res.status(404).json({ error: "找不到订单" });
-    if (action === 'download-awb') return await downloadAwb(order, res);
+    if (action === 'download-awb') {
+      const historyIndex = req.body?.historyIndex;
+      if (historyIndex === undefined) return await downloadAwb(order, res);
+      const history = order.customer?.easyparcel_history;
+      if (!Array.isArray(history) || !Number.isInteger(historyIndex) || historyIndex < 0 || historyIndex >= history.length) {
+        return res.status(404).json({ error: '找不到旧运单' });
+      }
+      return await downloadAwb({ ...order, customer: { easyparcel: history[historyIndex] } }, res);
+    }
     const input = parcelInput(req.body || {}, order);
     const inputError = validateShipment(input);
     if (inputError) return res.status(400).json({ error: inputError });
@@ -137,12 +163,12 @@ export default async function handler(req, res) {
     }
 
     if (action === "book") {
-      if (!['paid', 'processing'].includes(String(order.status || '').toLowerCase())) {
-        return res.status(409).json({ error: "只有已付款或处理中的订单可以建立正式运单" });
-      }
-      if (order.customer?.easyparcel?.awb) {
-        return res.status(409).json({ error: `该订单已有 EasyParcel 运单：${clean(order.customer.easyparcel.awb, 60)}` });
-      }
+      const rebook = req.body?.rebook === true;
+      const guardError = bookingError(order, req.body);
+      if (guardError) return res.status(409).json({ error: guardError });
+      const priorAwb = clean(order.customer?.easyparcel?.awb, 60);
+      const priorTracking = clean(order.tracking_number, 60);
+      const rebookReason = clean(req.body?.rebookReason, 300);
       const serviceId = clean(req.body?.serviceId, 20);
       if (!serviceId) return res.status(400).json({ error: "请选择快递服务" });
       const shipment = {
@@ -161,7 +187,7 @@ export default async function handler(req, res) {
         reference: clean(order.order_id, 25), cod_enabled: "false",
       };
       const submitted = await easyParcelCall(config, "EPSubmitOrderBulk", {
-        bulk: [shipment], idempotency_key: `cippy-${clean(order.id, 80)}-${serviceId}`,
+        bulk: [shipment], idempotency_key: rebook ? `cippy-rebook-${clean(req.body.rebookAttemptId, 36)}` : `cippy-${clean(order.id, 80)}-${serviceId}`,
       });
       const made = Array.isArray(submitted.result) ? submitted.result[0] : null;
       if (!made || String(made.status).toLowerCase() !== "success" || !made.order_number) {
@@ -178,12 +204,23 @@ export default async function handler(req, res) {
         courier, service_id: serviceId, price: Number(made.price || 0),
         awb_label_url: clean(parcel.awb_id_link, 500), tracking_url: clean(parcel.tracking_url, 500),
         booked_at: new Date().toISOString(), recipient: input.recipient, parcel: input.parcel,
+        ...(rebook ? { rebook_reason: rebookReason, previous_awb: priorAwb || priorTracking } : {}),
       };
-      await updateOrder(order.id, {
-        tracking_number: shipping.awb,
-        customer: { ...(order.customer || {}), easyparcel: shipping },
-      }, serviceKey);
-      return res.status(200).json({ ok: true, shipment: shipping });
+      const oldHistory = Array.isArray(order.customer?.easyparcel_history) ? order.customer.easyparcel_history : [];
+      const previous = order.customer?.easyparcel?.awb
+        ? order.customer.easyparcel
+        : priorTracking ? { awb: priorTracking, provider: 'Manual', archived_at: new Date().toISOString() } : null;
+      const history = rebook && previous ? [...oldHistory, previous] : oldHistory;
+      try {
+        await updateOrder(order.id, {
+          tracking_number: shipping.awb,
+          customer: { ...(order.customer || {}), easyparcel: shipping, ...(rebook ? { easyparcel_history: history } : {}) },
+        }, serviceKey);
+      } catch (error) {
+        console.error('EasyParcel AWB created but order save failed', { orderId: order.id, awb: shipping.awb, error });
+        return res.status(502).json({ error: `EasyParcel 已取得 AWB ${shipping.awb}，但后台保存失败。请先到 EasyParcel 核对，勿直接重试，避免重复扣款。` });
+      }
+      return res.status(200).json({ ok: true, shipment: shipping, ...(rebook ? { history } : {}) });
     }
     return res.status(400).json({ error: "Unknown action" });
   } catch (error) {
