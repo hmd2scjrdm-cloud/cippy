@@ -47,9 +47,6 @@ export default async function handler(req, res) {
     let prepared;
     try { prepared = prepareShipment(order, req.body || {}); }
     catch (error) { return res.status(409).json({ error: error.message }); }
-    if (order.customer?.easyparcel?.awb === prepared.shipment.tracking_number && !prepared.shipment.photo_url) {
-      return res.status(400).json({ error: 'EasyParcel 包裹请先上传本次出货照片' });
-    }
     const customer = { ...(order.customer || {}), shipments: prepared.shipments };
     const patch = { items: prepared.items, customer, tracking_number: prepared.shipment.tracking_number, status: prepared.allShipped ? 'shipped' : 'processing' };
     const saved = await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${encodeURIComponent(id)}`, {
