@@ -63,7 +63,7 @@ export default async function handler(req, res) {
     if (!recipient || !process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
       return res.status(200).json({ ok: true, order: savedRows[0], emailSent: false, emailError: '发货已记录，但通知邮箱或邮件服务未配置' });
     }
-    const message = shipmentEmail(savedRows[0], prepared.shipment, prepared.remaining);
+    const message = shipmentEmail(savedRows[0], prepared.shipment, prepared.remaining, await getSiteConfig(SUPABASE_URL, SUPABASE_ANON_KEY));
     try {
       const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD } });
       await transporter.sendMail({ from: `Cippy <${process.env.GMAIL_USER}>`, to: recipient, ...(ownerEmail && recipient !== ownerEmail ? { bcc: ownerEmail } : {}), ...message });
@@ -79,7 +79,7 @@ export default async function handler(req, res) {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: "顾客没有有效邮箱，无法寄送更新副本" });
     if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) return res.status(500).json({ error: "邮件服务未配置" });
     const ownerEmail = clean(process.env.ORDER_NOTIFY_EMAIL || process.env.GMAIL_USER).toLowerCase();
-    const message = orderRevisionEmail(order, req.body?.note);
+    const message = orderRevisionEmail(order, req.body?.note, await getSiteConfig(SUPABASE_URL, SUPABASE_ANON_KEY));
     try {
       const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD } });
       await transporter.sendMail({ from: `Cippy <${process.env.GMAIL_USER}>`, to: email, ...(ownerEmail && ownerEmail !== email.toLowerCase() ? { bcc: ownerEmail } : {}), subject: message.subject, html: message.html, text: message.text });

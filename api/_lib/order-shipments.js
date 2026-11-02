@@ -1,3 +1,5 @@
+import { DEFAULT_SITE_CONFIG } from "./site-config.js";
+import { emailShell, afterSalesBlockHtml, escapeHtml, labelStyle, pinkBox } from "./email-layout.js";
 import { randomUUID } from 'node:crypto';
 
 export function shipmentProgress(order) {
@@ -49,15 +51,40 @@ export function prepareShipment(order, input) {
   return { items, shipment, shipments, remaining: after.reduce((sum, row) => sum + row.remaining, 0), allShipped: after.every(row => row.remaining === 0) };
 }
 
-export function shipmentEmail(order, shipment, remaining) {
-  const escape = value => String(value ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+export function shipmentEmail(order, shipment, remaining, siteConfig = DEFAULT_SITE_CONFIG) {
   const products = (shipment.lines || []).map(line => {
     const item = (order.items || []).find(row => row.fulfillment_line_id === line.line_id);
     return item ? { name: item.name_zh || item.name || 'Item', size: item.size, color: item.color, qty: line.qty } : null;
   }).filter(Boolean);
-  const listHtml = products.map(item => `<li>${escape(item.name)} · ${escape([item.color, item.size].filter(Boolean).join(' / '))} ×${item.qty}</li>`).join('');
   const partial = remaining > 0;
-  const html = `<div style="max-width:560px;margin:auto;font-family:Arial,sans-serif;color:#332928;line-height:1.6"><h1>CIPPY</h1><h2>订单 #${escape(order.order_id || order.id)} ${partial ? '部分发货 / Partially shipped' : '已发货 / Shipped'}</h2><p>这次包裹包含以下商品。<br>This parcel contains the following items:</p><ul>${listHtml}</ul><p><strong>快递 / Courier:</strong> ${escape(shipment.courier)}<br><strong>运单号 / Tracking:</strong> ${escape(shipment.tracking_number)}</p>${shipment.photo_url ? `<img src="${escape(shipment.photo_url)}" alt="Packing photo" style="max-width:100%;max-height:320px;object-fit:cover">` : ''}${partial ? `<p>还有 ${remaining} 件商品尚未寄出，之后会另外通知您。<br>${remaining} item(s) remain and will be dispatched separately.</p>` : ''}<p>拆包前请录制完整、未剪辑的开箱视频。<br>Please record one continuous, unedited unboxing video before opening the parcel.</p></div>`;
-  const text = `CIPPY 订单 #${order.order_id || order.id} ${partial ? '部分发货 / Partially shipped' : '已发货 / Shipped'}\n\n本次包裹 / This parcel:\n${products.map(item => `- ${item.name} ${[item.color, item.size].filter(Boolean).join(' / ')} ×${item.qty}`).join('\n')}\n\n快递 / Courier: ${shipment.courier}\n运单号 / Tracking: ${shipment.tracking_number}${partial ? `\n\n还有 ${remaining} 件商品尚未寄出。${remaining} item(s) remain.` : ''}\n\n拆包前请录制完整开箱视频。Record an unedited unboxing video before opening.`;
+  const orderNo = escapeHtml(order.order_id || order.id);
+  const name = escapeHtml(order.customer?.name || 'there');
+  const courier = escapeHtml(shipment.courier);
+  const tracking = escapeHtml(shipment.tracking_number);
+  const isSpx = /spx/i.test(String(shipment.courier || ''));
+
+  const itemRows = products.map(item => {
+    const variant = escapeHtml([item.color, item.size].filter(Boolean).join(' / '));
+    return `<tr><td style="padding:10px 0;border-bottom:1px solid #f3f4f6;font-size:14px;color:#111827;">${escapeHtml(item.name)}${variant ? `<br><span style="font-size:12px;color:#9ca3af;">${variant}</span>` : ''}</td><td align="right" style="padding:10px 0;border-bottom:1px solid #f3f4f6;font-size:14px;color:#4b5563;white-space:nowrap;">×${item.qty}</td></tr>`;
+  }).join('');
+
+  const bodyHtml = `
+    ${pinkBox(`<p style="${labelStyle}">快递公司 / Courier</p><p style="margin:0 0 14px;font-size:15px;font-weight:600;color:#111827;">${courier}</p><p style="${labelStyle}">运单号 / Tracking Number</p><p style="margin:0;font-size:18px;font-weight:700;color:#111827;font-family:monospace;letter-spacing:0.03em;">${tracking}</p>`)}
+    ${isSpx ? `<p style="margin:0 0 20px;font-size:13px;color:#6b7280;line-height:1.6;">您可以前往 <a href="https://spx.com.my" style="color:#C4928A;">spx.com.my</a> 官网，输入以上运单号查询实时物流状态。<br/>You can track your parcel in real time at <a href="https://spx.com.my" style="color:#C4928A;">spx.com.my</a>.</p>` : ''}
+    <p style="${labelStyle}margin-bottom:2px;">本次包裹内容 / In this parcel</p>
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px;">${itemRows}</table>
+    ${partial ? `<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:14px 18px;margin-bottom:20px;"><p style="margin:0;font-size:13px;color:#92400e;line-height:1.7;">还有 <strong>${remaining}</strong> 件商品尚未寄出，之后会另外通知您。<br/><span style="color:#b45309;">${remaining} item(s) remain and will be dispatched separately.</span></p></div>` : ''}
+    ${shipment.photo_url ? `<p style="${labelStyle}">打包实拍 / Packing Photo</p><img src="${escapeHtml(shipment.photo_url)}" width="100%" style="border-radius:10px;display:block;margin-bottom:20px;max-height:320px;object-fit:cover;" alt="Packing photo"/>` : ''}
+    ${afterSalesBlockHtml()}`;
+
+  const html = emailShell({
+    eyebrow: partial ? 'Part of your order has shipped' : 'Your order has shipped',
+    title: orderNo,
+    intro: `Hi ${name}，${partial ? '你订单里的一部分商品已经寄出啦' : '你的 Cippy 订单已经寄出啦'}！🎉`,
+    bodyHtml,
+    siteConfig,
+  });
+  const text = `CIPPY 订单 #${order.order_id || order.id} ${partial ? '部分发货 / Partially shipped' : '已发货 / Shipped'}\n\n本次包裹 / This parcel:\n${products.map(item => `- ${item.name} ${[item.color, item.size].filter(Boolean).join(' / ')} ×${item.qty}`).join('\n')}\n\n快递 / Courier: ${shipment.courier}\n运单号 / Tracking: ${shipment.tracking_number}${partial ? `\n\n还有 ${remaining} 件商品尚未寄出。${remaining} item(s) remain.` : ''}\n\n拆包前请录制完整开箱视频，收货后 24 小时内如有问题请联系我们。Record an unedited unboxing video before opening; contact us within 24 hours of delivery if there is a problem.`;
   return { subject: `CIPPY 订单 #${order.order_id || order.id} ${partial ? '部分发货' : '已发货'} · ${partial ? 'Partially shipped' : 'Shipped'}`, html, text };
 }
+
