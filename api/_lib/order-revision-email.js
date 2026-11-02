@@ -1,5 +1,5 @@
 import { DEFAULT_SITE_CONFIG } from "./site-config.js";
-import { emailShell, escapeHtml, money, labelStyle, pinkBox } from "./email-layout.js";
+import { emailShell, escapeHtml, money, labelStyle, pinkBox, afterSalesBlockHtml } from "./email-layout.js";
 
 export function orderRevisionEmail(order, note = '', siteConfig = DEFAULT_SITE_CONFIG) {
   const items = Array.isArray(order.items) ? order.items.filter(item => !item._is_discount) : [];
@@ -40,7 +40,8 @@ export function orderRevisionEmail(order, note = '', siteConfig = DEFAULT_SITE_C
         ${discount > 0 ? `<tr><td style="padding:3px 0;color:#9f1239;">优惠 / Discount</td><td align="right" style="color:#9f1239;">−${money(discount)}</td></tr>` : ''}
         <tr><td style="padding:10px 0 0;font-size:16px;font-weight:700;color:#111827;">订单合计 / Order total</td><td align="right" style="padding:10px 0 0;font-size:16px;font-weight:700;color:#111827;">${money(order.totals?.total)}</td></tr>
       </table>`)}
-    <p style="margin:0;font-size:12px;color:#6b7280;line-height:1.7;">这是原订单的更新副本，不是新订单，也不会再次扣款。若金额需要调整，我们会另行联系您确认。<br/><span style="color:#9ca3af;">This is an updated copy of your original order, not a new charge. We will contact you separately about any payment adjustment.</span></p>`;
+    <p style="margin:0;font-size:12px;color:#6b7280;line-height:1.7;">这是原订单的更新副本，不是新订单，也不会再次扣款。若金额需要调整，我们会另行联系您确认。<br/><span style="color:#9ca3af;">This is an updated copy of your original order, not a new charge. We will contact you separately about any payment adjustment.</span></p>
+    <div style="margin-top:24px;">${afterSalesBlockHtml()}</div>`;
 
   const html = emailShell({
     eyebrow: '订单资料更新 / Order update',

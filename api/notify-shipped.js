@@ -3,6 +3,7 @@ import { getSiteConfig, shippingFee, emailCompanyFooterHtml } from "./_lib/site-
 import { isAdminUser } from "./_lib/admin-auth.js";
 import { orderRevisionEmail } from "./_lib/order-revision-email.js";
 import { prepareShipment, shipmentEmail } from "./_lib/order-shipments.js";
+import { afterSalesBlockHtml } from "./_lib/email-layout.js";
 
 const SUPABASE_URL = "https://ilzeziznxzaxxudzhdmu.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI";
@@ -148,28 +149,7 @@ export default async function handler(req, res) {
             <p style="margin:0 0 4px;font-size:14px;font-weight:600;color:#111827;">${clean(customer.name)}</p>
             <p style="margin:0;font-size:13px;color:#6b7280;">${clean(customer.address).replace(/\n/g, "<br>")}</p>
           </td></tr>
-          <tr><td style="padding:0 28px 28px;">
-            <div style="background:#fdf6f4;border-radius:12px;padding:20px;">
-              <p style="margin:0 0 4px;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#C4928A;font-weight:600;">售后须知 / After-Sales Notice</p>
-              <p style="margin:0 0 14px;font-size:12px;color:#6b7280;line-height:1.6;">收到包裹后，请先阅读以下内容。<br/>Please read this when your parcel arrives.</p>
-
-              <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#111827;">📹 请全程录制开箱视频 / Record an unboxing video</p>
-              <ul style="margin:0 0 14px;padding-left:18px;font-size:12px;color:#4b5563;line-height:1.7;">
-                <li>拆包前开始录制，先拍清楚未拆封的包裹，中途不暂停、不剪辑。<br/><span style="color:#9ca3af;">Start recording before you open the parcel. Show it sealed, and do not pause or cut.</span></li>
-                <li>逐件拍摄商品正面、背面和吊牌；有问题的部位请近距离特写；如有色差请在自然光下对比。<br/><span style="color:#9ca3af;">Show the front, back and tag of every item, and a close-up of any defect.</span></li>
-                <li>视频请保存至少 14 天。<br/><span style="color:#9ca3af;">Please keep the video for at least 14 days.</span></li>
-              </ul>
-
-              <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#111827;">⏱ 收货后 24 小时内联系我们 / Contact us within 24 hours</p>
-              <p style="margin:0 0 14px;font-size:12px;color:#4b5563;line-height:1.7;">通过 <a href="https://wa.me/601120861073" style="color:#C4928A;">WhatsApp</a> 提供订单号、开箱视频和照片，我们会在 1–2 个工作日内审核。逾期或没有完整开箱视频，恕不受理。<br/><span style="color:#9ca3af;">WhatsApp us your order number, the video and photos. We review within 1-2 working days. Late requests or requests without a complete unboxing video cannot be accepted.</span></p>
-
-              <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#111827;">🔁 可申请 / Eligible</p>
-              <p style="margin:0 0 14px;font-size:12px;color:#4b5563;line-height:1.7;">错发商品（款式、颜色、尺码）、与描述严重不符、明显制造缺陷。每笔订单限换货 1 次。若属本店责任，来回运费由我们承担。<br/><span style="color:#9ca3af;">Wrong item, major mismatch with the description, or a clear manufacturing defect. One exchange per order. If the issue is on our side, we cover shipping both ways.</span></p>
-
-              <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#111827;">🚫 不接受 / Not accepted</p>
-              <p style="margin:0;font-size:12px;color:#4b5563;line-height:1.7;">不喜欢颜色或款式、1–3cm 尺寸误差、轻微色差、已穿着或洗涤或去除吊牌的商品、特卖商品、配饰类商品。退回商品须全新、附吊牌、无气味污渍。<br/><span style="color:#9ca3af;">Change of mind, 1-3cm measurement difference, minor colour difference, worn / washed / tag removed items, sale items and accessories. Returned items must be brand new with tags, free from scent and stains.</span></p>
-            </div>
-          </td></tr>
+          <tr><td style="padding:0 28px 28px;">${afterSalesBlockHtml()}</td></tr>
           <tr><td style="background:#f9fafb;padding:20px 28px;border-top:1px solid #f3f4f6;text-align:center;">
             <p style="margin:0 0 8px;font-size:12px;color:#6b7280;">如有任何问题，欢迎通过 <a href="https://wa.me/601120861073" style="color:#C4928A;">WhatsApp</a> 联系我们。<br/>Questions? Message us on <a href="https://wa.me/601120861073" style="color:#C4928A;">WhatsApp</a>.</p>
             ${emailCompanyFooterHtml(siteConfig, "#9ca3af")}

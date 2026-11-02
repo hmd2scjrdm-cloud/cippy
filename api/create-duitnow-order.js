@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { nextOrderId } from "./_lib/next-order-id.js";
+import { afterSalesBlockHtml } from "./_lib/email-layout.js";
 import { getSiteConfig, shippingFee, emailCompanyFooterHtml } from "./_lib/site-config.js";
 
 const SUPABASE_URL = "https://ilzeziznxzaxxudzhdmu.supabase.co";
@@ -209,6 +210,7 @@ export default async function handler(req, res) {
   </div>
 
   <p style="color:#999;font-size:12px">We'll confirm your order within 1 hour of receiving your payment receipt. Thank you for shopping with Cippy! 🌸</p>
+  <div style="margin:20px 0">${afterSalesBlockHtml()}</div>
   ${emailCompanyFooterHtml(siteConfig, "#999")}
 </div>`,
       });

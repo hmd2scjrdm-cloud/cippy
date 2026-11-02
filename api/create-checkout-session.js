@@ -1,6 +1,7 @@
 import Stripe from "stripe";
 import nodemailer from "nodemailer";
 import { nextOrderId } from "./_lib/next-order-id.js";
+import { afterSalesBlockHtml } from "./_lib/email-layout.js";
 import { getSiteConfig, shippingFee, emailCompanyFooterHtml } from "./_lib/site-config.js";
 
 const SUPABASE_URL = "https://ilzeziznxzaxxudzhdmu.supabase.co";
@@ -209,6 +210,7 @@ function buildEmailHtml({ orderId, customer, items, totals, pointsEarned, tier, 
         </table>
 
       </td></tr>
+      <tr><td style="padding:0 28px 24px;">${afterSalesBlockHtml()}</td></tr>
       <tr><td style="background:#faf7f5;padding:18px 28px;border-top:1px solid #f0ebe8;text-align:center;">
         <p style="margin:0 0 6px;font-size:12px;color:#524344;">如有疑问请通过 Instagram 或 WhatsApp 联系我们</p>
         ${emailCompanyFooterHtml(siteConfig, "#857374")}
