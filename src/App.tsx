@@ -2881,7 +2881,7 @@ export default function App() {
                   {/* Filter Tabs & Search Row */}
                   <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 w-full xl:w-auto">
                     {/* Filter Tabs */}
-                    <div className="flex flex-wrap gap-1.5 flex-1 xl:flex-initial">
+                    <div className={`cippy-catalog-filters flex flex-wrap gap-1.5 flex-1 xl:flex-initial ${lang === 'zh' ? 'cippy-catalog-filters-zh' : ''}`}>
                       {[
                         { id: 'all', label: 'All Garments', cnLabel: '全部成衣' },
                         { id: 'wishlist', label: `Saves (${wishlist.length})`, cnLabel: '我的收藏' },
@@ -2894,7 +2894,7 @@ export default function App() {
                         <button
                           key={cat.id}
                           onClick={() => selectCollectionCategory(cat.id as CatalogCategory)}
-                          className={`px-3.5 py-1.5 rounded-xl text-xs tracking-normal transition-all duration-200 cursor-pointer ${lang === 'zh' ? 'font-serif font-medium' : 'font-sans font-medium'} ${
+                          className={`px-3.5 py-1.5 rounded-sm tracking-normal transition-all duration-200 cursor-pointer ${
                             selectedCategory === cat.id
                               ? `bg-[#F4ECEE] text-[#6D4852] border border-[#E9DBDE]`
                               : `text-zinc-500 hover:text-[#6D4852] hover:bg-[#FAF6F7] border border-transparent`

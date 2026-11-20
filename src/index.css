@@ -151,6 +151,20 @@
   background: #fff;
 }
 
+.cippy-catalog-filters button {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.cippy-catalog-filters-zh button {
+  font-family: "Noto Sans SC", ui-sans-serif, system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
 .cippy-editorial-catalog #allProductsGrid > div {
   border: 0;
   border-radius: 0;
