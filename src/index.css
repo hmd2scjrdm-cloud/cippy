@@ -194,8 +194,10 @@
 
 .cippy-editorial-catalog .product-price {
   color: #6d4852;
-  font-size: 13px;
-  font-weight: 700;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
 }
 
 .cippy-editorial-catalog .product-description {
@@ -203,11 +205,34 @@
 }
 
 .cippy-editorial-catalog #allProductsGrid h3 {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.16;
+  letter-spacing: 0;
+}
+
+.cippy-editorial-catalog.cippy-catalog-zh #allProductsGrid h3 {
   font-family: "Noto Sans SC", ui-sans-serif, system-ui, sans-serif;
   font-size: 13px;
   font-weight: 500;
   line-height: 1.45;
+}
+
+.cippy-editorial-catalog select,
+.cippy-editorial-catalog input {
+  font-family: Arial, "Noto Sans SC", sans-serif;
+  font-size: 12px;
   letter-spacing: 0;
+}
+
+.cippy-editorial-catalog .cippy-product-mobile-action {
+  font-family: Arial, "Noto Sans SC", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  box-shadow: none;
 }
 
 .cippy-editorial-catalog #allProductsGrid button[title="加入对比"] span,

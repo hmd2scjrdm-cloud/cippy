@@ -511,7 +511,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           {/* Mobile: one unambiguous action. Variant products open their details. */}
           <button
             onClick={showColorPicker || availableSizes.length > 1 ? handleCardClick : handleAdd}
-            className={`md:hidden w-full py-2.5 font-semibold text-xs transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer shadow-xs ${
+            className={`cippy-product-mobile-action md:hidden w-full py-2.5 font-semibold text-xs transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer shadow-xs ${
               isMinimal ? 'rounded-none font-mono tracking-widest uppercase' : isVintage ? 'rounded-sm font-serif italic' : 'rounded-xl font-sans'
             } ${
               addedAnimation

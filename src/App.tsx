@@ -2863,7 +2863,7 @@ export default function App() {
               ))}
 
               {/* Product catalog section */}
-              {collectionOpen && <div id="garments-section" className="cippy-editorial-catalog space-y-8 scroll-mt-24">
+              {collectionOpen && <div id="garments-section" className={`cippy-editorial-catalog space-y-8 scroll-mt-24 ${lang === 'zh' ? 'cippy-catalog-zh' : ''}`}>
                 
                 {/* Header / Filter row */}
                 <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 border-b border-[#E8E0E2] pb-6">
