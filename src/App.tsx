@@ -4,8 +4,6 @@ import { products, mixMatchTops, mixMatchBottoms } from './data';
 import { POLICIES, FAQS } from './data/policies';
 import { CartItem, Product, StoryChapter } from './types';
 import Logo from './components/Logo';
-import SizingHelper from './components/SizingHelper';
-import MixMatchRoom from './components/MixMatchRoom';
 import ProductCard from './components/ProductCard';
 import ShoppingBagDrawer from './components/ShoppingBag';
 import CheckoutPage from './components/CheckoutPage';
@@ -287,8 +285,7 @@ export default function App() {
   } : baseTheme;
 
   // Navigation tab states
-  const [activeTab, setActiveTab] = useState<'rtw' | 'atelier' | 'journal' | 'policies' | 'account' | 'alerts' | 'checkout'>('rtw');
-  const [atelierSubTab, setAtelierSubTab] = useState<'sizing' | 'mirror'>('sizing');
+  const [activeTab, setActiveTab] = useState<'rtw' | 'journal' | 'policies' | 'account' | 'alerts' | 'checkout'>('rtw');
   const [selectedPolicyId, setSelectedPolicyId] = useState<string>('shopping');
   const [faqOpenIndex, setFaqOpenIndex] = useState<number | null>(null);
   const [policySearchQuery, setPolicySearchQuery] = useState<string>('');
@@ -1890,17 +1887,6 @@ export default function App() {
                 </button>
                 <button
                   onClick={() => {
-                    setActiveTab('atelier');
-                    document.getElementById('nabi-studio-app-card')?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                  className={`text-[11px] tracking-[0.2em] font-bold font-sans transition-all duration-300 cursor-pointer ${
-                    activeTab === 'atelier' ? 'text-[#5D6B54] border-b border-[#5D6B54] pb-0.5' : 'text-zinc-500 hover:text-[#5D6B54] pb-0.5 border-b border-transparent'
-                  }`}
-                >
-                  ATELIER
-                </button>
-                <button
-                  onClick={() => {
                     setActiveTab('journal');
                     document.getElementById('nabi-studio-app-card')?.scrollIntoView({ behavior: 'smooth' });
                   }}
@@ -1967,17 +1953,6 @@ export default function App() {
                   }`}
                 >
                   COLLECTION
-                </button>
-                <button
-                  onClick={() => {
-                    setActiveTab('atelier');
-                    document.getElementById('nabi-studio-app-card')?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                  className={`text-[11px] tracking-[0.2em] font-bold font-sans transition-all duration-300 cursor-pointer ${
-                    activeTab === 'atelier' ? 'text-[#C88E93] border-b-2 border-[#C88E93] pb-0.5' : 'text-zinc-500 hover:text-[#C88E93] pb-0.5 border-b-2 border-transparent'
-                  }`}
-                >
-                  ARCHIVE
                 </button>
                 <button
                   onClick={() => {
@@ -2078,17 +2053,6 @@ export default function App() {
               <div onClick={() => setMobileNavOpen(false)} className={`order-3 lg:order-3 w-full lg:w-1/3 ${mobileNavOpen ? 'flex' : 'hidden'} lg:flex flex-col lg:flex-row lg:flex-wrap items-center justify-center lg:justify-end gap-x-4 gap-y-3 lg:gap-6 min-w-0`}>
                 <button
                   onClick={() => {
-                    setActiveTab('atelier');
-                    document.getElementById('nabi-studio-app-card')?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                  className={`text-[11px] tracking-[0.2em] font-bold font-sans transition-all duration-300 cursor-pointer ${
-                    activeTab === 'atelier' ? 'text-[#3F2B2B] border-b-2 border-[#3F2B2B] pb-1' : 'text-zinc-500 hover:text-[#3F2B2B] pb-1 border-b-2 border-transparent'
-                  }`}
-                >
-                  {lang === 'zh' ? '试衣工坊' : 'FITTING ROOM'}
-                </button>
-                <button
-                  onClick={() => {
                     setActiveTab('policies');
                     document.getElementById('nabi-studio-app-card')?.scrollIntoView({ behavior: 'smooth' });
                   }}
@@ -2186,7 +2150,6 @@ export default function App() {
                   [
                     { id: 'rtw' as const, label: 'COLLECTIONS' },
                     { id: 'journal' as const, label: 'THE STORY' },
-                    { id: 'atelier' as const, label: 'LOOSE-FIT GUIDE' },
                     { id: 'account' as const, label: 'MEMBER' },
                     { id: 'policies' as const, label: 'POLICIES' }
                   ].map((link) => {
@@ -2209,7 +2172,6 @@ export default function App() {
                 ) : (
                   // Nabi Navigation links: ATELIER, RTW EDITION, THE JOURNAL, MEMBER, POLICIES
                   [
-                    { id: 'atelier' as const, label: 'ATELIER' },
                     { id: 'rtw' as const, label: 'RTW EDITION' },
                     { id: 'journal' as const, label: 'THE JOURNAL' },
                     { id: 'account' as const, label: 'MEMBER' },
@@ -3001,80 +2963,7 @@ export default function App() {
                   </div>
                 )}
 
-                {/* Quick Sizing fairy callout */}
-                <div className="mt-16 border-y border-[#E8E0E2] py-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                  <div className="space-y-2 text-left">
-                    <span className="text-[10px] font-semibold text-[#9A7680] uppercase">{lang === 'zh' ? '尺码建议' : 'A NOTE ON FIT'}</span>
-                    <h3 className="text-lg md:text-xl font-serif text-[#3B3235]">
-                      {lang === 'zh' ? '拿不定主意选 S 还是 M？' : 'Unsure between Small (S) and Medium (M)?'}
-                    </h3>
-                    <p className="text-xs text-zinc-500 font-sans max-w-xl leading-relaxed">
-                      {lang === 'zh'
-                        ? '输入身高、体重与围度，取得一般尺码建议。结果仅供参考，下单前仍请核对商品实测尺寸。'
-                        : 'Enter your height, weight and measurements for a general size guide. Check the garment measurements before ordering.'}
-                    </p>
-                  </div>
-
-                  <button
-                    onClick={() => {
-                      setActiveTab('atelier');
-                      setAtelierSubTab('sizing');
-                      document.getElementById('nabi-studio-app-card')?.scrollIntoView({ behavior: 'smooth' });
-                    }}
-                    className="bg-[#3B3235] hover:bg-[#6D4852] text-white font-sans font-semibold text-xs px-5 py-3 transition-all duration-300 shrink-0 cursor-pointer flex items-center gap-1.5"
-                  >
-                    {lang === 'zh' ? '查看尺码建议' : 'Find your fit'} <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
               </div>}
-            </div>
-          )}
-
-          {/* Atelier Tab (Combined Sizing Fairy and Virtual Dressing Room) */}
-          {activeTab === 'atelier' && (
-            <div className="space-y-8 animate-fade-in">
-              <div className="text-center max-w-xl mx-auto space-y-2">
-                <span className="text-xs font-mono tracking-[0.25em] text-[#D89CA2] uppercase block">
-                  Nabi Atelier Salon
-                </span>
-                <h2 className="text-2xl md:text-3xl font-serif text-zinc-800 tracking-tight">
-                  {lang === 'zh' ? '试衣工坊' : 'Atelier Fitting & Dressing Room'}
-                </h2>
-                <p className="text-xs text-zinc-400">
-                  {lang === 'zh'
-                    ? '虚拟试穿宽松成衣搭配，或计算您的理想身形比例。'
-                    : 'Virtually try on loose-fit combinations or calculate your ideal silhouette proportions.'}
-                </p>
-              </div>
-
-              <div className="flex justify-center gap-6 border-b border-[#FBEBF0] pb-4 max-w-md mx-auto">
-                <button
-                  onClick={() => setAtelierSubTab('sizing')}
-                  className={`text-xs tracking-[0.15em] font-sans font-medium uppercase pb-2 border-b-2 transition-all cursor-pointer ${
-                    atelierSubTab === 'sizing' ? 'border-[#B96A73] text-[#B96A73]' : 'border-transparent text-zinc-400 hover:text-zinc-600'
-                  }`}
-                >
-                  {lang === 'zh' ? '尺码精灵计算器' : 'Sizing Fairy Calculator'}
-                </button>
-                <button
-                  onClick={() => setAtelierSubTab('mirror')}
-                  className={`text-xs tracking-[0.15em] font-sans font-medium uppercase pb-2 border-b-2 transition-all cursor-pointer ${
-                    atelierSubTab === 'mirror' ? 'border-[#B96A73] text-[#B96A73]' : 'border-transparent text-zinc-400 hover:text-zinc-600'
-                  }`}
-                >
-                  {lang === 'zh' ? '虚拟试衣间' : 'Virtual Dressing Room'}
-                </button>
-              </div>
-
-              {atelierSubTab === 'sizing' ? (
-                <div className="animate-fade-in max-w-4xl mx-auto">
-                  <SizingHelper activeTheme={activeTheme} activeArchetype={activeArchetype} lang={lang} />
-                </div>
-              ) : (
-                <div className="animate-fade-in">
-                  <MixMatchRoom onAddProductToCart={handleAddProductToCart} activeTheme={activeTheme} activeArchetype={activeArchetype} lang={lang} />
-                </div>
-              )}
             </div>
           )}
 
@@ -5564,20 +5453,6 @@ export default function App() {
                   className="hover:text-[#B96A73] cursor-pointer"
                 >
                   Boutique Catalogue
-                </button>
-                <span>·</span>
-                <button 
-                  onClick={() => { setActiveTab('atelier'); setAtelierSubTab('mirror'); document.getElementById('nabi-studio-app-card')?.scrollIntoView({ behavior: 'smooth' }); }} 
-                  className="hover:text-[#B96A73] cursor-pointer"
-                >
-                  Dressing Room Mixer
-                </button>
-                <span>·</span>
-                <button 
-                  onClick={() => { setActiveTab('atelier'); setAtelierSubTab('sizing'); document.getElementById('nabi-studio-app-card')?.scrollIntoView({ behavior: 'smooth' }); }} 
-                  className="hover:text-[#B96A73] cursor-pointer"
-                >
-                  Sizing Fairy Calculator
                 </button>
                 <span>·</span>
                 <button 
