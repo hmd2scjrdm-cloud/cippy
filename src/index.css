@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Noto+Serif+SC:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap');
 @import "tailwindcss";
 
 .cippy-editorial-shell {
@@ -63,7 +63,7 @@
 
 .cippy-editorial-intro h1 {
   margin-top: 9px;
-  font-family: "Cormorant Garamond", "Noto Serif SC", Georgia, serif;
+  font-family: "Cormorant Garamond", Georgia, serif;
   font-size: clamp(30px, 3.4vw, 51px);
   font-weight: 500;
   line-height: 1.12;
@@ -107,7 +107,7 @@
 }
 
 .cippy-collection-preview-head h2 {
-  font-family: "Cormorant Garamond", "Noto Serif SC", Georgia, serif;
+  font-family: "Cormorant Garamond", Georgia, serif;
   font-size: clamp(32px, 3vw, 46px);
   font-weight: 500;
   line-height: 1.1;
@@ -159,7 +159,7 @@
 }
 
 .cippy-catalog-filters-zh button {
-  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-family: sans-serif;
   font-size: 13px;
   font-weight: 500;
   line-height: 1.5;
@@ -194,7 +194,7 @@
 
 .cippy-editorial-catalog .product-price {
   color: #6d4852;
-  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  font-family: sans-serif;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0;
@@ -213,7 +213,7 @@
 }
 
 .cippy-editorial-catalog.cippy-catalog-zh #allProductsGrid h3 {
-  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-family: sans-serif;
   font-size: 13px;
   font-weight: 500;
   line-height: 1.45;
@@ -221,13 +221,13 @@
 
 .cippy-editorial-catalog select,
 .cippy-editorial-catalog input {
-  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-family: sans-serif;
   font-size: 12px;
   letter-spacing: 0;
 }
 
 .cippy-editorial-catalog .cippy-product-mobile-action {
-  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-family: sans-serif;
   font-size: 12px;
   font-weight: 500;
   letter-spacing: 0;
@@ -270,7 +270,7 @@
 .cippy-editorial-story-copy h2 {
   margin: 14px 0 24px;
   color: #3b3235;
-  font-family: "Cormorant Garamond", "Noto Serif SC", Georgia, serif;
+  font-family: "Cormorant Garamond", Georgia, serif;
   font-size: clamp(34px, 3.3vw, 48px);
   font-weight: 500;
   line-height: 1.2;
@@ -366,7 +366,7 @@ body,
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-family: sans-serif;
   font-optical-sizing: auto;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -380,8 +380,8 @@ textarea {
 }
 
 @theme {
-  --font-sans: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
-  --font-serif: "Cormorant Garamond", "Noto Serif SC", Georgia, serif;
+  --font-sans: sans-serif;
+  --font-serif: "Cormorant Garamond", Georgia, serif;
   
   --animate-star-float: star-float 6s ease-in-out infinite;
   --animate-ribbon-sway: ribbon-sway 4s ease-in-out infinite;
