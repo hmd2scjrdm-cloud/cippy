@@ -883,6 +883,8 @@ export default function App() {
   const [collectionOpen, setCollectionOpen] = useState(() => new URLSearchParams(window.location.search).has('collection'));
   const [productSearchQuery, setProductSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'newest' | 'price-asc' | 'price-desc' | 'best-sellers'>('newest');
+  const [heroSlideIndex, setHeroSlideIndex] = useState(0);
+  const heroGalleryRef = React.useRef<HTMLDivElement>(null);
 
   const navigateToCollection = (category: CatalogCategory = 'all') => {
     setActiveTab('rtw');
@@ -2660,25 +2662,46 @@ export default function App() {
                 </div>
               ) : isChaewon ? (
                 <div className="cippy-editorial-home">
-                  <div className="cippy-editorial-hero">
-                    <img
-                      src={homeImage('hero.lookbookLeft', siteContent)}
-                      alt={lang === 'zh' ? 'Cippy 日常穿搭：咖啡店造型' : 'Cippy everyday look at a cafe'}
-                      className="cippy-editorial-hero-side"
-                      fetchPriority="high"
-                    />
-                    <img
-                      src={homeImage('hero.lookbookCenter', siteContent)}
-                      alt={lang === 'zh' ? 'Cippy 日常穿搭：上衣与短裙全身造型' : 'Cippy full outfit with top and skirt'}
-                      className="cippy-editorial-hero-main"
-                      fetchPriority="high"
-                    />
-                    <img
-                      src={homeImage('hero.lookbookRight', siteContent)}
-                      alt={lang === 'zh' ? 'Cippy 日常穿搭：上衣面料与剪裁细节' : 'Cippy outfit close-up showing fabric and fit'}
-                      className="cippy-editorial-hero-side"
-                      loading="lazy"
-                    />
+                  <div className="cippy-editorial-gallery">
+                    <div
+                      ref={heroGalleryRef}
+                      className="cippy-editorial-hero"
+                      aria-label={lang === 'zh' ? 'Cippy 首页穿搭图集' : 'Cippy outfit gallery'}
+                      onScroll={(event) => {
+                        const gallery = event.currentTarget;
+                        if (gallery.clientWidth) setHeroSlideIndex(Math.round(gallery.scrollLeft / gallery.clientWidth));
+                      }}
+                    >
+                      <img
+                        src={homeImage('hero.lookbookLeft', siteContent)}
+                        alt={lang === 'zh' ? 'Cippy 日常穿搭：咖啡店造型' : 'Cippy everyday look at a cafe'}
+                        className="cippy-editorial-hero-side"
+                        fetchPriority="high"
+                      />
+                      <img
+                        src={homeImage('hero.lookbookCenter', siteContent)}
+                        alt={lang === 'zh' ? 'Cippy 日常穿搭：上衣与短裙全身造型' : 'Cippy full outfit with top and skirt'}
+                        className="cippy-editorial-hero-main"
+                        loading="lazy"
+                      />
+                      <img
+                        src={homeImage('hero.lookbookRight', siteContent)}
+                        alt={lang === 'zh' ? 'Cippy 日常穿搭：上衣面料与剪裁细节' : 'Cippy outfit close-up showing fabric and fit'}
+                        className="cippy-editorial-hero-side"
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className="cippy-editorial-gallery-dots" aria-label={lang === 'zh' ? '选择图集照片' : 'Select gallery photo'}>
+                      {[0, 1, 2].map((index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          aria-label={lang === 'zh' ? `查看第 ${index + 1} 张照片` : `View photo ${index + 1}`}
+                          aria-current={heroSlideIndex === index ? 'true' : undefined}
+                          onClick={() => heroGalleryRef.current?.scrollTo({ left: index * heroGalleryRef.current.clientWidth, behavior: 'smooth' })}
+                        />
+                      ))}
+                    </div>
                   </div>
                   <div className="cippy-editorial-intro">
                     <div className="min-w-0">
