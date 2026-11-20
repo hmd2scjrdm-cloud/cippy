@@ -4,7 +4,6 @@ import { products, mixMatchTops, mixMatchBottoms } from './data';
 import { POLICIES, FAQS } from './data/policies';
 import { CartItem, Product, StoryChapter } from './types';
 import Logo from './components/Logo';
-import StoryChapters from './components/StoryChapters';
 import SizingHelper from './components/SizingHelper';
 import MixMatchRoom from './components/MixMatchRoom';
 import ProductCard from './components/ProductCard';
@@ -194,24 +193,24 @@ export default function App() {
   };
 
   const styleArchetypes = {
-    storybook: {
-      id: 'storybook' as const,
-      name: 'Fairytale Storybook',
-      cnName: '童话浪漫绘本风',
-      desc: 'Soft hand-drawn shapes, floating stars, curved ruffles, and whimsical story frames.',
-      cnDesc: '童话绘本细节，蓬松花边与流星点缀，温润治愈的浪漫梦境。',
-      cardStyle: 'rounded-2xl border border-[#FBEBF0] shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-300 overflow-hidden bg-white',
-      btnStyle: 'rounded-xl',
-      fontTitle: 'font-serif',
+    editorial: {
+      id: 'minimalist' as const,
+      name: 'Cippy Editorial',
+      cnName: 'Cippy 编辑式陈列',
+      desc: 'Photography and clear product information take the lead.',
+      cnDesc: '让穿搭照片和清楚的商品资料成为主角。',
+      cardStyle: 'border-0 rounded-none shadow-none transition-colors duration-200 overflow-hidden bg-white',
+      btnStyle: 'rounded-none',
+      fontTitle: 'font-sans',
       fontBody: 'font-sans',
-      outerBg: 'bg-[#FAF4F6]',
-      navStyle: 'rounded-full p-1 border border-[#FBEBF0]',
-      navBtnStyle: 'rounded-full',
+      outerBg: 'bg-[#F8F5F6]',
+      navStyle: 'border-b border-[#E8E0E2]',
+      navBtnStyle: 'rounded-none',
       heroLayout: 'grid grid-cols-1 md:grid-cols-12 gap-8 items-center',
     }
   };
 
-  const styleArchetype = 'storybook';
+  const styleArchetype = 'editorial';
   const activeArchetype = styleArchetypes[styleArchetype];
 
   // Read initial brand concept - locked to Concept C: CHAEWON
@@ -1541,8 +1540,6 @@ export default function App() {
     return matchesCategory && matchesSearch;
   });
 
-  const featuredProduct = dbProducts.find(p => p.id === 'e59bbfe1-abfa-439f-b433-88eb20d9d011');
-
   // Sort products dynamically based on selected criteria
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     if (sortBy === 'price-asc') {
@@ -1734,9 +1731,9 @@ export default function App() {
         {/* Animated Announcement Ticker Row */}
         <div className="cippy-editorial-utility w-full min-w-0 py-2 px-4 md:px-10 flex items-center justify-between gap-2 text-[11px] font-medium font-sans"
           style={{
-            backgroundColor: '#E9EEE8',
-            color: '#25362D',
-            borderColor: '#D8E1D8'
+            backgroundColor: '#F2ECEE',
+            color: '#44393D',
+            borderColor: '#E9E1E3'
           }}
         >
           {/* Left Side: Language Switcher & Saves */}
@@ -1814,7 +1811,7 @@ export default function App() {
         </div>
 
         {/* Main Header / Navigation */}
-        <header className="cippy-editorial-header px-4 sm:px-6 md:px-10 py-4 bg-white border-b border-[#E8ECE7]">
+        <header className="cippy-editorial-header px-4 sm:px-6 md:px-10 py-4 bg-white border-b border-[#E9E1E3]">
           {isYunseo ? (
             <div className="flex flex-col lg:flex-row items-center justify-between gap-3 sm:gap-4 min-w-0">
               {/* Left: ESTABLISHED 2026 */}
@@ -2665,36 +2662,32 @@ export default function App() {
                 <div className="cippy-editorial-home">
                   <div className="cippy-editorial-hero">
                     <img
-                      src={siteContent['home.hero.featuredImage.url'] || featuredProduct?.images?.[0] || featuredProduct?.imageUrl || opt(homeImage('hero.image', siteContent))}
-                      alt={featuredProduct ? (lang === 'zh' ? featuredProduct.cnName : featuredProduct.name) : 'Cippy collection'}
-                      className="h-full w-full object-cover object-center"
+                      src={homeImage('hero.lookbookLeft', siteContent)}
+                      alt={lang === 'zh' ? 'Cippy 日常穿搭：咖啡店造型' : 'Cippy everyday look at a cafe'}
+                      className="cippy-editorial-hero-side"
                       fetchPriority="high"
-                      referrerPolicy="no-referrer"
+                    />
+                    <img
+                      src={homeImage('hero.lookbookCenter', siteContent)}
+                      alt={lang === 'zh' ? 'Cippy 日常穿搭：上衣与短裙全身造型' : 'Cippy full outfit with top and skirt'}
+                      className="cippy-editorial-hero-main"
+                      fetchPriority="high"
+                    />
+                    <img
+                      src={homeImage('hero.lookbookRight', siteContent)}
+                      alt={lang === 'zh' ? 'Cippy 日常穿搭：上衣面料与剪裁细节' : 'Cippy outfit close-up showing fabric and fit'}
+                      className="cippy-editorial-hero-side"
+                      loading="lazy"
                     />
                   </div>
                   <div className="cippy-editorial-intro">
                     <div className="min-w-0">
                       <p className="cippy-editorial-kicker">CIPPY · KUALA LUMPUR</p>
-                      <h1>{lang === 'zh' ? '为日常而选的韩系女装' : 'Everyday pieces, thoughtfully chosen'}</h1>
-                      <p className="cippy-editorial-subtitle">{lang === 'zh' ? '本周精选 · 小个子友好' : 'This week’s edit · Petite-friendly'}</p>
+                      <h1>{lang === 'zh' ? '好好穿衣，慢慢生活。' : 'The Everyday Edit'}</h1>
+                      <p className="cippy-editorial-subtitle">{lang === 'zh' ? '适合小个子的日常穿搭，现货在马来西亚。' : 'Everyday dressing for petite frames, ready in Malaysia.'}</p>
                     </div>
-                    <div className="cippy-editorial-feature">
-                      {featuredProduct && <p className="cippy-editorial-feature-name">{lang === 'zh' ? featuredProduct.cnName : featuredProduct.name}<span>RM {featuredProduct.price.toFixed(2)}</span></p>}
-                      {featuredProduct && <button type="button" onClick={() => setSelectedProduct(featuredProduct)} className="cippy-editorial-link">{lang === 'zh' ? '查看这件商品' : 'View this piece'} <ArrowRight className="h-4 w-4" /></button>}
-                    </div>
+                    <button type="button" onClick={() => document.getElementById('garments-section')?.scrollIntoView({ behavior: 'smooth' })} className="cippy-editorial-link">{lang === 'zh' ? '浏览 Collection' : 'Explore the collection'} <ArrowRight className="h-4 w-4" /></button>
                   </div>
-                  <nav className="cippy-editorial-categories" aria-label={lang === 'zh' ? '商品分类' : 'Shop by category'}>
-                    {[
-                      { id: 'dresses', en: 'Dresses', zh: '连衣裙' },
-                      { id: 'sets', en: 'Sets', zh: '套装' },
-                      { id: 'tops', en: 'Tops', zh: '上装' },
-                      { id: 'bottoms', en: 'Bottoms', zh: '下装' },
-                    ].map((category) => (
-                      <button key={category.id} type="button" onClick={() => { setSelectedCategory(category.id as typeof selectedCategory); document.getElementById('garments-section')?.scrollIntoView({ behavior: 'smooth' }); }}>
-                        {lang === 'zh' ? category.zh : category.en}<ArrowRight className="h-3.5 w-3.5" />
-                      </button>
-                    ))}
-                  </nav>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch pt-2 pb-6">
@@ -2813,15 +2806,15 @@ export default function App() {
               <div id="garments-section" className="cippy-editorial-catalog space-y-8 scroll-mt-24">
                 
                 {/* Header / Filter row */}
-                <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 border-b border-[#DDE5DC] pb-6">
+                <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 border-b border-[#E8E0E2] pb-6">
                   <div>
                     <h2 className="text-2xl md:text-3xl font-serif text-zinc-800">
-                      {lang === 'zh' ? '精选成衣' : 'The Collection'}
+                      {lang === 'zh' ? 'Collection · 精选成衣' : 'The Collection'}
                     </h2>
                     <p className="text-xs text-zinc-500 font-sans mt-1 leading-relaxed">
                       {lang === 'zh'
-                        ? '为马来西亚日常精选的韩系成衣。每件商品页均显示实际可选尺码。'
-                        : 'Korean-inspired ready-to-wear curated for Malaysian days. Available sizes are shown on each product.'}
+                        ? '看得见的价格、尺码和现货状态。慢慢挑一件真正会穿的。'
+                        : 'Everyday pieces with clear prices, sizes and availability.'}
                     </p>
                   </div>
 
@@ -2843,8 +2836,8 @@ export default function App() {
                           onClick={() => setSelectedCategory(cat.id as any)}
                           className={`px-3.5 py-1.5 rounded-xl text-xs tracking-normal transition-all duration-200 cursor-pointer ${lang === 'zh' ? 'font-serif font-medium' : 'font-sans font-medium'} ${
                             selectedCategory === cat.id
-                              ? `bg-[#E9EEE8] text-[#315B43] border border-[#D4E1D3]`
-                              : `text-zinc-500 hover:text-[#315B43] hover:bg-[#F1F4F0] border border-transparent`
+                              ? `bg-[#F4ECEE] text-[#6D4852] border border-[#E9DBDE]`
+                              : `text-zinc-500 hover:text-[#6D4852] hover:bg-[#FAF6F7] border border-transparent`
                           }`}
                         >
                           <span>{lang === 'zh' ? cat.cnLabel : cat.label}</span>
@@ -2853,19 +2846,19 @@ export default function App() {
                     </div>
 
                     {/* Sort Dropdown */}
-                    <div className="relative flex items-center bg-white border border-[#DDE5DC] rounded-md hover:border-[#8CA891] transition-all font-sans text-zinc-700 w-full md:w-48 shrink-0">
+                    <div className="relative flex items-center bg-white border border-[#E8E0E2] rounded-md hover:border-[#AF8C95] transition-all font-sans text-zinc-700 w-full md:w-48 shrink-0">
                       <span className="pl-3 pr-1 text-zinc-400 select-none flex items-center">
-                        <TrendingUp className="w-3.5 h-3.5 text-[#58725E]" />
+                        <TrendingUp className="w-3.5 h-3.5 text-[#9A7680]" />
                       </span>
                       <select
                         value={sortBy}
                         onChange={(e) => setSortBy(e.target.value as any)}
                         className="text-xs bg-transparent py-2.5 pl-1 pr-8 outline-none rounded-xl cursor-pointer font-sans text-zinc-700 w-full appearance-none font-medium"
                       >
-                        <option value="newest">{lang === 'zh' ? '✨ 最新上架' : '✨ Newest First'}</option>
-                        <option value="price-asc">{lang === 'zh' ? '💸 价格：低到高' : '💸 Price: Low to High'}</option>
-                        <option value="price-desc">{lang === 'zh' ? '💎 价格：高到低' : '💎 Price: High to Low'}</option>
-                        <option value="best-sellers">{lang === 'zh' ? '🔥 畅销热卖' : '🔥 Best Sellers'}</option>
+                        <option value="newest">{lang === 'zh' ? '最新上架' : 'Newest first'}</option>
+                        <option value="price-asc">{lang === 'zh' ? '价格：低到高' : 'Price: low to high'}</option>
+                        <option value="price-desc">{lang === 'zh' ? '价格：高到低' : 'Price: high to low'}</option>
+                        <option value="best-sellers">{lang === 'zh' ? '畅销款' : 'Best sellers'}</option>
                       </select>
                       <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-400">
                         <ChevronDown className="w-3.5 h-3.5" />
@@ -2875,14 +2868,14 @@ export default function App() {
                     {/* Search Bar */}
                     <div className="relative w-full md:w-64">
                       <span className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-zinc-400">
-                        <Search className="w-4 h-4 text-[#58725E]" />
+                        <Search className="w-4 h-4 text-[#9A7680]" />
                       </span>
                       <input
                         type="text"
                         placeholder={lang === 'zh' ? '搜索商品名称 / 拼音...' : 'Search ready-to-wear...'}
                         value={productSearchQuery}
                         onChange={(e) => setProductSearchQuery(e.target.value)}
-                        className="w-full text-xs pl-9 pr-8 py-2.5 bg-white border border-[#DDE5DC] hover:border-[#8CA891] focus:border-[#315B43] focus:ring-1 focus:ring-[#315B43] outline-none rounded-md transition-all font-sans text-zinc-700 placeholder-zinc-400"
+                        className="w-full text-xs pl-9 pr-8 py-2.5 bg-white border border-[#E8E0E2] hover:border-[#AF8C95] focus:border-[#6D4852] focus:ring-1 focus:ring-[#6D4852] outline-none rounded-md transition-all font-sans text-zinc-700 placeholder-zinc-400"
                       />
                       {productSearchQuery && (
                         <button
@@ -2901,10 +2894,10 @@ export default function App() {
                     <ShoppingBag className="w-12 h-12 text-[#D89CA2] mx-auto" />
                     <p className="text-zinc-500 font-medium font-serif text-sm mt-3">
                       {productSearchQuery 
-                        ? (lang === 'zh' ? `未找到符合 "${productSearchQuery}" 的童话商品。` : `No fairytale items found matching "${productSearchQuery}".`)
+                        ? (lang === 'zh' ? `找不到「${productSearchQuery}」的相关商品。` : `No products found for "${productSearchQuery}".`)
                         : selectedCategory === 'wishlist'
-                        ? (lang === 'zh' ? '您的收藏夹是空的哦 💖 快去为心爱的衣物点亮小红心吧！' : 'Your saved fairytale list is empty. Tap the heart 💖 on any outfit to fill it with magic!')
-                        : (lang === 'zh' ? '该分类下暂无商品。' : 'No fairytale items found under this shelf.')}
+                        ? (lang === 'zh' ? '收藏夹还没有商品。' : 'Your saved items are empty.')
+                        : (lang === 'zh' ? '该分类下暂无商品。' : 'No products in this category yet.')}
                     </p>
                     <div className="flex justify-center gap-4 mt-3">
                       {productSearchQuery && (
@@ -2949,10 +2942,10 @@ export default function App() {
                 )}
 
                 {/* Quick Sizing fairy callout */}
-                <div className="mt-16 border-y border-[#DDE5DC] py-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                <div className="mt-16 border-y border-[#E8E0E2] py-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                   <div className="space-y-2 text-left">
-                    <span className="text-[10px] font-semibold text-[#58725E] uppercase">{lang === 'zh' ? '尺码建议' : 'A NOTE ON FIT'}</span>
-                    <h3 className="text-lg md:text-xl font-serif text-[#25362D]">
+                    <span className="text-[10px] font-semibold text-[#9A7680] uppercase">{lang === 'zh' ? '尺码建议' : 'A NOTE ON FIT'}</span>
+                    <h3 className="text-lg md:text-xl font-serif text-[#3B3235]">
                       {lang === 'zh' ? '拿不定主意选 S 还是 M？' : 'Unsure between Small (S) and Medium (M)?'}
                     </h3>
                     <p className="text-xs text-zinc-500 font-sans max-w-xl leading-relaxed">
@@ -2968,7 +2961,7 @@ export default function App() {
                       setAtelierSubTab('sizing');
                       document.getElementById('nabi-studio-app-card')?.scrollIntoView({ behavior: 'smooth' });
                     }}
-                    className="bg-[#25362D] hover:bg-[#38513F] text-white font-sans font-semibold text-xs px-5 py-3 transition-all duration-300 shrink-0 cursor-pointer flex items-center gap-1.5"
+                    className="bg-[#3B3235] hover:bg-[#6D4852] text-white font-sans font-semibold text-xs px-5 py-3 transition-all duration-300 shrink-0 cursor-pointer flex items-center gap-1.5"
                   >
                     {lang === 'zh' ? '查看尺码建议' : 'Find your fit'} <ChevronRight className="w-4 h-4" />
                   </button>
@@ -3027,21 +3020,15 @@ export default function App() {
 
           {/* The Journal Tab */}
           {activeTab === 'journal' && (
-            <div className="animate-fade-in">
-              <div className="text-center max-w-xl mx-auto space-y-2 mb-10">
-                <span className="text-xs font-mono tracking-[0.25em] text-[#D89CA2] uppercase block">
-                  Our Anthology
-                </span>
-                <h2 className="text-2xl md:text-3xl font-serif text-zinc-800 tracking-tight">
-                  {lang === 'zh' ? '品牌纪事' : 'The Journal Chronicles'}
-                </h2>
-                <p className="text-xs text-zinc-400">
-                  {lang === 'zh'
-                    ? '阅读 Cippy 成衣背后的童话起源与穿搭日记。'
-                    : "Read the fairytale origins and styling diaries behind Cippy's ready-to-wear garments."}
-                </p>
+            <div className="cippy-editorial-story animate-fade-in">
+              <img src={homeImage('hero.lookbookLeft', siteContent)} alt={lang === 'zh' ? 'Cippy 日常穿搭' : 'Cippy everyday outfit'} className="cippy-editorial-story-image" />
+              <div className="cippy-editorial-story-copy">
+                <p className="cippy-editorial-kicker">CIPPY · KUALA LUMPUR</p>
+                <h2>{lang === 'zh' ? '穿得自在，就很好。' : 'Good clothes for ordinary days.'}</h2>
+                <p>{lang === 'zh' ? '我们挑选适合马来西亚日常的女装：上课、出门、喝咖啡，或只是想穿得舒服一点。' : 'We choose pieces for everyday life in Malaysia: class, coffee, a weekend out, or simply feeling comfortable in what you wear.'}</p>
+                <p>{lang === 'zh' ? '每件商品都列出价格、可选尺码与库存状态。拿不准尺寸时，先看实测数据，也可以直接问我们。' : 'Each product shows its price, available sizes and stock status. Check the measurements or ask us if you are unsure about fit.'}</p>
+                <button type="button" className="cippy-editorial-link" onClick={() => { setActiveTab('rtw'); setTimeout(() => document.getElementById('garments-section')?.scrollIntoView({ behavior: 'smooth' }), 0); }}>{lang === 'zh' ? '浏览 Collection' : 'Shop the collection'} <ArrowRight className="h-4 w-4" /></button>
               </div>
-              <StoryChapters activeTheme={activeTheme} activeArchetype={activeArchetype} lang={lang} />
             </div>
           )}
 
@@ -5426,53 +5413,25 @@ export default function App() {
           )}
 
         </main>
-                <section className="bg-[#FFF5F7]/40 border-t border-[#FBEBF0] py-12 px-4 md:px-10">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
-            
-            <div className="space-y-2">
-              <div className="w-10 h-10 rounded-full bg-[#FFF0F2] flex items-center justify-center text-[#B96A73] mx-auto md:mx-0">
-                <Sparkles className="w-5 h-5" />
-              </div>
-              <h3 className="font-serif font-bold text-zinc-800 text-sm">{lang === 'zh' ? '1. 高端韩系剪裁' : '1. High-End Korean Tailoring'}</h3>
-              <h4 className="text-[11px] font-serif text-[#D89CA2] font-semibold leading-none mt-0.5">{lang === 'zh' ? '高端成衣版型与垂感' : 'Considered shape and drape'}</h4>
-              <p className="text-xs text-zinc-500 leading-relaxed font-sans text-justify md:text-left">
-                {lang === 'zh'
-                  ? '我们重视领口、腰线、衣长与垂坠比例。每件商品的实际可选尺码均以商品页为准。'
-                  : 'We consider neckline, waist placement, length and drape. Available sizes vary and are shown on each product page.'}
-              </p>
+        <section className="cippy-editorial-notes border-t border-[#E8E0E2] py-9 px-4 md:px-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-7 max-w-6xl mx-auto">
+            <div>
+              <h3>{lang === 'zh' ? '尺码，先看清楚' : 'Fit, made clearer'}</h3>
+              <p>{lang === 'zh' ? '每件商品页列出可选尺码；拿不准时可先查看实测或联系顾客服务。' : 'Check available sizes and garment measurements on the product page, or ask us before ordering.'}</p>
             </div>
-
-            <div className="space-y-2">
-              <div className="w-10 h-10 rounded-full bg-[#FFF0F2] flex items-center justify-center text-[#B96A73] mx-auto md:mx-0">
-                <Heart className="w-5 h-5 fill-[#FFF0F2]" />
-              </div>
-              <h3 className="font-serif font-bold text-zinc-800 text-sm">{lang === 'zh' ? '2. 精致细节巧思' : '2. Delicate Editorial Touch'}</h3>
-              <h4 className="text-[11px] font-serif text-[#D89CA2] font-semibold leading-none mt-0.5">{lang === 'zh' ? '温润浪漫的视觉治愈' : 'Soft, romantic details'}</h4>
-              <p className="text-xs text-zinc-500 leading-relaxed font-sans text-justify md:text-left">
-                {lang === 'zh'
-                  ? '从品牌标志性蝴蝶结到柔软的荷叶边与设计口袋，每件衣裳都融入了童话般的精致巧思，为您的日常街头漫步注入俏皮浪漫的温度。'
-                  : 'From the brand bow ribbon to the soft ruffles and organic pockets, our clothes are infused with cute fairytale motifs that bring playfulness and cozy romance into your daily urban walks.'}
-              </p>
+            <div>
+              <h3>{lang === 'zh' ? '现货或预订' : 'Ready stock or preorder'}</h3>
+              <p>{lang === 'zh' ? '商品与购物袋会标明预订状态，方便你决定什么时候下单。' : 'Preorder status is shown on products and in your bag, so you know what to expect.'}</p>
             </div>
-
-            <div className="space-y-2">
-              <div className="w-10 h-10 rounded-full bg-[#FFF0F2] flex items-center justify-center text-[#B96A73] mx-auto md:mx-0">
-                <ShoppingBag className="w-5 h-5" />
-              </div>
-              <h3 className="font-serif font-bold text-zinc-800 text-sm">{lang === 'zh' ? '3. 大马本地化服务' : '3. Localised Malaysian Service'}</h3>
-              <h4 className="text-[11px] font-serif text-[#D89CA2] font-semibold leading-none mt-0.5">{lang === 'zh' ? '为马来西亚女生的日常而选' : 'Curated for everyday Malaysia'}</h4>
-              <p className="text-xs text-zinc-500 leading-relaxed font-sans text-justify md:text-left">
-                {lang === 'zh'
-                  ? '我们深知大马的气候与生活方式。棉麻混纺面料在艳阳街头透气清凉，在冷气咖啡馆里也舒适宜人，配合本地化 RM 定价与快捷配送。'
-                  : "We understand Malaysia's climate and lifestyle. Our cotton-linen blends are extremely breathable for sunny streets, yet comfortable for air-conditioned cafés, with prompt localized RM pricing and delivery."}
-              </p>
+            <div>
+              <h3>{lang === 'zh' ? '马来西亚配送' : 'Malaysia delivery'}</h3>
+              <p>{lang === 'zh' ? '结账前可查看运费，配送与退换条件也可以随时查询。' : 'See shipping costs before payment, with delivery and returns information easy to find.'}</p>
             </div>
-
           </div>
         </section>
 
         {/* Elegant footer inside card */}
-        <footer className="bg-white border-t border-[#FBEBF0] py-10 px-4 md:px-10 text-xs text-zinc-400">
+        <footer className="bg-white border-t border-[#E8E0E2] py-10 px-4 md:px-10 text-xs text-zinc-400">
           {isYunseo ? (
             <div className="flex flex-col md:flex-row items-center justify-between gap-4 font-sans text-[11px] font-bold text-zinc-400">
               {/* Left: copyright */}

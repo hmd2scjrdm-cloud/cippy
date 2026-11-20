@@ -10,7 +10,10 @@ export interface HomeField {
 }
 
 export const HOME_FIELDS: HomeField[] = [
-  { id: 'hero.featuredImage', label: '当前首页主视觉（首推商品实拍，可更换）', image: 'https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/1792493632314-img_1792493629101.jpg' },
+  { id: 'hero.lookbookLeft', label: '首页穿搭主视觉 · 左侧照片', image: '/opt/model-ootd/0001.webp' },
+  { id: 'hero.lookbookCenter', label: '首页穿搭主视觉 · 中间照片', image: '/opt/model-ootd/0004.webp' },
+  { id: 'hero.lookbookRight', label: '首页穿搭主视觉 · 右侧细节', image: '/opt/model-ootd/0002.webp' },
+  { id: 'hero.featuredImage', label: '旧版首推商品图（存档）', image: 'https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/1792493632314-img_1792493629101.jpg' },
   { id: 'hero.image', label: '旧版首页大图（存档）', image: 'https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/product-image/WhatsApp%20Image%202026-08-20%20at%2019.39.28.jpeg' },
   { id: 'hero.chapter', label: '旧版小标题（存档）', en: 'CHAPTER 01 — THE LOOSE SILHOUETTE', zh: '第一章 — 宽松轮廓美学' },
   { id: 'hero.badge', label: '旧版大图文字（存档）', en: 'NEW IN', zh: '新品现货' },
