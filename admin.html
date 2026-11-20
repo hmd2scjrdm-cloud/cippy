@@ -2843,10 +2843,10 @@ async function uploadImageToR2(blob, filename) {
 
 async function uploadShipmentPhoto(token, file = pendingShipmentPhotoFile) {
   const fileBase64 = await fileToBase64(file);
-  const r = await fetch('/api/upload-shipment-photo', {
+  const r = await fetch('/api/upload-image', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ fileBase64, fileName: file.name, contentType: file.type }),
+    body: JSON.stringify({ action: 'shipment-photo', fileBase64, fileName: file.name, contentType: file.type }),
   });
   const j = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error(j.error || '照片上传失败');

@@ -1,6 +1,7 @@
 import { AwsClient } from "aws4fetch";
 import { isAdminUser } from "./_lib/admin-auth.js";
 import { generateDetailCopy } from "./_lib/detail-copy.js";
+import { uploadToR2 } from "./_lib/r2.js";
 
 const SUPABASE_URL = "https://ilzeziznxzaxxudzhdmu.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsemV6aXpueHpheHh1ZHpoZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.NrfZ9tuDOHRkkeuotdF838ATIBsEkKa21LCpJ_AdQuI";
@@ -29,6 +30,18 @@ export default async function handler(req, res) {
   if (!(await isAdminUser(admin, SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY))) return res.status(403).json({ error: "无权限" });
 
   if (req.body?.action === 'generate-detail-copy') return generateDetailCopy(req.body, res);
+
+  if (req.body?.action === 'shipment-photo') {
+    const { fileBase64, fileName, contentType } = req.body;
+    if (!fileBase64 || !fileName) return res.status(400).json({ error: "Missing file" });
+    try {
+      const url = await uploadToR2({ folder: "shipment-photos", fileName, buffer: Buffer.from(fileBase64, "base64"), contentType });
+      return res.status(200).json({ url });
+    } catch (e) {
+      console.error("Shipment photo upload failed:", e);
+      return res.status(500).json({ error: "上传失败" });
+    }
+  }
 
   const { R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME, R2_PUBLIC_URL } = process.env;
   if (!R2_ACCOUNT_ID || !R2_ACCESS_KEY_ID || !R2_SECRET_ACCESS_KEY || !R2_BUCKET_NAME || !R2_PUBLIC_URL) {
