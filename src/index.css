@@ -29,7 +29,7 @@
   grid-template-columns: 1fr 1.16fr 1fr;
   gap: 4px;
   width: 100%;
-  height: clamp(400px, 49vw, 620px);
+  height: clamp(310px, 40vw, 500px);
   overflow: hidden;
   background: #eae3e3;
 }
@@ -90,6 +90,59 @@
 }
 
 .cippy-editorial-link:hover {
+  color: #3b3235;
+}
+
+.cippy-collection-preview {
+  padding: 44px clamp(20px, 5vw, 80px) 70px;
+  background: #fff;
+}
+
+.cippy-collection-preview-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.cippy-collection-preview-head h2 {
+  font-family: "Cormorant Garamond", "Noto Serif SC", Georgia, serif;
+  font-size: clamp(32px, 3vw, 46px);
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+.cippy-collection-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.cippy-collection-tile {
+  min-width: 0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cippy-collection-tile img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  transition: opacity 180ms ease;
+}
+
+.cippy-collection-tile:hover img { opacity: .86; }
+
+.cippy-collection-tile span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 12px;
+  font-size: 13px;
+  font-weight: 600;
   color: #3b3235;
 }
 
@@ -225,7 +278,7 @@
 
   .cippy-editorial-hero {
     display: block;
-    height: 400px;
+    height: 320px;
   }
 
   .cippy-editorial-hero-side {
@@ -244,6 +297,15 @@
 
   .cippy-editorial-link {
     margin-top: 20px;
+  }
+
+  .cippy-collection-preview {
+    padding-top: 32px;
+  }
+
+  .cippy-collection-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px 12px;
   }
 
   .cippy-editorial-catalog {

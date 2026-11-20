@@ -20,6 +20,9 @@ import { containsChinese, specLabel } from './lib/productLocalization';
 import { ShoppingBag, Star, Sparkles, BookOpen, Heart, ArrowRight, CheckCircle2, ChevronRight, Globe, Compass, RefreshCw, User, Lock, Mail, CreditCard, ClipboardList, LogOut, Truck, Package, Clock, Check, Search, X, TrendingUp, ChevronDown, GitCompare, Award, Calendar, Copy, Send, Bell, ShieldAlert, Trash2, Plus, Users, Activity } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
+type CatalogCategory = 'all' | 'dresses' | 'tops' | 'bottoms' | 'outerwear' | 'sets' | 'wishlist';
+const catalogCategories: CatalogCategory[] = ['all', 'dresses', 'tops', 'bottoms', 'outerwear', 'sets', 'wishlist'];
+
 const getEmailHTML = (product: Product, brandConcept: string, siteUrl: string) => {
   const name = product.name;
   const cnName = product.cnName;
@@ -876,9 +879,51 @@ export default function App() {
   const [isCartAnimating, setIsCartAnimating] = useState(false);
   
   // Category filter state
-  const [selectedCategory, setSelectedCategory] = useState<'all' | 'dresses' | 'tops' | 'bottoms' | 'outerwear' | 'sets' | 'wishlist'>('all');
+  const [selectedCategory, setSelectedCategory] = useState<CatalogCategory>(() => {
+    const category = new URLSearchParams(window.location.search).get('collection') as CatalogCategory;
+    return catalogCategories.includes(category) ? category : 'all';
+  });
+  const [collectionOpen, setCollectionOpen] = useState(() => new URLSearchParams(window.location.search).has('collection'));
   const [productSearchQuery, setProductSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'newest' | 'price-asc' | 'price-desc' | 'best-sellers'>('newest');
+
+  const navigateToCollection = (category: CatalogCategory = 'all') => {
+    setActiveTab('rtw');
+    setCollectionOpen(true);
+    setSelectedCategory(category);
+    setProductSearchQuery('');
+    const url = new URL(window.location.href);
+    url.searchParams.set('collection', category);
+    window.history.pushState({}, '', url);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const navigateHome = () => {
+    setActiveTab('rtw');
+    setCollectionOpen(false);
+    const url = new URL(window.location.href);
+    url.searchParams.delete('collection');
+    window.history.pushState({}, '', url);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const selectCollectionCategory = (category: CatalogCategory) => {
+    setSelectedCategory(category);
+    const url = new URL(window.location.href);
+    url.searchParams.set('collection', category);
+    window.history.replaceState({}, '', url);
+  };
+
+  React.useEffect(() => {
+    const restoreCollectionView = () => {
+      const category = new URLSearchParams(window.location.search).get('collection') as CatalogCategory | null;
+      setCollectionOpen(category !== null);
+      setSelectedCategory(category && catalogCategories.includes(category) ? category : 'all');
+      setActiveTab('rtw');
+    };
+    window.addEventListener('popstate', restoreCollectionView);
+    return () => window.removeEventListener('popstate', restoreCollectionView);
+  }, []);
 
   // Compare Feature state
   const [compareProducts, setCompareProducts] = useState<Product[]>([]);
@@ -1766,11 +1811,7 @@ export default function App() {
             <span className="hidden sm:inline text-zinc-300 font-light select-none">|</span>
             <button
               onClick={() => {
-                setActiveTab('rtw');
-                setSelectedCategory('wishlist');
-                document.getElementById('garments-section')?.scrollIntoView({ behavior: 'smooth' });
-                setToastMessage(lang === 'zh' ? `💖 已显示您的所有收藏项目` : `💖 Showing your saved fairytale items`);
-                setTimeout(() => setToastMessage(null), 3000);
+                navigateToCollection('wishlist');
               }}
               className="hidden sm:flex items-center gap-1 hover:opacity-80 transition-opacity cursor-pointer font-semibold"
             >
@@ -1811,7 +1852,7 @@ export default function App() {
         </div>
 
         {/* Main Header / Navigation */}
-        <header className="cippy-editorial-header px-4 sm:px-6 md:px-10 py-4 bg-white border-b border-[#E9E1E3]">
+        <header className="cippy-editorial-header px-4 sm:px-6 md:px-10 py-2 bg-white border-b border-[#E9E1E3]">
           {isYunseo ? (
             <div className="flex flex-col lg:flex-row items-center justify-between gap-3 sm:gap-4 min-w-0">
               {/* Left: ESTABLISHED 2026 */}
@@ -1978,11 +2019,10 @@ export default function App() {
               <div onClick={() => setMobileNavOpen(false)} className={`order-2 lg:order-1 w-full lg:w-1/3 ${mobileNavOpen ? 'flex' : 'hidden'} lg:flex flex-col lg:flex-row lg:flex-wrap items-center justify-center lg:justify-start gap-x-4 gap-y-3 lg:gap-6 min-w-0`}>
                 <button
                   onClick={() => {
-                    setActiveTab('rtw');
-                    document.getElementById('nabi-studio-app-card')?.scrollIntoView({ behavior: 'smooth' });
+                    navigateToCollection('all');
                   }}
                   className={`text-[11px] tracking-[0.2em] font-bold font-sans transition-all duration-300 cursor-pointer ${
-                    activeTab === 'rtw' ? 'text-[#3F2B2B] border-b-2 border-[#3F2B2B] pb-1' : 'text-zinc-500 hover:text-[#3F2B2B] pb-1 border-b-2 border-transparent'
+                    activeTab === 'rtw' && collectionOpen ? 'text-[#3F2B2B] border-b-2 border-[#3F2B2B] pb-1' : 'text-zinc-500 hover:text-[#3F2B2B] pb-1 border-b-2 border-transparent'
                   }`}
                 >
                   {lang === 'zh' ? '成衣目录' : 'COLLECTION'}
@@ -2024,16 +2064,14 @@ export default function App() {
                     <span className="absolute top-0 right-0 min-w-[16px] h-4 px-1 rounded-full bg-[#3F2B2B] text-white text-[9px] font-bold flex items-center justify-center">{totalCartCount}</span>
                   )}
                 </button>
-                <img 
-                  src="https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/logo/cippylogo.svg.PNG"
-                  alt="Cippy Logo"
-                  onClick={() => {
-                    setActiveTab('rtw');
-                    document.getElementById('nabi-studio-app-card')?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                  className="h-12 sm:h-14 md:h-16 w-auto object-contain hover:opacity-85 transition-opacity duration-300 cursor-pointer select-none"
-                  referrerPolicy="no-referrer"
-                />
+                <button type="button" onClick={navigateHome} aria-label={lang === 'zh' ? '返回 Cippy 首页' : 'Cippy home'} className="cursor-pointer">
+                  <img
+                    src="https://pub-0c1693782698482098fa2ba7577d4409.r2.dev/logo/cippylogo.svg.PNG"
+                    alt="Cippy"
+                    className="h-16 sm:h-20 w-auto object-contain scale-[1.7] hover:opacity-85 transition-opacity duration-300 select-none"
+                    referrerPolicy="no-referrer"
+                  />
+                </button>
               </div>
 
               {/* Right navigation links: ARCHIVE, MEMBER, ALERTS, CART */}
@@ -2234,8 +2272,8 @@ export default function App() {
           {activeTab === 'rtw' && (
             <div className="animate-fade-in">
               
-              {/* Editorial Section matching screenshot exactly */}
-              {isYunseo ? (
+              {/* The homepage is separate from the searchable collection. */}
+              {!collectionOpen && (isYunseo ? (
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start pt-2 pb-6">
                   {/* Left Column: Minimalist Modern Presentation */}
                   <div className="lg:col-span-5 flex flex-col justify-between space-y-8 lg:sticky lg:top-24">
@@ -2686,8 +2724,30 @@ export default function App() {
                       <h1>{lang === 'zh' ? '好好穿衣，慢慢生活。' : 'The Everyday Edit'}</h1>
                       <p className="cippy-editorial-subtitle">{lang === 'zh' ? '适合小个子的日常穿搭，现货在马来西亚。' : 'Everyday dressing for petite frames, ready in Malaysia.'}</p>
                     </div>
-                    <button type="button" onClick={() => document.getElementById('garments-section')?.scrollIntoView({ behavior: 'smooth' })} className="cippy-editorial-link">{lang === 'zh' ? '浏览 Collection' : 'Explore the collection'} <ArrowRight className="h-4 w-4" /></button>
+                    <button type="button" onClick={() => document.getElementById('collection-preview')?.scrollIntoView({ behavior: 'smooth' })} className="cippy-editorial-link">{lang === 'zh' ? '浏览精选分类' : 'Explore the collection'} <ArrowRight className="h-4 w-4" /></button>
                   </div>
+                  <section id="collection-preview" className="cippy-collection-preview">
+                    <div className="cippy-collection-preview-head">
+                      <div>
+                        <p className="cippy-editorial-kicker">CIPPY · READY TO WEAR</p>
+                        <h2>{lang === 'zh' ? '精选分类' : 'The Collection'}</h2>
+                      </div>
+                      <button type="button" onClick={() => navigateToCollection('all')} className="cippy-editorial-link">{lang === 'zh' ? '查看全部' : 'Shop All'} <ArrowRight className="h-4 w-4" /></button>
+                    </div>
+                    <div className="cippy-collection-grid">
+                      {([
+                        { id: 'dresses', image: 'collection.dresses', zh: '连衣裙', en: 'Dresses' },
+                        { id: 'sets', image: 'collection.sets', zh: '套装', en: 'Sets' },
+                        { id: 'tops', image: 'collection.tops', zh: '上装', en: 'Tops' },
+                        { id: 'bottoms', image: 'collection.bottoms', zh: '下装', en: 'Bottoms' },
+                      ] as const).map((category) => (
+                        <button key={category.id} type="button" className="cippy-collection-tile" onClick={() => navigateToCollection(category.id)}>
+                          <img src={homeImage(category.image, siteContent)} alt="" loading="lazy" />
+                          <span>{lang === 'zh' ? category.zh : category.en}<ArrowRight className="h-4 w-4" /></span>
+                        </button>
+                      ))}
+                    </div>
+                  </section>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch pt-2 pb-6">
@@ -2800,10 +2860,10 @@ export default function App() {
                     </div>
                   </div>
                 </div>
-              )}
+              ))}
 
               {/* Product catalog section */}
-              <div id="garments-section" className="cippy-editorial-catalog space-y-8 scroll-mt-24">
+              {collectionOpen && <div id="garments-section" className="cippy-editorial-catalog space-y-8 scroll-mt-24">
                 
                 {/* Header / Filter row */}
                 <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 border-b border-[#E8E0E2] pb-6">
@@ -2833,7 +2893,7 @@ export default function App() {
                       ].map((cat) => (
                         <button
                           key={cat.id}
-                          onClick={() => setSelectedCategory(cat.id as any)}
+                          onClick={() => selectCollectionCategory(cat.id as CatalogCategory)}
                           className={`px-3.5 py-1.5 rounded-xl text-xs tracking-normal transition-all duration-200 cursor-pointer ${lang === 'zh' ? 'font-serif font-medium' : 'font-sans font-medium'} ${
                             selectedCategory === cat.id
                               ? `bg-[#F4ECEE] text-[#6D4852] border border-[#E9DBDE]`
@@ -2966,7 +3026,7 @@ export default function App() {
                     {lang === 'zh' ? '查看尺码建议' : 'Find your fit'} <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
-              </div>
+              </div>}
             </div>
           )}
 
@@ -3027,7 +3087,7 @@ export default function App() {
                 <h2>{lang === 'zh' ? '穿得自在，就很好。' : 'Good clothes for ordinary days.'}</h2>
                 <p>{lang === 'zh' ? '我们挑选适合马来西亚日常的女装：上课、出门、喝咖啡，或只是想穿得舒服一点。' : 'We choose pieces for everyday life in Malaysia: class, coffee, a weekend out, or simply feeling comfortable in what you wear.'}</p>
                 <p>{lang === 'zh' ? '每件商品都列出价格、可选尺码与库存状态。拿不准尺寸时，先看实测数据，也可以直接问我们。' : 'Each product shows its price, available sizes and stock status. Check the measurements or ask us if you are unsure about fit.'}</p>
-                <button type="button" className="cippy-editorial-link" onClick={() => { setActiveTab('rtw'); setTimeout(() => document.getElementById('garments-section')?.scrollIntoView({ behavior: 'smooth' }), 0); }}>{lang === 'zh' ? '浏览 Collection' : 'Shop the collection'} <ArrowRight className="h-4 w-4" /></button>
+                <button type="button" className="cippy-editorial-link" onClick={() => navigateToCollection('all')}>{lang === 'zh' ? '浏览 Collection' : 'Shop the collection'} <ArrowRight className="h-4 w-4" /></button>
               </div>
             </div>
           )}
