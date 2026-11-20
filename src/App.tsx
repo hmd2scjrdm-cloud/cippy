@@ -11,7 +11,6 @@ import ProductCard from './components/ProductCard';
 import ShoppingBagDrawer from './components/ShoppingBag';
 import CheckoutPage from './components/CheckoutPage';
 import ProductDetailModal from './components/ProductDetailModal';
-import { Bilingual } from './components/Bilingual';
 import { supabase } from './lib/supabase';
 import { opt, optAll } from './lib/optimizeImage';
 import { loadSiteConfig } from './lib/siteConfig';
@@ -1726,18 +1725,18 @@ export default function App() {
 
   return (
     <div 
-      className="min-h-screen w-full min-w-0 overflow-x-hidden bg-[#FAF4F6] text-zinc-800 font-sans selection:bg-[#FFF5F7] selection:text-[#B96A73] flex flex-col items-center justify-center p-0 sm:p-4 md:p-8"
+      className="cippy-editorial-shell min-h-screen w-full min-w-0 overflow-x-hidden text-zinc-800 font-sans flex flex-col items-center"
       style={{ ...activeTheme.customProperties } as React.CSSProperties}
     >
       {/* Pristine rounded card container matching high-end mockup design */}
-      <div id="nabi-studio-app-card" className="w-full min-w-0 max-w-7xl bg-[#FFFBFD] rounded-none sm:rounded-[24px] md:rounded-[32px] shadow-none sm:shadow-2xl border-x-0 sm:border border-[#FBEBF0] overflow-hidden flex flex-col min-h-screen sm:min-h-[90vh]">
+      <div id="nabi-studio-app-card" className="w-full min-w-0 max-w-[1600px] bg-white overflow-hidden flex flex-col min-h-screen">
         
         {/* Animated Announcement Ticker Row */}
-        <div className="w-full min-w-0 bg-[#FFF0F2] text-[#B96A73] border-b border-[#FBEBF0] py-2.5 px-3 md:px-8 flex items-center justify-between gap-2 text-[11px] font-medium font-sans transition-all duration-500"
+        <div className="cippy-editorial-utility w-full min-w-0 py-2 px-4 md:px-10 flex items-center justify-between gap-2 text-[11px] font-medium font-sans"
           style={{
-            backgroundColor: isYunseo ? '#F4F6F2' : isHwayoon ? '#FFF5F6' : isHanyu ? '#FFF5F7' : isChaewon ? '#FFF5F7' : '#FFF0F2',
-            color: isYunseo ? '#5D6B54' : isHwayoon ? '#C88E93' : isHanyu ? '#D31558' : isChaewon ? '#3F2B2B' : '#B96A73',
-            borderColor: isYunseo ? '#EFF2EC' : isHwayoon ? '#FDF1F2' : '#FBEBF0'
+            backgroundColor: '#E9EEE8',
+            color: '#25362D',
+            borderColor: '#D8E1D8'
           }}
         >
           {/* Left Side: Language Switcher & Saves */}
@@ -1815,7 +1814,7 @@ export default function App() {
         </div>
 
         {/* Main Header / Navigation */}
-        <header className="px-3 sm:px-4 md:px-10 py-4 sm:py-6 bg-white/90 border-b border-[#FBEBF0] backdrop-blur-md overflow-hidden">
+        <header className="cippy-editorial-header px-4 sm:px-6 md:px-10 py-4 bg-white border-b border-[#E8ECE7]">
           {isYunseo ? (
             <div className="flex flex-col lg:flex-row items-center justify-between gap-3 sm:gap-4 min-w-0">
               {/* Left: ESTABLISHED 2026 */}
@@ -1979,7 +1978,7 @@ export default function App() {
           ) : isChaewon ? (
             <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
               {/* Left navigation links: COLLECTION, THE NARRATIVE */}
-              <div onClick={() => setMobileNavOpen(false)} className={`order-2 lg:order-1 w-full lg:w-1/3 ${mobileNavOpen ? 'flex' : 'hidden'} lg:flex flex-col lg:flex-row lg:flex-wrap items-center justify-center lg:justify-start gap-x-4 gap-y-3 lg:gap-8 min-w-0`}>
+              <div onClick={() => setMobileNavOpen(false)} className={`order-2 lg:order-1 w-full lg:w-1/3 ${mobileNavOpen ? 'flex' : 'hidden'} lg:flex flex-col lg:flex-row lg:flex-wrap items-center justify-center lg:justify-start gap-x-4 gap-y-3 lg:gap-6 min-w-0`}>
                 <button
                   onClick={() => {
                     setActiveTab('rtw');
@@ -1989,18 +1988,7 @@ export default function App() {
                     activeTab === 'rtw' ? 'text-[#3F2B2B] border-b-2 border-[#3F2B2B] pb-1' : 'text-zinc-500 hover:text-[#3F2B2B] pb-1 border-b-2 border-transparent'
                   }`}
                 >
-                  <Bilingual en="COLLECTION" zh="成衣目录" enClassName="block" zhClassName="block text-[8px] tracking-normal font-normal" />
-                </button>
-                <button
-                  onClick={() => {
-                    setActiveTab('rtw');
-                    setTimeout(() => {
-                      document.getElementById('garments-section')?.scrollIntoView({ behavior: 'smooth' });
-                    }, 0);
-                  }}
-                  className="text-[11px] tracking-[0.2em] font-bold font-sans transition-all duration-300 cursor-pointer text-zinc-500 hover:text-[#3F2B2B] pb-1 border-b-2 border-transparent"
-                >
-                  <Bilingual en="SHOP NOW" zh="浏览商品" enClassName="block" zhClassName="block text-[8px] tracking-normal font-normal" />
+                  {lang === 'zh' ? '成衣目录' : 'COLLECTION'}
                 </button>
                 <button
                   onClick={() => {
@@ -2011,7 +1999,7 @@ export default function App() {
                     activeTab === 'journal' ? 'text-[#3F2B2B] border-b-2 border-[#3F2B2B] pb-1' : 'text-zinc-500 hover:text-[#3F2B2B] pb-1 border-b-2 border-transparent'
                   }`}
                 >
-                  <Bilingual en="THE NARRATIVE" zh="品牌故事" enClassName="block" zhClassName="block text-[8px] tracking-normal font-normal" />
+                  {lang === 'zh' ? '品牌故事' : 'OUR STORY'}
                 </button>
               </div>
 
@@ -2046,13 +2034,13 @@ export default function App() {
                     setActiveTab('rtw');
                     document.getElementById('nabi-studio-app-card')?.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className="h-10 sm:h-12 md:h-14 w-auto object-contain hover:opacity-85 transition-opacity duration-300 cursor-pointer select-none"
+                  className="h-12 sm:h-14 md:h-16 w-auto object-contain hover:opacity-85 transition-opacity duration-300 cursor-pointer select-none"
                   referrerPolicy="no-referrer"
                 />
               </div>
 
               {/* Right navigation links: ARCHIVE, MEMBER, ALERTS, CART */}
-              <div onClick={() => setMobileNavOpen(false)} className={`order-3 lg:order-3 w-full lg:w-1/3 ${mobileNavOpen ? 'flex' : 'hidden'} lg:flex flex-col lg:flex-row lg:flex-wrap items-center justify-center lg:justify-end gap-x-4 gap-y-3 lg:gap-8 min-w-0`}>
+              <div onClick={() => setMobileNavOpen(false)} className={`order-3 lg:order-3 w-full lg:w-1/3 ${mobileNavOpen ? 'flex' : 'hidden'} lg:flex flex-col lg:flex-row lg:flex-wrap items-center justify-center lg:justify-end gap-x-4 gap-y-3 lg:gap-6 min-w-0`}>
                 <button
                   onClick={() => {
                     setActiveTab('atelier');
@@ -2062,7 +2050,7 @@ export default function App() {
                     activeTab === 'atelier' ? 'text-[#3F2B2B] border-b-2 border-[#3F2B2B] pb-1' : 'text-zinc-500 hover:text-[#3F2B2B] pb-1 border-b-2 border-transparent'
                   }`}
                 >
-                  <Bilingual en="ARCHIVE" zh="工坊" enClassName="block" zhClassName="block text-[8px] tracking-normal font-normal" />
+                  {lang === 'zh' ? '试衣工坊' : 'FITTING ROOM'}
                 </button>
                 <button
                   onClick={() => {
@@ -2073,7 +2061,7 @@ export default function App() {
                     activeTab === 'policies' ? 'text-[#3F2B2B] border-b-2 border-[#3F2B2B] pb-1' : 'text-zinc-500 hover:text-[#3F2B2B] pb-1 border-b-2 border-transparent'
                   }`}
                 >
-                  <Bilingual en="T&C" zh="政策条款" enClassName="block" zhClassName="block text-[8px] tracking-normal font-normal" />
+                  {lang === 'zh' ? '配送与退换' : 'DELIVERY & RETURNS'}
                 </button>
                 {isAdminUser && (
                   <button
@@ -2085,7 +2073,7 @@ export default function App() {
                       activeTab === 'alerts' ? 'text-[#3F2B2B] border-b-2 border-[#3F2B2B] pb-1' : 'text-zinc-500 hover:text-[#3F2B2B] pb-1 border-b-2 border-transparent'
                     }`}
                   >
-                    <Bilingual en="ALERTS" zh="推送群发" enClassName="block" zhClassName="block text-[8px] tracking-normal font-normal" />
+                    {lang === 'zh' ? '推送群发' : 'ALERTS'}
                   </button>
                 )}
                 <button
@@ -2097,7 +2085,7 @@ export default function App() {
                     activeTab === 'account' ? 'text-[#3F2B2B] border-b-2 border-[#3F2B2B] pb-1' : 'text-zinc-500 hover:text-[#3F2B2B] pb-1 border-b-2 border-transparent'
                   }`}
                 >
-                  <Bilingual en="MEMBER" zh="会员中心" enClassName="block" zhClassName="block text-[8px] tracking-normal font-normal" />
+                  {lang === 'zh' ? '会员中心' : 'ACCOUNT'}
                 </button>
                 <button
                   onClick={() => setIsCartOpen(true)}
@@ -2107,7 +2095,7 @@ export default function App() {
                       : 'text-zinc-500 hover:text-[#3F2B2B]'
                   }`}
                 >
-                  <Bilingual en={`CART (${totalCartCount})`} zh={`购物袋 (${totalCartCount})`} enClassName="block" zhClassName="block text-[8px] tracking-normal font-normal normal-case" />
+                  {lang === 'zh' ? `购物袋 (${totalCartCount})` : `BAG (${totalCartCount})`}
                 </button>
               </div>
             </div>
@@ -2243,11 +2231,11 @@ export default function App() {
         </header>
  
         {/* Main Viewport Content inside the frame */}
-        <main id="main-viewport" className="flex-1 min-w-0 w-full p-3 sm:p-6 md:p-10 transition-all duration-300">
+        <main id="main-viewport" className={`flex-1 min-w-0 w-full transition-all duration-300 ${activeTab === 'rtw' ? 'p-0' : 'p-3 sm:p-6 md:p-10'}`}>
           
           {/* RTW Edition Tab */}
           {activeTab === 'rtw' && (
-            <div className="space-y-8 animate-fade-in">
+            <div className="animate-fade-in">
               
               {/* Editorial Section matching screenshot exactly */}
               {isYunseo ? (
@@ -2674,26 +2662,39 @@ export default function App() {
                   </div>
                 </div>
               ) : isChaewon ? (
-                <div className="relative h-[400px] sm:h-[370px] lg:h-[380px] overflow-hidden bg-[#F8F1F2]">
+                <div className="cippy-editorial-home">
+                  <div className="cippy-editorial-hero">
                     <img
                       src={siteContent['home.hero.featuredImage.url'] || featuredProduct?.images?.[0] || featuredProduct?.imageUrl || opt(homeImage('hero.image', siteContent))}
                       alt={featuredProduct ? (lang === 'zh' ? featuredProduct.cnName : featuredProduct.name) : 'Cippy collection'}
-                      className="absolute inset-0 w-full h-full object-cover object-center"
+                      className="h-full w-full object-cover object-center"
                       fetchPriority="high"
                       referrerPolicy="no-referrer"
                     />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
-                  <div className="absolute inset-x-0 bottom-0 px-5 pb-7 sm:px-10 sm:pb-10 lg:px-14 lg:pb-12 text-white">
-                    <p className="text-[11px] font-semibold uppercase tracking-widest text-white/85">{lang === 'zh' ? 'Cippy 本周首推' : 'Featured this week'}</p>
-                    <h1 className="mt-2 max-w-2xl font-serif text-2xl sm:text-4xl lg:text-5xl leading-tight text-white">
-                      {featuredProduct ? (lang === 'zh' ? '修身收腰螺纹 T 恤' : 'Waist-Fit Ribbed Tee') : (lang === 'zh' ? '适合日常的韩系女装' : 'Korean style for everyday')}
-                    </h1>
-                    {featuredProduct && <p className="mt-3 text-base font-medium">RM {featuredProduct.price.toFixed(2)}</p>}
-                    <div className="mt-5 flex flex-wrap gap-3">
-                      {featuredProduct && <button type="button" onClick={() => setSelectedProduct(featuredProduct)} className="bg-white px-6 py-3 text-xs font-semibold text-[#3F2B2B] transition-colors hover:bg-[#F8F1F2] cursor-pointer">{lang === 'zh' ? '查看商品' : 'View product'}</button>}
-                      <button type="button" onClick={() => document.getElementById('garments-section')?.scrollIntoView({ behavior: 'smooth' })} className="border border-white/80 px-6 py-3 text-xs font-semibold text-white transition-colors hover:bg-white/10 cursor-pointer">{lang === 'zh' ? '浏览全部' : 'Browse all'}</button>
+                  </div>
+                  <div className="cippy-editorial-intro">
+                    <div className="min-w-0">
+                      <p className="cippy-editorial-kicker">CIPPY · KUALA LUMPUR</p>
+                      <h1>{lang === 'zh' ? '为日常而选的韩系女装' : 'Everyday pieces, thoughtfully chosen'}</h1>
+                      <p className="cippy-editorial-subtitle">{lang === 'zh' ? '本周精选 · 小个子友好' : 'This week’s edit · Petite-friendly'}</p>
+                    </div>
+                    <div className="cippy-editorial-feature">
+                      {featuredProduct && <p className="cippy-editorial-feature-name">{lang === 'zh' ? featuredProduct.cnName : featuredProduct.name}<span>RM {featuredProduct.price.toFixed(2)}</span></p>}
+                      {featuredProduct && <button type="button" onClick={() => setSelectedProduct(featuredProduct)} className="cippy-editorial-link">{lang === 'zh' ? '查看这件商品' : 'View this piece'} <ArrowRight className="h-4 w-4" /></button>}
                     </div>
                   </div>
+                  <nav className="cippy-editorial-categories" aria-label={lang === 'zh' ? '商品分类' : 'Shop by category'}>
+                    {[
+                      { id: 'dresses', en: 'Dresses', zh: '连衣裙' },
+                      { id: 'sets', en: 'Sets', zh: '套装' },
+                      { id: 'tops', en: 'Tops', zh: '上装' },
+                      { id: 'bottoms', en: 'Bottoms', zh: '下装' },
+                    ].map((category) => (
+                      <button key={category.id} type="button" onClick={() => { setSelectedCategory(category.id as typeof selectedCategory); document.getElementById('garments-section')?.scrollIntoView({ behavior: 'smooth' }); }}>
+                        {lang === 'zh' ? category.zh : category.en}<ArrowRight className="h-3.5 w-3.5" />
+                      </button>
+                    ))}
+                  </nav>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch pt-2 pb-6">
@@ -2809,13 +2810,13 @@ export default function App() {
               )}
 
               {/* Product catalog section */}
-              <div id="garments-section" className="space-y-8 border-t border-[#FBEBF0] pt-12 scroll-mt-24">
+              <div id="garments-section" className="cippy-editorial-catalog space-y-8 scroll-mt-24">
                 
                 {/* Header / Filter row */}
-                <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 border-b border-[#FBEBF0] pb-6">
+                <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 border-b border-[#DDE5DC] pb-6">
                   <div>
-                    <h2 className="text-2xl md:text-3xl font-serif text-zinc-800 tracking-tight">
-                      {lang === 'zh' ? '成衣目录' : 'Our Ready-to-Wear Catalogue'}
+                    <h2 className="text-2xl md:text-3xl font-serif text-zinc-800">
+                      {lang === 'zh' ? '精选成衣' : 'The Collection'}
                     </h2>
                     <p className="text-xs text-zinc-500 font-sans mt-1 leading-relaxed">
                       {lang === 'zh'
@@ -2842,8 +2843,8 @@ export default function App() {
                           onClick={() => setSelectedCategory(cat.id as any)}
                           className={`px-3.5 py-1.5 rounded-xl text-xs tracking-normal transition-all duration-200 cursor-pointer ${lang === 'zh' ? 'font-serif font-medium' : 'font-sans font-medium'} ${
                             selectedCategory === cat.id
-                              ? `bg-[#FFF0F2] text-[#B96A73] border border-[#FBEBF0]`
-                              : `text-zinc-500 hover:text-[#B96A73] hover:bg-[#FFF0F2]/30 border border-transparent`
+                              ? `bg-[#E9EEE8] text-[#315B43] border border-[#D4E1D3]`
+                              : `text-zinc-500 hover:text-[#315B43] hover:bg-[#F1F4F0] border border-transparent`
                           }`}
                         >
                           <span>{lang === 'zh' ? cat.cnLabel : cat.label}</span>
@@ -2852,9 +2853,9 @@ export default function App() {
                     </div>
 
                     {/* Sort Dropdown */}
-                    <div className="relative flex items-center bg-white border border-[#FBEBF0] rounded-xl hover:border-pink-200 transition-all font-sans text-zinc-700 w-full md:w-48 shrink-0">
+                    <div className="relative flex items-center bg-white border border-[#DDE5DC] rounded-md hover:border-[#8CA891] transition-all font-sans text-zinc-700 w-full md:w-48 shrink-0">
                       <span className="pl-3 pr-1 text-zinc-400 select-none flex items-center">
-                        <TrendingUp className="w-3.5 h-3.5 text-[#D89CA2]" />
+                        <TrendingUp className="w-3.5 h-3.5 text-[#58725E]" />
                       </span>
                       <select
                         value={sortBy}
@@ -2874,14 +2875,14 @@ export default function App() {
                     {/* Search Bar */}
                     <div className="relative w-full md:w-64">
                       <span className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-zinc-400">
-                        <Search className="w-4 h-4 text-[#D89CA2]" />
+                        <Search className="w-4 h-4 text-[#58725E]" />
                       </span>
                       <input
                         type="text"
                         placeholder={lang === 'zh' ? '搜索商品名称 / 拼音...' : 'Search ready-to-wear...'}
                         value={productSearchQuery}
                         onChange={(e) => setProductSearchQuery(e.target.value)}
-                        className="w-full text-xs pl-9 pr-8 py-2.5 bg-white border border-[#FBEBF0] hover:border-pink-200 focus:border-[#B96A73] focus:ring-1 focus:ring-[#B96A73] outline-none rounded-xl transition-all font-sans text-zinc-700 placeholder-zinc-400"
+                        className="w-full text-xs pl-9 pr-8 py-2.5 bg-white border border-[#DDE5DC] hover:border-[#8CA891] focus:border-[#315B43] focus:ring-1 focus:ring-[#315B43] outline-none rounded-md transition-all font-sans text-zinc-700 placeholder-zinc-400"
                       />
                       {productSearchQuery && (
                         <button
@@ -2928,7 +2929,7 @@ export default function App() {
                     </div>
                   </div>
                 ) : (
-                  <div id="allProductsGrid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                  <div id="allProductsGrid" className="grid grid-cols-2 lg:grid-cols-4 gap-x-3 gap-y-8 sm:gap-x-5 lg:gap-x-7 lg:gap-y-12">
                     {sortedProducts.map((prod) => (
                       <ProductCard
                         key={prod.id}
@@ -2948,18 +2949,13 @@ export default function App() {
                 )}
 
                 {/* Quick Sizing fairy callout */}
-                <div className="mt-16 bg-[#FFF5F7] rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden border border-[#FBEBF0]">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-[#FBEBF0]/30 rounded-full blur-2xl" />
-                  
-                  <div className="space-y-2 relative z-10 text-center md:text-left">
-                    <div className="flex items-center justify-center md:justify-start gap-1 text-[#D89CA2]">
-                      <Star className="w-4 h-4 fill-[#FBEBF0]" />
-                      <span className="text-xs font-mono tracking-widest font-semibold uppercase">{lang === 'zh' ? '尺码小仙女提醒' : 'SIZING FAIRY NOTICE'}</span>
-                    </div>
-                    <h3 className="text-lg md:text-xl font-serif text-zinc-800 tracking-tight">
+                <div className="mt-16 border-y border-[#DDE5DC] py-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                  <div className="space-y-2 text-left">
+                    <span className="text-[10px] font-semibold text-[#58725E] uppercase">{lang === 'zh' ? '尺码建议' : 'A NOTE ON FIT'}</span>
+                    <h3 className="text-lg md:text-xl font-serif text-[#25362D]">
                       {lang === 'zh' ? '拿不定主意选 S 还是 M？' : 'Unsure between Small (S) and Medium (M)?'}
                     </h3>
-                    <p className="text-xs text-zinc-500 font-sans max-w-xl">
+                    <p className="text-xs text-zinc-500 font-sans max-w-xl leading-relaxed">
                       {lang === 'zh'
                         ? '输入身高、体重与围度，取得一般尺码建议。结果仅供参考，下单前仍请核对商品实测尺寸。'
                         : 'Enter your height, weight and measurements for a general size guide. Check the garment measurements before ordering.'}
@@ -2972,9 +2968,9 @@ export default function App() {
                       setAtelierSubTab('sizing');
                       document.getElementById('nabi-studio-app-card')?.scrollIntoView({ behavior: 'smooth' });
                     }}
-                    className="bg-white hover:bg-[#FFF0F2] text-[#B96A73] font-sans font-semibold text-xs px-5 py-3 rounded-xl border border-[#FBEBF0] shadow-xs transition-all duration-300 shrink-0 cursor-pointer flex items-center gap-1.5"
+                    className="bg-[#25362D] hover:bg-[#38513F] text-white font-sans font-semibold text-xs px-5 py-3 transition-all duration-300 shrink-0 cursor-pointer flex items-center gap-1.5"
                   >
-                    Open Sizing Fairy · 尺码测算 <ChevronRight className="w-4 h-4" />
+                    {lang === 'zh' ? '查看尺码建议' : 'Find your fit'} <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
               </div>

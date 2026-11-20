@@ -485,10 +485,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
         {/* Price tier, localized title and price */}
         <div className="space-y-1">
           <div className="flex items-center justify-between gap-2">
-            <span className={`text-[9px] font-bold uppercase tracking-[0.12em] ${activeTheme.accentText}`}>
+            <span className={`product-tier text-[9px] font-bold uppercase tracking-[0.12em] ${activeTheme.accentText}`}>
               {getPriceTier(product.price).emoji} {lang === 'zh' ? getPriceTier(product.price).zh : getPriceTier(product.price).en}
             </span>
-            <span className="font-mono text-xs text-zinc-400 shrink-0">
+            <span className="product-price font-mono text-xs text-zinc-400 shrink-0">
               RM {product.price}
             </span>
           </div>
@@ -502,7 +502,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
         {/* Short description */}
         {(lang === 'zh' && product.cnDescription ? product.cnDescription : product.description) && (
-          <p className={`text-xs text-zinc-500 leading-relaxed text-justify line-clamp-2 ${activeArchetype.fontBody}`}>
+          <p className={`product-description text-xs text-zinc-500 leading-relaxed text-justify line-clamp-2 ${activeArchetype.fontBody}`}>
             {lang === 'zh' && product.cnDescription ? product.cnDescription : product.description}
           </p>
         )}
