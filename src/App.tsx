@@ -15,6 +15,7 @@ import { loadSiteContent, useSiteContent, homeImage } from './lib/siteContent';
 import { applyContentOverrides } from './lib/contentWalk';
 import { signInWithGoogleGmail, sendGmailMessage, logoutGmail, getGmailToken, getGmailEmail } from './lib/gmailService';
 import { containsChinese, specLabel } from './lib/productLocalization';
+import { applySeo, getSeoData } from './lib/seo';
 import { ShoppingBag, Star, Sparkles, BookOpen, Heart, ArrowRight, CheckCircle2, ChevronRight, Globe, Compass, RefreshCw, User, Lock, Mail, CreditCard, ClipboardList, LogOut, Truck, Package, Clock, Check, Search, X, TrendingUp, ChevronDown, GitCompare, Award, Calendar, Copy, Send, Bell, ShieldAlert, Trash2, Plus, Users, Activity } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -890,8 +891,10 @@ export default function App() {
     setActiveTab('rtw');
     setCollectionOpen(true);
     setSelectedCategory(category);
+    setSelectedProduct(null);
     setProductSearchQuery('');
     const url = new URL(window.location.href);
+    url.searchParams.delete('product');
     url.searchParams.set('collection', category);
     window.history.pushState({}, '', url);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -900,8 +903,10 @@ export default function App() {
   const navigateHome = () => {
     setActiveTab('rtw');
     setCollectionOpen(false);
+    setSelectedProduct(null);
     const url = new URL(window.location.href);
     url.searchParams.delete('collection');
+    url.searchParams.delete('product');
     window.history.pushState({}, '', url);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -913,16 +918,55 @@ export default function App() {
     window.history.replaceState({}, '', url);
   };
 
+  const openProduct = (product: Product) => {
+    setSelectedProduct(product);
+    const url = new URL(window.location.href);
+    url.searchParams.delete('collection');
+    url.searchParams.set('product', product.id);
+    window.history.pushState({}, '', url);
+  };
+
+  const closeProduct = () => {
+    setSelectedProduct(null);
+    const url = new URL(window.location.href);
+    url.searchParams.delete('product');
+    url.searchParams.set('collection', selectedCategory);
+    window.history.replaceState({}, '', url);
+  };
+
+  React.useEffect(() => {
+    const productId = new URLSearchParams(window.location.search).get('product');
+    if (!productId) return;
+    const product = dbProducts.find((item) => item.id === productId);
+    if (product) {
+      setSelectedProduct(product);
+      setCollectionOpen(true);
+      setSelectedCategory((product.category as CatalogCategory) || 'all');
+    }
+  }, [dbProducts]);
+
+  React.useEffect(() => {
+    applySeo(getSeoData({
+      category: activeTab === 'rtw' && collectionOpen ? selectedCategory : null,
+      product: selectedProduct,
+      lang,
+    }), lang);
+  }, [activeTab, collectionOpen, selectedCategory, selectedProduct, lang]);
+
   React.useEffect(() => {
     const restoreCollectionView = () => {
       const category = new URLSearchParams(window.location.search).get('collection') as CatalogCategory | null;
       setCollectionOpen(category !== null);
       setSelectedCategory(category && catalogCategories.includes(category) ? category : 'all');
+      const productId = new URLSearchParams(window.location.search).get('product');
+      const product = dbProducts.find((item) => item.id === productId);
+      setSelectedProduct(product || null);
+      if (product) setCollectionOpen(true);
       setActiveTab('rtw');
     };
     window.addEventListener('popstate', restoreCollectionView);
     return () => window.removeEventListener('popstate', restoreCollectionView);
-  }, []);
+  }, [dbProducts]);
 
   // Compare Feature state
   const [compareProducts, setCompareProducts] = useState<Product[]>([]);
@@ -1851,7 +1895,7 @@ export default function App() {
         </div>
 
         {/* Main Header / Navigation */}
-        <header className="cippy-editorial-header px-4 sm:px-6 md:px-10 py-2 bg-white border-b border-[#E9E1E3]">
+        <header className={`cippy-editorial-header px-4 sm:px-6 md:px-10 py-2 bg-white border-b border-[#E9E1E3] ${lang === 'zh' ? 'cippy-editorial-header-zh' : ''}`}>
           {isYunseo ? (
             <div className="flex flex-col lg:flex-row items-center justify-between gap-3 sm:gap-4 min-w-0">
               {/* Left: ESTABLISHED 2026 */}
@@ -1881,7 +1925,7 @@ export default function App() {
                     setActiveTab('rtw');
                     document.getElementById('nabi-studio-app-card')?.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className={`text-[11px] tracking-[0.2em] font-bold font-sans transition-all duration-300 cursor-pointer ${
+                  className={`cippy-editorial-nav-link text-[11px] tracking-[0.2em] font-bold font-sans transition-all duration-300 cursor-pointer ${
                     activeTab === 'rtw' ? 'text-[#5D6B54] border-b border-[#5D6B54] pb-0.5' : 'text-zinc-500 hover:text-[#5D6B54] pb-0.5 border-b border-transparent'
                   }`}
                 >
@@ -1892,7 +1936,7 @@ export default function App() {
                     setActiveTab('journal');
                     document.getElementById('nabi-studio-app-card')?.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className={`text-[11px] tracking-[0.2em] font-bold font-sans transition-all duration-300 cursor-pointer ${
+                  className={`cippy-editorial-nav-link text-[11px] tracking-[0.2em] font-bold font-sans transition-all duration-300 cursor-pointer ${
                     activeTab === 'journal' ? 'text-[#5D6B54] border-b border-[#5D6B54] pb-0.5' : 'text-zinc-500 hover:text-[#5D6B54] pb-0.5 border-b border-transparent'
                   }`}
                 >
@@ -1903,7 +1947,7 @@ export default function App() {
                     setActiveTab('account');
                     document.getElementById('nabi-studio-app-card')?.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className={`text-[11px] tracking-[0.2em] font-bold font-sans transition-all duration-300 cursor-pointer ${
+                  className={`cippy-editorial-nav-link text-[11px] tracking-[0.2em] font-bold font-sans transition-all duration-300 cursor-pointer ${
                     activeTab === 'account' ? 'text-[#5D6B54] border-b border-[#5D6B54] pb-0.5' : 'text-zinc-500 hover:text-[#5D6B54] pb-0.5 border-b border-transparent'
                   }`}
                 >
@@ -1998,7 +2042,7 @@ export default function App() {
                   onClick={() => {
                     navigateToCollection('all');
                   }}
-                  className={`text-[11px] tracking-[0.2em] font-bold font-sans transition-all duration-300 cursor-pointer ${
+                  className={`cippy-editorial-nav-link text-[11px] tracking-[0.2em] font-bold font-sans transition-all duration-300 cursor-pointer ${
                     activeTab === 'rtw' && collectionOpen ? 'text-[#3F2B2B] border-b-2 border-[#3F2B2B] pb-1' : 'text-zinc-500 hover:text-[#3F2B2B] pb-1 border-b-2 border-transparent'
                   }`}
                 >
@@ -2009,7 +2053,7 @@ export default function App() {
                     setActiveTab('journal');
                     document.getElementById('nabi-studio-app-card')?.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className={`text-[11px] tracking-[0.2em] font-bold font-sans transition-all duration-300 cursor-pointer ${
+                  className={`cippy-editorial-nav-link text-[11px] tracking-[0.2em] font-bold font-sans transition-all duration-300 cursor-pointer ${
                     activeTab === 'journal' ? 'text-[#3F2B2B] border-b-2 border-[#3F2B2B] pb-1' : 'text-zinc-500 hover:text-[#3F2B2B] pb-1 border-b-2 border-transparent'
                   }`}
                 >
@@ -2058,7 +2102,7 @@ export default function App() {
                     setActiveTab('policies');
                     document.getElementById('nabi-studio-app-card')?.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className={`text-[11px] tracking-[0.2em] font-bold font-sans transition-all duration-300 cursor-pointer ${
+                  className={`cippy-editorial-nav-link text-[11px] tracking-[0.2em] font-bold font-sans transition-all duration-300 cursor-pointer ${
                     activeTab === 'policies' ? 'text-[#3F2B2B] border-b-2 border-[#3F2B2B] pb-1' : 'text-zinc-500 hover:text-[#3F2B2B] pb-1 border-b-2 border-transparent'
                   }`}
                 >
@@ -2070,7 +2114,7 @@ export default function App() {
                       setActiveTab('alerts');
                       document.getElementById('nabi-studio-app-card')?.scrollIntoView({ behavior: 'smooth' });
                     }}
-                    className={`text-[11px] tracking-[0.2em] font-bold font-sans transition-all duration-300 cursor-pointer ${
+                    className={`cippy-editorial-nav-link text-[11px] tracking-[0.2em] font-bold font-sans transition-all duration-300 cursor-pointer ${
                       activeTab === 'alerts' ? 'text-[#3F2B2B] border-b-2 border-[#3F2B2B] pb-1' : 'text-zinc-500 hover:text-[#3F2B2B] pb-1 border-b-2 border-transparent'
                     }`}
                   >
@@ -2082,7 +2126,7 @@ export default function App() {
                     setActiveTab('account');
                     document.getElementById('nabi-studio-app-card')?.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className={`text-[11px] tracking-[0.2em] font-bold font-sans transition-all duration-300 cursor-pointer ${
+                  className={`cippy-editorial-nav-link text-[11px] tracking-[0.2em] font-bold font-sans transition-all duration-300 cursor-pointer ${
                     activeTab === 'account' ? 'text-[#3F2B2B] border-b-2 border-[#3F2B2B] pb-1' : 'text-zinc-500 hover:text-[#3F2B2B] pb-1 border-b-2 border-transparent'
                   }`}
                 >
@@ -2717,7 +2761,7 @@ export default function App() {
                         <p className="cippy-editorial-kicker">CIPPY · READY TO WEAR</p>
                         <h2>{lang === 'zh' ? '精选分类' : 'The Collection'}</h2>
                       </div>
-                      <button type="button" onClick={() => navigateToCollection('all')} className="cippy-editorial-link">{lang === 'zh' ? '查看全部' : 'Shop All'} <ArrowRight className="h-4 w-4" /></button>
+                      <a href="/?collection=all" onClick={(event) => { if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); navigateToCollection('all'); }} className="cippy-editorial-link">{lang === 'zh' ? '查看全部' : 'Shop All'} <ArrowRight className="h-4 w-4" /></a>
                     </div>
                     <div className="cippy-collection-grid">
                       {([
@@ -2726,10 +2770,10 @@ export default function App() {
                         { id: 'tops', image: 'collection.tops', zh: '上装', en: 'Tops' },
                         { id: 'bottoms', image: 'collection.bottoms', zh: '下装', en: 'Bottoms' },
                       ] as const).map((category) => (
-                        <button key={category.id} type="button" className="cippy-collection-tile" onClick={() => navigateToCollection(category.id)}>
+                        <a key={category.id} href={`/?collection=${category.id}`} className="cippy-collection-tile" onClick={(event) => { if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); navigateToCollection(category.id); }}>
                           <img src={homeImage(category.image, siteContent)} alt="" loading="lazy" />
                           <span>{lang === 'zh' ? category.zh : category.en}<ArrowRight className="h-4 w-4" /></span>
-                        </button>
+                        </a>
                       ))}
                     </div>
                   </section>
@@ -2973,7 +3017,7 @@ export default function App() {
                         key={prod.id}
                         product={prod}
                         onAddProductToCart={handleAddProductToCart}
-                        onViewProduct={setSelectedProduct}
+                        onViewProduct={openProduct}
                         activeTheme={activeTheme}
                         activeArchetype={activeArchetype}
                         lang={lang}
@@ -5531,7 +5575,7 @@ export default function App() {
       {selectedProduct && (
         <ProductDetailModal
           isOpen={!!selectedProduct}
-          onClose={() => setSelectedProduct(null)}
+          onClose={closeProduct}
           product={selectedProduct}
           lang={lang}
           isWishlisted={wishlist.some((w: any) => w.id === selectedProduct.id)}

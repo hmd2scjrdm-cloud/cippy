@@ -24,6 +24,21 @@
   color: #9a7680;
 }
 
+.cippy-editorial-header .cippy-editorial-nav-link {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: 0;
+}
+
+.cippy-editorial-header-zh .cippy-editorial-nav-link {
+  font-family: serif;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
 .cippy-editorial-gallery {
   position: relative;
 }

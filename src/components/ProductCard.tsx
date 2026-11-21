@@ -324,7 +324,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </button>
         )}
         {product.imageUrl ? (
-          <div className="relative w-full h-full flex items-center justify-center overflow-hidden rounded-xl">
+          <a
+            href={`/?product=${encodeURIComponent(product.id)}`}
+            onClick={(event) => { event.stopPropagation(); if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); handleCardClick(); }}
+            className="relative w-full h-full flex items-center justify-center overflow-hidden rounded-xl"
+            aria-label={lang === 'zh' ? `查看 ${product.cnName}` : `View ${product.name}`}
+          >
             <img loading="lazy" decoding="async"
               src={product.imageUrl}
               alt={lang === 'zh' ? product.cnName : product.name}
@@ -335,7 +340,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             />
             {/* Elegant overlay gradient to make cards feel soft and blended */}
             <div className="absolute inset-0 bg-gradient-to-t from-white/10 to-transparent pointer-events-none" />
-          </div>
+          </a>
         ) : (
           /* Large vector silhouette fallback */
           <div className={`transition-all duration-500 transform ${
@@ -492,11 +497,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
               RM {product.price}
             </span>
           </div>
-          <h3
-            onClick={handleCardClick}
-            className={`cursor-pointer ${activeArchetype.fontTitle} font-bold text-zinc-800 text-sm md:text-base leading-snug tracking-tight group-hover:${activeTheme.primaryText} transition-colors duration-200`}
-          >
-            {lang === 'zh' ? product.cnName : product.name}
+          <h3 className={`${activeArchetype.fontTitle} font-bold text-zinc-800 text-sm md:text-base leading-snug tracking-tight group-hover:${activeTheme.primaryText} transition-colors duration-200`}>
+            <a href={`/?product=${encodeURIComponent(product.id)}`} onClick={(event) => { if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); handleCardClick(); }}>
+              {lang === 'zh' ? product.cnName : product.name}
+            </a>
           </h3>
         </div>
 
