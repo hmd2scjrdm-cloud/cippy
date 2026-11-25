@@ -1340,7 +1340,7 @@ async function loadSettingsPage() {
   if (error) { msg.textContent = '读取设置失败：' + error.message; msg.className = 'text-sm text-red-500'; }
   document.getElementById('setWest').value = c.shipping_west ?? 10;
   document.getElementById('setEast').value = c.shipping_east ?? 15;
-  document.getElementById('setFree').value = c.free_shipping_min ?? 150;
+  document.getElementById('setFree').value = c.free_shipping_min ?? 120;
   document.getElementById('setSignoff').value = c.email_signoff || '';
   document.getElementById('setCompany').value = c.company_name || '';
   document.getElementById('setSsm').value = c.ssm_no || '';

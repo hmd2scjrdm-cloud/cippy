@@ -4,7 +4,7 @@
 export const DEFAULT_SITE_CONFIG = {
   shipping_west: 10,
   shipping_east: 15,
-  free_shipping_min: 150,
+  free_shipping_min: 120,
   company_name: "",
   ssm_no: "",
   company_address: "",

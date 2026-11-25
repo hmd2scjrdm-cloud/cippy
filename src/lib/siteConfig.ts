@@ -8,7 +8,7 @@ export interface SiteConfig {
   freeShippingMin: number;
 }
 
-const DEFAULTS: SiteConfig = { shippingWest: 10, shippingEast: 15, freeShippingMin: 150 };
+const DEFAULTS: SiteConfig = { shippingWest: 10, shippingEast: 15, freeShippingMin: 120 };
 
 let current: SiteConfig = DEFAULTS;
 const listeners = new Set<() => void>();
